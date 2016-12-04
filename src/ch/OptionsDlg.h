@@ -31,7 +31,7 @@ class COptionsDlg : public ictranslate::CLanguageDialog
 public:
 	explicit COptionsDlg(CWnd* pParent = nullptr);   // standard constructor
 
-	virtual void OnLanguageChanged();
+	void OnLanguageChanged() override;
 
 	void SendClosingNotify();
 
@@ -40,7 +40,7 @@ public:
 	friend void RecentPropertyCallbackProc(LPVOID lpParam, int iParam, CPtrList* pList, int iIndex);
 
 protected:
-	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
+	void DoDataExchange(CDataExchange* pDX) override;    // DDX/DDV support
 
 private:
 	void FillPropertyList();
@@ -53,9 +53,9 @@ private:
 	CString MakeCompoundString(UINT uiBase, int iCount, LPCTSTR lpszSeparator);
 
 	// Generated message map functions
-	virtual BOOL OnInitDialog();
-	virtual void OnOK();
-	virtual void OnCancel();
+	BOOL OnInitDialog() override;
+	void OnOK() override;
+	void OnCancel() override;
 	afx_msg void OnApplyButton();
 
 	DECLARE_MESSAGE_MAP()

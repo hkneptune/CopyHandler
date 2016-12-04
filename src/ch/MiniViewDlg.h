@@ -68,15 +68,15 @@ public:
 	void RefreshStatus();
 	void RecalcSize(int nHeight, bool bInitial);
 
-	virtual UINT GetLanguageUpdateOptions() { return LDF_NODIALOGSIZE; };
-	virtual void OnLanguageChanged();
+	UINT GetLanguageUpdateOptions() override { return LDF_NODIALOGSIZE; };
+	void OnLanguageChanged() override;
 
 protected:
-	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
-	virtual LRESULT WindowProc(UINT message, WPARAM wParam, LPARAM lParam);
+	void DoDataExchange(CDataExchange* pDX) override;    // DDX/DDV support
+	LRESULT WindowProc(UINT message, WPARAM wParam, LPARAM lParam) override;
 
 	afx_msg HBRUSH OnCtlColor(CDC*, CWnd*, UINT);
-	virtual BOOL OnInitDialog();
+	BOOL OnInitDialog() override;
 	afx_msg void OnTimer(UINT_PTR nIDEvent);
 	afx_msg void OnSelchangeProgressList();
 	afx_msg void OnNcLButtonDown(UINT nHitTest, CPoint point);

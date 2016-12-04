@@ -36,11 +36,11 @@ public:
 
 // Overrides
 protected:
-	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
+	void DoDataExchange(CDataExchange* pDX) override;    // DDX/DDV support
 
 // Implementation
 protected:
-	virtual void OnLanguageChanged();
+	void OnLanguageChanged() override;
 
 	void UpdateFilesListCtrlHeaderWidth();
 
@@ -55,12 +55,12 @@ protected:
 	void UpdateInternalTaskDefinition();
 
 	// Generated message map functions
-	virtual BOOL OnInitDialog();
+	BOOL OnInitDialog() override;
 	afx_msg void OnAddDirectoryButton();
 	afx_msg void OnAddFilesButton();
 	afx_msg void OnRemoveButton();
 	afx_msg void OnBrowseButton();
-	virtual void OnOK();
+	void OnOK() override;
 	afx_msg void OnChangebufferButton();
 	afx_msg void OnAddfilterButton();
 	afx_msg void OnRemovefilterButton();

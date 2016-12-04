@@ -38,9 +38,9 @@ public:
 	// ClassWizard generated virtual function overrides
 	//{{AFX_VIRTUAL(CThemedButton)
 	public:
-	virtual void DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct);
+	void DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct) override;
 	protected:
-	virtual LRESULT WindowProc(UINT message, WPARAM wParam, LPARAM lParam);
+	LRESULT WindowProc(UINT message, WPARAM wParam, LPARAM lParam) override;
 	//}}AFX_VIRTUAL
 
 // Implementation

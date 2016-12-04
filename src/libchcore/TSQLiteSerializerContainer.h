@@ -40,13 +40,13 @@ namespace chcore
 		TSQLiteSerializerContainer(const TString& strName, const sqlite::TSQLiteDatabasePtr& spDB, TPlainStringPool& poolStrings);
 		virtual ~TSQLiteSerializerContainer();
 
-		virtual IColumnsDefinition& GetColumnsDefinition();
+		IColumnsDefinition& GetColumnsDefinition() override;
 
-		virtual ISerializerRowData& GetRow(object_id_t oidRowID, bool bMarkAsAdded);
-		virtual void DeleteRow(object_id_t oidRowID);
-		virtual void DeleteRows(const TRemovedObjects& setObjects);
+		ISerializerRowData& GetRow(object_id_t oidRowID, bool bMarkAsAdded) override;
+		void DeleteRow(object_id_t oidRowID) override;
+		void DeleteRows(const TRemovedObjects& setObjects) override;
 
-		virtual ISerializerRowReaderPtr GetRowReader();
+		ISerializerRowReaderPtr GetRowReader() override;
 
 		void Flush();
 

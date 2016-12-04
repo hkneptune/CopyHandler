@@ -31,7 +31,7 @@ namespace chcore
 		TSQLiteTaskSchema();
 		virtual ~TSQLiteTaskSchema();
 
-		virtual void Setup(const sqlite::TSQLiteDatabasePtr& spDatabase);
+		void Setup(const sqlite::TSQLiteDatabasePtr& spDatabase) override;
 
 	private:
 		void CreateNewDatabase(const sqlite::TSQLiteDatabasePtr& spDatabase, TSerializerVersion &tVersion);

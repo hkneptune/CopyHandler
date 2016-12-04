@@ -28,15 +28,15 @@ public:
 
 	void UpdateProgramVersion();
 
-	virtual void OnLanguageChanged();
-	virtual BOOL OnTooltipText(UINT uiID, TOOLTIPTEXT* pTip);
+	void OnLanguageChanged() override;
+	BOOL OnTooltipText(UINT uiID, TOOLTIPTEXT* pTip) override;
 
 protected:
 	static bool m_bLock;				// locker
 
 // Implementation
 protected:
-	virtual BOOL OnInitDialog();
+	BOOL OnInitDialog() override;
 
 	DECLARE_MESSAGE_MAP()
 };

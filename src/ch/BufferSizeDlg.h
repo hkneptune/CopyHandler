@@ -32,10 +32,10 @@ public:
 	const chcore::TBufferSizes& GetBufferSizes() const { return m_bsSizes; }
 
 protected:
-	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
-	virtual void OnLanguageChanged();
-	virtual BOOL OnInitDialog();
-	virtual void OnOK();
+	void DoDataExchange(CDataExchange* pDX) override;    // DDX/DDV support
+	void OnLanguageChanged() override;
+	BOOL OnInitDialog() override;
+	void OnOK() override;
 	void OnOnlydefaultCheck();
 
 	void SetLANSize(UINT uiSize);

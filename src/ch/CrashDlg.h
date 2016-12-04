@@ -28,10 +28,10 @@ public:
 	CCrashDlg(bool bResult, PCTSTR pszFilename, CWnd* pParent = nullptr);   // standard constructor
 	virtual ~CCrashDlg();
 
-	virtual BOOL OnInitDialog();
+	BOOL OnInitDialog() override;
 
 protected:
-	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
+	void DoDataExchange(CDataExchange* pDX) override;    // DDX/DDV support
 
 	DECLARE_MESSAGE_MAP()
 

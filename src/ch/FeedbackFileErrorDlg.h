@@ -44,7 +44,7 @@ public:
 	CString m_strSrcPath;
 	CString m_strDstPath;
 	unsigned long m_ulSysError;
-	virtual BOOL OnInitDialog();
+	BOOL OnInitDialog() override;
 };
 
 #endif

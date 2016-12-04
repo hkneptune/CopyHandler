@@ -31,14 +31,14 @@ namespace chcore
 		TSQLiteColumnsDefinition();
 		virtual ~TSQLiteColumnsDefinition();
 
-		virtual size_t AddColumn(const TString& strColumnName, ETypes eColType);
-		virtual void Clear();
+		size_t AddColumn(const TString& strColumnName, ETypes eColType) override;
+		void Clear() override;
 
-		virtual size_t GetColumnIndex(const wchar_t* strColumnName);
+		size_t GetColumnIndex(const wchar_t* strColumnName) override;
 		virtual ETypes GetColumnType(size_t stIndex) const;
-		virtual const TString& GetColumnName(size_t stIndex) const;
-		virtual size_t GetCount() const;
-		virtual bool IsEmpty() const;
+		const TString& GetColumnName(size_t stIndex) const override;
+		size_t GetCount() const override;
+		bool IsEmpty() const override;
 
 		virtual TString GetCommaSeparatedColumns() const;
 

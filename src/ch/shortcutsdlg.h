@@ -29,14 +29,14 @@ public:
 	explicit CShortcutsDlg(CWnd* pParent = nullptr);   // standard constructor
 
 protected:
-	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
+	void DoDataExchange(CDataExchange* pDX) override;    // DDX/DDV support
 
 protected:
 	void UpdateComboIcon();
 	void SetComboPath(LPCTSTR lpszPath);
 
 	// Generated message map functions
-	virtual BOOL OnInitDialog();
+	BOOL OnInitDialog() override;
 	afx_msg void OnItemchangedShortcutList(NMHDR* pNMHDR, LRESULT* pResult);
 	afx_msg void OnEditchangePathComboboxex();
 	afx_msg void OnAddButton();

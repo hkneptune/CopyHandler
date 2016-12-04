@@ -27,7 +27,7 @@ public:
 	CFeedbackReplaceDlg(const chcore::TFileInfo& spSrcFile, const chcore::TFileInfo& spDstFile, CWnd* pParent = nullptr);   // standard constructor
 	virtual ~CFeedbackReplaceDlg();
 
-	virtual BOOL OnInitDialog();
+	BOOL OnInitDialog() override;
 
 	bool IsApplyToAllItemsChecked() const;
 

@@ -106,8 +106,8 @@ public:
 	// ClassWizard generated virtual function overrides
 	//{{AFX_VIRTUAL(CDirTreeCtrl)
 	protected:
-	virtual void PreSubclassWindow();
-	virtual LRESULT WindowProc(UINT message, WPARAM wParam, LPARAM lParam);
+	void PreSubclassWindow() override;
+	LRESULT WindowProc(UINT message, WPARAM wParam, LPARAM lParam) override;
 	//}}AFX_VIRTUAL
 
 	// Implementation

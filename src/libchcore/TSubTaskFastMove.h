@@ -39,14 +39,14 @@ namespace chcore
 		explicit TSubTaskFastMove(TSubTaskContext& rContext);
 		virtual ~TSubTaskFastMove();
 
-		virtual void Reset();
+		void Reset() override;
 
 		virtual void InitBeforeExec() override;
 		virtual ESubOperationResult Exec(const IFeedbackHandlerPtr& spFeedbackHandler) override;
 		virtual ESubOperationType GetSubOperationType() const override { return eSubOperation_FastMove; }
 
-		virtual void Store(const ISerializerPtr& spSerializer) const;
-		virtual void Load(const ISerializerPtr& spSerializer);
+		void Store(const ISerializerPtr& spSerializer) const override;
+		void Load(const ISerializerPtr& spSerializer) override;
 
 		void InitColumns(const ISerializerContainerPtr& spContainer) const;
 

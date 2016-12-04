@@ -29,7 +29,7 @@ namespace chcore
 	public:
 		TTimestampProviderTickCount();
 
-		virtual unsigned long long GetCurrentTimestamp() const;
+		unsigned long long GetCurrentTimestamp() const override;
 
 	private:
 		mutable unsigned long long m_ullTimestampAdjustment;

@@ -29,7 +29,7 @@ public:
 protected:
 	afx_msg void OnDropFiles(HDROP hDrop);
 
-	virtual void PreSubclassWindow();
+	void PreSubclassWindow() override;
 
 private:
 	DECLARE_MESSAGE_MAP();

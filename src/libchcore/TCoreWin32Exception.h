@@ -30,8 +30,8 @@ namespace chcore
 
 		DWORD GetWin32ErrorCode() const { return m_dwWin32ErrorCode; }
 
-		virtual void GetErrorInfo(wchar_t* pszBuffer, size_t stMaxBuffer) const;
-		virtual void GetDetailedErrorInfo(wchar_t* pszBuffer, size_t stMaxBuffer) const;
+		void GetErrorInfo(wchar_t* pszBuffer, size_t stMaxBuffer) const override;
+		void GetDetailedErrorInfo(wchar_t* pszBuffer, size_t stMaxBuffer) const override;
 
 	protected:
 		DWORD m_dwWin32ErrorCode;

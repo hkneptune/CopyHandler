@@ -49,9 +49,9 @@ namespace chcore
 		virtual void RestoreDefaults() override;
 
 		// serialization
-		void Store(const ISerializerContainerPtr& spContainer) const;
+		void Store(const ISerializerContainerPtr& spContainer) const override;
 		static void InitColumns(const ISerializerContainerPtr& spContainer);
-		void Load(const ISerializerContainerPtr& spContainer);
+		void Load(const ISerializerContainerPtr& spContainer) override;
 
 		virtual DWORD GetRetryInterval() const override;
 

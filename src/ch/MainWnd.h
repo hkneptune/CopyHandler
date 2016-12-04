@@ -39,7 +39,7 @@ public:
 	BOOL Create();
 
 protected:
-	virtual LRESULT WindowProc(UINT message, WPARAM wParam, LPARAM lParam);
+	LRESULT WindowProc(UINT message, WPARAM wParam, LPARAM lParam) override;
 
 	void PrepareDragAndDropMenuItems(TShellExtMenuConfig &cfgShellExt) const;
 	void PrepareNormalMenuItems(TShellExtMenuConfig &cfgShellExt) const;

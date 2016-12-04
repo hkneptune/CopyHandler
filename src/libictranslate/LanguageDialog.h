@@ -189,7 +189,7 @@ public:
 	static void SetResManager(CResourceManager* prm) { m_prm=prm; };
 
 	// creation
-	virtual INT_PTR DoModal();
+	INT_PTR DoModal() override;
 	virtual BOOL Create();
 
 	void MapRect(RECT* pRect);
@@ -212,11 +212,11 @@ protected:
 	void Cleanup();
 
 	virtual BOOL OnTooltipText(UINT /*uiID*/, TOOLTIPTEXT* /*pTip*/) { return FALSE; };
-	virtual BOOL OnInitDialog();
-	virtual void OnCancel();
-	virtual void OnOK();
-	virtual void PostNcDestroy();
-	virtual LRESULT WindowProc(UINT message, WPARAM wParam, LPARAM lParam);
+	BOOL OnInitDialog() override;
+	void OnCancel() override;
+	void OnOK() override;
+	void PostNcDestroy() override;
+	LRESULT WindowProc(UINT message, WPARAM wParam, LPARAM lParam) override;
 
 	DECLARE_MESSAGE_MAP()
 private:

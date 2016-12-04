@@ -55,11 +55,11 @@ public:
 	void EnableControls(bool bEnable=true);
 
 protected:
-	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
-	virtual BOOL OnCommand(WPARAM wParam, LPARAM lParam);
-	virtual LRESULT WindowProc(UINT message, WPARAM wParam, LPARAM lParam);
+	void DoDataExchange(CDataExchange* pDX) override;    // DDX/DDV support
+	BOOL OnCommand(WPARAM wParam, LPARAM lParam) override;
+	LRESULT WindowProc(UINT message, WPARAM wParam, LPARAM lParam) override;
 
-	virtual void OnLanguageChanged();
+	void OnLanguageChanged() override;
 
 	void PrepareResizableControls();
 	CString GetStatusString(const chcore::TTaskStatsSnapshotPtr& spTaskStats);
@@ -80,7 +80,7 @@ protected:
 	CString GetSpeedString(double dSizeSpeed, double dAvgSizeSpeed, double dCountSpeed, double dAvgCountSpeed) const;
 	void SetWindowTitle(PCTSTR pszText);
 
-	virtual BOOL OnInitDialog();
+	BOOL OnInitDialog() override;
 
 	void SelectInitialTask();
 
@@ -99,7 +99,7 @@ protected:
 	afx_msg void OnRemoveFinishedButton();
 	afx_msg void OnKeydownStatusList(NMHDR* pNMHDR, LRESULT* pResult);
 	afx_msg void OnSelectionChanged(NMHDR* /*pNMHDR*/, LRESULT* /*pResult*/);
-	virtual void OnCancel();
+	void OnCancel() override;
 	afx_msg void OnShowLogButton();
 	afx_msg void OnStickButton();
 	afx_msg void OnResumeButton();

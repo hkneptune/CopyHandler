@@ -35,20 +35,20 @@ namespace chcore
 		TSQLiteSerializerRowReader(const sqlite::TSQLiteDatabasePtr& spDatabase, TSQLiteColumnsDefinition& rColumns, const TString& strContainerName);
 		virtual ~TSQLiteSerializerRowReader();
 
-		virtual bool Next();
+		bool Next() override;
 
-		virtual void GetValue(const TString& strColName, bool& bValue);
-		virtual void GetValue(const TString& strColName, short& iValue);
-		virtual void GetValue(const TString& strColName, unsigned short& uiValue);
-		virtual void GetValue(const TString& strColName, int& iValue);
-		virtual void GetValue(const TString& strColName, unsigned int& uiValue);
-		virtual void GetValue(const TString& strColName, long& lValue);
-		virtual void GetValue(const TString& strColName, unsigned long& ulValue);
-		virtual void GetValue(const TString& strColName, long long& llValue);
-		virtual void GetValue(const TString& strColName, unsigned long long& ullValue);
-		virtual void GetValue(const TString& strColName, double& dValue);
-		virtual void GetValue(const TString& strColName, TString& strValue);
-		virtual void GetValue(const TString& strColName, TSmartPath& pathValue);
+		void GetValue(const TString& strColName, bool& bValue) override;
+		void GetValue(const TString& strColName, short& iValue) override;
+		void GetValue(const TString& strColName, unsigned short& uiValue) override;
+		void GetValue(const TString& strColName, int& iValue) override;
+		void GetValue(const TString& strColName, unsigned int& uiValue) override;
+		void GetValue(const TString& strColName, long& lValue) override;
+		void GetValue(const TString& strColName, unsigned long& ulValue) override;
+		void GetValue(const TString& strColName, long long& llValue) override;
+		void GetValue(const TString& strColName, unsigned long long& ullValue) override;
+		void GetValue(const TString& strColName, double& dValue) override;
+		void GetValue(const TString& strColName, TString& strValue) override;
+		void GetValue(const TString& strColName, TSmartPath& pathValue) override;
 
 	private:
 		int GetColumnIndex(const TString& strColName) const;

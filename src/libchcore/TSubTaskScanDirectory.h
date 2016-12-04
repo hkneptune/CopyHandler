@@ -41,16 +41,16 @@ namespace chcore
 		explicit TSubTaskScanDirectories(TSubTaskContext& rContext);
 		virtual ~TSubTaskScanDirectories();
 
-		virtual void Reset();
+		void Reset() override;
 
 		virtual void InitBeforeExec() override;
 		virtual ESubOperationResult Exec(const IFeedbackHandlerPtr& spFeedbackHandler) override;
 		virtual ESubOperationType GetSubOperationType() const override { return eSubOperation_Scanning; }
 
-		virtual void Store(const ISerializerPtr& spSerializer) const;
-		virtual void Load(const ISerializerPtr& spSerializer);
+		void Store(const ISerializerPtr& spSerializer) const override;
+		void Load(const ISerializerPtr& spSerializer) override;
 
-		virtual void GetStatsSnapshot(TSubTaskStatsSnapshotPtr& spStats) const;
+		void GetStatsSnapshot(TSubTaskStatsSnapshotPtr& spStats) const override;
 
 	private:
 		int ScanDirectory(TSmartPath pathDirName, const TBasePathDataPtr& spBasePathData,

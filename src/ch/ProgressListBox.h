@@ -56,7 +56,7 @@ protected:
 	// ClassWizard generated virtual function overrides
 	//{{AFX_VIRTUAL(CProgressListBox)
 public:
-	virtual void DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct);
+	void DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct) override;
 	//}}AFX_VIRTUAL
 
 // Implementation

@@ -37,10 +37,10 @@ namespace chcore
 		TSQLiteSerializer(const TSmartPath& pathDB, const ISerializerSchemaPtr& spSchema);
 		virtual ~TSQLiteSerializer();
 
-		virtual TSmartPath GetLocation() const;
+		TSmartPath GetLocation() const override;
 
-		virtual ISerializerContainerPtr GetContainer(const TString& strContainerName);
-		virtual void Flush();
+		ISerializerContainerPtr GetContainer(const TString& strContainerName) override;
+		void Flush() override;
 		void SetupDBOptions();
 
 	private:

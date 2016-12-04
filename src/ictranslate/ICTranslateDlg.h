@@ -30,7 +30,7 @@ public:
 	explicit CICTranslateDlg(CWnd* pParent = nullptr);	// standard constructor
 
 // Dialog Data
-	virtual BOOL PreTranslateMessage(MSG* pMsg);
+	BOOL PreTranslateMessage(MSG* pMsg) override;
 	afx_msg void OnFileOpenBaseTranslation();
 	afx_msg void OnFileOpenYourTranslation();
 	afx_msg void OnItemChangedSrcDataList(NMHDR *pNMHDR, LRESULT *pResult);
@@ -52,9 +52,9 @@ public:
 	afx_msg void OnFileSaveTranslation();
 
 protected:
-	virtual void DoDataExchange(CDataExchange* pDX);	// DDX/DDV support
-	virtual BOOL OnInitDialog();
-	virtual void OnCancel();
+	void DoDataExchange(CDataExchange* pDX) override;	// DDX/DDV support
+	BOOL OnInitDialog() override;
+	void OnCancel() override;
 	afx_msg void OnSysCommand(UINT nID, LPARAM lParam);
 	afx_msg void OnPaint();
 	afx_msg HCURSOR OnQueryDragIcon();

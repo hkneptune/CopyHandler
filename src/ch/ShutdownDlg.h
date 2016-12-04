@@ -32,8 +32,8 @@ public:
 private:
 	void FormatTimeString(int iTime, CString* pstrData);
 
-	virtual BOOL OnInitDialog();
-	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
+	BOOL OnInitDialog() override;
+	void DoDataExchange(CDataExchange* pDX) override;    // DDX/DDV support
 
 	afx_msg void OnTimer(UINT_PTR nIDEvent);
 

@@ -25,7 +25,7 @@ public:
 	CUpdaterDlg(bool bBackgroundMode, CWnd* pParent = nullptr);   // standard constructor
 	virtual ~CUpdaterDlg();
 
-	virtual BOOL OnInitDialog();
+	BOOL OnInitDialog() override;
 
 	void CheckForUpdates();
 
@@ -35,7 +35,7 @@ public:
 	afx_msg void OnSelchangeChannelCombo();
 
 protected:
-	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
+	void DoDataExchange(CDataExchange* pDX) override;    // DDX/DDV support
 
 	DECLARE_MESSAGE_MAP()
 

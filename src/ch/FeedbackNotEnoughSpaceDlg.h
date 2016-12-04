@@ -31,7 +31,7 @@ public:
 
 // Overrides
 protected:
-	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
+	void DoDataExchange(CDataExchange* pDX) override;    // DDX/DDV support
 
 // Implementation
 public:

@@ -44,31 +44,31 @@ namespace chcore
 
 		TSQLiteSerializerRowData& operator=(const TSQLiteSerializerRowData& rSrc);
 
-		virtual ISerializerRowData& SetValue(size_t stColIndex, bool bValue);
-		virtual ISerializerRowData& SetValue(size_t stColIndex, short iValue);
-		virtual ISerializerRowData& SetValue(size_t stColIndex, unsigned short uiValue);
-		virtual ISerializerRowData& SetValue(size_t stColIndex, int iValue);
-		virtual ISerializerRowData& SetValue(size_t stColIndex, unsigned int uiValue);
-		virtual ISerializerRowData& SetValue(size_t stColIndex, long lValue);
-		virtual ISerializerRowData& SetValue(size_t stColIndex, unsigned long ulValue);
-		virtual ISerializerRowData& SetValue(size_t stColIndex, long long llValue);
-		virtual ISerializerRowData& SetValue(size_t stColIndex, unsigned long long llValue);
-		virtual ISerializerRowData& SetValue(size_t stColIndex, double dValue);
-		virtual ISerializerRowData& SetValue(size_t stColIndex, const TString& strValue);
-		virtual ISerializerRowData& SetValue(size_t stColIndex, const TSmartPath& pathValue);
+		ISerializerRowData& SetValue(size_t stColIndex, bool bValue) override;
+		ISerializerRowData& SetValue(size_t stColIndex, short iValue) override;
+		ISerializerRowData& SetValue(size_t stColIndex, unsigned short uiValue) override;
+		ISerializerRowData& SetValue(size_t stColIndex, int iValue) override;
+		ISerializerRowData& SetValue(size_t stColIndex, unsigned int uiValue) override;
+		ISerializerRowData& SetValue(size_t stColIndex, long lValue) override;
+		ISerializerRowData& SetValue(size_t stColIndex, unsigned long ulValue) override;
+		ISerializerRowData& SetValue(size_t stColIndex, long long llValue) override;
+		ISerializerRowData& SetValue(size_t stColIndex, unsigned long long llValue) override;
+		ISerializerRowData& SetValue(size_t stColIndex, double dValue) override;
+		ISerializerRowData& SetValue(size_t stColIndex, const TString& strValue) override;
+		ISerializerRowData& SetValue(size_t stColIndex, const TSmartPath& pathValue) override;
 
-		virtual ISerializerRowData& SetValue(const wchar_t* strColumnName, bool bValue);
-		virtual ISerializerRowData& SetValue(const wchar_t* strColumnName, short iValue);
-		virtual ISerializerRowData& SetValue(const wchar_t* strColumnName, unsigned short uiValue);
-		virtual ISerializerRowData& SetValue(const wchar_t* strColumnName, int iValue);
-		virtual ISerializerRowData& SetValue(const wchar_t* strColumnName, unsigned int uiValue);
-		virtual ISerializerRowData& SetValue(const wchar_t* strColumnName, long lValue);
-		virtual ISerializerRowData& SetValue(const wchar_t* strColumnName, unsigned long ulValue);
-		virtual ISerializerRowData& SetValue(const wchar_t* strColumnName, long long llValue);
-		virtual ISerializerRowData& SetValue(const wchar_t* strColumnName, unsigned long long llValue);
-		virtual ISerializerRowData& SetValue(const wchar_t* strColumnName, double dValue);
-		virtual ISerializerRowData& SetValue(const wchar_t* strColumnName, const TString& strValue);
-		virtual ISerializerRowData& SetValue(const wchar_t* strColumnName, const TSmartPath& pathValue);
+		ISerializerRowData& SetValue(const wchar_t* strColumnName, bool bValue) override;
+		ISerializerRowData& SetValue(const wchar_t* strColumnName, short iValue) override;
+		ISerializerRowData& SetValue(const wchar_t* strColumnName, unsigned short uiValue) override;
+		ISerializerRowData& SetValue(const wchar_t* strColumnName, int iValue) override;
+		ISerializerRowData& SetValue(const wchar_t* strColumnName, unsigned int uiValue) override;
+		ISerializerRowData& SetValue(const wchar_t* strColumnName, long lValue) override;
+		ISerializerRowData& SetValue(const wchar_t* strColumnName, unsigned long ulValue) override;
+		ISerializerRowData& SetValue(const wchar_t* strColumnName, long long llValue) override;
+		ISerializerRowData& SetValue(const wchar_t* strColumnName, unsigned long long llValue) override;
+		ISerializerRowData& SetValue(const wchar_t* strColumnName, double dValue) override;
+		ISerializerRowData& SetValue(const wchar_t* strColumnName, const TString& strValue) override;
+		ISerializerRowData& SetValue(const wchar_t* strColumnName, const TSmartPath& pathValue) override;
 
 		TString GetQuery(const TString& strContainerName) const;
 		unsigned long long GetChangeIdentification() const;

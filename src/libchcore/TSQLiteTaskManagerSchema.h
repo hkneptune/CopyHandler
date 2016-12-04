@@ -30,7 +30,7 @@ namespace chcore
 		TSQLiteTaskManagerSchema();
 		virtual ~TSQLiteTaskManagerSchema();
 
-		virtual void Setup(const sqlite::TSQLiteDatabasePtr& spDatabase);
+		void Setup(const sqlite::TSQLiteDatabasePtr& spDatabase) override;
 	};
 
 	typedef std::shared_ptr<TSQLiteTaskManagerSchema> TTaskManagerSchemaPtr;

@@ -48,13 +48,13 @@ public:
 	virtual ~CFolderDialog();
 
 public:
-	virtual INT_PTR DoModal();
+	INT_PTR DoModal() override;
 
 protected:
-	virtual LRESULT WindowProc(UINT message, WPARAM wParam, LPARAM lParam);
+	LRESULT WindowProc(UINT message, WPARAM wParam, LPARAM lParam) override;
 
 public:
-	virtual BOOL OnTooltipText(UINT uiID, TOOLTIPTEXT* pTip);
+	BOOL OnTooltipText(UINT uiID, TOOLTIPTEXT* pTip) override;
 
 	// structure used for passing parameters
 	struct BROWSEDATA
@@ -127,10 +127,10 @@ protected:
 	afx_msg void OnSelchangedFolderTree(NMHDR* pNMHDR, LRESULT* pResult);
 	afx_msg void OnGetInfoTipFolderTree(NMHDR* pNMHDR, LRESULT* pResult);
 	afx_msg void OnShortcutKeyDown(NMHDR* pNMHDR, LRESULT* pResult);
-	virtual BOOL OnInitDialog();
+	BOOL OnInitDialog() override;
 	afx_msg void OnNewfolderButton();
-	virtual void OnCancel();
-	virtual void OnOK();
+	void OnCancel() override;
+	void OnOK() override;
 	afx_msg void OnPathChanging();
 	afx_msg void OnIconsRadio();
 	afx_msg void OnSmalliconsRadio();

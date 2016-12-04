@@ -29,10 +29,10 @@ public:
 	explicit CRecentDlg(CWnd* pParent = nullptr);   // standard constructor
 
 protected:
-	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
+	void DoDataExchange(CDataExchange* pDX) override;    // DDX/DDV support
 
 protected:
-	virtual BOOL OnInitDialog();
+	BOOL OnInitDialog() override;
 	afx_msg void OnItemchangedRecentList(NMHDR* pNMHDR, LRESULT* pResult);
 	afx_msg void OnBrowseButton();
 	afx_msg void OnAddButton();

@@ -68,7 +68,7 @@ private:
 	void DrawTriangle(CDC* pDC, CRect Rect);
 
 public:
-	virtual void DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct );
+	void DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct ) override;
 	virtual void MeasureItem(LPMEASUREITEMSTRUCT /*lpMeasureItemStruct*/);
 
 protected:
@@ -177,8 +177,8 @@ public:
 	// ClassWizard generated virtual function overrides
 	//{{AFX_VIRTUAL(CPropertyListCtrl)
 	public:
-	virtual void DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct);
-	virtual void MeasureItem(LPMEASUREITEMSTRUCT /*lpMeasureItemStruct*/);
+	void DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct) override;
+	void MeasureItem(LPMEASUREITEMSTRUCT /*lpMeasureItemStruct*/) override;
 	//}}AFX_VIRTUAL
 
 // Implementation

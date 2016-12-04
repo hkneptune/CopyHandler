@@ -66,7 +66,7 @@ public:
 	// ClassWizard generated virtual function overrides
 	//{{AFX_VIRTUAL(CFilterDlg)
 	protected:
-	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
+	void DoDataExchange(CDataExchange* pDX) override;    // DDX/DDV support
 	//}}AFX_VIRTUAL
 
 	// Implementation
@@ -77,15 +77,15 @@ public:
 	CStringArray m_astrAddExcludeMask;
 
 protected:
-	virtual void OnLanguageChanged();
+	void OnLanguageChanged() override;
 	int GetMultiplier(int iIndex);
 	void EnableControls();
 	void SetSize1(unsigned __int64 ullSize);
 
 	// Generated message map functions
 	//{{AFX_MSG(CFilterDlg)
-	virtual BOOL OnInitDialog();
-	virtual void OnOK();
+	BOOL OnInitDialog() override;
+	void OnOK() override;
 	afx_msg void OnAttributesCheck();
 	afx_msg void OnDateCheck();
 	afx_msg void OnDate2Check();

@@ -41,26 +41,26 @@ public:
 	/** \name File operations */
 	/**@{*/
 	/// Reads the xml document from the specified file
-	virtual void read(const wchar_t* pszPath);
+	void read(const wchar_t* pszPath) override;
 	/// Processes the data from a given buffer
-	virtual void read_from_buffer(const wchar_t* pszBuffer, size_t stLen);
+	void read_from_buffer(const wchar_t* pszBuffer, size_t stLen) override;
 	/// Saves the internal data to a specified file as the xml document
-	virtual void save(const wchar_t* pszPath);
+	void save(const wchar_t* pszPath) override;
 	/**@}*/
 
 	/** \name Key and value handling */
 	/**@{*/
 	/// Searches for a specified key (given all the path to a specific string)
-	virtual void* find(const wchar_t* pszName);
+	void* find(const wchar_t* pszName) override;
 	/// Searches for the next string
-	virtual bool find_next(void* pFindHandle, PROPINFO& pi);
+	bool find_next(void* pFindHandle, PROPINFO& pi) override;
 	/// Closes the search operation
-	virtual void find_close(void* pFindHandle);
+	void find_close(void* pFindHandle) override;
 
 	/// Sets a value for a given key
-	virtual void set_value(const wchar_t* pszName, const wchar_t* pszValue, actions a=action_add);
+	void set_value(const wchar_t* pszName, const wchar_t* pszValue, actions a=action_add) override;
 	/// Clear values for a given property name
-	virtual void clear(const wchar_t* pszName);
+	void clear(const wchar_t* pszName) override;
 	/// Clears all entries
 	virtual void clear();
 	/**@}*/

@@ -46,18 +46,18 @@ namespace chcore
 	public:
 		explicit TSubTaskCopyMove(TSubTaskContext& tSubTaskContext);
 
-		virtual void Reset();
+		void Reset() override;
 
 		virtual void InitBeforeExec() override;
 		virtual ESubOperationResult Exec(const IFeedbackHandlerPtr& spFeedbackHandler) override;
 		virtual ESubOperationType GetSubOperationType() const override { return eSubOperation_Copying; }
 
-		virtual void Store(const ISerializerPtr& spSerializer) const;
-		virtual void Load(const ISerializerPtr& spSerializer);
+		void Store(const ISerializerPtr& spSerializer) const override;
+		void Load(const ISerializerPtr& spSerializer) override;
 
 		void InitColumns(const ISerializerContainerPtr& spContainer) const;
 
-		virtual void GetStatsSnapshot(TSubTaskStatsSnapshotPtr& rStats) const;
+		void GetStatsSnapshot(TSubTaskStatsSnapshotPtr& rStats) const override;
 
 	private:
 		TBufferSizes::EBufferType GetBufferIndex(const TBufferSizes& rBufferSizes, const TFileInfoPtr& spFileInfo);

@@ -54,14 +54,14 @@ public:
 	static INT_PTR MsgBox(const CString& strMessage, EButtonConfig eButtons, EIconConfig eIcon, const CString& strCheckboxText = CString(), bool* pbWasChecked = nullptr, CWnd* pParent = nullptr);
 
 protected:
-	virtual void DoDataExchange(CDataExchange* pDX);
-	virtual BOOL OnInitDialog();
+	void DoDataExchange(CDataExchange* pDX) override;
+	BOOL OnInitDialog() override;
 
 	void CalculateMinimumDlgSize();
 
 	void InitRichEdit();
 
-	virtual void OnCancel();
+	void OnCancel() override;
 	void OnGetMinMaxInfo(MINMAXINFO* lpMMI);
 
 	void InitializeControls();
