@@ -47,7 +47,7 @@ namespace chcore
 		bool PathExist(const TSmartPath& strPath) override;	// check for file or folder existence
 
 		void SetFileDirBasicInfo(const TSmartPath& pathFileDir, DWORD dwAttributes, const TFileTime& ftCreationTime, const TFileTime& ftLastAccessTime, const TFileTime& ftLastWriteTime) override;
-		virtual void SetAttributes(const TSmartPath& pathFileDir, DWORD dwAttributes) override;
+		void SetAttributes(const TSmartPath& pathFileDir, DWORD dwAttributes) override;
 
 		void CreateDirectory(const TSmartPath& pathDirectory, bool bCreateFullPath) override;
 		void RemoveDirectory(const TSmartPath& pathFile) override;

@@ -34,10 +34,10 @@ public:
 	CCopyHandlerApp();
 	~CCopyHandlerApp();
 
-	virtual BOOL InitInstance() override;
-	virtual int ExitInstance() override;
+	BOOL InitInstance() override;
+	int ExitInstance() override;
 
-	virtual void HtmlHelp(DWORD_PTR dwData, UINT nCmd) override;
+	void HtmlHelp(DWORD_PTR dwData, UINT nCmd) override;
 
 	PCTSTR GetHelpPath() const { return m_pszHelpFilePath; };
 

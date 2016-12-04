@@ -51,12 +51,12 @@ namespace chcore
 
 	protected:
 		// running/not running state
-		virtual void MarkAsRunning() override;
-		virtual void MarkAsNotRunning() override;
+		void MarkAsRunning() override;
+		void MarkAsNotRunning() override;
 
 		// time tracking
-		virtual void EnableTimeTracking() override;
-		virtual void DisableTimeTracking() override;
+		void EnableTimeTracking() override;
+		void DisableTimeTracking() override;
 
 #pragma warning(push)
 #pragma warning(disable: 4251)

@@ -114,12 +114,12 @@ namespace chcore
 		TSubTaskStatsInfo& operator=(const TSubTaskStatsInfo&) = delete;
 
 		// is running?
-		virtual void MarkAsRunning() override;
-		virtual void MarkAsNotRunning() override;
+		void MarkAsRunning() override;
+		void MarkAsNotRunning() override;
 
 		// time tracking
-		virtual void EnableTimeTracking() override;
-		virtual void DisableTimeTracking() override;
+		void EnableTimeTracking() override;
+		void DisableTimeTracking() override;
 
 		void UpdateTime(boost::upgrade_lock<boost::shared_mutex>& lock) const;
 

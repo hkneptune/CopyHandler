@@ -28,7 +28,7 @@ public:
 	CFeedbackHandlerFactory();
 	virtual ~CFeedbackHandlerFactory();
 
-	virtual chcore::IFeedbackHandlerPtr Create() override;
+	chcore::IFeedbackHandlerPtr Create() override;
 };
 
 typedef std::shared_ptr<CFeedbackHandlerFactory> CFeedbackHandlerFactoryPtr;

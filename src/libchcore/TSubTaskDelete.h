@@ -38,9 +38,9 @@ namespace chcore
 
 		void Reset() override;
 
-		virtual void InitBeforeExec() override;
-		virtual ESubOperationResult Exec(const IFeedbackHandlerPtr& spFeedbackHandler) override;
-		virtual ESubOperationType GetSubOperationType() const override { return eSubOperation_Deleting; }
+		void InitBeforeExec() override;
+		ESubOperationResult Exec(const IFeedbackHandlerPtr& spFeedbackHandler) override;
+		ESubOperationType GetSubOperationType() const override { return eSubOperation_Deleting; }
 
 		void Store(const ISerializerPtr& spSerializer) const override;
 		void Load(const ISerializerPtr& spSerializer) override;

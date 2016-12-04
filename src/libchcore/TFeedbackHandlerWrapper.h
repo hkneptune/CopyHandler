@@ -34,18 +34,18 @@ namespace chcore
 		TFeedbackHandlerWrapper(const TFeedbackHandlerWrapper&) = delete;
 		TFeedbackHandlerWrapper& operator=(const TFeedbackHandlerWrapper&) = delete;
 
-		virtual TFeedbackResult FileError(const TString& strSrcPath, const TString& strDstPath, EFileError eFileError, unsigned long ulError) override;
-		virtual TFeedbackResult FileAlreadyExists(const TFileInfo& spSrcFileInfo, const TFileInfo& spDstFileInfo) override;
-		virtual TFeedbackResult NotEnoughSpace(const TString& strSrcPath, const TString& strDstPath, unsigned long long ullRequiredSize) override;
-		virtual TFeedbackResult OperationFinished() override;
-		virtual TFeedbackResult OperationError() override;
+		TFeedbackResult FileError(const TString& strSrcPath, const TString& strDstPath, EFileError eFileError, unsigned long ulError) override;
+		TFeedbackResult FileAlreadyExists(const TFileInfo& spSrcFileInfo, const TFileInfo& spDstFileInfo) override;
+		TFeedbackResult NotEnoughSpace(const TString& strSrcPath, const TString& strDstPath, unsigned long long ullRequiredSize) override;
+		TFeedbackResult OperationFinished() override;
+		TFeedbackResult OperationError() override;
 
-		virtual void RestoreDefaults() override;
+		void RestoreDefaults() override;
 
-		virtual void Store(const ISerializerContainerPtr& spContainer) const override;
-		virtual void Load(const ISerializerContainerPtr& spContainer) override;
+		void Store(const ISerializerContainerPtr& spContainer) const override;
+		void Load(const ISerializerContainerPtr& spContainer) override;
 
-		virtual DWORD GetRetryInterval() const override;
+		DWORD GetRetryInterval() const override;
 
 	private:
 		IFeedbackHandlerPtr m_spFeedbackHandler;

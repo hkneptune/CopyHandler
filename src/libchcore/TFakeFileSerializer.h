@@ -32,9 +32,9 @@ namespace chcore
 		TFakeFileSerializer(const TFakeFileSerializer& rSrc) = delete;
 		TFakeFileSerializer& operator=(const TFakeFileSerializer& rSrc) = delete;
 
-		virtual TSmartPath GetLocation() const override;
-		virtual ISerializerContainerPtr GetContainer(const TString& strContainerName) override;
-		virtual void Flush() override;
+		TSmartPath GetLocation() const override;
+		ISerializerContainerPtr GetContainer(const TString& strContainerName) override;
+		void Flush() override;
 
 	private:
 		TSmartPath m_pathFileSerializer;

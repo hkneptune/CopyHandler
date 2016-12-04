@@ -41,16 +41,16 @@ namespace chcore
 
 		void Reset() override;
 
-		virtual void InitBeforeExec() override;
-		virtual ESubOperationResult Exec(const IFeedbackHandlerPtr& spFeedbackHandler) override;
-		virtual ESubOperationType GetSubOperationType() const override { return eSubOperation_FastMove; }
+		void InitBeforeExec() override;
+		ESubOperationResult Exec(const IFeedbackHandlerPtr& spFeedbackHandler) override;
+		ESubOperationType GetSubOperationType() const override { return eSubOperation_FastMove; }
 
 		void Store(const ISerializerPtr& spSerializer) const override;
 		void Load(const ISerializerPtr& spSerializer) override;
 
 		void InitColumns(const ISerializerContainerPtr& spContainer) const;
 
-		virtual void GetStatsSnapshot(TSubTaskStatsSnapshotPtr& rStats) const override;
+		void GetStatsSnapshot(TSubTaskStatsSnapshotPtr& rStats) const override;
 
 	private:
 #pragma warning(push)

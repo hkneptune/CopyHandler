@@ -31,8 +31,8 @@ namespace chcore
 	public:
 		virtual ~TLocalFilesystemFind();
 
-		virtual bool FindNext(TFileInfoPtr& rspFileInfo) override;
-		virtual void Close() override;
+		bool FindNext(TFileInfoPtr& rspFileInfo) override;
+		void Close() override;
 
 	private:
 		TLocalFilesystemFind(const TSmartPath& pathDir, const TSmartPath& pathMask, const logger::TLogFileDataPtr& spLogFileData);

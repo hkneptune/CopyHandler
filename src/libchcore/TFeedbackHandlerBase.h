@@ -46,14 +46,14 @@ namespace chcore
 		bool HasNotEnoughSpacePermanentResponse(EFeedbackResult& rePermanentResult) const;
 
 		// resets the permanent status from all responses
-		virtual void RestoreDefaults() override;
+		void RestoreDefaults() override;
 
 		// serialization
 		void Store(const ISerializerContainerPtr& spContainer) const override;
 		static void InitColumns(const ISerializerContainerPtr& spContainer);
 		void Load(const ISerializerContainerPtr& spContainer) override;
 
-		virtual DWORD GetRetryInterval() const override;
+		DWORD GetRetryInterval() const override;
 
 	private:
 		enum EModifications

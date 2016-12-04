@@ -30,8 +30,8 @@ namespace chcore
 		explicit TSQLiteSerializerFactory(const TSmartPath& pathSerializeDir);
 		virtual ~TSQLiteSerializerFactory();
 
-		virtual ISerializerPtr CreateTaskManagerSerializer(bool bForceRecreate = false) override;
-		virtual ISerializerPtr CreateTaskSerializer(const TString& strNameHint = _T(""), bool bForceRecreate = false) override;
+		ISerializerPtr CreateTaskManagerSerializer(bool bForceRecreate = false) override;
+		ISerializerPtr CreateTaskSerializer(const TString& strNameHint = _T(""), bool bForceRecreate = false) override;
 
 	private:
 		TSmartPath m_pathSerializeDir;

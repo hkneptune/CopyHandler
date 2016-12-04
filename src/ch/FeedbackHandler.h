@@ -29,11 +29,11 @@ public:
 	CFeedbackHandler();
 	virtual ~CFeedbackHandler();
 
-	virtual chcore::TFeedbackResult FileError(const chcore::TString& strSrcPath, const chcore::TString& strDstPath, chcore::EFileError eFileError, unsigned long ulError) override;
-	virtual chcore::TFeedbackResult FileAlreadyExists(const chcore::TFileInfo& spSrcFileInfo, const chcore::TFileInfo& spDstFileInfo) override;
-	virtual chcore::TFeedbackResult NotEnoughSpace(const chcore::TString& strSrcPath, const chcore::TString& strDstPath, unsigned long long ullRequiredSize) override;
-	virtual chcore::TFeedbackResult OperationFinished() override;
-	virtual chcore::TFeedbackResult OperationError() override;
+	chcore::TFeedbackResult FileError(const chcore::TString& strSrcPath, const chcore::TString& strDstPath, chcore::EFileError eFileError, unsigned long ulError) override;
+	chcore::TFeedbackResult FileAlreadyExists(const chcore::TFileInfo& spSrcFileInfo, const chcore::TFileInfo& spDstFileInfo) override;
+	chcore::TFeedbackResult NotEnoughSpace(const chcore::TString& strSrcPath, const chcore::TString& strDstPath, unsigned long long ullRequiredSize) override;
+	chcore::TFeedbackResult OperationFinished() override;
+	chcore::TFeedbackResult OperationError() override;
 
 protected:
 	friend class CFeedbackHandlerFactory;
