@@ -22,7 +22,6 @@
 // ============================================================================
 #include "stdafx.h"
 #include "TSubTaskStatsSnapshot.h"
-#include <boost/numeric/conversion/cast.hpp>
 #include "MathFunctions.h"
 #include "TBufferSizes.h"
 #include "EngineConstants.h"
@@ -35,17 +34,17 @@ namespace chcore
 		m_bSubTaskIsRunning(false),
 		m_ullTotalSize(0),
 		m_ullProcessedSize(0),
+		m_dSizeSpeed(0),
 		m_fcTotalCount(0),
 		m_fcProcessedCount(0),
+		m_dCountSpeed(0),
+		m_ullCurrentItemTotalSize(0),
+		m_ullCurrentItemProcessedSize(0),
+		m_fcCurrentIndex(0),
+		m_eSubOperationType(eSubOperation_None),
 		m_iCurrentBufferIndex(TBufferSizes::eBuffer_Default),
 		m_strCurrentPath(0),
-		m_timeElapsed(0),
-		m_dSizeSpeed(0),
-		m_dCountSpeed(0),
-		m_ullCurrentItemProcessedSize(0),
-		m_ullCurrentItemTotalSize(0),
-		m_eSubOperationType(eSubOperation_None),
-		m_fcCurrentIndex(0)
+		m_timeElapsed(0)
 	{
 	}
 

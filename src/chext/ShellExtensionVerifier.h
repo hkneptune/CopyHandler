@@ -20,7 +20,6 @@
 #define __SHELLEXTENSIONVERIFIER_H__
 
 #include "chext.h"
-#include "../common/ipcstructs.h"
 
 class TShellExtMenuConfig;
 

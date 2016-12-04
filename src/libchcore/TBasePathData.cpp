@@ -45,11 +45,11 @@ namespace chcore
 	}
 
 	TBasePathData::TBasePathData(const TBasePathData& rEntry) :
+		m_setModifications(rEntry.m_setModifications),
 		m_oidObjectID(rEntry.m_oidObjectID),
 		m_pathSrc(m_setModifications, rEntry.m_pathSrc),
-		m_pathDst(m_setModifications, rEntry.m_pathDst),
 		m_bSkipFurtherProcessing(m_setModifications, rEntry.m_bSkipFurtherProcessing),
-		m_setModifications(rEntry.m_setModifications)
+		m_pathDst(m_setModifications, rEntry.m_pathDst)
 	{
 	}
 

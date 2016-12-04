@@ -21,7 +21,6 @@
 
 #include "stdafx.h"
 #include <afxwin.h>
-#include <afxdllx.h>
 
 #ifdef _DEBUG
 #define new DEBUG_NEW

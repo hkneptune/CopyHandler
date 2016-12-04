@@ -19,11 +19,10 @@
 #ifndef __TLOCALFILESYSTEMFILE_H__
 #define __TLOCALFILESYSTEMFILE_H__
 
-#include "libchcore.h"
 #include "TPath.h"
 #include "TOverlappedDataBuffer.h"
 #include "IFilesystemFile.h"
-#include "..\liblogger\TLogger.h"
+#include "../liblogger/TLogger.h"
 
 namespace chcore
 {

@@ -19,7 +19,6 @@
 #ifndef __TTASKBASEDATA_H__
 #define __TTASKBASEDATA_H__
 
-#include "libchcore.h"
 #include "ISerializerRowData.h"
 #include <bitset>
 #include "TSharedModificationTracker.h"

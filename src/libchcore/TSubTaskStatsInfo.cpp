@@ -28,6 +28,7 @@
 #include "ErrorCodes.h"
 #include "SerializerDataTypes.h"
 #include <boost/thread/locks.hpp>
+#include "IColumnsDefinition.h"
 
 namespace chcore
 {
@@ -35,22 +36,22 @@ namespace chcore
 	// class TSubTaskStatsInfo
 
 	TSubTaskStatsInfo::TSubTaskStatsInfo(ESubOperationType eSubTaskType) :
-		m_eSubOperationType(eSubTaskType),
 		m_bSubTaskIsRunning(m_setModifications, false),
 		m_ullTotalSize(m_setModifications, 0),
 		m_ullProcessedSize(m_setModifications, 0),
+		m_tSizeSpeed(m_setModifications, DefaultSpeedTrackTime, DefaultSpeedSampleTime),
 		m_fcTotalCount(m_setModifications, 0),
 		m_fcProcessedCount(m_setModifications, 0),
-		m_iCurrentBufferIndex(m_setModifications, 0),
-		m_strCurrentPath(m_setModifications),
-		m_tSizeSpeed(m_setModifications, DefaultSpeedTrackTime, DefaultSpeedSampleTime),
 		m_tCountSpeed(m_setModifications, DefaultSpeedTrackTime, DefaultSpeedSampleTime),
+		m_fcCurrentIndex(m_setModifications, 0),
 		m_ullCurrentItemProcessedSize(m_setModifications, 0),
 		m_ullCurrentItemTotalSize(m_setModifications, 0),
+		m_bCurrentItemSilentResume(m_setModifications, false),
 		m_tTimer(m_setModifications),
+		m_iCurrentBufferIndex(m_setModifications, 0),
+		m_strCurrentPath(m_setModifications),
 		m_bIsInitialized(m_setModifications, false),
-		m_fcCurrentIndex(m_setModifications, 0),
-		m_bCurrentItemSilentResume(m_setModifications, false)
+		m_eSubOperationType(eSubTaskType)
 	{
 		m_setModifications[eMod_Added] = true;
 	}

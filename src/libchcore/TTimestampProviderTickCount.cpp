@@ -22,8 +22,8 @@
 namespace chcore
 {
 	TTimestampProviderTickCount::TTimestampProviderTickCount() :
-		m_dwLastTimestamp(0),
-		m_ullTimestampAdjustment(0)
+		m_ullTimestampAdjustment(0),
+		m_dwLastTimestamp(0)
 	{
 	}
 

@@ -19,7 +19,6 @@
 #ifndef __TASK_H__
 #define __TASK_H__
 
-#include "libchcore.h"
 #include "TWorkerThreadController.h"
 #include "IFeedbackHandler.h"
 #include "TTaskDefinition.h"

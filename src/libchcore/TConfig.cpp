@@ -23,7 +23,6 @@
 #include "stdafx.h"
 #include "TConfig.h"
 #include <fstream>
-#include <iostream>
 #include <ios>
 #include "TConfigArray.h"
 
@@ -32,8 +31,6 @@
 	#include <boost/property_tree/xml_parser.hpp>
 #pragma warning(pop)
 
-#include <boost/algorithm/string/find.hpp>
-#include <deque>
 #include "TConfigNotifier.h"
 #include "ConfigNodeContainer.h"
 #include "ErrorCodes.h"

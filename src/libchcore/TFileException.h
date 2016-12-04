@@ -19,7 +19,6 @@
 #ifndef __TFILEWIN32EXCEPTION_H__
 #define __TFILEWIN32EXCEPTION_H__
 
-#include "libchcore.h"
 #include "ErrorCodes.h"
 #include "TPath.h"
 #include "TCoreException.h"
@@ -32,8 +31,8 @@ namespace chcore
 		TFileException(EGeneralErrors eErrorCode, DWORD dwNativeErrorCode, const TSmartPath& path, wchar_t* pszMsg,
 			const wchar_t* pszFile, size_t stLineNumber, const wchar_t* pszFunction);
 
-		virtual void GetErrorInfo(wchar_t* pszBuffer, size_t stMaxBuffer) const;
-		virtual void GetDetailedErrorInfo(wchar_t* pszBuffer, size_t stMaxBuffer) const;
+		void GetErrorInfo(wchar_t* pszBuffer, size_t stMaxBuffer) const override;
+		void GetDetailedErrorInfo(wchar_t* pszBuffer, size_t stMaxBuffer) const override;
 
 		const TSmartPath& GetPath() const { return m_path; }
 		DWORD GetNativeError() const { return m_dwNativeErrorCode; }

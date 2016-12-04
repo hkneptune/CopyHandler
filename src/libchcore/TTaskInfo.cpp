@@ -25,9 +25,9 @@
 namespace chcore
 {
 	TTaskInfoEntry::TTaskInfoEntry() :
-		m_iOrder(m_setModifications, 0),
+		m_oidObjectID(0),
 		m_pathSerializeLocation(m_setModifications),
-		m_oidObjectID(0)
+		m_iOrder(m_setModifications, 0)
 	{
 		m_setModifications[eMod_Added] = true;
 	}
@@ -43,10 +43,10 @@ namespace chcore
 
 	TTaskInfoEntry::TTaskInfoEntry(const TTaskInfoEntry& rSrc) :
 		m_oidObjectID(rSrc.m_oidObjectID),
+		m_setModifications(rSrc.m_setModifications),
 		m_pathSerializeLocation(m_setModifications, rSrc.m_pathSerializeLocation),
 		m_iOrder(m_setModifications, rSrc.m_iOrder),
-		m_spTask(rSrc.m_spTask),
-		m_setModifications(rSrc.m_setModifications)
+		m_spTask(rSrc.m_spTask)
 	{
 	}
 

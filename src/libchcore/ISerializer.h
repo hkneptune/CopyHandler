@@ -19,7 +19,6 @@
 #ifndef __ISERIALIZER_H__
 #define __ISERIALIZER_H__
 
-#include "libchcore.h"
 #include "TPath.h"
 #include "ISerializerContainer.h"
 

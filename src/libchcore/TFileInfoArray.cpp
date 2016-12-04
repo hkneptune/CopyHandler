@@ -19,7 +19,6 @@
 // File was originally based on FileInfo.cpp by Antonio Tejada Lacaci.
 // Almost everything has changed since then.
 #include "stdafx.h"
-#include <limits>
 #include "TFileInfoArray.h"
 #include "TFileInfo.h"
 #include "ISerializerContainer.h"

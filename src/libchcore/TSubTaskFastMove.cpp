@@ -30,13 +30,10 @@
 #include "TTaskLocalStats.h"
 #include "TFileInfo.h"
 #include <boost\lexical_cast.hpp>
-#include "TCoreException.h"
-#include "ErrorCodes.h"
 #include "TPathContainer.h"
 #include "TScopedRunningTimeTracker.h"
 #include "TFeedbackHandlerWrapper.h"
 #include "TBufferSizes.h"
-#include "TFileException.h"
 #include "TFilesystemFeedbackWrapper.h"
 #include "TDestinationPathProvider.h"
 

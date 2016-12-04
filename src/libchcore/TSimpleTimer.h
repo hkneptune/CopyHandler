@@ -19,7 +19,6 @@
 #ifndef __TSIMPLETIMER_H__
 #define __TSIMPLETIMER_H__
 
-#include "libchcore.h"
 #include "ITimestampProvider.h"
 
 namespace chcore

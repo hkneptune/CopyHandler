@@ -19,7 +19,6 @@
 #ifndef __TFILEFILTER_H__
 #define __TFILEFILTER_H__
 
-#include "libchcore.h"
 #include <atltime.h>
 #include "TDateTime.h"
 #include "TStringArray.h"

@@ -39,8 +39,8 @@ namespace chcore
 		}
 
 		TModificationTracker(const TModificationTracker<T>& rSrc) :
-			m_chModified(rSrc.m_chModified),
-			m_tValue(rSrc.m_tValue)
+			m_tValue(rSrc.m_tValue),
+			m_chModified(rSrc.m_chModified)
 		{
 		}
 

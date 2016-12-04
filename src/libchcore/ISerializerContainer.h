@@ -19,7 +19,6 @@
 #ifndef __ISERIALIZERCONTAINER_H__
 #define __ISERIALIZERCONTAINER_H__
 
-#include "libchcore.h"
 #include "IColumnsDefinition.h"
 #include "ISerializerRowReader.h"
 #include "SerializerDataTypes.h"

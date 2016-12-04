@@ -26,8 +26,8 @@
 #endif
 
 TShellExtensionClient::TShellExtensionClient() :
-	m_piShellExtControl(nullptr),
-	m_bInitialized(false)
+	m_bInitialized(false),
+	m_piShellExtControl(nullptr)
 {
 }
 

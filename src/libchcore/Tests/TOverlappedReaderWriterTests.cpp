@@ -1,8 +1,0 @@
-#include "stdafx.h"
-#include "gtest/gtest.h"
-#include "gmock/gmock.h"
-#include "../TOverlappedDataBuffer.h"
-#include "../TCoreException.h"
-#include "../../liblogger/TLogFileData.h"
-#include "../GTestMacros.h"
-#include "../TOverlappedMemoryPool.h"

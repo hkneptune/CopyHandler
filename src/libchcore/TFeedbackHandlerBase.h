@@ -19,7 +19,6 @@
 #ifndef __TFEEDBACKHANDLERBASE_H__
 #define __TFEEDBACKHANDLERBASE_H__
 
-#include "libchcore.h"
 #include "IFeedbackHandler.h"
 #include "ISerializerRowData.h"
 #include <bitset>

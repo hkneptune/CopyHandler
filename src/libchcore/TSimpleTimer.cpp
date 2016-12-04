@@ -25,8 +25,8 @@ namespace chcore
 	TSimpleTimer::TSimpleTimer(bool bAutostart, const ITimestampProviderPtr& spTimestampProvider) :
 		m_spTimestampProvider(spTimestampProvider),
 		m_bStarted(false),
-		m_ullLastTime(0),
-		m_ullTotalTime(0)
+		m_ullTotalTime(0),
+		m_ullLastTime(0)
 	{
 		if (!spTimestampProvider)
 			m_spTimestampProvider = std::make_shared<TTimestampProviderTickCount>();

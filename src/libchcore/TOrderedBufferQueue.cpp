@@ -20,7 +20,6 @@
 #include "TOrderedBufferQueue.h"
 #include "TOverlappedDataBuffer.h"
 #include "TCoreException.h"
-#include <boost/thread/shared_mutex.hpp>
 #include <boost/thread/locks.hpp>
 
 namespace chcore

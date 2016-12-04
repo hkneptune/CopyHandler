@@ -23,7 +23,6 @@
 #ifndef __TSUBTASKBASE_H__
 #define __TSUBTASKBASE_H__
 
-#include "libchcore.h"
 #include "ESubTaskTypes.h"
 #include "TSubTaskStatsInfo.h"
 #include "ISerializer.h"

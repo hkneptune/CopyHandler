@@ -23,7 +23,6 @@
 #ifndef __TDATETIME_H__
 #define __TDATETIME_H__
 
-#include "libchcore.h"
 #include "TConfig.h"
 
 namespace chcore

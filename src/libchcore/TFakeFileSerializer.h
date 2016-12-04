@@ -19,7 +19,6 @@
 #ifndef __TFAKEFILESERIALIZER_H__
 #define __TFAKEFILESERIALIZER_H__
 
-#include "libchcore.h"
 #include "ISerializer.h"
 
 namespace chcore

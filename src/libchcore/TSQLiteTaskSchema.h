@@ -19,7 +19,6 @@
 #ifndef __TSQLITETASKSCHEMA_H__
 #define __TSQLITETASKSCHEMA_H__
 
-#include "libchcore.h"
 #include "ISQLiteSerializerSchema.h"
 
 namespace chcore

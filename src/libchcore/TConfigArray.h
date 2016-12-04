@@ -19,7 +19,6 @@
 #ifndef __TCONFIGARRAY_H__
 #define __TCONFIGARRAY_H__
 
-#include "libchcore.h"
 #include "TConfig.h"
 
 namespace chcore

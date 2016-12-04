@@ -19,7 +19,6 @@
 #ifndef __TSQLITESERIALIZERCONTAINER_H__
 #define __TSQLITESERIALIZERCONTAINER_H__
 
-#include "libchcore.h"
 #include "ISerializerRowReader.h"
 #include "ISerializerContainer.h"
 #include <boost/pool/poolfwd.hpp>

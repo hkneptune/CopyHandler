@@ -360,12 +360,12 @@ CLangData::CLangData(const CLangData& ld) :
 	m_pszFilename(nullptr),
 	m_pszLngName(nullptr),
 	m_pszFontFace(nullptr),
+	m_wPointSize(ld.m_wPointSize),
 	m_pszHelpName(nullptr),
 	m_pszAuthor(nullptr),
 	m_bRTL(ld.m_bRTL),
-	m_bUpdating(ld.m_bUpdating),
 	m_uiSectionID(ld.m_uiSectionID),
-	m_wPointSize(ld.m_wPointSize),
+	m_bUpdating(ld.m_bUpdating),
 	m_bModified(false)
 {
 	SetFilename(ld.GetFilename(true));
@@ -848,8 +848,8 @@ void CLangData::SetFnameData(PTSTR *ppszDst, PCTSTR pszSrc)
 }
 
 CResourceManager::CResourceManager() :
-	m_pfnCallback(nullptr),
-	m_hRes(nullptr)
+	m_hRes(nullptr),
+	m_pfnCallback(nullptr)
 {
 	InitializeCriticalSection(&m_cs);
 }

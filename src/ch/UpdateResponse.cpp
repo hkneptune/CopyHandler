@@ -24,7 +24,6 @@
 #include <boost/property_tree/ptree.hpp>
 #include <boost/algorithm/string.hpp>
 #include <boost/date_time/gregorian/gregorian.hpp>
-#include <iostream>
 #include <sstream>
 
 UpdateResponse::UpdateResponse(std::stringstream& tDataStream)

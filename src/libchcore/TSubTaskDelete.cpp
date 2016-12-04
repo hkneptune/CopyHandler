@@ -30,12 +30,9 @@
 #include "TFileInfoArray.h"
 #include "TFileInfo.h"
 #include "TTaskLocalStats.h"
-#include "TCoreException.h"
-#include "ErrorCodes.h"
 #include "TScopedRunningTimeTracker.h"
 #include "TFeedbackHandlerWrapper.h"
 #include "TBufferSizes.h"
-#include "TFileException.h"
 #include "TFilesystemFeedbackWrapper.h"
 
 namespace chcore

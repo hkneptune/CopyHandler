@@ -19,7 +19,6 @@
 #ifndef __TMODPATHCONTAINER_H__
 #define __TMODPATHCONTAINER_H__
 
-#include "libchcore.h"
 #include <boost/container/flat_map.hpp>
 #include "TModificationTracker.h"
 #include "TPath.h"

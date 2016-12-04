@@ -23,7 +23,6 @@
 #ifndef __TSUBTASKCOPYMOVE_H__
 #define __TSUBTASKCOPYMOVE_H__
 
-#include "libchcore.h"
 #include "TSubTaskBase.h"
 #include "TBufferSizes.h"
 #include "../liblogger/TLogger.h"

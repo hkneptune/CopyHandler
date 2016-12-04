@@ -32,6 +32,7 @@ namespace chcore
 	//////////////////////////////////////////////////////////////////////
 
 	TFileInfo::TFileInfo() :
+		m_oidObjectID(0),
 		m_pathFile(m_setModifications),
 		m_spBasePathData(m_setModifications),
 		m_dwAttributes(m_setModifications, 0),
@@ -39,13 +40,14 @@ namespace chcore
 		m_ftCreation(m_setModifications),
 		m_ftLastAccess(m_setModifications),
 		m_ftLastWrite(m_setModifications),
-		m_uiFlags(m_setModifications, 0),
-		m_oidObjectID(0)
+		m_uiFlags(m_setModifications, 0)
 	{
 		m_setModifications[eMod_Added] = true;
 	}
 
 	TFileInfo::TFileInfo(const TFileInfo& rSrc) :
+		m_setModifications(rSrc.m_setModifications),
+		m_oidObjectID(rSrc.m_oidObjectID),
 		m_pathFile(m_setModifications, rSrc.m_pathFile),
 		m_spBasePathData(m_setModifications, rSrc.m_spBasePathData),
 		m_dwAttributes(m_setModifications, rSrc.m_dwAttributes),
@@ -53,13 +55,12 @@ namespace chcore
 		m_ftCreation(m_setModifications, rSrc.m_ftCreation),
 		m_ftLastAccess(m_setModifications, rSrc.m_ftLastAccess),
 		m_ftLastWrite(m_setModifications, rSrc.m_ftLastWrite),
-		m_uiFlags(m_setModifications, rSrc.m_uiFlags),
-		m_oidObjectID(rSrc.m_oidObjectID),
-		m_setModifications(rSrc.m_setModifications)
+		m_uiFlags(m_setModifications, rSrc.m_uiFlags)
 	{
 	}
 
 	TFileInfo::TFileInfo(const TBasePathDataPtr& spBasePathData, const TSmartPath& rpathFile, DWORD dwAttributes, ULONGLONG uhFileSize, const TFileTime& ftCreation, const TFileTime& ftLastAccess, const TFileTime& ftLastWrite, unsigned int uiFlags) :
+		m_oidObjectID(0),
 		m_pathFile(m_setModifications, rpathFile),
 		m_spBasePathData(m_setModifications, spBasePathData),
 		m_dwAttributes(m_setModifications, dwAttributes),
@@ -67,8 +68,7 @@ namespace chcore
 		m_ftCreation(m_setModifications, ftCreation),
 		m_ftLastAccess(m_setModifications, ftLastAccess),
 		m_ftLastWrite(m_setModifications, ftLastWrite),
-		m_uiFlags(m_setModifications, uiFlags),
-		m_oidObjectID(0)
+		m_uiFlags(m_setModifications, uiFlags)
 	{
 		if (m_spBasePathData.Get())
 			m_pathFile.Modify().MakeRelativePath(m_spBasePathData.Get()->GetSrcPath());

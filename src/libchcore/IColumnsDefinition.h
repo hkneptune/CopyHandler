@@ -19,7 +19,6 @@
 #ifndef __ICOLUMNSDEFINITION_H__
 #define __ICOLUMNSDEFINITION_H__
 
-#include "libchcore.h"
 #include "TString.h"
 #include "TPath.h"
 

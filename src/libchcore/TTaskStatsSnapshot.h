@@ -23,7 +23,6 @@
 #ifndef __TTASKSTATSSNAPSHOT_H__
 #define __TTASKSTATSSNAPSHOT_H__
 
-#include "libchcore.h"
 #include "TSubTaskStatsInfo.h"
 #include "TSubTaskArrayStatsSnapshot.h"
 #include "TFileFiltersArray.h"

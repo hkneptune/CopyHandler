@@ -19,7 +19,6 @@
 #ifndef __IFILESYSTEMFILE_H__
 #define __IFILESYSTEMFILE_H__
 
-#include "libchcore.h"
 #include "TPath.h"
 #include "CommonDataTypes.h"
 

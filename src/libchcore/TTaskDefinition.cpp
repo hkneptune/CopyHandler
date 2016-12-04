@@ -21,7 +21,6 @@
 /// @brief Contains implementation of class representing task input data.
 // ============================================================================
 #include "stdafx.h"
-#include "..\common\version.h"
 #include <boost/uuid/uuid.hpp>
 #include <boost/uuid/uuid_io.hpp>
 #include <boost/uuid/random_generator.hpp>
@@ -35,9 +34,9 @@
 namespace chcore
 {
 	TTaskDefinition::TTaskDefinition() :
-		m_bModified(false),
 		m_strTaskName(),
-		m_ullTaskVersion(CURRENT_TASK_VERSION)
+		m_ullTaskVersion(CURRENT_TASK_VERSION),
+		m_bModified(false)
 	{
 		boost::uuids::random_generator gen;
 		boost::uuids::uuid u = gen();
@@ -47,8 +46,8 @@ namespace chcore
 	TTaskDefinition::TTaskDefinition(const TTaskDefinition& rSrc) :
 		m_strTaskName(rSrc.m_strTaskName),
 		m_vSourcePaths(rSrc.m_vSourcePaths),
-		m_afFilters(rSrc.m_afFilters),
 		m_pathDestinationPath(rSrc.m_pathDestinationPath),
+		m_afFilters(rSrc.m_afFilters),
 		m_tOperationPlan(rSrc.m_tOperationPlan),
 		m_ullTaskVersion(rSrc.m_ullTaskVersion),
 		m_tConfiguration(rSrc.m_tConfiguration),

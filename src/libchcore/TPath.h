@@ -19,7 +19,6 @@
 #ifndef __TPATH_H__
 #define __TPATH_H__
 
-#include "libchcore.h"
 #include "TString.h"
 
 namespace chcore

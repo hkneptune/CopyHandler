@@ -14,10 +14,10 @@ namespace chcore
 		m_stRequiredSamples(ullSampleTime ? boost::numeric_cast<size_t>(ullTrackTime / ullSampleTime) : 0),
 		m_ullSampleTime(ullSampleTime),
 		m_dSamplesPerSecond(ullSampleTime != 0 ? 1000.0 / ullSampleTime : 0.0),
-		m_dPartialSpeedNotInSamples(0),
-		m_ullTimeIntervalNotInSamples(0),
 		m_stNextSamplePos(0),
 		m_ullLastTimestamp(std::numeric_limits<unsigned long long>::max()),
+		m_dPartialSpeedNotInSamples(0),
+		m_ullTimeIntervalNotInSamples(0),
 		m_ullZeroIntervalData(0)
 	{
 		if(ullSampleTime == 0)

@@ -38,9 +38,9 @@ namespace chcore
 		const TSmartPath& pathLogDir,
 		const logger::TMultiLoggerConfigPtr& spMultiLoggerConfig,
 		bool bForceRecreateSerializer) :
-		m_spSerializerFactory(spSerializerFactory),
-		m_spFeedbackFactory(spFeedbackHandlerFactory),
 		m_pathLogDir(pathLogDir),
+		m_spFeedbackFactory(spFeedbackHandlerFactory),
+		m_spSerializerFactory(spSerializerFactory),
 		m_spMultiLoggerConfig(spMultiLoggerConfig)
 	{
 		if(!spFeedbackHandlerFactory)

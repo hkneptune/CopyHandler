@@ -19,7 +19,6 @@
 #ifndef __IFILESYSTEM_H__
 #define __IFILESYSTEM_H__
 
-#include "libchcore.h"
 #include "TPath.h"
 #include "TFileInfoFwd.h"
 #include "TBasePathDataFwd.h"

@@ -36,12 +36,12 @@ END_MESSAGE_MAP()
 
 TMsgBox::TMsgBox(UINT uiMsgResourceID, EButtonConfig eButtons, EIconConfig eIcon, CWnd* pParent /*= nullptr*/) :
 	CLanguageDialog(IDD_MSGBOX_DIALOG, pParent),
-	m_eButtons(eButtons),
 	m_eIcon(eIcon),
+	m_eButtons(eButtons),
 	m_rcRichEdit(0,0,0,0),
 	m_rcDialogMinSize(0,0,0,0),
-	m_bCheckboxChecked(false),
-	m_iCheckBoxHeight(0)
+	m_iCheckBoxHeight(0),
+	m_bCheckboxChecked(false)
 {
 	m_strMessageText = GetResManager().LoadString(uiMsgResourceID);
 }
@@ -49,12 +49,12 @@ TMsgBox::TMsgBox(UINT uiMsgResourceID, EButtonConfig eButtons, EIconConfig eIcon
 TMsgBox::TMsgBox(const CString& strMessage, EButtonConfig eButtons, EIconConfig eIcon, CWnd* pParent /*= nullptr*/) :
 	CLanguageDialog(IDD_MSGBOX_DIALOG, pParent),
 	m_strMessageText(strMessage),
-	m_eButtons(eButtons),
 	m_eIcon(eIcon),
+	m_eButtons(eButtons),
 	m_rcRichEdit(0,0,0,0),
 	m_rcDialogMinSize(0,0,0,0),
-	m_bCheckboxChecked(false),
-	m_iCheckBoxHeight(0)
+	m_iCheckBoxHeight(0),
+	m_bCheckboxChecked(false)
 {
 }
 

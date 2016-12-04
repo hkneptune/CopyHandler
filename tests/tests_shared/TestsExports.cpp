@@ -1,10 +1,10 @@
+#ifdef TESTING
+
 #include "gtest/gtest.h"
 #include "gmock/gmock.h"
 #include <tchar.h>
 #include <boost/format.hpp>
 #include <boost/algorithm/string/replace.hpp>
-
-#ifdef TESTING
 
 class TFailedOutputPrinter : public ::testing::EmptyTestEventListener
 {

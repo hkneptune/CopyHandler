@@ -25,9 +25,9 @@
 #include "../libchcore/TIpcMutexLock.h"
 
 CShellExtControl::CShellExtControl() :
-	m_pShellExtData(nullptr),
 	m_hMemory(nullptr),
 	m_mutex(L"CHShellExtControlDataMutex"),
+	m_pShellExtData(nullptr),
 	m_spLog(GetLogger(L"ShellExtControl"))
 {
 	LOG_DEBUG(m_spLog) << L"Constructing CShellExtControl";

@@ -19,7 +19,6 @@
 #ifndef __TSERIALIZERVERSION_H__
 #define __TSERIALIZERVERSION_H__
 
-#include "libchcore.h"
 #include "TSQLiteDatabase.h"
 
 namespace chcore

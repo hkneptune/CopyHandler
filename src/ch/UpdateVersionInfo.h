@@ -19,7 +19,6 @@
 #ifndef __UPDATEVERSIONINFO_H__
 #define __UPDATEVERSIONINFO_H__
 
-#include <boost/date_time/date.hpp>
 #include <boost/property_tree/ptree.hpp>
 
 class UpdateVersionInfo

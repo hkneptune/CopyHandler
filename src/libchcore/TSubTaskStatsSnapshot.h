@@ -23,7 +23,6 @@
 #ifndef __TSUBTASKSTATSSNAPSHOT_H__
 #define __TSUBTASKSTATSSNAPSHOT_H__
 
-#include "libchcore.h"
 #include "TString.h"
 #include "ESubTaskTypes.h"
 #include "CommonDataTypes.h"

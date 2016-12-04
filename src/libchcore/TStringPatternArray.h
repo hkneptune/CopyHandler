@@ -19,7 +19,6 @@
 #ifndef __TSTRINGPATTERNARRAY_H__
 #define __TSTRINGPATTERNARRAY_H__
 
-#include "libchcore.h"
 #include "TStringPattern.h"
 
 namespace chcore

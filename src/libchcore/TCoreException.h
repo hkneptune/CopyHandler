@@ -19,7 +19,6 @@
 #ifndef __TEXCEPTION_H__
 #define __TEXCEPTION_H__
 
-#include "libchcore.h"
 #include "ErrorCodes.h"
 #include "TBaseException.h"
 

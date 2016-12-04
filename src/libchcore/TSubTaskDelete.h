@@ -23,7 +23,6 @@
 #ifndef __TSUBTASKDELETE_H__
 #define __TSUBTASKDELETE_H__
 
-#include "libchcore.h"
 #include "TSubTaskBase.h"
 #include "../liblogger/TLogger.h"
 

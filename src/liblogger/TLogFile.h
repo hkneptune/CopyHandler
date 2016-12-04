@@ -19,7 +19,6 @@
 #ifndef __TLOGFILE_H__
 #define __TLOGFILE_H__
 
-#include <set>
 #include "TLoggerRotationInfo.h"
 #include <vector>
 #include <list>

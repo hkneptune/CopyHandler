@@ -21,8 +21,8 @@ namespace chcore
 	}
 
 	TStringPattern::TStringPattern(const TString& strPattern, EPatternType ePatternType) :
-		m_ePatternType(ePatternType),
-		m_strPattern(strPattern)
+		m_strPattern(strPattern),
+		m_ePatternType(ePatternType)
 	{
 	}
 

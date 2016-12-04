@@ -23,7 +23,6 @@
 #ifndef __TLOCALFILESYSTEM_H__
 #define __TLOCALFILESYSTEM_H__
 
-#include "libchcore.h"
 #include "TPath.h"
 #include "TBasePathData.h"
 #include "TFileInfoFwd.h"

@@ -19,10 +19,8 @@
 #ifndef __ISERIALIZERROWREADER_H__
 #define __ISERIALIZERROWREADER_H__
 
-#include "libchcore.h"
 #include "TString.h"
 #include "TPath.h"
-#include "IColumnsDefinition.h"
 
 namespace chcore
 {

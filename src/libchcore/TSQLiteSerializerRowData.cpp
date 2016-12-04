@@ -29,8 +29,8 @@ namespace chcore
 {
 	///////////////////////////////////////////////////////////////////////////
 	TSQLiteSerializerRowData::TSQLiteSerializerRowData(object_id_t oidRowID, TSQLiteColumnsDefinition& rColumnDefinition, bool bAdded, unsigned long long* pPoolMemory, size_t stPoolMemorySizeInBytes, TPlainStringPool& poolStrings) :
-		m_rColumns(rColumnDefinition),
 		m_pPoolMemory(pPoolMemory),
+		m_rColumns(rColumnDefinition),
 		m_poolStrings(poolStrings)
 	{
 		if (!m_pPoolMemory)
@@ -50,8 +50,8 @@ namespace chcore
 	}
 
 	TSQLiteSerializerRowData::TSQLiteSerializerRowData(const TSQLiteSerializerRowData& rSrc) :
-		m_rColumns(rSrc.m_rColumns),
 		m_pPoolMemory(rSrc.m_pPoolMemory),
+		m_rColumns(rSrc.m_rColumns),
 		m_poolStrings(rSrc.m_poolStrings)
 	{
 	}

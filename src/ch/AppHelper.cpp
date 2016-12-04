@@ -18,7 +18,6 @@
 ***************************************************************************/
 #include "stdafx.h"
 #include "AppHelper.h"
-#include "shlobj.h"
 #include "../common/version.h"
 
 #ifdef _DEBUG

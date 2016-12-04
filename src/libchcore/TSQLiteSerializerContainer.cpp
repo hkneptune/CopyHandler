@@ -20,7 +20,6 @@
 #include "TSQLiteSerializerContainer.h"
 #include "TSQLiteSerializerRowData.h"
 #include "ErrorCodes.h"
-#include "TCoreException.h"
 #include <boost/format.hpp>
 #include "TSQLiteStatement.h"
 #include "TSQLiteSerializerRowReader.h"
@@ -34,9 +33,9 @@ namespace chcore
 	using namespace sqlite;
 
 	TSQLiteSerializerContainer::TSQLiteSerializerContainer(const TString& strName, const sqlite::TSQLiteDatabasePtr& spDB, TPlainStringPool& poolStrings) :
+		m_pPoolRows(nullptr),
 		m_strName(strName),
 		m_spDB(spDB),
-		m_pPoolRows(nullptr),
 		m_poolStrings(poolStrings)
 	{
 	}

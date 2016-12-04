@@ -21,15 +21,15 @@
 #include <boost\algorithm\string\split.hpp>
 #include <boost/algorithm/string/classification.hpp>
 #include <boost\lexical_cast.hpp>
-#include <boost/date_time/gregorian/greg_date.hpp>
+#include <boost/date_time/gregorian/gregorian_types.hpp>
 
 UpdateVersionInfo::UpdateVersionInfo(const std::wstring& strNumericVersion, const std::wstring& strReadableVersion, boost::gregorian::date dateRelease, const std::wstring& strDownloadLink, const std::wstring& strReleaseNotes) :
 	m_strNumericVersion(strNumericVersion),
+	m_ullNumericVersion(ParseNumericVersion(strNumericVersion)),
 	m_strReadableVersion(strReadableVersion),
 	m_dateRelease(dateRelease),
 	m_strDownloadLink(strDownloadLink),
-	m_strReleaseNotes(strReleaseNotes),
-	m_ullNumericVersion(ParseNumericVersion(strNumericVersion))
+	m_strReleaseNotes(strReleaseNotes)
 {
 }
 

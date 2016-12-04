@@ -19,7 +19,6 @@
 #ifndef __TWIN32ERRORFORMATTER_H__
 #define __TWIN32ERRORFORMATTER_H__
 
-#include "libchcore.h"
 #include "TString.h"
 
 namespace chcore

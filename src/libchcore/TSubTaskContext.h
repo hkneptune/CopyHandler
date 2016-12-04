@@ -23,7 +23,6 @@
 #ifndef __TSUBTASKCONTEXT_H__
 #define __TSUBTASKCONTEXT_H__
 
-#include "libchcore.h"
 #include "TPath.h"
 #include "EOperationTypes.h"
 #include "TBasePathData.h"

@@ -19,8 +19,6 @@
 #ifndef __ISERIALIZERROWWRITER_H__
 #define __ISERIALIZERROWWRITER_H__
 
-#include "libchcore.h"
-#include "TString.h"
 #include "TPath.h"
 
 namespace chcore

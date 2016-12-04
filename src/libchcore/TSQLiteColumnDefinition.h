@@ -19,7 +19,6 @@
 #ifndef __TSQLITECOLUMNDEFINITION_H__
 #define __TSQLITECOLUMNDEFINITION_H__
 
-#include "libchcore.h"
 #include "TString.h"
 #include <vector>
 #include "IColumnsDefinition.h"

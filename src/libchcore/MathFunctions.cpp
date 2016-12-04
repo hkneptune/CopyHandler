@@ -1,6 +1,5 @@
 #include "stdafx.h"
 #include "MathFunctions.h"
-#include <boost/numeric/conversion/cast.hpp>
 
 namespace chcore
 {

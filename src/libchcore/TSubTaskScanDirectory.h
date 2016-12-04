@@ -23,7 +23,6 @@
 #ifndef __TSUBTASKSCANDIRECTORY_H__
 #define __TSUBTASKSCANDIRECTORY_H__
 
-#include "libchcore.h"
 #include "TSubTaskBase.h"
 #include "TPath.h"
 #include "TBasePathData.h"

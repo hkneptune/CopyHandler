@@ -629,9 +629,6 @@
     <ClCompile Include="dllmain.cpp">
       <Filter>Source Files\Library files</Filter>
     </ClCompile>
-    <ClCompile Include="libchcore.cpp">
-      <Filter>Source Files\Library files</Filter>
-    </ClCompile>
     <ClCompile Include="stdafx.cpp">
       <Filter>Source Files\Library files</Filter>
     </ClCompile>
@@ -923,9 +920,6 @@
     <ClCompile Include="TCoreEngine.cpp">
       <Filter>Source Files\Library files</Filter>
     </ClCompile>
-    <ClCompile Include="Tests\TOverlappedReaderWriterTests.cpp">
-      <Filter>Tests\DataBuffer</Filter>
-    </ClCompile>
     <ClCompile Include="Tests\TOverlappedDataBufferTests.cpp">
       <Filter>Tests\DataBuffer</Filter>
     </ClCompile>
@@ -936,9 +930,6 @@
       <Filter>Tests\DataBuffer</Filter>
     </ClCompile>
     <ClCompile Include="Tests\TOverlappedMemoryPoolTests.cpp">
-      <Filter>Tests\DataBuffer</Filter>
-    </ClCompile>
-    <ClCompile Include="Tests\OverlappedCallbacksTests.cpp">
       <Filter>Tests\DataBuffer</Filter>
     </ClCompile>
     <ClCompile Include="Tests\TOrderedBufferQueueTests.cpp">

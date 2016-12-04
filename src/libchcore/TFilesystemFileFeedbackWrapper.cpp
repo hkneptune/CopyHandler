@@ -31,9 +31,9 @@ namespace chcore
 		TWorkerThreadController& rThreadController, const IFilesystemPtr& spFilesystem) :
 		m_spFile(spFile),
 		m_spFeedbackHandler(spFeedbackHandler),
+		m_spFilesystem(spFilesystem),
 		m_spLog(std::make_unique<logger::TLogger>(spLogFileData, L"Filesystem-File")),
-		m_rThreadController(rThreadController),
-		m_spFilesystem(spFilesystem)
+		m_rThreadController(rThreadController)
 	{
 		if (!spFeedbackHandler)
 			throw TCoreException(eErr_InvalidArgument, L"spFeedbackHandler is NULL", LOCATION);

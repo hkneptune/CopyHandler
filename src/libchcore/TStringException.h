@@ -19,7 +19,6 @@
 #ifndef __TSTRINGEXCEPTION_H__
 #define __TSTRINGEXCEPTION_H__
 
-#include "libchcore.h"
 #include "ErrorCodes.h"
 #include "TBaseException.h"
 

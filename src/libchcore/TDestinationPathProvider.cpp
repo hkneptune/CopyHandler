@@ -15,8 +15,8 @@ namespace chcore
 
 		m_spFilesystem(spFilesystem),
 		m_pathDestinationBase(pathDestinationBase),
-		m_bForceDirectories(bForceDirectories),
 		m_bIgnoreFolders(bIgnoreFolders),
+		m_bForceDirectories(bForceDirectories),
 		m_strFirstAltName(strFirstAltName),
 		m_strNextAltName(strNextAltName)
 	{

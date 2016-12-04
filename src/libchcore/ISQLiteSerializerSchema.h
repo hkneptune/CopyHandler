@@ -19,7 +19,6 @@
 #ifndef __ISERIALIZERSCHEMA_H__
 #define __ISERIALIZERSCHEMA_H__
 
-#include "libchcore.h"
 #include "TSQLiteDatabase.h"
 
 namespace chcore

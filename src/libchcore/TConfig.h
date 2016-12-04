@@ -23,7 +23,6 @@
 #ifndef __TCONFIG_H__
 #define __TCONFIG_H__
 
-#include "libchcore.h"
 #include "ISerializerContainer.h"
 
 namespace chcore

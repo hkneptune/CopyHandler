@@ -27,8 +27,8 @@ namespace chcore
 		m_pszMsg(pszMsg),
 		m_bDeleteMsg(false),
 		m_pszFile(pszFile),
-		m_stLineNumber(stLineNumber),
-		m_pszFunction(pszFunction)
+		m_pszFunction(pszFunction),
+		m_stLineNumber(stLineNumber)
 	{
 		ATLTRACE(_T("*** Base Exception is being thrown:\n\tMsg: %s\n\tError code: %d\n\tFile: %s\n\tLine number: %ld\n\tFunction: %s\n"), pszMsg, eErrorCode, pszFile, stLineNumber, pszFunction);
 	}
@@ -38,8 +38,8 @@ namespace chcore
 		m_pszMsg(nullptr),
 		m_bDeleteMsg(false),
 		m_pszFile(pszFile),
-		m_stLineNumber(stLineNumber),
-		m_pszFunction(pszFunction)
+		m_pszFunction(pszFunction),
+		m_stLineNumber(stLineNumber)
 	{
 		ATLTRACE(_T("*** Base Exception is being thrown:\n\tMsg: %S\n\tError code: %d\n\tFile: %s\n\tLine number: %ld\n\tFunction: %s\n"), pszMsg, eErrorCode, pszFile, stLineNumber, pszFunction);
 		if (pszMsg)

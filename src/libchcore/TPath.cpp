@@ -17,8 +17,6 @@
 *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
 ***************************************************************************/
 #include "stdafx.h"
-#include <boost/serialization/serialization.hpp>
-#include <boost/bind.hpp>
 #include "TPath.h"
 #pragma warning(push)
 #pragma warning(disable: 4996)

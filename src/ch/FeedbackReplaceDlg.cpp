@@ -6,7 +6,6 @@
 #include "../libchcore/TFileInfo.h"
 #include "FeedbackReplaceDlg.h"
 #include "../libictranslate/ResourceManager.h"
-#include "../libchcore/TFileInfo.h"
 #include "FeedbackHandler.h"
 #include "resource.h"
 
@@ -16,9 +15,9 @@ IMPLEMENT_DYNAMIC(CFeedbackReplaceDlg, ictranslate::CLanguageDialog)
 
 CFeedbackReplaceDlg::CFeedbackReplaceDlg(const chcore::TFileInfo& spSrcFile, const chcore::TFileInfo& spDstFile, CWnd* pParent /*=nullptr*/)
 	: ictranslate::CLanguageDialog(IDD_FEEDBACK_REPLACE_DIALOG, pParent),
+	m_bAllItems(FALSE),
 	m_rSrcFile(spSrcFile),
-	m_rDstFile(spDstFile),
-	m_bAllItems(FALSE)
+	m_rDstFile(spDstFile)
 {
 }
 

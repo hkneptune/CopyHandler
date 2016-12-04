@@ -19,7 +19,6 @@
 #ifndef __TFILEFILTERSARRAY_H__
 #define __TFILEFILTERSARRAY_H__
 
-#include "libchcore.h"
 #include "TFileFilter.h"
 #include "ISerializerContainer.h"
 #include "TRemovedObjects.h"

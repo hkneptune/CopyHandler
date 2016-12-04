@@ -22,7 +22,6 @@
 #include "TCoreException.h"
 #include "ErrorCodes.h"
 #include "TSQLiteTransaction.h"
-#include "TSQLiteStatement.h"
 #include "TSimpleTimer.h"
 #include "SerializerTrace.h"
 

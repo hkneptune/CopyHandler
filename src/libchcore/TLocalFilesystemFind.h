@@ -19,7 +19,6 @@
 #ifndef __TLOCALFILESYSTEMFIND_H__
 #define __TLOCALFILESYSTEMFIND_H__
 
-#include "libchcore.h"
 #include "TFileInfoFwd.h"
 #include "TPath.h"
 #include "IFilesystemFind.h"

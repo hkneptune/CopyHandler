@@ -19,7 +19,6 @@
 #ifndef __TOBSOLETEFILES_H__
 #define __TOBSOLETEFILES_H__
 
-#include "libchcore.h"
 #include "TPath.h"
 #include <map>
 #include "ISerializerRowData.h"

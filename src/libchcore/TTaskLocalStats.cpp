@@ -23,7 +23,6 @@
 #include "stdafx.h"
 #include "TTaskLocalStats.h"
 #include "TSubTaskStatsInfo.h"
-#include <boost\numeric\conversion\cast.hpp>
 #include "TTaskStatsSnapshot.h"
 #include "ISerializerContainer.h"
 #include "ISerializerRowData.h"
@@ -34,8 +33,8 @@ namespace chcore
 	////////////////////////////////////////////////////////////////////////////////
 	// TTasksGlobalStats members
 	TTaskLocalStatsInfo::TTaskLocalStatsInfo() :
-		m_tTimer(m_setModifications),
-		m_bTaskIsRunning(false)
+		m_bTaskIsRunning(false),
+		m_tTimer(m_setModifications)
 	{
 		m_setModifications[eMod_Added] = true;
 	}

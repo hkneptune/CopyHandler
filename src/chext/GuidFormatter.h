@@ -19,9 +19,6 @@
 #ifndef __GUIDFORMATTER_H__
 #define __GUIDFORMATTER_H__
 
-#include <string>
-#include <Guiddef.h>
-
 class GuidFormatter
 {
 public:

@@ -35,12 +35,12 @@ namespace chcore
 		m_rConfig(rConfig),
 		m_eOperationType(eOperation_None),
 		m_spBasePaths(spBasePaths),
+		m_rFilters(rFilters),
 		m_pathDestination(),
 		m_rCfgTracker(rCfgTracker),
-		m_spLogFileData(spLogFileData),
-		m_rThreadController(rThreadController),
 		m_spFilesystem(spFilesystem),
-		m_rFilters(rFilters)
+		m_spLogFileData(spLogFileData),
+		m_rThreadController(rThreadController)
 	{
 		if (!spFilesystem)
 			throw TCoreException(eErr_InvalidArgument, L"spFilesystem", LOCATION);

@@ -19,7 +19,6 @@
 #ifndef __TSQLITESERIALIZERROWWRITER_H__
 #define __TSQLITESERIALIZERROWWRITER_H__
 
-#include "libchcore.h"
 #include "ISerializerRowData.h"
 #include "TSQLiteColumnDefinition.h"
 #include "ISerializerContainer.h"

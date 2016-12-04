@@ -46,8 +46,8 @@ namespace logger
 	};
 
 	inline TLogger::TLogger(const TLogFileDataPtr& spFileData, PCTSTR pszChannel) :
-		m_spFileData(spFileData),
 		m_spLoggerConfig(spFileData->GetMultiLoggerConfig()->GetLoggerConfig(pszChannel)),
+		m_spFileData(spFileData),
 		m_strChannel(pszChannel)
 	{
 		if(!spFileData)

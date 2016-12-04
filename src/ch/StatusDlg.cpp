@@ -43,8 +43,8 @@ bool CStatusDlg::m_bLock=false;
 
 CStatusDlg::CStatusDlg(chcore::TTaskManager* pTasks, CWnd* pParent /*=nullptr*/)
 	: ictranslate::CLanguageDialog(IDD_STATUS_DIALOG, pParent, &m_bLock),
-	m_spTaskMgrStats(new chcore::TTaskManagerStatsSnapshot),
-	m_pTasks(pTasks)
+	m_pTasks(pTasks),
+	m_spTaskMgrStats(new chcore::TTaskManagerStatsSnapshot)
 {
 	RegisterStaticExControl(AfxGetInstanceHandle());
 }

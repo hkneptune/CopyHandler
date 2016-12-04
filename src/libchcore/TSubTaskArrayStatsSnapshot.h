@@ -19,7 +19,6 @@
 #ifndef __TSUBTASKARRAYSTATSSNAPSHOT_H__
 #define __TSUBTASKARRAYSTATSSNAPSHOT_H__
 
-#include "libchcore.h"
 #include "TSubTaskStatsSnapshot.h"
 #include "SerializerDataTypes.h"
 

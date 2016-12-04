@@ -22,7 +22,6 @@
 #ifndef __TFILEINFOARRAY_H__
 #define __TFILEINFOARRAY_H__
 
-#include "libchcore.h"
 #include "TBasePathData.h"
 #include "CommonDataTypes.h"
 

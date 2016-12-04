@@ -18,8 +18,6 @@
 // ============================================================================
 #include "stdafx.h"
 #include "TSubTaskArrayStatsSnapshot.h"
-#include "ErrorCodes.h"
-#include "TCoreException.h"
 #include <boost\numeric\conversion\cast.hpp>
 
 namespace chcore

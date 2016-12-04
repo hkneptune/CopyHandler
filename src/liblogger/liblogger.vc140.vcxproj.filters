@@ -77,9 +77,6 @@
     <ClCompile Include="TLoggerRotationInfo.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="liblogger.cpp">
-      <Filter>Source Files\Library files</Filter>
-    </ClCompile>
     <ClCompile Include="dllmain.cpp">
       <Filter>Source Files\Library files</Filter>
     </ClCompile>

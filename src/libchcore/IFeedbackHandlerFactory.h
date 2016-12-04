@@ -19,7 +19,6 @@
 #ifndef __IFEEDBACKHANDLERFACTORY_H__
 #define __IFEEDBACKHANDLERFACTORY_H__
 
-#include "libchcore.h"
 #include "IFeedbackHandler.h"
 
 namespace chcore

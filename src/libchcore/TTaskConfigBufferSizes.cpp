@@ -18,6 +18,7 @@
 // ============================================================================
 #include "stdafx.h"
 #include "TTaskConfigBufferSizes.h"
+#include "TTaskConfiguration.h"
 
 namespace chcore
 {

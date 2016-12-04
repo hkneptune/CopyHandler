@@ -20,7 +20,6 @@
 #include "UpdateHeaders.h"
 #include "WindowsVersion.h"
 #include <boost\lexical_cast.hpp>
-#include <string>
 #include "..\common\version.h"
 #include <boost/algorithm/string.hpp>
 

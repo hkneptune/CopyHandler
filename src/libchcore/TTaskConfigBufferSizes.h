@@ -19,10 +19,8 @@
 #ifndef __TTASKCONFIGBUFFERSIZES_H__
 #define __TTASKCONFIGBUFFERSIZES_H__
 
-#include "libchcore.h"
 #include "TBufferSizes.h"
 #include "TConfig.h"
-#include "TTaskConfiguration.h"
 
 namespace chcore
 {

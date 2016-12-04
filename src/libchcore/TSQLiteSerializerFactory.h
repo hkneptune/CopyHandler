@@ -19,7 +19,6 @@
 #ifndef __TSQLITESERIALIZERFACTORY_H__
 #define __TSQLITESERIALIZERFACTORY_H__
 
-#include "libchcore.h"
 #include "TPath.h"
 #include "ISerializerFactory.h"
 

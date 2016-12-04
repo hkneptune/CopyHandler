@@ -23,7 +23,6 @@
 #ifndef __TSUBTASKSARRAY_H__
 #define __TSUBTASKSARRAY_H__
 
-#include "libchcore.h"
 #include <boost/tuple/tuple.hpp>
 #include "TSubTaskBase.h"
 #include "TTaskLocalStats.h"

@@ -48,12 +48,12 @@ bool CMiniViewDlg::m_bLock=false;
 
 CMiniViewDlg::CMiniViewDlg(chcore::TTaskManager* pTaskManager, bool *pbHide, CWnd* pParent /*=nullptr*/)
 	:ictranslate::CLanguageDialog(IDD_MINIVIEW_DIALOG, pParent, &m_bLock),
+	m_pTasks(pTaskManager),
 	m_iLastHeight(0),
 	m_bShown(false),
-	m_pTasks(pTaskManager),
 	m_bActive(false),
-	m_iIndex(-1),
-	m_pbHide(pbHide)
+	m_pbHide(pbHide),
+	m_iIndex(-1)
 {
 	COLORREF cr3DFace = GetSysColor(COLOR_3DFACE);
 	m_brBackground.CreateSolidBrush(cr3DFace);

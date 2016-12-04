@@ -19,7 +19,6 @@
 #ifndef __TFEEDBACKHANDLERWRAPPER_H__
 #define __TFEEDBACKHANDLERWRAPPER_H__
 
-#include "libchcore.h"
 #include "IFeedbackHandler.h"
 
 namespace chcore

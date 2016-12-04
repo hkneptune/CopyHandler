@@ -28,9 +28,9 @@
 namespace chcore
 {
 	TSQLiteSerializerRowReader::TSQLiteSerializerRowReader(const sqlite::TSQLiteDatabasePtr& spDatabase, TSQLiteColumnsDefinition& rColumns, const TString& strContainerName) :
+		m_bInitialized(false),
 		m_spStatement(new sqlite::TSQLiteStatement(spDatabase)),
 		m_rColumns(rColumns),
-		m_bInitialized(false),
 		m_strContainerName(strContainerName)
 	{
 		if (m_strContainerName.IsEmpty())

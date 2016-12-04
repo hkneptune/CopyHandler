@@ -19,8 +19,6 @@
 #ifndef __WINDOWSVERSION_H__
 #define __WINDOWSVERSION_H__
 
-#include <string>
-
 class WindowsVersion
 {
 public:

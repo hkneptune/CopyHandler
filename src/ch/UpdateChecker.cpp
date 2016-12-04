@@ -25,7 +25,6 @@
 #include "UpdateResponse.h"
 #include <afxinet.h>
 #include "../libchcore/TWin32ErrorFormatter.h"
-#include "../common/version.h"
 #include <boost/date_time/gregorian/gregorian_io.hpp>
 
 // ============================================================================
@@ -35,10 +34,10 @@
 /// @brief     Constructs the update checker object.
 // ============================================================================
 CUpdateChecker::CUpdateChecker() :
-	m_hThread(nullptr),
-	m_hKillEvent(nullptr),
+	m_eUpdateChannel(UpdateVersionInfo::eStable),
 	m_eResult(eResult_Undefined),
-	m_eUpdateChannel(UpdateVersionInfo::eStable)
+	m_hThread(nullptr),
+	m_hKillEvent(nullptr)
 {
 	m_hKillEvent = ::CreateEvent(nullptr, FALSE, FALSE, nullptr);
 	BOOST_ASSERT(m_hKillEvent);

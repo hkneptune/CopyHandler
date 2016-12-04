@@ -19,7 +19,6 @@
 #ifndef __TSQLITESERIALIZERROWREADER_H__
 #define __TSQLITESERIALIZERROWREADER_H__
 
-#include "libchcore.h"
 #include "ISerializerRowReader.h"
 #include "TSQLiteStatement.h"
 #include "TSQLiteColumnDefinition.h"

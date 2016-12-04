@@ -21,7 +21,6 @@
 
 #include "TLogFileData.h"
 #include <unordered_set>
-#include <thread>
 #include "TLoggerRotationInfo.h"
 #include "liblogger.h"
 

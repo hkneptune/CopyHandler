@@ -23,7 +23,6 @@
 #ifndef __TTASKMANAGERSTATSSNAPSHOT_H__
 #define __TTASKMANAGERSTATSSNAPSHOT_H__
 
-#include "libchcore.h"
 #include "TTaskStatsSnapshot.h"
 
 namespace chcore

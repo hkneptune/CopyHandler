@@ -27,9 +27,9 @@ namespace chcore
 	namespace sqlite
 	{
 		TSQLiteDatabase::TSQLiteDatabase(const TSmartPath& pathDatabase) :
+			m_pathDatabase(pathDatabase),
 			m_pDBHandle(nullptr),
-			m_bInTransaction(false),
-			m_pathDatabase(pathDatabase)
+			m_bInTransaction(false)
 		{
 			int iResult = sqlite3_open16(m_pathDatabase.ToString(), &m_pDBHandle);
 			if (iResult != SQLITE_OK)

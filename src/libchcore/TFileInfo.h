@@ -22,7 +22,6 @@
 #ifndef __TFILEINFO_H__
 #define __TFILEINFO_H__
 
-#include "libchcore.h"
 #include "TPath.h"
 #include "TBasePathData.h"
 #include <bitset>

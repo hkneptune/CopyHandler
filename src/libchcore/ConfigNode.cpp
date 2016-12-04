@@ -33,11 +33,11 @@ namespace chcore
 		}
 
 		ConfigNode::ConfigNode(const ConfigNode& rSrc) :
+			m_setModifications(rSrc.m_setModifications),
 			m_oidObjectID(rSrc.m_oidObjectID),
 			m_iOrder(m_setModifications, rSrc.m_iOrder),
 			m_strNodeName(m_setModifications, rSrc.m_strNodeName),
-			m_strValue(m_setModifications, rSrc.m_strValue),
-			m_setModifications(rSrc.m_setModifications)
+			m_strValue(m_setModifications, rSrc.m_strValue)
 		{
 		}
 

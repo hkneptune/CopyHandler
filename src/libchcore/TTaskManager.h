@@ -19,7 +19,6 @@
 #ifndef __TASKMANAGER_H__
 #define __TASKMANAGER_H__
 
-#include "libchcore.h"
 #include "IFeedbackHandlerFactory.h"
 #include "TPath.h"
 #include "TTaskManagerStatsSnapshot.h"

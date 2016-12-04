@@ -19,7 +19,6 @@
 #ifndef __TCORESTDEXCEPTION_H__
 #define __TCORESTDEXCEPTION_H__
 
-#include "libchcore.h"
 #include "TCoreException.h"
 
 #define THROW_CORE_EXCEPTION_STD(error_code, std_exception)\

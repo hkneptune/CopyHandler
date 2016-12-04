@@ -37,8 +37,8 @@ namespace chcore
 	TSharedMemory::TSharedMemory() :
 		m_hFileMapping(nullptr),
 		m_pMappedMemory(nullptr),
-		m_mutex(nullptr),
-		m_stSize(0)
+		m_stSize(0),
+		m_mutex(nullptr)
 	{
 	}
 

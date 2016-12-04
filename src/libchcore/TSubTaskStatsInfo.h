@@ -42,6 +42,7 @@ namespace boost
 
 namespace chcore
 {
+	class IColumnsDefinition;
 	class TSubTaskStatsInfo;
 	class TSubTaskStatsSnapshot;
 

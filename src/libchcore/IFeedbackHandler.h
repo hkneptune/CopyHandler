@@ -19,8 +19,6 @@
 #ifndef __FEEDBACKHANDLERBASE_H__
 #define __FEEDBACKHANDLERBASE_H__
 
-#include "libchcore.h"
-#include "TString.h"
 #include "ISerializerRowData.h"
 #include "EFileError.h"
 #include "TFeedbackResult.h"

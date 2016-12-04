@@ -19,7 +19,6 @@
 #ifndef __ISERIALIZERFACTORY_H__
 #define __ISERIALIZERFACTORY_H__
 
-#include "libchcore.h"
 #include "TString.h"
 #include "ISerializer.h"
 

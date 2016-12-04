@@ -19,7 +19,6 @@
 #ifndef __TSQLITESERIALIZER_H__
 #define __TSQLITESERIALIZER_H__
 
-#include "libchcore.h"
 #include <map>
 #include "ISerializer.h"
 #include "TSQLiteDatabase.h"

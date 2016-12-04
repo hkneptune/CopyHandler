@@ -18,7 +18,6 @@
 ***************************************************************************/
 #include "stdafx.h"
 #include "DirTreeCtrl.h"
-#include "afxtempl.h"
 #include "memdc.h"
 #include "shlobj.h"
 

@@ -26,8 +26,8 @@
 #include "Logger.h"
 
 TContextMenuHandler::TContextMenuHandler() :
-	m_uiNextMenuID(0),
 	m_uiFirstMenuID(0),
+	m_uiNextMenuID(0),
 	m_bEnableOwnerDrawnPaths(false),
 	m_fsLocal(GetLogFileData())
 {

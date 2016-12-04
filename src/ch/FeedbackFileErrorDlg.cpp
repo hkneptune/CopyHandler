@@ -3,7 +3,6 @@
 
 #include "stdafx.h"
 #include "ch.h"
-#include "../libchcore/TFileInfo.h"
 #include "FeedbackFileErrorDlg.h"
 #include "FeedbackHandler.h"
 #include "../libchcore/TWin32ErrorFormatter.h"

@@ -32,6 +32,7 @@ namespace chcore
 
 	TTaskStatsSnapshot::TTaskStatsSnapshot() :
 		m_tSubTasksStats(),
+		m_tTaskID(0),
 		m_bTaskIsRunning(false),
 		m_ullTimeElapsed(0),
 		m_iThreadPriority(0),
@@ -43,6 +44,7 @@ namespace chcore
 		m_bIgnoreDirectories(false),
 		m_bCreateEmptyFiles(false),
 		m_ullCurrentBufferSize(0),
+		m_uiBufferCount(0),
 		m_bCacheFilled(false),
 		m_ullProcessedCount(0),
 		m_ullTotalCount(0),
@@ -50,9 +52,7 @@ namespace chcore
 		m_ullTotalSize(0),
 		m_dTaskCountSpeed(0.0),
 		m_dTaskSizeSpeed(0.0),
-		m_dCombinedProgress(0.0),
-		m_uiBufferCount(0),
-		m_tTaskID(0)
+		m_dCombinedProgress(0.0)
 	{
 	}
 

@@ -2,7 +2,6 @@
 #include "gtest/gtest.h"
 #include "gmock/gmock.h"
 #include "../TOverlappedDataBuffer.h"
-#include "../../liblogger/TLogFileData.h"
 #include "../TCoreException.h"
 
 using namespace chcore;

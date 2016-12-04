@@ -19,7 +19,6 @@
 #ifndef __TTASKINFO_H__
 #define __TTASKINFO_H__
 
-#include "libchcore.h"
 #include "TPath.h"
 #include "TaskID.h"
 #include "ISerializerContainer.h"

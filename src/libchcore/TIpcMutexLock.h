@@ -19,7 +19,6 @@
 #ifndef __TIPCMUTEXLOCK_H__
 #define __TIPCMUTEXLOCK_H__
 
-#include "libchcore.h"
 #include "TIpcMutex.h"
 
 namespace chcore

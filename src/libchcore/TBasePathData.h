@@ -23,7 +23,6 @@
 #ifndef __TBASEPATHDATA_H__
 #define __TBASEPATHDATA_H__
 
-#include "libchcore.h"
 #include "TPath.h"
 #include <bitset>
 #include "TSharedModificationTracker.h"

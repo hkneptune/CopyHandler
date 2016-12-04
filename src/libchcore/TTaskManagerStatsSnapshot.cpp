@@ -39,9 +39,9 @@ namespace chcore
 		m_ullTotalSize(0),
 		m_dCountSpeed(0.0),
 		m_dSizeSpeed(0.0),
-		m_dCombinedProgress(0.0),
 		m_dAvgCountSpeed(0.0),
-		m_dAvgSizeSpeed(0.0)
+		m_dAvgSizeSpeed(0.0),
+		m_dCombinedProgress(0.0)
 	{
 	}
 

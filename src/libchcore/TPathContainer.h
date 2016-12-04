@@ -19,7 +19,6 @@
 #ifndef __TPATHCONTAINER_H__
 #define __TPATHCONTAINER_H__
 
-#include "libchcore.h"
 #include "TPath.h"
 #include "TConfig.h"
 

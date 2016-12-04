@@ -19,7 +19,6 @@
 #ifndef __TTASKMANAGERSCHEMA_H__
 #define __TTASKMANAGERSCHEMA_H__
 
-#include "libchcore.h"
 #include "TSQLiteDatabase.h"
 #include "ISQLiteSerializerSchema.h"
 

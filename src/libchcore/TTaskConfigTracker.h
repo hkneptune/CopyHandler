@@ -23,7 +23,6 @@
 #ifndef __TCONFIGTRACKER_H__
 #define __TCONFIGTRACKER_H__
 
-#include "libchcore.h"
 #include "TTaskConfiguration.h"
 
 namespace chcore

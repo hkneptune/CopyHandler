@@ -19,7 +19,6 @@
 #ifndef __TSERIALIZEREXCEPTION_H__
 #define __TSERIALIZEREXCEPTION_H__
 
-#include "libchcore.h"
 #include "TBaseException.h"
 
 namespace chcore

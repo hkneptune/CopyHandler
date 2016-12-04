@@ -195,34 +195,34 @@ bool TDestinationPathInfo::ReadFromConfig(chcore::TConfig& rConfig, PCTSTR pszNo
 // class TShellMenuItem
 
 TShellMenuItem::TShellMenuItem() :
-	m_tOperationType(),
-	m_tSourcePaths(),
-	m_tDestinationPath(),
 	m_eItemType(eSeparatorItem),
+	m_tOperationType(),
+	m_tDestinationPath(),
+	m_tSourcePaths(),
 	m_bSpecialOperation(false),
 	m_eDefaultItemHint(chcore::eOperation_None)
 {
 }
 
 TShellMenuItem::TShellMenuItem(const chcore::TString& wstrName, const chcore::TString& wstrItemTip, const TOperationTypeInfo& rOperationType, const TSourcePathsInfo& rSourcePaths, const TDestinationPathInfo& rDestinationPath, bool bSpecialOperation, chcore::EOperationType eDefaultItemHint) :
+	m_eItemType(eStandardItem),
 	m_strName(wstrName),
 	m_strItemTip(wstrItemTip),
 	m_tOperationType(rOperationType),
-	m_tSourcePaths(rSourcePaths),
 	m_tDestinationPath(rDestinationPath),
-	m_eItemType(eStandardItem),
+	m_tSourcePaths(rSourcePaths),
 	m_bSpecialOperation(bSpecialOperation),
 	m_eDefaultItemHint(eDefaultItemHint)
 {
 }
 
 TShellMenuItem::TShellMenuItem(const chcore::TString& wstrName, const chcore::TString& wstrItemTip) :
+	m_eItemType(eGroupItem),
 	m_strName(wstrName),
 	m_strItemTip(wstrItemTip),
 	m_tOperationType(),
-	m_tSourcePaths(),
 	m_tDestinationPath(),
-	m_eItemType(eGroupItem),
+	m_tSourcePaths(),
 	m_bSpecialOperation(false),
 	m_eDefaultItemHint(chcore::eOperation_None)
 {
@@ -450,13 +450,13 @@ bool TShellMenuItem::ReadFromConfig(chcore::TConfig& rConfig, PCTSTR pszNodeName
 }
 
 TShellExtMenuConfig::TShellExtMenuConfig() :
+	m_spDragAndDropRoot(std::make_shared<TShellMenuItem>(_T(""), _T(""))),
+	m_spNormalRoot(std::make_shared<TShellMenuItem>(_T(""), _T(""))),
+	m_spFmtSize(std::make_shared<chcore::TSizeFormatter>()),
 	m_bInterceptDragAndDrop(false),
 	m_bInterceptKeyboardActions(false),
 	m_bInterceptCtxMenuActions(false),
-	m_bShowShortcutIcons(false),
-	m_spDragAndDropRoot(std::make_shared<TShellMenuItem>(_T(""), _T(""))),
-	m_spNormalRoot(std::make_shared<TShellMenuItem>(_T(""), _T(""))),
-	m_spFmtSize(std::make_shared<chcore::TSizeFormatter>())
+	m_bShowShortcutIcons(false)
 {
 }
 
