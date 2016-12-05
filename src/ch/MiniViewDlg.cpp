@@ -713,7 +713,7 @@ void CMiniViewDlg::OnLButtonUp(UINT nFlags, CPoint point)
 	}
 
 	if (!bProcessed)
-		m_ctlStatus.SetCurSel(-1);
+		m_ctlStatus.SetCurrentSelection(-1);
 
 	m_iIndex=-1;
 

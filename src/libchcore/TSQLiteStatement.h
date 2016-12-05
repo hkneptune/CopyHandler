@@ -41,11 +41,14 @@ namespace chcore
 
 		public:
 			explicit TSQLiteStatement(const TSQLiteDatabasePtr& spDatabase);
+			TSQLiteStatement(const TSQLiteStatement&) = delete;
 			~TSQLiteStatement();
+
+			TSQLiteStatement& operator=(const TSQLiteStatement&) = delete;
 
 			void Close();
 
-			void Prepare(PCTSTR pszQuery);
+			void Prepare(PCWSTR pszQuery);
 
 			void BindValue(int iColumn, bool bValue);
 			void BindValue(int iColumn, short siValue);

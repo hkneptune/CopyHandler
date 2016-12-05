@@ -90,9 +90,6 @@ namespace chcore
 		typedef TStringArrayConstIterator const_iterator;
 
 	public:
-		TStringArray();
-		~TStringArray();
-
 		bool operator==(const TStringArray& rSrc) const;
 		bool operator!=(const TStringArray& rSrc) const;
 

@@ -19,8 +19,8 @@
 #ifndef __FEEDBACKHANDLERFACTORY_H__
 #define __FEEDBACKHANDLERFACTORY_H__
 
-#include "..\libchcore\IFeedbackHandlerFactory.h"
-#include "..\libchcore\IFeedbackHandler.h"
+#include "../libchcore/IFeedbackHandlerFactory.h"
+#include "../libchcore/IFeedbackHandler.h"
 
 class CFeedbackHandlerFactory : public chcore::IFeedbackHandlerFactory
 {

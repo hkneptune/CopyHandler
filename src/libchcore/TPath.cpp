@@ -44,18 +44,6 @@ namespace chcore
 	}
 
 	// ============================================================================
-	/// TSmartPath::TSmartPath
-	/// @date 2009/11/29
-	///
-	/// @brief     Constructs path object from another path object.
-	/// @param[in] spPath - reference to another path object.
-	// ============================================================================
-	TSmartPath::TSmartPath(const TSmartPath& spPath) :
-		m_strPath(spPath.m_strPath)
-	{
-	}
-
-	// ============================================================================
 	/// TSmartPath::~TSmartPath
 	/// @date 2009/11/29
 	///
@@ -64,7 +52,6 @@ namespace chcore
 	// ============================================================================
 	TSmartPath::~TSmartPath()
 	{
-		Clear();
 	}
 
 	// ============================================================================
@@ -77,7 +64,6 @@ namespace chcore
 	{
 		m_strPath.Clear();
 	}
-
 
 	TSmartPath TSmartPath::AppendCopy(const TSmartPath& pathToAppend, bool bEnsurePathSeparatorExists) const
 	{
@@ -116,25 +102,6 @@ namespace chcore
 				else
 					m_strPath += pathToAppend.m_strPath;
 			}
-		}
-
-		return *this;
-	}
-
-	// ============================================================================
-	/// TSmartPath::operator=
-	/// @date 2009/11/29
-	///
-	/// @brief     Assigns a path from other path object.
-	/// @param[in] spPath - path object from which we want to get path.
-	/// @return    Reference to this object.
-	// ============================================================================
-	TSmartPath& TSmartPath::operator=(const TSmartPath& spPath)
-	{
-		if (this != &spPath)
-		{
-			Clear();
-			m_strPath = spPath.m_strPath;
 		}
 
 		return *this;
@@ -932,14 +899,6 @@ namespace chcore
 		return spPath;
 	}
 
-	// ============================================================================
-	/// PathFromWString
-	/// @date 2010/10/12
-	///
-	/// @brief     Creates a path object from string.
-	/// @param[in] pszPath - string containing path.
-	/// @return    New path object.
-	// ============================================================================
 	TSmartPath PathFromWString(const TString& strPath)
 	{
 		TSmartPath spPath;

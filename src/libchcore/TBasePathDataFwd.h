@@ -22,7 +22,7 @@
 namespace chcore
 {
 	class TBasePathData;
-	typedef std::shared_ptr<TBasePathData> TBasePathDataPtr;
+	using TBasePathDataPtr = std::shared_ptr<TBasePathData>;
 }
 
 #endif

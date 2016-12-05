@@ -24,7 +24,7 @@
 #include "FolderDialog.h"
 #include "CustomCopyDlg.h"
 #include "AboutDlg.h"
-#include "..\common\ipcstructs.h"
+#include "../common/ipcstructs.h"
 #include "UpdateChecker.h"
 #include "UpdaterDlg.h"
 #include "MiniviewDlg.h"
@@ -610,12 +610,10 @@ void CMainWnd::ProcessCommandLine(const TCommandLineParser& rCommandLine)
 			}
 			catch(const chcore::TBaseException& e)
 			{
-				bImported = false;
 				e.GetDetailedErrorInfo(szBuffer.get(), stBufferSize);
 			}
 			catch(...)
 			{
-				bImported = false;
 				szBuffer.get()[0] = _T('\0');
 			}
 

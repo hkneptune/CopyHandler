@@ -19,7 +19,7 @@
 #ifndef __DIRECTORYCHOOSER_H__
 #define __DIRECTORYCHOOSER_H__
 
-#include "..\libchcore\EOperationTypes.h"
+#include "../libchcore/EOperationTypes.h"
 
 namespace DirectoryChooser
 {

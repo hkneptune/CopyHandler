@@ -308,9 +308,6 @@
     <ClInclude Include="MathFunctions.h">
       <Filter>Source Files\Tools</Filter>
     </ClInclude>
-    <ClInclude Include="TModPathContainer.h">
-      <Filter>Source Files\Tools</Filter>
-    </ClInclude>
     <ClInclude Include="TPathContainer.h">
       <Filter>Source Files\Tools</Filter>
     </ClInclude>
@@ -434,9 +431,6 @@
     <ClInclude Include="TLocalFilesystemFind.h">
       <Filter>Source Files\Filesystems\Local</Filter>
     </ClInclude>
-    <ClInclude Include="TSparseRangeMap.h">
-      <Filter>Source Files\Tools</Filter>
-    </ClInclude>
     <ClInclude Include="SerializerDataTypes.h">
       <Filter>Source Files\Tools</Filter>
     </ClInclude>
@@ -456,9 +450,6 @@
       <Filter>Source Files\Tools\Exceptions</Filter>
     </ClInclude>
     <ClInclude Include="TCoreWin32Exception.h">
-      <Filter>Source Files\Tools\Exceptions</Filter>
-    </ClInclude>
-    <ClInclude Include="TCoreStdException.h">
       <Filter>Source Files\Tools\Exceptions</Filter>
     </ClInclude>
     <ClInclude Include="TFileException.h">
@@ -740,9 +731,6 @@
     <ClCompile Include="MathFunctions.cpp">
       <Filter>Source Files\Tools</Filter>
     </ClCompile>
-    <ClCompile Include="TModPathContainer.cpp">
-      <Filter>Source Files\Tools</Filter>
-    </ClCompile>
     <ClCompile Include="TPathContainer.cpp">
       <Filter>Source Files\Tools</Filter>
     </ClCompile>
@@ -881,9 +869,6 @@
     <ClCompile Include="TLocalFilesystemFind.cpp">
       <Filter>Source Files\Filesystems\Local</Filter>
     </ClCompile>
-    <ClCompile Include="TSparseRangeMap.cpp">
-      <Filter>Source Files\Tools</Filter>
-    </ClCompile>
     <ClCompile Include="Tests\TestsTSparseRangeMap.cpp">
       <Filter>Tests</Filter>
     </ClCompile>
@@ -894,9 +879,6 @@
       <Filter>Source Files\Tools\Exceptions</Filter>
     </ClCompile>
     <ClCompile Include="TCoreWin32Exception.cpp">
-      <Filter>Source Files\Tools\Exceptions</Filter>
-    </ClCompile>
-    <ClCompile Include="TCoreStdException.cpp">
       <Filter>Source Files\Tools\Exceptions</Filter>
     </ClCompile>
     <ClCompile Include="TFileException.cpp">

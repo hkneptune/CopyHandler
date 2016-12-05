@@ -41,13 +41,10 @@ namespace chcore
 
 	public:
 		TFileInfo();
-		TFileInfo(const TFileInfo& rSrc);
 		TFileInfo(const TBasePathDataPtr& spBasePathData, const TSmartPath& rpathFile,
 			DWORD dwAttributes, ULONGLONG uhFileSize, const TFileTime& ftCreation, const TFileTime& ftLastAccess, const TFileTime& ftLastWrite,
 			unsigned int uiFlags);
 		~TFileInfo();
-
-		TFileInfo& operator=(const TFileInfo& rSrc);
 
 		// operators
 		bool operator==(const TFileInfo& rInfo) const;

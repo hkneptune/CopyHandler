@@ -285,26 +285,6 @@ void CControlResizeInfo::SetInitialPosition(const CRect& rcPos)
 }
 
 // ============================================================================
-/// ictranslate::CControlResizeInfo::SetFactors
-/// @date 2009/04/18
-///
-/// @brief     Sets the offset and scaling factors for future placement calculations.
-/// @param[in] dXPosFactor	  Multiplier for the dialog width change - used for x-offset.
-/// @param[in] dYPosFactor    Multiplier for the dialog height change - used for y-offset.
-/// @param[in] dXScaleFactor  Multiplier for the dialog width change - used for x-size.
-/// @param[in] dYScaleFactor  Multiplier for the dialog height change - used for y-size.
-// ============================================================================
-/*
-void CControlResizeInfo::SetFactors(double dXPosFactor, double dYPosFactor, double dXScaleFactor, double dYScaleFactor)
-{
-	m_dXOffsetFactor = dXPosFactor;
-	m_dYOffsetFactor = dYPosFactor;
-	m_dXScaleFactor = dXScaleFactor;
-	m_dYScaleFactor = dYScaleFactor;
-}*/
-
-
-// ============================================================================
 /// ictranslate::CControlResizeInfo::GetNewControlPlacement
 /// @date 2009/04/18
 ///

@@ -19,7 +19,7 @@
 #ifndef __TTASKMANAGERWRAPPER_H__
 #define __TTASKMANAGERWRAPPER_H__
 
-#include "..\libchcore\TTaskManager.h"
+#include "../libchcore/TTaskManager.h"
 
 class TTaskManagerWrapper
 {

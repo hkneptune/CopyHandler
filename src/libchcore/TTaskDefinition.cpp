@@ -43,37 +43,8 @@ namespace chcore
 		m_strTaskName = boost::lexical_cast<std::wstring>(u).c_str();
 	}
 
-	TTaskDefinition::TTaskDefinition(const TTaskDefinition& rSrc) :
-		m_strTaskName(rSrc.m_strTaskName),
-		m_vSourcePaths(rSrc.m_vSourcePaths),
-		m_pathDestinationPath(rSrc.m_pathDestinationPath),
-		m_afFilters(rSrc.m_afFilters),
-		m_tOperationPlan(rSrc.m_tOperationPlan),
-		m_ullTaskVersion(rSrc.m_ullTaskVersion),
-		m_tConfiguration(rSrc.m_tConfiguration),
-		m_bModified(rSrc.m_bModified)
-	{
-	}
-
 	TTaskDefinition::~TTaskDefinition()
 	{
-	}
-
-	TTaskDefinition& TTaskDefinition::operator=(const TTaskDefinition& rSrc)
-	{
-		if (this != &rSrc)
-		{
-			m_strTaskName = rSrc.m_strTaskName;
-			m_vSourcePaths = rSrc.m_vSourcePaths;
-			m_afFilters = rSrc.m_afFilters;
-			m_pathDestinationPath = rSrc.m_pathDestinationPath;
-			m_tOperationPlan = rSrc.m_tOperationPlan;
-			m_ullTaskVersion = rSrc.m_ullTaskVersion;
-			m_tConfiguration = rSrc.m_tConfiguration;
-			m_bModified = rSrc.m_bModified;
-		}
-
-		return *this;
 	}
 
 	// Task unique id

@@ -21,9 +21,9 @@
 
 #include "resource.h"       // main symbols
 #include "TContextMenuHandler.h"
-#include "..\common\TShellExtMenuConfig.h"
+#include "../common/TShellExtMenuConfig.h"
 #include "TShellExtData.h"
-#include "..\liblogger\TLogger.h"
+#include "../liblogger/TLogger.h"
 
 class TShellMenuItem;
 

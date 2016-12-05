@@ -35,7 +35,10 @@ namespace chcore
 
 	public:
 		TSharedMemory();
+		TSharedMemory(const TSharedMemory&) = delete;
 		~TSharedMemory();
+
+		TSharedMemory& operator=(const TSharedMemory&) = delete;
 
 		void Create(const wchar_t* pszName, shm_size_t stSize);
 		void Create(const wchar_t* pszName, const TString& wstrData);

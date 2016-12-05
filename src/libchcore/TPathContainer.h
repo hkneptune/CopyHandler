@@ -28,10 +28,7 @@ namespace chcore
 	{
 	public:
 		TPathContainer();
-		TPathContainer(const TPathContainer& rSrcContainer);
 		~TPathContainer();
-
-		TPathContainer& operator=(const TPathContainer& rSrcContainer);
 
 		void Add(const TSmartPath& spPath);
 		void Append(const TPathContainer& vPaths);

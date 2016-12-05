@@ -30,7 +30,10 @@ namespace chcore
 	{
 	public:
 		TFeedbackHandlerBase();
+		TFeedbackHandlerBase(const TFeedbackHandlerBase&) = delete;
 		virtual ~TFeedbackHandlerBase();
+
+		TFeedbackHandlerBase& operator=(const TFeedbackHandlerBase&) = delete;
 
 		// marking responses as permanent
 		void SetFileErrorPermanentResponse(EFeedbackResult ePermanentResult);

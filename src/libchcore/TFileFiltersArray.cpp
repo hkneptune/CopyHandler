@@ -32,16 +32,6 @@ namespace chcore
 	{
 	}
 
-	TFileFiltersArray& TFileFiltersArray::operator=(const TFileFiltersArray& rSrc)
-	{
-		if (this != &rSrc)
-		{
-			m_vFilters = rSrc.m_vFilters;
-		}
-
-		return *this;
-	}
-
 	bool TFileFiltersArray::Match(const TFileInfoPtr& spInfo) const
 	{
 		if (m_vFilters.empty())

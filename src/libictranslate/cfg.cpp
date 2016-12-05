@@ -121,10 +121,6 @@ void property_tracker::enum_ids(bool(*pfn)(unsigned int uiProp, void* pParam), v
 
 #define m_pvProps ((std::vector<property>*)m_hProps)
 
-/** Constructs a config object.
- * \param[in] pCfgBase - pointer to a base handler of the configuration strings
- *						 cound be pointer to xml handler, ini handler or any other
- */
 config::config(config_base_types eCfgType) :
 	m_lock(),
 	m_hProps((void*)new std::vector<property>),
@@ -685,14 +681,6 @@ void config::set_signed_num(unsigned int uiProp, long long llVal, property::acti
 	property_changed_notify(uiProp);
 }
 
-/** Function sets the unsigned number property value.
- *
- * \param[in] uiProp - property id to set the value for
- * \param[in] llVal - property value to set
- * \param[in] a - action to take if the property is array based
- * \param[in] tIndex - index of a value to set at (for action action_setat)
- * \param[out] pTracker - property tracker that collects the property ID's
- */
 void config::set_unsigned_num(unsigned int uiProp, unsigned long long ullVal, property::actions a, size_t tIndex, property_tracker* pTracker)
 {
 	m_lock.Lock();
@@ -703,14 +691,6 @@ void config::set_unsigned_num(unsigned int uiProp, unsigned long long ullVal, pr
 	property_changed_notify(uiProp);
 }
 
-/** Function sets the bool property value.
- *
- * \param[in] uiProp - property id to set the value for
- * \param[in] llVal - property value to set
- * \param[in] a - action to take if the property is array based
- * \param[in] tIndex - index of a value to set at (for action action_setat)
- * \param[out] pTracker - property tracker that collects the property ID's
- */
 void config::set_bool(unsigned int uiProp, bool bVal, property::actions a, size_t tIndex, property_tracker* pTracker)
 {
 	m_lock.Lock();
@@ -721,14 +701,6 @@ void config::set_bool(unsigned int uiProp, bool bVal, property::actions a, size_
 	property_changed_notify(uiProp);
 }
 
-/** Function sets the string property value.
- *
- * \param[in] uiProp - property id to set the value for
- * \param[in] llVal - property value to set
- * \param[in] a - action to take if the property is array based
- * \param[in] tIndex - index of a value to set at (for action action_setat)
- * \param[out] pTracker - property tracker that collects the property ID's
- */
 void config::set_string(unsigned int uiProp, const wchar_t* pszVal, property::actions a, size_t tIndex, property_tracker* pTracker)
 {
 	m_lock.Lock();
@@ -739,13 +711,6 @@ void config::set_string(unsigned int uiProp, const wchar_t* pszVal, property::ac
 	property_changed_notify(uiProp);
 }
 
-/** Sets the string manually, without using registered properties; does not notify about change.
-*
-* \param[in] pszName - name of the property
-* \param[in] pszVal - value of the property
-* \param[in] a - action to take if the property is array based
-* \param[in] tIndex - index of a value to set at (for action action_setat)
-*/
 void config::set_string(const wchar_t* pszName, const wchar_t* pszVal, property::actions a)
 {
 	config_base::actions action;

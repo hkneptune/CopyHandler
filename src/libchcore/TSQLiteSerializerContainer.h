@@ -32,13 +32,12 @@ namespace chcore
 {
 	class LIBCHCORE_API TSQLiteSerializerContainer : public ISerializerContainer
 	{
-	private:
-		TSQLiteSerializerContainer(const TSQLiteSerializerContainer&);
-		TSQLiteSerializerContainer& operator=(const TSQLiteSerializerContainer&);
-
 	public:
 		TSQLiteSerializerContainer(const TString& strName, const sqlite::TSQLiteDatabasePtr& spDB, TPlainStringPool& poolStrings);
+		TSQLiteSerializerContainer(const TSQLiteSerializerContainer&) = delete;
 		virtual ~TSQLiteSerializerContainer();
+
+		TSQLiteSerializerContainer& operator=(const TSQLiteSerializerContainer&) = delete;
 
 		IColumnsDefinition& GetColumnsDefinition() override;
 

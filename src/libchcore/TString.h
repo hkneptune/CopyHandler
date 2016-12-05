@@ -41,59 +41,44 @@ namespace chcore
 	class LIBCHCORE_API TString
 	{
 	public:
-		/** \name Construction/destruction */
-		/*@{*/
-		TString();						///< Standard constructor
+		TString();
 		// cppcheck-suppress noExplicitConstructor
-		TString(const wchar_t* pszStr);	///< Constructor that takes const wchar_t* as an initial TString
+		TString(const wchar_t* pszStr);
 		TString(const wchar_t* pszStart, const wchar_t* pszEnd, size_t stMaxStringSize = DefaultMaxStringSize);
 		TString(const wchar_t* pszStart, size_t stCount);
-		TString(const TString& str);	///< Standard copy constructor
 
-		~TString();						///< Standard destructor
-	/*@}*/
+		TString(const TString& str);
+		TString(TString&& str);
 
-	/** \name Operators */
-	/**@{*/
+		~TString();
+
 		// assignment
-		TString& operator=(const TString& src);			///< Assign operator for TString objects
-		TString operator+(const TString& src) const;	///< Concatenate operator for TString objects
-		const TString& operator+=(const TString& src);		///< Merge operator for TString objects
+		TString& operator=(const TString& src);
+		TString& operator=(TString&& src);
 
-		const TString& operator=(const wchar_t* pszSrc);			///< Assign operator from unicode strings
-		TString operator+(const wchar_t* pszSrc) const;	///< Concatenate operator for unicode strings
-		const TString& operator+=(const wchar_t* pszSrc);		///< Merge operator for unicode strings
+		const TString& operator=(const wchar_t* pszSrc);
 
-		/// Makes case sensitive comparison to the unicode TString ( see Compare(const wchar_t* psz) )
+		TString operator+(const TString& src) const;
+		const TString& operator+=(const TString& src);
+
+		TString operator+(const wchar_t* pszSrc) const;
+		const TString& operator+=(const wchar_t* pszSrc);
+
 		bool operator<(const wchar_t* psz) const { return Compare(psz) < 0; };
-		/// Makes case sensitive comparison to the unicode TString ( see Compare(const wchar_t* psz) )
 		bool operator<=(const wchar_t* psz) const { return Compare(psz) <= 0; };
-		/// Makes case sensitive comparison to the unicode TString ( see Compare(const wchar_t* psz) )
 		bool operator==(const wchar_t* psz) const { return Compare(psz) == 0; };
-		/// Makes case sensitive comparison to the unicode TString ( see Compare(const wchar_t* psz) )
 		bool operator>=(const wchar_t* psz) const { return Compare(psz) >= 0; };
-		/// Makes case sensitive comparison to the unicode TString ( see Compare(const wchar_t* psz) )
 		bool operator>(const wchar_t* psz) const { return Compare(psz) > 0; };
-		/// Makes case sensitive comparison to the unicode TString ( see Compare(const wchar_t* psz) )
 		bool operator!=(const wchar_t* psz) const { return Compare(psz) != 0; };
 
-		/// Makes case sensitive comparison to the TString object ( see Compare(const TString& str) )
 		bool operator<(const TString& str) const { return Compare(str) < 0; };
-		/// Makes case sensitive comparison to the TString object ( see Compare(const TString& str) )
 		bool operator<=(const TString& str) const { return Compare(str) <= 0; };
-		/// Makes case sensitive comparison to the TString object ( see Compare(const TString& str) )
 		bool operator==(const TString& str) const { return Compare(str) == 0; };
-		/// Makes case sensitive comparison to the TString object ( see Compare(const TString& str) )
 		bool operator>=(const TString& str) const { return Compare(str) >= 0; };
-		/// Makes case sensitive comparison to the TString object ( see Compare(const TString& str) )
 		bool operator>(const TString& str) const { return Compare(str) >= 0; };
-		/// Makes case sensitive comparison to the TString object ( see Compare(const TString& str) )
 		bool operator!=(const TString& str) const { return Compare(str) != 0; };
-		/**@}*/
 
-		/** \name Standard operations */
-		/**@{*/
-			// appends the given TString to this
+		// appends the given TString to this
 		void Append(const wchar_t* pszSrc);		///< Appends an unicode TString to the TString object
 		void Append(const TString& src);			///< Appends a TString object to another TString object
 
@@ -145,7 +130,6 @@ namespace chcore
 		void Clear();			///< Clear the contents of the TString object
 
 		bool IsEmpty() const;	///< Returns true if the TString is empty
-	/**@}*/
 
 	protected:
 		void SetString(const wchar_t* pszStart, size_t stCount);

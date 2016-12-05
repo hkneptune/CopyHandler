@@ -18,7 +18,7 @@
 // ============================================================================
 #include "stdafx.h"
 #include "TSubTaskArrayStatsSnapshot.h"
-#include <boost\numeric\conversion\cast.hpp>
+#include <boost/numeric/conversion/cast.hpp>
 
 namespace chcore
 {

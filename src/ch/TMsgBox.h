@@ -19,7 +19,7 @@
 #ifndef __TMSGBOX_H__
 #define __TMSGBOX_H__
 
-#include "..\libictranslate\LanguageDialog.h"
+#include "../libictranslate/LanguageDialog.h"
 
 class TMsgBox : public ictranslate::CLanguageDialog
 {
@@ -62,7 +62,7 @@ protected:
 	void InitRichEdit();
 
 	void OnCancel() override;
-	void OnGetMinMaxInfo(MINMAXINFO* lpMMI);
+	afx_msg void OnGetMinMaxInfo(MINMAXINFO* lpMMI);
 
 	void InitializeControls();
 

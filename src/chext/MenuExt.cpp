@@ -19,7 +19,7 @@
 #include "stdafx.h"
 #include "chext.h"
 #include "MenuExt.h"
-#include "..\common\ipcstructs.h"
+#include "../common/ipcstructs.h"
 #include "stdio.h"
 #include "memory.h"
 #include <boost/shared_array.hpp>

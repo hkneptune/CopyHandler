@@ -29,10 +29,8 @@ namespace chcore
 		TFileTime();
 		// cppcheck-suppress noExplicitConstructor
 		TFileTime(const FILETIME& rftTime);
-		TFileTime(const TFileTime& rSrc);
 		~TFileTime();
 
-		TFileTime& operator=(const TFileTime& rSrc);
 		TFileTime& operator=(const FILETIME& rSrc);
 
 		bool operator==(const TFileTime& rSrc) const;

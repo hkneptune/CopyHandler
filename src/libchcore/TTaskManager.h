@@ -26,7 +26,7 @@
 #include "ISerializer.h"
 #include "ISerializerFactory.h"
 #include "TObsoleteFiles.h"
-#include "..\liblogger\TMultiLoggerConfig.h"
+#include "../liblogger/TMultiLoggerConfig.h"
 
 namespace chcore
 {
@@ -44,8 +44,11 @@ namespace chcore
 			const TSmartPath& pathLogDir,
 			const logger::TMultiLoggerConfigPtr& spMultiLoggerConfig,
 			bool bForceRecreateSerializer = false);
+		TTaskManager(const TTaskManager&) = delete;
 
 		~TTaskManager();
+
+		TTaskManager& operator=(const TTaskManager&) = delete;
 
 		void Store(bool bForce);
 		void Load();

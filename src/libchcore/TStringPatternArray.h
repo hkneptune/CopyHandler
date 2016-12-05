@@ -26,9 +26,6 @@ namespace chcore
 	class LIBCHCORE_API TStringPatternArray
 	{
 	public:
-		TStringPatternArray();
-		~TStringPatternArray();
-
 		// general api
 		void Add(const TStringPattern& strPattern);
 		void InsertAt(size_t stIndex, const TStringPattern& strPattern);

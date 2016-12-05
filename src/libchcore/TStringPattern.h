@@ -33,7 +33,7 @@ namespace chcore
 
 	public:
 		explicit TStringPattern(EPatternType ePatternType = EPatternType::eType_Wildcard);
-		TStringPattern(const TString& strPattern, EPatternType ePatternType = EPatternType::eType_Wildcard);
+		explicit TStringPattern(const TString& strPattern, EPatternType ePatternType = EPatternType::eType_Wildcard);
 
 		void SetPattern(const TString& strPattern, EPatternType ePatternType = EPatternType::eType_Wildcard);
 		bool Matches(const TString& strTextToMatch) const;

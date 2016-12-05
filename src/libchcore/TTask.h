@@ -33,7 +33,7 @@
 #include "TTaskBaseData.h"
 #include <mutex>
 #include "IFilesystem.h"
-#include "..\liblogger\TLogger.h"
+#include "../liblogger/TLogger.h"
 
 namespace chcore
 {
@@ -47,8 +47,11 @@ namespace chcore
 	class LIBCHCORE_API TTask
 	{
 	private:
+		TTask(const TTask&) = delete;
 		TTask(const ISerializerPtr& spSerializer, const IFeedbackHandlerPtr& spFeedbackHandler, const TTaskBaseData& rBaseTaskData, const logger::TMultiLoggerConfigPtr& spLoggerConfig);
 		TTask(const ISerializerPtr& spSerializer, const IFeedbackHandlerPtr& spFeedbackHandler, const TTaskDefinition& rTaskDefinition, const TSmartPath& rLogPath, const logger::TMultiLoggerConfigPtr& spLoggerConfig);
+
+		TTask& operator=(const TTask&) = delete;
 
 	public:
 		~TTask();

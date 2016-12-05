@@ -369,9 +369,7 @@ HRESULT CDirTreeCtrl::FillNode(HTREEITEM hParent, LPSHELLFOLDER lpsf, LPITEMIDLI
 		ULONG ulAttrib = 0;
 		TVITEM tvi = { 0 };
 		TVINSERTSTRUCT tvis = { 0 };
-		_SHELLITEMDATA *psid = nullptr;
 		TCHAR szText[ _MAX_PATH ];
-		HTREEITEM hCurrent = nullptr;
 
 		while (lpeid->Next(1, &lpiidl, nullptr) == NOERROR)
 		{
@@ -384,7 +382,7 @@ HRESULT CDirTreeCtrl::FillNode(HTREEITEM hParent, LPSHELLFOLDER lpsf, LPITEMIDLI
 				bFound=true;
 
 				// it's time to add everything
-				psid=new _SHELLITEMDATA;
+				_SHELLITEMDATA* psid=new _SHELLITEMDATA;
 				lpsf->BindToObject(lpiidl, nullptr, IID_IShellFolder, (void**)&psid->lpsf);
 				psid->lpiidl=ConcatPidls(lpidl, lpiidl);
 				psid->lpiidlRelative=CopyITEMID(lpm, lpiidl);
@@ -401,7 +399,7 @@ HRESULT CDirTreeCtrl::FillNode(HTREEITEM hParent, LPSHELLFOLDER lpsf, LPITEMIDLI
 
 				tvis.hParent=hParent;
 				tvis.item=tvi;
-				hCurrent=InsertItem(&tvis);
+				HTREEITEM hCurrent=InsertItem(&tvis);
 
 				if (hParent == GetRootItem() && lpsfDesktop)
 				{

@@ -55,7 +55,7 @@ namespace chcore
 			return pBuffer;
 		}
 
-		const TOverlappedDataBuffer* const Peek() const
+		const TOverlappedDataBuffer* Peek() const
 		{
 			if(empty())
 				return nullptr;

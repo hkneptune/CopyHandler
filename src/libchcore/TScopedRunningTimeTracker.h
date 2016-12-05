@@ -27,17 +27,16 @@ namespace chcore
 	{
 	public:
 		explicit TScopedRunningTimeTracker(IRunningTimeControl& rStats);
+		TScopedRunningTimeTracker(const TScopedRunningTimeTracker& rLocalStats) = delete;
 		~TScopedRunningTimeTracker();
+
+		TScopedRunningTimeTracker& operator=(const TScopedRunningTimeTracker& rLocalStats) = delete;
 
 		void PauseTimeTracking();
 		void UnPauseTimeTracking();
 
 		void PauseRunningState();
 		void UnPauseRunningState();
-
-	private:
-		TScopedRunningTimeTracker(const TScopedRunningTimeTracker& rLocalStats) = delete;
-		TScopedRunningTimeTracker& operator=(const TScopedRunningTimeTracker& rLocalStats) = delete;
 
 	private:
 		IRunningTimeControl& m_rLocalStats;

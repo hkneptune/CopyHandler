@@ -24,14 +24,6 @@
 
 namespace chcore
 {
-	TStringPatternArray::TStringPatternArray()
-	{
-	}
-
-	TStringPatternArray::~TStringPatternArray()
-	{
-	}
-
 	void TStringPatternArray::Add(const TStringPattern& strPattern)
 	{
 		m_vPatterns.push_back(strPattern);

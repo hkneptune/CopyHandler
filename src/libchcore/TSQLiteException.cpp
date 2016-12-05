@@ -29,12 +29,6 @@ namespace chcore
 		{
 		}
 
-		TSQLiteException::TSQLiteException(EGeneralErrors eErrorCode, int iSQLiteError, const char* pszMsg, const wchar_t* pszFile, size_t stLineNumber, const wchar_t* pszFunction) :
-			TBaseException(eErrorCode, pszMsg, pszFile, stLineNumber, pszFunction),
-			m_iSQLiteError(iSQLiteError)
-		{
-		}
-
 		int TSQLiteException::GetSQLiteError() const
 		{
 			return m_iSQLiteError;

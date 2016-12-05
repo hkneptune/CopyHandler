@@ -19,8 +19,8 @@
 #include "stdafx.h"
 #include "TTaskConfigVerifier.h"
 #include "TTaskConfiguration.h"
-#include <boost\format.hpp>
-#include "..\liblogger\TLogger.h"
+#include <boost/format.hpp>
+#include "../liblogger/TLogger.h"
 
 namespace chcore
 {

@@ -27,13 +27,12 @@ namespace chcore
 {
 	class LIBCHCORE_API TSQLiteSerializerRowReader : public ISerializerRowReader
 	{
-	private:
-		TSQLiteSerializerRowReader(const TSQLiteSerializerRowReader&);
-		TSQLiteSerializerRowReader& operator=(const TSQLiteSerializerRowReader&);
-
 	public:
 		TSQLiteSerializerRowReader(const sqlite::TSQLiteDatabasePtr& spDatabase, TSQLiteColumnsDefinition& rColumns, const TString& strContainerName);
+		TSQLiteSerializerRowReader(const TSQLiteSerializerRowReader&) = delete;
 		virtual ~TSQLiteSerializerRowReader();
+
+		TSQLiteSerializerRowReader& operator=(const TSQLiteSerializerRowReader&) = delete;
 
 		bool Next() override;
 

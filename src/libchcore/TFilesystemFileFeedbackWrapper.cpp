@@ -140,8 +140,6 @@ namespace chcore
 		bool bRetry = false;
 		do
 		{
-			bRetry = false;
-
 			DWORD dwLastError = ERROR_SUCCESS;
 
 			try
@@ -194,8 +192,6 @@ namespace chcore
 		bool bRetry = false;
 		do
 		{
-			bRetry = false;
-
 			DWORD dwLastError = ERROR_SUCCESS;
 
 			try
@@ -248,8 +244,6 @@ namespace chcore
 		bool bRetry = false;
 		do
 		{
-			bRetry = false;
-
 			DWORD dwLastError = ERROR_SUCCESS;
 
 			try
@@ -384,8 +378,6 @@ namespace chcore
 		bool bRetry = false;
 		do
 		{
-			bRetry = false;
-
 			DWORD dwLastError = ERROR_SUCCESS;
 
 			try
@@ -442,8 +434,6 @@ namespace chcore
 		bool bRetry = false;
 		do
 		{
-			bRetry = false;
-
 			DWORD dwLastError = ERROR_SUCCESS;
 
 			try
@@ -503,8 +493,6 @@ namespace chcore
 		bool bRetry = false;
 		do
 		{
-			bRetry = false;
-
 			DWORD dwLastError = ERROR_SUCCESS;
 
 			try

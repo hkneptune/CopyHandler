@@ -22,7 +22,7 @@
 #include "TFileInfoFwd.h"
 #include "TPath.h"
 #include "IFilesystemFind.h"
-#include "..\liblogger\TLogger.h"
+#include "../liblogger/TLogger.h"
 
 namespace chcore
 {

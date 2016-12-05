@@ -508,7 +508,6 @@ goto end
     <ClInclude Include="TConfigArray.h" />
     <ClInclude Include="TConfigNotifier.h" />
     <ClInclude Include="TCoreEngine.h" />
-    <ClInclude Include="TCoreStdException.h" />
     <ClInclude Include="TCoreWin32Exception.h" />
     <ClInclude Include="TDestinationPathProvider.h" />
     <ClInclude Include="TEvent.h" />
@@ -532,7 +531,6 @@ goto end
     <ClInclude Include="TLocalFilesystemFile.h" />
     <ClInclude Include="TLocalFilesystemFind.h" />
     <ClInclude Include="TModificationTracker.h" />
-    <ClInclude Include="TModPathContainer.h" />
     <ClInclude Include="TObsoleteFiles.h" />
     <ClInclude Include="TOrderedBufferQueue.h" />
     <ClInclude Include="TOverlappedMemoryPool.h" />
@@ -553,7 +551,6 @@ goto end
     <ClInclude Include="TSimpleOrderedBufferQueue.h" />
     <ClInclude Include="TSimpleTimer.h" />
     <ClInclude Include="TSizeFormatter.h" />
-    <ClInclude Include="TSparseRangeMap.h" />
     <ClInclude Include="TSpeedTracker.h" />
     <ClInclude Include="TSQLiteColumnDefinition.h" />
     <ClInclude Include="TSQLiteDatabase.h" />
@@ -658,7 +655,6 @@ goto end
     <ClCompile Include="TConfigArray.cpp" />
     <ClCompile Include="TConfigNotifier.cpp" />
     <ClCompile Include="TCoreEngine.cpp" />
-    <ClCompile Include="TCoreStdException.cpp" />
     <ClCompile Include="TCoreWin32Exception.cpp" />
     <ClCompile Include="TDestinationPathProvider.cpp" />
     <ClCompile Include="Tests\TBufferListTests.cpp">
@@ -831,7 +827,6 @@ goto end
     <ClCompile Include="TIpcMutexLock.cpp" />
     <ClCompile Include="TLocalFilesystemFile.cpp" />
     <ClCompile Include="TLocalFilesystemFind.cpp" />
-    <ClCompile Include="TModPathContainer.cpp" />
     <ClCompile Include="TObsoleteFiles.cpp" />
     <ClCompile Include="TOrderedBufferQueue.cpp" />
     <ClCompile Include="TOverlappedMemoryPool.cpp" />
@@ -851,7 +846,6 @@ goto end
     <ClCompile Include="TSerializerVersion.cpp" />
     <ClCompile Include="TSimpleTimer.cpp" />
     <ClCompile Include="TSizeFormatter.cpp" />
-    <ClCompile Include="TSparseRangeMap.cpp" />
     <ClCompile Include="TSpeedTracker.cpp" />
     <ClCompile Include="TSQLiteColumnDefinition.cpp" />
     <ClCompile Include="TSQLiteDatabase.cpp" />

@@ -23,7 +23,7 @@
 #include "TSerializerException.h"
 #include "TSQLiteStatement.h"
 #include "TSQLiteException.h"
-#include "sqlite3\sqlite3.h"
+#include <sqlite3/sqlite3.h>
 
 namespace chcore
 {

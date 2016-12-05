@@ -45,7 +45,7 @@ namespace chcore
 		TOverlappedDataBuffer* Pop();
 		TOverlappedDataBuffer* PopError();
 
-		const TOverlappedDataBuffer* const Peek() const;
+		const TOverlappedDataBuffer* Peek() const;
 
 		size_t GetCount() const;
 		bool IsEmpty() const;

@@ -102,6 +102,14 @@ namespace chcore
 		SetString(rSrc.m_pszData);
 	}
 
+	TString::TString(TString&& str) :
+		m_pszData(str.m_pszData),
+		m_stBufferSize(str.m_stBufferSize)
+	{
+		str.m_pszData = nullptr;
+		str.m_stBufferSize = 0;
+	}
+
 	/** Destructor releases the underlying data object.
 	 */
 	TString::~TString()
@@ -111,12 +119,6 @@ namespace chcore
 		m_stBufferSize = 0;
 	}
 
-	/** Operator releases the current data object, stores a pointer to
-	 *  the data object from the given TString object and increases a reference
-	 *  count.
-	 * \param[in] src - source TString object
-	 * \return A reference to the current TString.
-	 */
 	TString& TString::operator=(const TString& rSrc)
 	{
 		if (this != &rSrc)
@@ -134,6 +136,14 @@ namespace chcore
 	{
 		if (pszSrc != m_pszData)
 			SetString(pszSrc);
+
+		return *this;
+	}
+
+	TString& TString::operator=(TString&& src)
+	{
+		std::swap(m_pszData, src.m_pszData);
+		std::swap(m_stBufferSize, src.m_stBufferSize);
 
 		return *this;
 	}
@@ -228,9 +238,6 @@ namespace chcore
 		wcsncpy_s(m_pszData + stThisLen, m_stBufferSize - stThisLen, pszSrc, stAddLen + 1);
 	}
 
-	/** Function merges the given TString object with the current content of an internal buffer.
-	 * \param[in] src - TString object to append
-	 */
 	void TString::Append(const TString& rSrc)
 	{
 		if (rSrc.IsEmpty())
@@ -306,13 +313,6 @@ namespace chcore
 		return Mid(tStart, stAfterEndPos - tStart);
 	}
 
-	/** Makes this TString it's Left part. Much faster than using standard
-	 *  Left() function.
-	 * \param[in] tLen - count of characters at the beginning of the TString to be Left in a TString.
-	 * \param[in] bReallocBuffer - if the internal TString buffer is to be reallocated if exceeds
-	 *									  the allowable range size (CHUNK_INCSIZE, CHUNK_DECSIZE).
-	 * \see Left()
-	 */
 	void TString::LeftSelf(size_t tLen)
 	{
 		size_t stThisLen = GetLength();
@@ -325,13 +325,6 @@ namespace chcore
 			m_pszData[tLen] = _T('\0');
 	}
 
-	/** Makes this TString it's Right part. Much faster than using standard
-	 *  Right() function.
-	 * \param[in] tLen - count of characters at the end of the TString to be Left in a TString.
-	 * \param[in] bReallocBuffer - if the internal TString buffer is to be reallocated if exceeds
-	 *									  the allowable range size (CHUNK_INCSIZE, CHUNK_DECSIZE).
-	 * \see Right()
-	 */
 	void TString::RightSelf(size_t tLen)
 	{
 		size_t stThisLen = GetLength();
@@ -344,14 +337,6 @@ namespace chcore
 			wmemmove(m_pszData, m_pszData + stThisLen - tLen, tLen + 1);
 	}
 
-	/** Makes this TString it's middle part. Much faster than using standard
-	 *  Mid() function.
-	 * \param[in] tStart - starting position of a text to be Left in a TString
-	 * \param[in] tLen - count of characters at the middle of the TString to be Left in a TString.
-	 * \param[in] bReallocBuffer - if the internal TString buffer is to be reallocated if exceeds
-	 *									  the allowable range size (CHUNK_INCSIZE, CHUNK_DECSIZE).
-	 * \see Mid()
-	 */
 	void TString::MidSelf(size_t tStart, size_t tLen)
 	{
 		size_t stThisLen = GetLength();

@@ -21,7 +21,6 @@
 #include "DropMenuExt.h"
 #include "../Common/ipcstructs.h"
 #include "../libchcore/TTaskDefinition.h"
-#include <boost/shared_array.hpp>
 #include "../common/TShellExtMenuConfig.h"
 #include "../libchcore/TSharedMemory.h"
 #include "Logger.h"
@@ -268,14 +267,12 @@ STDMETHODIMP CDropMenuExt::GetCommandString(UINT_PTR idCmd, UINT uFlags, UINT* /
 	}
 }
 
-STDMETHODIMP CDropMenuExt::HandleMenuMsg(UINT uMsg, WPARAM wParam, LPARAM lParam)
+STDMETHODIMP CDropMenuExt::HandleMenuMsg(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/)
 {
-	uMsg; wParam; lParam;
 	return S_FALSE;
 }
 
-STDMETHODIMP CDropMenuExt::HandleMenuMsg2(UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT* /*plResult*/)
+STDMETHODIMP CDropMenuExt::HandleMenuMsg2(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, LRESULT* /*plResult*/)
 {
-	uMsg; wParam; lParam;
 	return S_FALSE;
 }

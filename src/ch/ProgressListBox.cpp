@@ -229,9 +229,9 @@ BOOL CProgressListBox::OnEraseBkgnd(CDC*)
 	return FALSE/*CListBox::OnEraseBkgnd(pDC)*/;
 }
 
-int CProgressListBox::SetCurSel(int nSelect)
+int CProgressListBox::SetCurrentSelection(int nSelect)
 {
-	int nResult=static_cast<CListBox*>(this)->SetCurSel(nSelect);
+	int nResult=SetCurSel(nSelect);
 	if (nSelect == -1)
 		GetParent()->SendMessage(WM_COMMAND, (LBN_SELCANCEL << 16) | GetDlgCtrlID(), reinterpret_cast<LPARAM>(this->m_hWnd));
 
@@ -240,7 +240,7 @@ int CProgressListBox::SetCurSel(int nSelect)
 
 void CProgressListBox::OnKillfocus() 
 {
-	SetCurSel(-1);
+	SetCurrentSelection(-1);
 }
 
 void CProgressListBox::SetSmoothProgress(bool bSmoothProgress)

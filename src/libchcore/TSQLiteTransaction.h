@@ -29,7 +29,10 @@ namespace chcore
 		{
 		public:
 			explicit TSQLiteTransaction(const TSQLiteDatabasePtr& spDatabase);
+			TSQLiteTransaction(const TSQLiteTransaction&) = delete;
 			~TSQLiteTransaction();
+
+			TSQLiteTransaction& operator=(const TSQLiteTransaction&) = delete;
 
 			void Begin();
 			void Rollback();

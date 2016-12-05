@@ -27,7 +27,7 @@
 #include "TTaskInfo.h"
 #include "SerializerTrace.h"
 #include "TFakeFileSerializer.h"
-#include "..\liblogger\TLoggerPaths.h"
+#include "../liblogger/TLoggerPaths.h"
 
 namespace chcore
 {

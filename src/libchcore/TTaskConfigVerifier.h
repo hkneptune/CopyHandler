@@ -19,7 +19,7 @@
 #ifndef __TTASKCONFIGVERIFIER_H__
 #define __TTASKCONFIGVERIFIER_H__
 
-#include "..\liblogger\TLogger.h"
+#include "../liblogger/TLogger.h"
 
 namespace chcore
 {

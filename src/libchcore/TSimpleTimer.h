@@ -26,8 +26,11 @@ namespace chcore
 	class LIBCHCORE_API TSimpleTimer
 	{
 	public:
-		TSimpleTimer(bool bAutostart = false, const ITimestampProviderPtr& spTimestampProvider = ITimestampProviderPtr());
+		explicit TSimpleTimer(bool bAutostart = false, const ITimestampProviderPtr& spTimestampProvider = ITimestampProviderPtr());
+		TSimpleTimer(const TSimpleTimer&) = delete;
 		~TSimpleTimer();
+
+		TSimpleTimer& operator=(const TSimpleTimer&) = delete;
 
 		void Init(unsigned long long ullTotalTime);
 

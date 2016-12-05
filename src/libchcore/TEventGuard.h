@@ -27,7 +27,10 @@ namespace chcore
 	{
 	public:
 		TEventGuard(TEvent& rEvent, bool bValueToSetAtExit);
+		TEventGuard(const TEventGuard&) = delete;
 		~TEventGuard();
+
+		TEventGuard& operator=(const TEventGuard&) = delete;
 
 	private:
 		TEvent& m_event;

@@ -43,7 +43,10 @@ namespace chcore
 	public:
 		explicit TSubTasksArray(TSubTaskContext& rSubTaskContext);
 		TSubTasksArray(const TOperationPlan& rOperationPlan, TSubTaskContext& rSubTaskContext);
+		TSubTasksArray(const TSubTasksArray& rSrc) = delete;
 		~TSubTasksArray();
+
+		TSubTasksArray& operator=(const TSubTasksArray& rSrc) = delete;
 
 		void Init(const TOperationPlan& rOperationPlan);
 		EOperationType GetOperationType() const;
@@ -63,9 +66,6 @@ namespace chcore
 		bool AreAllBasePathsProcessed() const;
 
 	private:
-		TSubTasksArray(const TSubTasksArray& rSrc);
-		TSubTasksArray& operator=(const TSubTasksArray& rSrc);
-
 		void AddSubTask(const TSubTaskBasePtr& spOperation, bool bIsPartOfEstimation);
 		static TSubTaskBasePtr CreateSubtask(ESubOperationType eType, TSubTaskContext& rContext);
 

@@ -16,10 +16,6 @@
 //  Free Software Foundation, Inc.,
 //  59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // ============================================================================
-/// @file  TTaskLocalStatsInfo.h
-/// @date  2011/03/28
-/// @brief Contains classes responsible for maintaining local task stats.
-// ============================================================================
 #ifndef __TTASKLOCALSTATS_H__
 #define __TTASKLOCALSTATS_H__
 
@@ -37,7 +33,10 @@ namespace chcore
 	{
 	public:
 		TTaskLocalStatsInfo();
+		TTaskLocalStatsInfo(const TTaskLocalStatsInfo&) = delete;
 		~TTaskLocalStatsInfo();
+
+		TTaskLocalStatsInfo& operator=(const TTaskLocalStatsInfo&) = delete;
 
 		void Clear();
 		void GetSnapshot(TTaskStatsSnapshotPtr& spSnapshot) const;
@@ -62,10 +61,6 @@ namespace chcore
 #pragma warning(disable: 4251)
 		void UpdateTime(boost::upgrade_lock<boost::shared_mutex>& lock) const;
 #pragma warning(pop)
-
-	private:
-		TTaskLocalStatsInfo(const TTaskLocalStatsInfo&);
-		TTaskLocalStatsInfo& operator=(const TTaskLocalStatsInfo&);
 
 	private:
 		enum EModifications

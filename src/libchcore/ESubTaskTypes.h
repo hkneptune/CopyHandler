@@ -16,10 +16,6 @@
 //  Free Software Foundation, Inc.,
 //  59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // ============================================================================
-/// @file  SubTaskTypes.h
-/// @date  2011/11/12
-/// @brief File contains subtask types enumeration.
-// ============================================================================
 #ifndef __SUBTASKTYPES_H__
 #define __SUBTASKTYPES_H__
 

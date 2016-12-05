@@ -22,7 +22,7 @@
 namespace chcore
 {
 	class TFileInfo;
-	typedef std::shared_ptr<TFileInfo> TFileInfoPtr;
+	using TFileInfoPtr = std::shared_ptr<TFileInfo>;
 }
 
 #endif

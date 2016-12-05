@@ -34,12 +34,7 @@ namespace chcore
 	public:
 		// Construction/destruction
 		TSmartPath();
-		TSmartPath(const TSmartPath& spPath);
-
 		~TSmartPath();
-
-		// operators
-		TSmartPath& operator=(const TSmartPath& spPath);
 
 		bool operator==(const TSmartPath& rPath) const;
 		bool operator!=(const TSmartPath& rPath) const;

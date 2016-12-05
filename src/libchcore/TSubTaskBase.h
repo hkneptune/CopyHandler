@@ -53,7 +53,10 @@ namespace chcore
 
 	public:
 		explicit TSubTaskBase(TSubTaskContext& rContext);
+		TSubTaskBase(const TSubTaskBase&) = delete;
 		virtual ~TSubTaskBase();
+
+		TSubTaskBase& operator=(const TSubTaskBase&) = delete;
 
 		virtual void Reset() = 0;
 
@@ -72,10 +75,6 @@ namespace chcore
 		// some common operations
 		TSubTaskContext& GetContext() { return m_rContext; }
 		const TSubTaskContext& GetContext() const { return m_rContext; }
-
-	private:
-		TSubTaskBase(const TSubTaskBase&);
-		TSubTaskBase& operator=(const TSubTaskBase&);
 
 	private:
 		TSubTaskContext& m_rContext;

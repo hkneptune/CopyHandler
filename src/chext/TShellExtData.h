@@ -23,9 +23,9 @@
 #ifndef __TSHELLEXTDATA_H__
 #define __TSHELLEXTDATA_H__
 
-#include "..\libchcore\TPath.h"
-#include "..\libchcore\EOperationTypes.h"
-#include "..\libchcore\TPathContainer.h"
+#include "../libchcore/TPath.h"
+#include "../libchcore/EOperationTypes.h"
+#include "../libchcore/TPathContainer.h"
 
 class TShellMenuItem;
 

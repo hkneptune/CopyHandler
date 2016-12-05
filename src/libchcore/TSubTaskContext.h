@@ -28,7 +28,7 @@
 #include "TBasePathData.h"
 #include "TFileInfoArray.h"
 #include "IFilesystem.h"
-#include "..\liblogger\TLogFileData.h"
+#include "../liblogger/TLogFileData.h"
 
 namespace chcore
 {
@@ -47,7 +47,10 @@ namespace chcore
 			const TFileFiltersArray& rFilters,
 			TTaskConfigTracker& rCfgTracker, const logger::TLogFileDataPtr& spLogFileData,
 			TWorkerThreadController& rThreadController, const IFilesystemPtr& spFilesystem);
+		TSubTaskContext(const TSubTaskContext& rSrc) = delete;
 		~TSubTaskContext();
+
+		TSubTaskContext& operator=(const TSubTaskContext& rSrc) = delete;
 
 		TConfig& GetConfig();
 		const TConfig& GetConfig() const;
@@ -73,10 +76,6 @@ namespace chcore
 		const TWorkerThreadController& GetThreadController() const;
 
 		IFilesystemPtr GetLocalFilesystem() const;
-
-	private:
-		TSubTaskContext(const TSubTaskContext& rSrc);
-		TSubTaskContext& operator=(const TSubTaskContext& rSrc);
 
 	private:
 		TConfig& m_rConfig;

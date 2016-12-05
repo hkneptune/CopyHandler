@@ -419,21 +419,11 @@ void ini_cfg::set_value(const wchar_t* pszName, const wchar_t* pszValue, actions
 	}
 }
 
-/** Clears the contents of this class
-*
-* \param[in] pszName - name of the property to clear the values for
-*/
 void ini_cfg::clear()
 {
 	m_pMainNode->clear();
 }
 
-/** Recursive clear function - searches recursively for a proper node
-*  and finally clears the string map.
-*
-* \param[in] pNodePtr - pointer to a node to be processed
-* \param[in] pszName - name of the property to search for in the given node
-*/
 void ini_cfg::clear(const wchar_t* pszName)
 {
 	if(pszName == nullptr || pszName[0] == _T('*'))

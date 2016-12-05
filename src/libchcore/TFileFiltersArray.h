@@ -35,7 +35,6 @@ namespace chcore
 		TFileFiltersArray();
 		~TFileFiltersArray();
 
-		TFileFiltersArray& operator=(const TFileFiltersArray& rSrc);
 		bool Match(const TFileInfoPtr& spInfo) const;
 
 		void StoreInConfig(TConfig& rConfig, PCTSTR pszNodeName) const;

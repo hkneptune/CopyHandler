@@ -85,6 +85,9 @@ namespace chcore
 	{
 	public:
 		TTaskInfoContainer();
+		TTaskInfoContainer(const TTaskInfoContainer&) = delete;
+
+		TTaskInfoContainer& operator=(const TTaskInfoContainer&) = delete;
 
 		void Add(const TSmartPath& strPath, int iOrder, const TTaskPtr& spTask);
 		void RemoveAt(size_t stIndex);

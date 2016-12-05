@@ -26,8 +26,7 @@ namespace chcore
 	{
 	}
 
-	TCoreException::TCoreException(EGeneralErrors eErrorCode, const char* pszMsg, const wchar_t* pszFile, size_t stLineNumber, const wchar_t* pszFunction) :
-		TBaseException(eErrorCode, pszMsg, pszFile, stLineNumber, pszFunction)
+	TCoreException::TCoreException(TCoreException&& rSrc) : TBaseException(std::forward<TBaseException>(rSrc))
 	{
 	}
 }

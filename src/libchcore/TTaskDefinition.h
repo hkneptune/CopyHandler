@@ -38,10 +38,7 @@ namespace chcore
 	{
 	public:
 		TTaskDefinition();
-		TTaskDefinition(const TTaskDefinition& rSrc);
 		~TTaskDefinition();
-
-		TTaskDefinition& operator=(const TTaskDefinition& rSrc);
 
 		// Task unique ID
 		TString GetTaskName() const;

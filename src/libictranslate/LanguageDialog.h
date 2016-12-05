@@ -177,8 +177,8 @@ class LIBICTRANSLATE_API CLanguageDialog : public CDialog
 public:
 // Construction/destruction
 	explicit CLanguageDialog(bool* pLock=nullptr);
-	CLanguageDialog(PCTSTR lpszTemplateName, CWnd* pParent = nullptr, bool* pLock=nullptr);   // standard constructor
-	CLanguageDialog(UINT uiIDTemplate, CWnd* pParent = nullptr, bool* pLock=nullptr);   // standard constructor
+	explicit CLanguageDialog(PCTSTR lpszTemplateName, CWnd* pParent = nullptr, bool* pLock=nullptr);   // standard constructor
+	explicit CLanguageDialog(UINT uiIDTemplate, CWnd* pParent = nullptr, bool* pLock=nullptr);   // standard constructor
 	CLanguageDialog(const CLanguageDialog&) = delete;
 
 	CLanguageDialog& operator=(const CLanguageDialog&) = delete;
@@ -195,8 +195,8 @@ public:
 	void MapRect(RECT* pRect);
 	CFont* GetFont() { return m_pFont ? m_pFont : ((CDialog*)this)->GetFont(); };
 
-	BOOL OnHelpInfo(HELPINFO* pHelpInfo);
-	void OnContextMenu(CWnd* pWnd, CPoint point);
+	afx_msg BOOL OnHelpInfo(HELPINFO* pHelpInfo);
+	afx_msg void OnContextMenu(CWnd* pWnd, CPoint point);
 	void OnHelpButton();
 
 	// Controls resize support

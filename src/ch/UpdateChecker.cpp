@@ -66,15 +66,6 @@ CUpdateChecker::~CUpdateChecker()
 	::DeleteCriticalSection(&m_cs);
 }
 
-// ============================================================================
-/// CUpdateChecker::AsyncCheckForUpdates
-/// @date 2009/04/18
-///
-/// @brief     Starts the asynchronous checking for updates.
-/// @param[in] pszSite	    Site where to search for updates (without file name).
-/// @param[in] bCheckBeta   States if we are interested in beta products.
-/// @return    True if operation started, false otherwise.
-// ============================================================================
 bool CUpdateChecker::AsyncCheckForUpdates(const wchar_t* pszSite, const wchar_t* pszLanguage, UpdateVersionInfo::EVersionType eUpdateChannel, bool bOnlyIfConnected, bool bSendHeaders)
 {
 	if(!pszSite)
@@ -212,13 +203,6 @@ void CUpdateChecker::SetSendHeaders(bool bSendHeaders)
 	::LeaveCriticalSection(&m_cs);
 }
 
-// ============================================================================
-/// CUpdateChecker::GetSiteAddress
-/// @date 2009/04/18
-///
-/// @brief     Retrieves the address of a site to check the updates at.
-/// @param[out] rstrAddress  Receives the address.
-// ============================================================================
 CString CUpdateChecker::GetSiteAddress() const
 {
 	::EnterCriticalSection(&m_cs);

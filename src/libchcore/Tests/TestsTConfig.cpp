@@ -29,7 +29,7 @@ namespace
 class FileWithConfigurationFixture : public ::testing::Test
 {
 protected:
-	virtual void SetUp()
+	void SetUp() override
 	{
 		m_strTempFilePath = GetTmpPath();
 
@@ -73,7 +73,7 @@ protected:
 		outFile.flush();
 	}
 
-	virtual void TearDown()
+	void TearDown() override
 	{
 		DeleteFile(m_strTempFilePath.c_str());
 	}
@@ -84,7 +84,7 @@ protected:
 class InitializedConfigFixture : public ::testing::Test
 {
 protected:
-	virtual void SetUp()
+	void SetUp() override
 	{
 		m_strInputXmlString =
 			L"<?xml version=\"1.0\" encoding=\"utf-8\"?>\

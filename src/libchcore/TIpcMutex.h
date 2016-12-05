@@ -27,8 +27,11 @@ namespace chcore
 	{
 	public:
 		TIpcMutex();
+		TIpcMutex(const TIpcMutex&) = delete;
 		explicit TIpcMutex(const wchar_t* pszName);
 		~TIpcMutex();
+
+		TIpcMutex& operator=(const TIpcMutex&) = delete;
 
 		void CreateMutex(const wchar_t* pszName);
 

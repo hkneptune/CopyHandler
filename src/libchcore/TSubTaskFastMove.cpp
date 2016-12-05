@@ -29,7 +29,7 @@
 #include "TWorkerThreadController.h"
 #include "TTaskLocalStats.h"
 #include "TFileInfo.h"
-#include <boost\lexical_cast.hpp>
+#include <boost/lexical_cast.hpp>
 #include "TPathContainer.h"
 #include "TScopedRunningTimeTracker.h"
 #include "TFeedbackHandlerWrapper.h"

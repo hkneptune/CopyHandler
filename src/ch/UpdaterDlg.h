@@ -22,7 +22,7 @@ class CUpdaterDlg : public ictranslate::CLanguageDialog
 	};
 
 public:
-	CUpdaterDlg(bool bBackgroundMode, CWnd* pParent = nullptr);   // standard constructor
+	explicit CUpdaterDlg(bool bBackgroundMode, CWnd* pParent = nullptr);   // standard constructor
 	virtual ~CUpdaterDlg();
 
 	BOOL OnInitDialog() override;

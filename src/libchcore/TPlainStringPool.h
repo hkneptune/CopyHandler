@@ -30,7 +30,10 @@ namespace chcore
 
 	public:
 		TPlainStringPool();
+		TPlainStringPool(const TPlainStringPool&) = delete;
 		~TPlainStringPool();
+
+		TPlainStringPool& operator=(const TPlainStringPool&) = delete;
 
 		wchar_t* Alloc(size_t stCount);
 		wchar_t* AllocForString(const wchar_t* pszString);

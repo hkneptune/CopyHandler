@@ -40,8 +40,6 @@ namespace chcore
 		bool bRetry = false;
 		do
 		{
-			bRetry = false;
-
 			DWORD dwLastError = ERROR_SUCCESS;
 			try
 			{
@@ -196,7 +194,6 @@ namespace chcore
 		bool bRetry = false;
 		do
 		{
-			bRetry = false;
 			DWORD dwLastError = ERROR_SUCCESS;
 
 			try
@@ -257,8 +254,6 @@ namespace chcore
 		bool bRetry = false;
 		do
 		{
-			bRetry = false;
-
 			DWORD dwLastError = ERROR_SUCCESS;
 			try
 			{
@@ -318,8 +313,6 @@ namespace chcore
 		bool bRetry = false;
 		do
 		{
-			bRetry = false;
-
 			TSmartPath pathSrc = spBasePath->GetSrcPath();
 
 			DWORD dwLastError = ERROR_SUCCESS;
@@ -381,8 +374,6 @@ namespace chcore
 		bool bRetry = false;
 		do
 		{
-			bRetry = false;
-
 			// read attributes of src file/folder
 			DWORD dwLastError = ERROR_SUCCESS;
 			try
@@ -430,8 +421,6 @@ namespace chcore
 		bool bRetry = false;
 		do
 		{
-			bRetry = false;
-
 			// read attributes of src file/folder
 			DWORD dwLastError = ERROR_SUCCESS;
 			try

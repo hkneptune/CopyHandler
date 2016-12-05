@@ -31,7 +31,10 @@ namespace chcore
 		{
 		public:
 			explicit TSQLiteDatabase(const TSmartPath& strFilename);
+			TSQLiteDatabase(const TSQLiteDatabase&) = delete;
 			~TSQLiteDatabase();
+
+			TSQLiteDatabase& operator=(const TSQLiteDatabase&) = delete;
 
 			HANDLE GetHandle();
 

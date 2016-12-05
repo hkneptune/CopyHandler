@@ -16,10 +16,6 @@
 //  Free Software Foundation, Inc.,
 //  59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // ============================================================================
-/// @file  TConfigTracker.h
-/// @date  2010/10/04
-/// @brief Contains declaration of the TTaskConfigTracker class.
-// ============================================================================
 #ifndef __TCONFIGTRACKER_H__
 #define __TCONFIGTRACKER_H__
 
@@ -45,7 +41,10 @@ namespace chcore
 	{
 	public:
 		TTaskConfigTracker();
+		TTaskConfigTracker(const TTaskConfigTracker&) = delete;
 		~TTaskConfigTracker();
+
+		TTaskConfigTracker& operator=(const TTaskConfigTracker&) = delete;
 
 		bool IsModified() const;
 		bool IsModified(ETaskOptions eOption) const;

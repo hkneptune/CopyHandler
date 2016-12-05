@@ -16,10 +16,6 @@
 //  Free Software Foundation, Inc.,
 //  59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // ============================================================================
-/// @file  TTaskLocalStatsInfo.cpp
-/// @date  2011/03/28
-/// @brief Contains implementation of classes responsible for maintaining local task stats.
-// ============================================================================
 #include "stdafx.h"
 #include "TTaskLocalStats.h"
 #include "TSubTaskStatsInfo.h"

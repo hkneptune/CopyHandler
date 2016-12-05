@@ -40,7 +40,10 @@ namespace chcore
 	{
 	public:
 		TObsoleteFiles();
+		TObsoleteFiles(const TObsoleteFiles&) = delete;
 		virtual ~TObsoleteFiles();
+
+		TObsoleteFiles& operator=(const TObsoleteFiles&) = delete;
 
 		void DeleteObsoleteFile(const TSmartPath& pathToDelete);
 

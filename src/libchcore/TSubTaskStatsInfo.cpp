@@ -22,7 +22,7 @@
 // ============================================================================
 #include "stdafx.h"
 #include "TSubTaskStatsInfo.h"
-#include <boost\numeric\conversion\cast.hpp>
+#include <boost/numeric/conversion/cast.hpp>
 #include "TSubTaskStatsSnapshot.h"
 #include "TCoreException.h"
 #include "ErrorCodes.h"

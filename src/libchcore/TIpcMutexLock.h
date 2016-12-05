@@ -27,7 +27,10 @@ namespace chcore
 	{
 	public:
 		explicit TIpcMutexLock(TIpcMutex& rMutex);
+		TIpcMutexLock(const TIpcMutexLock&) = delete;
 		~TIpcMutexLock();
+
+		TIpcMutexLock& operator=(const TIpcMutexLock&) = delete;
 
 	private:
 		TIpcMutex& m_rMutex;

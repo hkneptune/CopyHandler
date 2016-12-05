@@ -19,8 +19,8 @@
 #include "stdafx.h"
 #include "TLogFile.h"
 #include <functional>
-#include <boost\date_time\posix_time\posix_time_io.hpp>
-#include <boost\algorithm\string.hpp>
+#include <boost/date_time/posix_time/posix_time_io.hpp>
+#include <boost/algorithm/string.hpp>
 #include <codecvt>
 
 namespace logger

@@ -32,8 +32,9 @@ namespace chcore
 	{
 	public:
 		TBaseException(EGeneralErrors eErrorCode, const wchar_t* pszMsg, const wchar_t* pszFile, size_t stLineNumber, const wchar_t* pszFunction);
-		TBaseException(EGeneralErrors eErrorCode, const char* pszMsg, const wchar_t* pszFile, size_t stLineNumber, const wchar_t* pszFunction);
-		TBaseException() = delete;
+		TBaseException(const TBaseException& rSrc);
+
+		TBaseException& operator=(const TBaseException&);
 
 		virtual ~TBaseException();
 
@@ -55,7 +56,6 @@ namespace chcore
 
 		// where it happened?
 		const wchar_t* m_pszMsg;
-		bool m_bDeleteMsg;
 
 		const wchar_t* m_pszFile;
 		const wchar_t* m_pszFunction;

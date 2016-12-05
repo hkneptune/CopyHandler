@@ -16,10 +16,6 @@
 //  Free Software Foundation, Inc.,
 //  59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // ============================================================================
-/// @file  TDataBuffer.cpp
-/// @date  2012/03/04
-/// @brief Contains class representing buffer for data.
-// ============================================================================
 #include "stdafx.h"
 #include "TOverlappedDataBuffer.h"
 #include "TCoreException.h"

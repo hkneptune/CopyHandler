@@ -18,8 +18,8 @@
 // ============================================================================
 #include "stdafx.h"
 #include "HResultFormatter.h"
-#include <boost\lexical_cast.hpp>
-#include "..\libchcore\TWin32ErrorFormatter.h"
+#include <boost/lexical_cast.hpp>
+#include "../libchcore/TWin32ErrorFormatter.h"
 
 std::wstring HResultFormatter::FormatHResult(HRESULT hResult)
 {

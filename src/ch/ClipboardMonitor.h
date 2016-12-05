@@ -22,8 +22,8 @@
 #ifndef __CLIPBOARDMONITOR_H__
 #define __CLIPBOARDMONITOR_H__
 
-#include "..\libchcore\TWorkerThreadController.h"
-#include "..\libchcore\TTaskManager.h"
+#include "../libchcore/TWorkerThreadController.h"
+#include "../libchcore/TTaskManager.h"
 
 namespace chcore
 {

@@ -25,7 +25,6 @@ namespace chcore
 	TBaseException::TBaseException(EGeneralErrors eErrorCode, const wchar_t* pszMsg, const wchar_t* pszFile, size_t stLineNumber, const wchar_t* pszFunction) :
 		m_eErrorCode(eErrorCode),
 		m_pszMsg(pszMsg),
-		m_bDeleteMsg(false),
 		m_pszFile(pszFile),
 		m_pszFunction(pszFunction),
 		m_stLineNumber(stLineNumber)
@@ -33,29 +32,31 @@ namespace chcore
 		ATLTRACE(_T("*** Base Exception is being thrown:\n\tMsg: %s\n\tError code: %d\n\tFile: %s\n\tLine number: %ld\n\tFunction: %s\n"), pszMsg, eErrorCode, pszFile, stLineNumber, pszFunction);
 	}
 
-	TBaseException::TBaseException(EGeneralErrors eErrorCode, const char* pszMsg, const wchar_t* pszFile, size_t stLineNumber, const wchar_t* pszFunction) :
-		m_eErrorCode(eErrorCode),
-		m_pszMsg(nullptr),
-		m_bDeleteMsg(false),
-		m_pszFile(pszFile),
-		m_pszFunction(pszFunction),
-		m_stLineNumber(stLineNumber)
+	TBaseException::TBaseException(const TBaseException& rSrc) :
+		m_eErrorCode(rSrc.m_eErrorCode),
+		m_pszMsg(rSrc.m_pszMsg),
+		m_pszFile(rSrc.m_pszFile),
+		m_pszFunction(rSrc.m_pszFunction),
+		m_stLineNumber(rSrc.m_stLineNumber)
 	{
-		ATLTRACE(_T("*** Base Exception is being thrown:\n\tMsg: %S\n\tError code: %d\n\tFile: %s\n\tLine number: %ld\n\tFunction: %s\n"), pszMsg, eErrorCode, pszFile, stLineNumber, pszFunction);
-		if (pszMsg)
-		{
-			size_t stMsgLen = strlen(pszMsg);
-			m_pszMsg = new wchar_t[stMsgLen + 1];
+	}
 
-			size_t stResult = 0;
-			mbstowcs_s(&stResult, const_cast<wchar_t*>(m_pszMsg), stMsgLen + 1, pszMsg, _TRUNCATE);
+	TBaseException& TBaseException::operator=(const TBaseException& rSrc)
+	{
+		if(this != &rSrc)
+		{
+			m_eErrorCode = rSrc.m_eErrorCode;
+			m_pszMsg = rSrc.m_pszMsg;
+			m_pszFile = rSrc.m_pszFile;
+			m_pszFunction = rSrc.m_pszFunction;
+			m_stLineNumber = rSrc.m_stLineNumber;
 		}
+
+		return *this;
 	}
 
 	TBaseException::~TBaseException()
 	{
-		if (m_bDeleteMsg)
-			delete[] m_pszMsg;
 	}
 
 	void TBaseException::GetErrorInfo(wchar_t* pszBuffer, size_t stMaxBuffer) const

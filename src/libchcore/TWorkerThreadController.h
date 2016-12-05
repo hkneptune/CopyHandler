@@ -37,7 +37,10 @@ namespace chcore
 	{
 	public:
 		TWorkerThreadController();
+		TWorkerThreadController(const TWorkerThreadController&) = delete;
 		~TWorkerThreadController();
+
+		TWorkerThreadController& operator=(const TWorkerThreadController&) = delete;
 
 		// methods to be used outside of the thread being controlled
 		void StartThread(PTHREAD_START_ROUTINE pThreadFunction, PVOID pThreadParam, int iPriority = THREAD_PRIORITY_NORMAL);
@@ -56,10 +59,6 @@ namespace chcore
 
 		void SignalThreadToStop(boost::upgrade_lock<boost::shared_mutex>& rUpgradeLock);
 		void WaitForThreadToExit(boost::upgrade_lock<boost::shared_mutex>& rUpgradeLock, DWORD dwMiliseconds = INFINITE);
-
-	private:
-		TWorkerThreadController(const TWorkerThreadController&);
-		TWorkerThreadController& operator=(const TWorkerThreadController&);
 
 	private:
 		HANDLE m_hThread;

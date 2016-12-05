@@ -28,12 +28,12 @@
 #include "TSharedModificationTracker.h"
 #include "TRemovedObjects.h"
 #include "ISerializerRowData.h"
-#include "IColumnsDefinition.h"
 #include "ISerializerRowReader.h"
 #include "CommonDataTypes.h"
 
 namespace chcore
 {
+	class IColumnsDefinition;
 	class TPathContainer;
 
 	/////////////////////////////////////////////////////////////////////////////
@@ -98,7 +98,10 @@ namespace chcore
 	public:
 		// constructors/destructor
 		TBasePathDataContainer();
+		TBasePathDataContainer(const TBasePathDataContainer& rSrc) = delete;
 		~TBasePathDataContainer();
+
+		TBasePathDataContainer& operator=(const TBasePathDataContainer& rSrc) = delete;
 
 		TBasePathDataContainer& operator=(const TPathContainer& tPaths);
 
@@ -123,9 +126,6 @@ namespace chcore
 		void InitColumns(const ISerializerContainerPtr& spContainer) const;
 
 	private:
-		TBasePathDataContainer(const TBasePathDataContainer& rSrc);
-		TBasePathDataContainer& operator=(const TBasePathDataContainer& rSrc);
-
 		void ClearNL();
 
 	protected:

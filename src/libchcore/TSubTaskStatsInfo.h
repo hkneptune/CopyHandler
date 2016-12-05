@@ -54,6 +54,9 @@ namespace chcore
 
 	public:
 		explicit TSubTaskStatsInfo(ESubOperationType eSubTaskType);
+		TSubTaskStatsInfo(const TSubTaskStatsInfo&) = delete;
+
+		TSubTaskStatsInfo& operator=(const TSubTaskStatsInfo&) = delete;
 
 		void Init(int iCurrentBufferIndex, file_count_t fcTotalCount, file_count_t fcProcessedCount, unsigned long long ullTotalSize, unsigned long long ullProcessedSize, const TString& strCurrentPath);
 		void Clear();
@@ -110,9 +113,6 @@ namespace chcore
 		void Load(const ISerializerRowReaderPtr& spRowReader);
 
 	private:
-		TSubTaskStatsInfo(const TSubTaskStatsInfo&) = delete;
-		TSubTaskStatsInfo& operator=(const TSubTaskStatsInfo&) = delete;
-
 		// is running?
 		void MarkAsRunning() override;
 		void MarkAsNotRunning() override;

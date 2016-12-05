@@ -27,11 +27,6 @@ namespace chcore
 		m_ftTime.dwLowDateTime = 0;
 	}
 
-	TFileTime::TFileTime(const TFileTime& rSrc) :
-		m_ftTime(rSrc.m_ftTime)
-	{
-	}
-
 	TFileTime::TFileTime(const FILETIME& rftTime) :
 		m_ftTime(rftTime)
 	{
@@ -41,23 +36,12 @@ namespace chcore
 	{
 	}
 
-	TFileTime& TFileTime::operator=(const TFileTime& rSrc)
-	{
-		if (this != &rSrc)
-		{
-			m_ftTime = rSrc.m_ftTime;
-		}
-
-		return *this;
-	}
-
 	TFileTime& TFileTime::operator=(const FILETIME& rSrc)
 	{
 		m_ftTime = rSrc;
 
 		return *this;
 	}
-
 
 	bool TFileTime::operator==(const TFileTime& rSrc) const
 	{

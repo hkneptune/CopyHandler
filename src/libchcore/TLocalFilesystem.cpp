@@ -111,9 +111,9 @@ namespace chcore
 			L", last-access-time: " << ftLastAccessTime.GetAsFiletime() <<
 			L", last-write-time: " << ftLastWriteTime.GetAsFiletime();
 
-		TAutoFileHandle hFile = TAutoFileHandle(CreateFile(fullPath.ToString(), GENERIC_READ | GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE,
+		TAutoFileHandle hFile(CreateFile(fullPath.ToString(), GENERIC_READ | GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE,
 			nullptr, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL | FILE_FLAG_BACKUP_SEMANTICS, nullptr));
-		if(hFile == INVALID_HANDLE_VALUE)
+		if(!hFile.HasValidHandle())
 		{
 			DWORD dwLastError = GetLastError();
 			LOG_ERROR(m_spLog) << L"Open file failed with error: " << dwLastError << L". Cannot set file/directory times.";
@@ -128,7 +128,7 @@ namespace chcore
 		basicInfo.LastWriteTime.QuadPart = ftLastWriteTime.ToUInt64();
 		basicInfo.ChangeTime.QuadPart = ftLastWriteTime.ToUInt64();
 
-		if(!SetFileInformationByHandle(hFile, FileBasicInfo, &basicInfo, sizeof(FILE_BASIC_INFO)))
+		if(!SetFileInformationByHandle((HANDLE)hFile, FileBasicInfo, &basicInfo, sizeof(FILE_BASIC_INFO)))
 		{
 			DWORD dwLastError = GetLastError();
 			LOG_ERROR(m_spLog) << L"Failed to set file/dir basic info for " << pathFileDir;

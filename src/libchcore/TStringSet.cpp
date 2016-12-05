@@ -119,15 +119,6 @@ namespace chcore
 
 	///////////////////////////////////////////////////////////////////////////////////////////
 	// class TStringSet
-
-	TStringSet::TStringSet()
-	{
-	}
-
-	TStringSet::~TStringSet()
-	{
-	}
-
 	void TStringSet::Insert(const TString& str)
 	{
 		m_setItems.insert(str);

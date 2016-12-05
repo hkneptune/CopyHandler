@@ -25,9 +25,4 @@ namespace chcore
 		TBaseException(eErrorCode, pszMsg, pszFile, stLineNumber, pszFunction)
 	{
 	}
-
-	TSerializerException::TSerializerException(EGeneralErrors eErrorCode, const char* pszMsg, const wchar_t* pszFile, size_t stLineNumber, const wchar_t* pszFunction) :
-		TBaseException(eErrorCode, pszMsg, pszFile, stLineNumber, pszFunction)
-	{
-	}
 }

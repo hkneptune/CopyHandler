@@ -87,9 +87,6 @@ namespace chcore
 		typedef TStringSetConstIterator const_iterator;
 
 	public:
-		TStringSet();
-		~TStringSet();
-
 		void Insert(const TString& str);
 		void Insert(const TStringSet& setStrings);
 		void Remove(const TString& str);

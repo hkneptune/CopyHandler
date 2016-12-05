@@ -19,7 +19,7 @@
 #ifndef __BUFFERSIZEDLG_H__
 #define __BUFFERSIZEDLG_H__
 
-#include "..\libchcore\TBufferSizes.h"
+#include "../libchcore/TBufferSizes.h"
 
 /////////////////////////////////////////////////////////////////////////////
 // CBufferSizeDlg dialog
@@ -27,7 +27,7 @@
 class CBufferSizeDlg : public ictranslate::CLanguageDialog
 {
 public:
-	CBufferSizeDlg(chcore::TBufferSizes* pInitialBufferSizes, chcore::TBufferSizes::EBufferType eSelectedBuffer = chcore::TBufferSizes::eBuffer_Default);
+	explicit CBufferSizeDlg(chcore::TBufferSizes* pInitialBufferSizes, chcore::TBufferSizes::EBufferType eSelectedBuffer = chcore::TBufferSizes::eBuffer_Default);
 
 	const chcore::TBufferSizes& GetBufferSizes() const { return m_bsSizes; }
 
@@ -43,7 +43,7 @@ protected:
 	void SetTwoDisksSize(UINT uiSize);
 	void SetOneDiskSize(UINT uiSize);
 	void SetDefaultSize(UINT uiSize);
-	UINT IndexToValue(int iIndex);
+	static UINT IndexToValue(int iIndex);
 
 	void EnableControls(bool bEnable=true);
 

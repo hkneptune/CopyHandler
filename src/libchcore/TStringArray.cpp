@@ -127,14 +127,6 @@ namespace chcore
 
 	///////////////////////////////////////////////////////////////////////////////////////////////////////
 	// class TStringArray
-	TStringArray::TStringArray()
-	{
-	}
-
-	TStringArray::~TStringArray()
-	{
-	}
-
 	void TStringArray::Add(const TString& str)
 	{
 		m_vItems.push_back(str);

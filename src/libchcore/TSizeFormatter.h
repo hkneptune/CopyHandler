@@ -30,7 +30,10 @@ namespace chcore
 	{
 	public:
 		TSizeFormatter();
+		TSizeFormatter(const TSizeFormatter&) = delete;
 		TSizeFormatter(const wchar_t* strBytes, const wchar_t* strKBytes, const wchar_t* strMBytes, const wchar_t* strGBytes, const wchar_t* strTBytes);
+
+		TSizeFormatter& operator=(const TSizeFormatter&) = delete;
 
 		void SetValues(const wchar_t* strBytes, const wchar_t* strKBytes, const wchar_t* strMBytes, const wchar_t* strGBytes, const wchar_t* strTBytes);
 

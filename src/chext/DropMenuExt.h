@@ -21,9 +21,9 @@
 
 #include "resource.h"       // main symbols
 #include "TContextMenuHandler.h"
-#include "..\common\TShellExtMenuConfig.h"
+#include "../common/TShellExtMenuConfig.h"
 #include "TShellExtData.h"
-#include "..\liblogger\TLogger.h"
+#include "../liblogger/TLogger.h"
 
 /////////////////////////////////////////////////////////////////////////////
 // CDropMenuExt
@@ -48,7 +48,7 @@ BEGIN_COM_MAP(CDropMenuExt)
 END_COM_MAP()
 
 public:
-	STDMETHOD(InvokeCommand)(LPCMINVOKECOMMANDINFO lpici);
+	STDMETHOD(InvokeCommand) (LPCMINVOKECOMMANDINFO lpici);
 	STDMETHOD(Initialize)(LPCITEMIDLIST pidlFolder, IDataObject* piDataObject, HKEY /*hkeyProgID*/);
 	STDMETHOD(GetCommandString)(UINT_PTR idCmd, UINT uFlags, UINT* /*pwReserved*/, LPSTR pszName, UINT cchMax);
 	STDMETHOD(QueryContextMenu)(HMENU hmenu, UINT indexMenu, UINT idCmdFirst, UINT /*idCmdLast*/, UINT uFlags);

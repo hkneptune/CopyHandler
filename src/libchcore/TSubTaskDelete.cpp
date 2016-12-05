@@ -26,7 +26,7 @@
 #include "TWorkerThreadController.h"
 #include "TTaskConfiguration.h"
 #include "IFeedbackHandler.h"
-#include <boost\lexical_cast.hpp>
+#include <boost/lexical_cast.hpp>
 #include "TFileInfoArray.h"
 #include "TFileInfo.h"
 #include "TTaskLocalStats.h"

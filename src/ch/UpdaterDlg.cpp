@@ -179,7 +179,7 @@ void CUpdaterDlg::OnTimer(UINT_PTR nIDEvent)
 			fmt.SetParam(_T("%officialver"), m_ucChecker.GetReadableVersion());
 			fmt.SetParam(L"%reldate", m_ucChecker.GetReleaseDate());
 
-			CString strEntireText = fmt;
+			CString strEntireText = (PCTSTR)fmt;
 			CString strReleaseNotes = m_ucChecker.GetReleaseNotes();
 			strReleaseNotes = strReleaseNotes.Trim();
 			if(!strReleaseNotes.IsEmpty())

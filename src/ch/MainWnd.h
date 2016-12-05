@@ -41,9 +41,6 @@ public:
 protected:
 	LRESULT WindowProc(UINT message, WPARAM wParam, LPARAM lParam) override;
 
-	void PrepareDragAndDropMenuItems(TShellExtMenuConfig &cfgShellExt) const;
-	void PrepareNormalMenuItems(TShellExtMenuConfig &cfgShellExt) const;
-
 	BOOL RegisterClass();
 	int ShowTrayIcon();
 	void ShowStatusWindow(const chcore::TTaskPtr& spSelect = chcore::TTaskPtr());

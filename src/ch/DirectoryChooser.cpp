@@ -20,8 +20,8 @@
 #include "DirectoryChooser.h"
 #include "ch.h"
 #include "FolderDialog.h"
-#include "..\libchcore\TPathContainer.h"
-#include "..\libchcore\TPath.h"
+#include "../libchcore/TPathContainer.h"
+#include "../libchcore/TPath.h"
 #include "CfgProperties.h"
 #include "resource.h"
 

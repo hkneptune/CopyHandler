@@ -19,8 +19,8 @@
 #include "stdafx.h"
 #include "WindowsVersion.h"
 #include "TRegistry.h"
-#include <boost\lexical_cast.hpp>
-#include <boost\algorithm\string\replace.hpp>
+#include <boost/lexical_cast.hpp>
+#include <boost/algorithm/string/replace.hpp>
 
 std::wstring WindowsVersion::GetWindowsVersion()
 {

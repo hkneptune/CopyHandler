@@ -36,18 +36,6 @@ namespace chcore
 	}
 
 	// ============================================================================
-	/// TPathContainer::TPathContainer
-	/// @date 2009/11/30
-	///
-	/// @brief     Constructs the path container object from another path container.
-	/// @param[in] rSrcContainer - path container to copy paths from.
-	// ============================================================================
-	TPathContainer::TPathContainer(const TPathContainer& rSrcContainer) :
-		m_vPaths(rSrcContainer.m_vPaths)
-	{
-	}
-
-	// ============================================================================
 	/// TPathContainer::~TPathContainer
 	/// @date 2009/11/30
 	///
@@ -55,22 +43,6 @@ namespace chcore
 	// ============================================================================
 	TPathContainer::~TPathContainer()
 	{
-	}
-
-	// ============================================================================
-	/// TPathContainer::operator=
-	/// @date 2009/11/30
-	///
-	/// @brief     Assigns another path container object to this one.
-	/// @param[in] rSrcContainer - container with paths to copy from.
-	/// @return    Reference to this object.
-	// ============================================================================
-	TPathContainer& TPathContainer::operator=(const TPathContainer& rSrcContainer)
-	{
-		if (this != &rSrcContainer)
-			m_vPaths = rSrcContainer.m_vPaths;
-
-		return *this;
 	}
 
 	// ============================================================================

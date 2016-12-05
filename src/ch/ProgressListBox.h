@@ -62,7 +62,7 @@ public:
 // Implementation
 public:
 	void SetSmoothProgress(bool bSmoothProgress);
-	int SetCurSel( int nSelect );
+	int SetCurrentSelection( int nSelect );
 	void Init();
 
 	void UpdateItems(int nLimit, bool bUpdateSize);		// updates items in listbox

@@ -29,7 +29,6 @@ namespace chcore
 		{
 		public:
 			TSQLiteException(EGeneralErrors eErrorCode, int iSQLiteError, const wchar_t* pszMsg, const wchar_t* pszFile, size_t stLineNumber, const wchar_t* pszFunction);
-			TSQLiteException(EGeneralErrors eErrorCode, int iSQLiteError, const char* pszMsg, const wchar_t* pszFile, size_t stLineNumber, const wchar_t* pszFunction);
 
 			int GetSQLiteError() const;
 

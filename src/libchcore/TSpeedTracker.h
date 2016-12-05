@@ -9,6 +9,9 @@ namespace chcore
 	{
 	public:
 		TSpeedTracker(unsigned long long ullTrackTime, unsigned long long ullSampleTime);
+		TSpeedTracker(const TSpeedTracker&) = delete;
+
+		TSpeedTracker& operator=(const TSpeedTracker&) = delete;
 
 		void AddSample(unsigned long long ullValue, unsigned long long ullTimestamp);
 		void Clear();
@@ -20,9 +23,6 @@ namespace chcore
 		void FromString(const TString& strData);
 
 	private:
-		TSpeedTracker(const TSpeedTracker&);
-		TSpeedTracker& operator=(const TSpeedTracker&);
-
 		static double NormalizeValueByTime(unsigned long long ullValue, unsigned long long ullTime, unsigned long long ullNormalizeTime = 1000);
 
 		size_t GetNextSampleIndexAndIncrease();

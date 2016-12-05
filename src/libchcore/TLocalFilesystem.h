@@ -27,7 +27,7 @@
 #include "TBasePathData.h"
 #include "TFileInfoFwd.h"
 #include "IFilesystem.h"
-#include "..\liblogger\TLogger.h"
+#include "../liblogger/TLogger.h"
 
 namespace chcore
 {
@@ -42,7 +42,11 @@ namespace chcore
 	{
 	public:
 		explicit TLocalFilesystem(const logger::TLogFileDataPtr& spLogFileData);
+		TLocalFilesystem(const TLocalFilesystem&) = delete;
+
 		virtual ~TLocalFilesystem();
+
+		TLocalFilesystem& operator=(const TLocalFilesystem&) = delete;
 
 		bool PathExist(const TSmartPath& strPath) override;	// check for file or folder existence
 

@@ -105,7 +105,7 @@ namespace chcore
 		return pBuffer;
 	}
 
-	const TOverlappedDataBuffer* const TOrderedBufferQueue::Peek() const
+	const TOverlappedDataBuffer* TOrderedBufferQueue::Peek() const
 	{
 		boost::unique_lock<boost::recursive_mutex> lock(m_mutex);
 
