@@ -40,45 +40,62 @@ namespace chcore
 
 		static const unsigned int BufferGranularity = 4096;
 		static const unsigned int MinBufferCount = 1;
+		static const unsigned int MinReadAhead = 1;
+		static const unsigned int MinConcurrentReads = 1;
+		static const unsigned int MinConcurrentWrites = 1;
 
 	public:
 		TBufferSizes();
-		TBufferSizes(bool bOnlyDefault, UINT uiBufferCount, UINT uiDefaultSize,
-			UINT uiOneDiskSize, UINT uiTwoDisksSize, UINT uiCDSize, UINT uiLANSize);
+		TBufferSizes(bool bOnlyDefault, unsigned int uiBufferCount, unsigned int uiDefaultSize,
+			unsigned int uiOneDiskSize, unsigned int uiTwoDisksSize, unsigned int uiCDSize, unsigned int uiLANSize,
+			unsigned int uiMaxReadAheadBuffers, unsigned int uiMaxConcurrentReads, unsigned int uiMaxConcurrentWrites);
 
 		void Clear();
 
 		bool IsOnlyDefault() const { return m_bOnlyDefault; }
-		UINT GetDefaultSize() const { return m_uiDefaultSize; }
-		UINT GetOneDiskSize() const { return m_uiOneDiskSize; }
-		UINT GetTwoDisksSize() const { return m_uiTwoDisksSize; }
-		UINT GetCDSize() const { return m_uiCDSize; }
-		UINT GetLANSize() const { return m_uiLANSize; }
+		unsigned int GetDefaultSize() const { return m_uiDefaultSize; }
+		unsigned int GetOneDiskSize() const { return m_uiOneDiskSize; }
+		unsigned int GetTwoDisksSize() const { return m_uiTwoDisksSize; }
+		unsigned int GetCDSize() const { return m_uiCDSize; }
+		unsigned int GetLANSize() const { return m_uiLANSize; }
 
 		void SetOnlyDefault(bool bOnlyDefault) { m_bOnlyDefault = bOnlyDefault; }
-		void SetDefaultSize(UINT uiSize);
-		void SetOneDiskSize(UINT uiSize);
-		void SetTwoDisksSize(UINT uiSize);
-		void SetCDSize(UINT uiSize);
-		void SetLANSize(UINT uiSize);
+		void SetDefaultSize(unsigned int uiSize);
+		void SetOneDiskSize(unsigned int uiSize);
+		void SetTwoDisksSize(unsigned int uiSize);
+		void SetCDSize(unsigned int uiSize);
+		void SetLANSize(unsigned int uiSize);
 
-		UINT GetBufferCount() const { return m_uiBufferCount; }
-		void SetBufferCount(UINT uiBufferCount);
+		unsigned int GetBufferCount() const { return m_uiBufferCount; }
+		void SetBufferCount(unsigned int uiBufferCount);
 
-		UINT GetSizeByType(EBufferType eType) const;
-		void SetSizeByType(EBufferType eType, UINT uiSize);
+		unsigned int GetSizeByType(EBufferType eType) const;
+		void SetSizeByType(EBufferType eType, unsigned int uiSize);
 
-		UINT GetMaxSize() const;
+		unsigned int GetMaxReadAheadBuffers() const { return m_uiMaxReadAheadBuffers; }
+		void SetMaxReadAheadBuffers(unsigned int uiMaxReadAhead) { m_uiMaxReadAheadBuffers = uiMaxReadAhead; }
+
+		unsigned int GetMaxConcurrentReads() const { return m_uiMaxConcurrentReads; }
+		void SetMaxConcurrentReads(unsigned int uiMaxConcurrentReads) { m_uiMaxConcurrentReads = uiMaxConcurrentReads; }
+
+		unsigned int GetMaxConcurrentWrites() const { return m_uiMaxConcurrentWrites; }
+		void SetMaxConcurrentWrites(unsigned int uiMaxConcurrentWrites) { m_uiMaxConcurrentWrites = uiMaxConcurrentWrites; }
+
+		unsigned int GetMaxSize() const;
 
 	private:
-		UINT m_uiDefaultSize;
-		UINT m_uiOneDiskSize;
-		UINT m_uiTwoDisksSize;
-		UINT m_uiCDSize;
-		UINT m_uiLANSize;
+		unsigned int m_uiDefaultSize = 0;
+		unsigned int m_uiOneDiskSize = 0;
+		unsigned int m_uiTwoDisksSize = 0;
+		unsigned int m_uiCDSize = 0;
+		unsigned int m_uiLANSize = 0;
 
-		bool m_bOnlyDefault;
-		UINT m_uiBufferCount;
+		bool m_bOnlyDefault = false;
+		unsigned int m_uiBufferCount = 0;
+
+		unsigned int m_uiMaxReadAheadBuffers = 0;
+		unsigned int m_uiMaxConcurrentReads = 0;
+		unsigned int m_uiMaxConcurrentWrites = 0;
 	};
 }
 

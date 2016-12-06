@@ -37,6 +37,9 @@ namespace chcore
 		const TOverlappedMemoryPoolPtr& spMemoryPool,
 		unsigned long long ullResumePosition,
 		DWORD dwChunkSize,
+		unsigned int uiMaxReadAhead,
+		unsigned int uiMaxConcurrentReads,
+		unsigned int uiMaxConcurrentWrites,
 		bool bNoBuffering,
 		bool bProtectReadOnlyFiles,
 		bool bOnlyCreate,
@@ -47,8 +50,8 @@ namespace chcore
 		m_rThreadController(rThreadController),
 		m_spRange(std::make_shared<TOverlappedProcessorRange>(ullResumePosition)),
 		m_spMemoryPool(spMemoryPool),
-		m_spReader(std::make_shared<TOverlappedReaderFB>(spFilesystem, spFeedbackHandler, rThreadController, spStats, spSrcFileInfo, spLogFileData, spMemoryPool ? spMemoryPool->GetBufferList() : TBufferListPtr(), m_spRange, dwChunkSize, MaxOtfBuffers, MaxReadAheadBuffers, bNoBuffering, bProtectReadOnlyFiles)),
-		m_spWriter(std::make_shared<TOverlappedWriterFB>(spFilesystem, spFeedbackHandler, rThreadController, spStats, spSrcFileInfo, pathDst, spLogFileData, m_spReader->GetFinishedQueue(), m_spRange, spMemoryPool ? spMemoryPool->GetBufferList() : TBufferListPtr(), MaxOtfBuffers, bOnlyCreate, bNoBuffering, bProtectReadOnlyFiles, bUpdateFileAttributesAndTimes))
+		m_spReader(std::make_shared<TOverlappedReaderFB>(spFilesystem, spFeedbackHandler, rThreadController, spStats, spSrcFileInfo, spLogFileData, spMemoryPool ? spMemoryPool->GetBufferList() : TBufferListPtr(), m_spRange, dwChunkSize, uiMaxConcurrentReads, uiMaxReadAhead, bNoBuffering, bProtectReadOnlyFiles)),
+		m_spWriter(std::make_shared<TOverlappedWriterFB>(spFilesystem, spFeedbackHandler, rThreadController, spStats, spSrcFileInfo, pathDst, spLogFileData, m_spReader->GetFinishedQueue(), m_spRange, spMemoryPool ? spMemoryPool->GetBufferList() : TBufferListPtr(), uiMaxConcurrentWrites, bOnlyCreate, bNoBuffering, bProtectReadOnlyFiles, bUpdateFileAttributesAndTimes))
 	{
 	}
 

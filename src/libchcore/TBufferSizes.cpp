@@ -31,18 +31,25 @@ namespace chcore
 		m_uiCDSize(BufferGranularity),
 		m_uiLANSize(BufferGranularity),
 		m_bOnlyDefault(false),
-		m_uiBufferCount(MinBufferCount)
+		m_uiBufferCount(MinBufferCount),
+		m_uiMaxReadAheadBuffers(MinReadAhead),
+		m_uiMaxConcurrentReads(MinConcurrentReads),
+		m_uiMaxConcurrentWrites(MinConcurrentWrites)
 	{
 	}
 
-	TBufferSizes::TBufferSizes(bool bOnlyDefault, UINT uiBufferCount, UINT uiDefaultSize, UINT uiOneDiskSize, UINT uiTwoDisksSize, UINT uiCDSize, UINT uiLANSize) :
+	TBufferSizes::TBufferSizes(bool bOnlyDefault, unsigned int uiBufferCount, unsigned int uiDefaultSize, unsigned int uiOneDiskSize, unsigned int uiTwoDisksSize, unsigned int uiCDSize, unsigned int uiLANSize,
+		unsigned int uiMaxReadAheadBuffers, unsigned int uiMaxConcurrentReads, unsigned int uiMaxConcurrentWrites) :
 		m_uiDefaultSize(std::max(BufferGranularity, RoundUp(uiDefaultSize, BufferGranularity))),
 		m_uiOneDiskSize(std::max(BufferGranularity, RoundUp(uiOneDiskSize, BufferGranularity))),
 		m_uiTwoDisksSize(std::max(BufferGranularity, RoundUp(uiTwoDisksSize, BufferGranularity))),
 		m_uiCDSize(std::max(BufferGranularity, RoundUp(uiCDSize, BufferGranularity))),
 		m_uiLANSize(std::max(BufferGranularity, RoundUp(uiLANSize, BufferGranularity))),
 		m_bOnlyDefault(bOnlyDefault),
-		m_uiBufferCount(std::max(uiBufferCount, MinBufferCount))
+		m_uiBufferCount(std::max(uiBufferCount, MinBufferCount)),
+		m_uiMaxReadAheadBuffers(std::max(uiMaxReadAheadBuffers, MinReadAhead)),
+		m_uiMaxConcurrentReads(std::max(uiMaxConcurrentReads, MinConcurrentReads)),
+		m_uiMaxConcurrentWrites(std::max(uiMaxConcurrentWrites, MinConcurrentWrites))
 	{
 	}
 
@@ -55,9 +62,12 @@ namespace chcore
 		m_uiLANSize = BufferGranularity;
 		m_bOnlyDefault = false;
 		m_uiBufferCount = MinBufferCount;
+		m_uiMaxReadAheadBuffers = MinReadAhead;
+		m_uiMaxConcurrentReads = MinConcurrentReads;
+		m_uiMaxConcurrentWrites = MinConcurrentWrites;
 	}
 
-	UINT TBufferSizes::GetSizeByType(EBufferType eType) const
+	unsigned int TBufferSizes::GetSizeByType(EBufferType eType) const
 	{
 		switch (eType)
 		{
@@ -76,7 +86,7 @@ namespace chcore
 		}
 	}
 
-	void TBufferSizes::SetSizeByType(EBufferType eType, UINT uiSize)
+	void TBufferSizes::SetSizeByType(EBufferType eType, unsigned int uiSize)
 	{
 		switch (eType)
 		{
@@ -100,37 +110,37 @@ namespace chcore
 		}
 	}
 
-	void TBufferSizes::SetDefaultSize(UINT uiSize)
+	void TBufferSizes::SetDefaultSize(unsigned int uiSize)
 	{
 		m_uiDefaultSize = std::max(BufferGranularity, RoundUp(uiSize, BufferGranularity));
 	}
 
-	void TBufferSizes::SetOneDiskSize(UINT uiSize)
+	void TBufferSizes::SetOneDiskSize(unsigned int uiSize)
 	{
 		m_uiOneDiskSize = std::max(BufferGranularity, RoundUp(uiSize, BufferGranularity));
 	}
 
-	void TBufferSizes::SetTwoDisksSize(UINT uiSize)
+	void TBufferSizes::SetTwoDisksSize(unsigned int uiSize)
 	{
 		m_uiTwoDisksSize = std::max(BufferGranularity, RoundUp(uiSize, BufferGranularity));
 	}
 
-	void TBufferSizes::SetCDSize(UINT uiSize)
+	void TBufferSizes::SetCDSize(unsigned int uiSize)
 	{
 		m_uiCDSize = std::max(BufferGranularity, RoundUp(uiSize, BufferGranularity));
 	}
 
-	void TBufferSizes::SetLANSize(UINT uiSize)
+	void TBufferSizes::SetLANSize(unsigned int uiSize)
 	{
 		m_uiLANSize = std::max(BufferGranularity, RoundUp(uiSize, BufferGranularity));
 	}
 
-	void TBufferSizes::SetBufferCount(UINT uiBufferCount)
+	void TBufferSizes::SetBufferCount(unsigned int uiBufferCount)
 	{
 		m_uiBufferCount = std::max(uiBufferCount, MinBufferCount);
 	}
 
-	UINT TBufferSizes::GetMaxSize() const
+	unsigned int TBufferSizes::GetMaxSize() const
 	{
 		if (m_bOnlyDefault)
 			return m_uiDefaultSize;

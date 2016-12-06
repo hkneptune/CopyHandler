@@ -55,6 +55,9 @@ void CBufferSizeDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Text(pDX, IDC_TWODISKSSIZE_EDIT, m_uiTwoDisksSize);
 	DDX_Check(pDX, IDC_ONLYDEFAULT_CHECK, m_bOnlyDefaultCheck);
 	DDX_Text(pDX, IDC_BUFFERCOUNT_EDIT, m_uiBufferCount);
+	DDX_Text(pDX, IDC_MAXREADAHEAD_EDIT, m_uiMaxReadAhead);
+	DDX_Text(pDX, IDC_MAXCONCURRENTREADS_EDIT, m_uiMaxConcurrentReads);
+	DDX_Text(pDX, IDC_MAXCONCURRENTWRITES_EDIT, m_uiMaxConcurrentWrites);
 }
 
 BEGIN_MESSAGE_MAP(CBufferSizeDlg,ictranslate::CLanguageDialog)
@@ -97,6 +100,9 @@ BOOL CBufferSizeDlg::OnInitDialog()
 	SetLANSize(m_bsSizes.GetLANSize());
 	m_uiBufferCount = m_bsSizes.GetBufferCount();
 	m_bOnlyDefaultCheck=m_bsSizes.IsOnlyDefault();
+	m_uiMaxReadAhead = m_bsSizes.GetMaxReadAheadBuffers();
+	m_uiMaxConcurrentReads = m_bsSizes.GetMaxConcurrentReads();
+	m_uiMaxConcurrentWrites = m_bsSizes.GetMaxConcurrentWrites();
 
 	// buffer count handling
 	m_ctlBufferCountSpin.SetRange(1, 1000);
@@ -212,6 +218,9 @@ void CBufferSizeDlg::OnOK()
 	m_bsSizes.SetCDSize(m_uiCDROMSize*IndexToValue(m_ctlCDROMMulti.GetCurSel()));
 	m_bsSizes.SetLANSize(m_uiLANSize*IndexToValue(m_ctlLANMulti.GetCurSel()));
 	m_bsSizes.SetBufferCount(m_uiBufferCount);
+	m_bsSizes.SetMaxReadAheadBuffers(m_uiMaxReadAhead);
+	m_bsSizes.SetMaxConcurrentReads(m_uiMaxConcurrentReads);
+	m_bsSizes.SetMaxConcurrentWrites(m_uiMaxConcurrentWrites);
 
 	CLanguageDialog::OnOK();
 }

@@ -21,7 +21,7 @@ TEST(TestsTBufferSizes, DefaultConstructor)
 
 TEST(TestsTBufferSizes, ParametrizedConstructor_RoundedValues)
 {
-	TBufferSizes tSizes(true, 2, 4096, 8192, 16384, 32768, 65536);
+	TBufferSizes tSizes(true, 2, 4096, 8192, 16384, 32768, 65536, 10, 2, 1);
 
 	EXPECT_EQ(2, tSizes.GetBufferCount());
 	EXPECT_EQ(4096, tSizes.GetDefaultSize());
@@ -30,11 +30,14 @@ TEST(TestsTBufferSizes, ParametrizedConstructor_RoundedValues)
 	EXPECT_EQ(32768, tSizes.GetCDSize());
 	EXPECT_EQ(65536, tSizes.GetLANSize());
 	EXPECT_EQ(true, tSizes.IsOnlyDefault());
+	EXPECT_EQ(10, tSizes.GetMaxReadAheadBuffers());
+	EXPECT_EQ(2, tSizes.GetMaxConcurrentReads());
+	EXPECT_EQ(1, tSizes.GetMaxConcurrentWrites());
 }
 
 TEST(TestsTBufferSizes, ParametrizedConstructor_MinimumCheck)
 {
-	TBufferSizes tSizes(true, 0, 0, 0, 0, 0, 0);
+	TBufferSizes tSizes(true, 0, 0, 0, 0, 0, 0, 0, 0, 0);
 
 	EXPECT_EQ(TBufferSizes::MinBufferCount, tSizes.GetBufferCount());
 	EXPECT_EQ(TBufferSizes::BufferGranularity, tSizes.GetDefaultSize());
@@ -43,11 +46,14 @@ TEST(TestsTBufferSizes, ParametrizedConstructor_MinimumCheck)
 	EXPECT_EQ(TBufferSizes::BufferGranularity, tSizes.GetCDSize());
 	EXPECT_EQ(TBufferSizes::BufferGranularity, tSizes.GetLANSize());
 	EXPECT_EQ(true, tSizes.IsOnlyDefault());
+	EXPECT_EQ(1, tSizes.GetMaxReadAheadBuffers());
+	EXPECT_EQ(1, tSizes.GetMaxConcurrentReads());
+	EXPECT_EQ(1, tSizes.GetMaxConcurrentWrites());
 }
 
 TEST(TestsTBufferSizes, ParametrizedConstructor_RoundingCheck)
 {
-	TBufferSizes tSizes(true, 2, 6543, 9891, 17123, 37012, 72089);
+	TBufferSizes tSizes(true, 2, 6543, 9891, 17123, 37012, 72089, 10, 2, 1);
 
 	EXPECT_EQ(2, tSizes.GetBufferCount());
 	EXPECT_EQ(8192, tSizes.GetDefaultSize());
@@ -56,11 +62,14 @@ TEST(TestsTBufferSizes, ParametrizedConstructor_RoundingCheck)
 	EXPECT_EQ(40960, tSizes.GetCDSize());
 	EXPECT_EQ(73728, tSizes.GetLANSize());
 	EXPECT_EQ(true, tSizes.IsOnlyDefault());
+	EXPECT_EQ(10, tSizes.GetMaxReadAheadBuffers());
+	EXPECT_EQ(2, tSizes.GetMaxConcurrentReads());
+	EXPECT_EQ(1, tSizes.GetMaxConcurrentWrites());
 }
 
 TEST(TestsTBufferSizes, Clear)
 {
-	TBufferSizes tSizes(true, 2, 6543, 9891, 17123, 37012, 72089);
+	TBufferSizes tSizes(true, 2, 6543, 9891, 17123, 37012, 72089, 10, 2, 1);
 
 	tSizes.Clear();
 
@@ -71,6 +80,9 @@ TEST(TestsTBufferSizes, Clear)
 	EXPECT_EQ(TBufferSizes::BufferGranularity, tSizes.GetCDSize());
 	EXPECT_EQ(TBufferSizes::BufferGranularity, tSizes.GetLANSize());
 	EXPECT_EQ(false, tSizes.IsOnlyDefault());
+	EXPECT_EQ(1, tSizes.GetMaxReadAheadBuffers());
+	EXPECT_EQ(1, tSizes.GetMaxConcurrentReads());
+	EXPECT_EQ(1, tSizes.GetMaxConcurrentWrites());
 }
 
 TEST(TestsTBufferSizes, SetOnlyDefault_IsOnlyDefault)
@@ -303,42 +315,42 @@ TEST(TestsTBufferSizes, SetSizeByType_GetSizeByType_OutOfRange)
 ////////////////////////////////////////////////////////////////////////////////////////////////
 TEST(TestsTBufferSizes, GetMaxSize_Default)
 {
-	TBufferSizes tSizes(false, 1, 16384, 0, 0, 0, 0);
+	TBufferSizes tSizes(false, 1, 16384, 0, 0, 0, 0, 0, 0, 0);
 
 	EXPECT_EQ(16384, tSizes.GetMaxSize());
 }
 
 TEST(TestsTBufferSizes, GetMaxSize_OneDisk)
 {
-	TBufferSizes tSizes(false, 1, 0, 16384, 0, 0, 0);
+	TBufferSizes tSizes(false, 1, 0, 16384, 0, 0, 0, 0, 0, 0);
 
 	EXPECT_EQ(16384, tSizes.GetMaxSize());
 }
 
 TEST(TestsTBufferSizes, GetMaxSize_TwoDisks)
 {
-	TBufferSizes tSizes(false, 1, 0, 0, 16384, 0, 0);
+	TBufferSizes tSizes(false, 1, 0, 0, 16384, 0, 0, 0, 0, 0);
 
 	EXPECT_EQ(16384, tSizes.GetMaxSize());
 }
 
 TEST(TestsTBufferSizes, GetMaxSize_CD)
 {
-	TBufferSizes tSizes(false, 1, 0, 0, 0, 16384, 0);
+	TBufferSizes tSizes(false, 1, 0, 0, 0, 16384, 0, 0, 0, 0);
 
 	EXPECT_EQ(16384, tSizes.GetMaxSize());
 }
 
 TEST(TestsTBufferSizes, GetMaxSize_LAN)
 {
-	TBufferSizes tSizes(false, 1, 0, 0, 0, 0, 16384);
+	TBufferSizes tSizes(false, 1, 0, 0, 0, 0, 16384, 0, 0, 0);
 
 	EXPECT_EQ(16384, tSizes.GetMaxSize());
 }
 
 TEST(TestsTBufferSizes, GetMaxSize_OnlyDefault)
 {
-	TBufferSizes tSizes(true, 1, 16384, 0, 0, 0, 32768);
+	TBufferSizes tSizes(true, 1, 16384, 0, 0, 0, 32768, 0, 0, 0);
 
 	EXPECT_EQ(16384, tSizes.GetMaxSize());
 }

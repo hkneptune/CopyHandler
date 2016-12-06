@@ -65,6 +65,10 @@ private:
 	UINT m_uiBufferCount = 0;
 	BOOL m_bOnlyDefaultCheck = TRUE;
 
+	unsigned int m_uiMaxReadAhead = 0;
+	unsigned int m_uiMaxConcurrentReads = 0;
+	unsigned int m_uiMaxConcurrentWrites = 0;
+
 	chcore::TBufferSizes::EBufferType m_eSelectedBuffer;
 	chcore::TBufferSizes m_bsSizes;
 };

@@ -30,7 +30,11 @@ namespace chcore
 			GetTaskPropValue<eTO_OneDiskBufferSize>(rConfig),
 			GetTaskPropValue<eTO_TwoDisksBufferSize>(rConfig),
 			GetTaskPropValue<eTO_CDBufferSize>(rConfig),
-			GetTaskPropValue<eTO_LANBufferSize>(rConfig));
+			GetTaskPropValue<eTO_LANBufferSize>(rConfig),
+			GetTaskPropValue<eTO_MaxReadAheadBuffers>(rConfig),
+			GetTaskPropValue<eTO_MaxConcurrentReads>(rConfig),
+			GetTaskPropValue<eTO_MaxConcurrentWrites>(rConfig)
+		);
 	}
 
 	void SetTaskPropBufferSizes(TConfig& rConfig, const TBufferSizes& rBufferSizes)
@@ -42,5 +46,8 @@ namespace chcore
 		SetTaskPropValue<eTO_TwoDisksBufferSize>(rConfig, rBufferSizes.GetTwoDisksSize());
 		SetTaskPropValue<eTO_CDBufferSize>(rConfig, rBufferSizes.GetCDSize());
 		SetTaskPropValue<eTO_LANBufferSize>(rConfig, rBufferSizes.GetLANSize());
+		SetTaskPropValue<eTO_MaxReadAheadBuffers>(rConfig, rBufferSizes.GetMaxReadAheadBuffers());
+		SetTaskPropValue<eTO_MaxConcurrentReads>(rConfig, rBufferSizes.GetMaxConcurrentReads());
+		SetTaskPropValue<eTO_MaxConcurrentWrites>(rConfig, rBufferSizes.GetMaxConcurrentWrites());
 	}
 }

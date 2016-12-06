@@ -32,10 +32,6 @@ namespace chcore
 	class TOverlappedReaderWriterFB
 	{
 	public:
-		static const size_t MaxOtfBuffers = 2;
-		static const size_t MaxReadAheadBuffers = 50;
-
-	public:
 		explicit TOverlappedReaderWriterFB(const IFilesystemPtr& spFilesystem,
 			const IFeedbackHandlerPtr& spFeedbackHandler,
 			TWorkerThreadController& rThreadController,
@@ -47,6 +43,9 @@ namespace chcore
 			const TOverlappedMemoryPoolPtr& spBuffers,
 			unsigned long long ullResumePosition,
 			DWORD dwChunkSize,
+			unsigned int uiMaxReadAhead,
+			unsigned int uiMaxConcurrentReads,
+			unsigned int uiMaxConcurrentWrites,
 			bool bNoBuffering,
 			bool bProtectReadOnlyFiles,
 			bool bOnlyCreate,

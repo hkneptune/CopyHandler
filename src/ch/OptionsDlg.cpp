@@ -138,7 +138,10 @@ void CustomPropertyCallbackProc(LPVOID lpParam, int iParam, CPtrList* pList, int
 		pDlg->GetUintProp(iIndex - iParam + 1),
 		pDlg->GetUintProp(iIndex - iParam + 2),
 		pDlg->GetUintProp(iIndex - iParam + 3),
-		pDlg->GetUintProp(iIndex - iParam + 4));
+		pDlg->GetUintProp(iIndex - iParam + 4),
+		pDlg->GetUintProp(iIndex - iParam + 8),
+		pDlg->GetUintProp(iIndex - iParam + 9),
+		pDlg->GetUintProp(iIndex - iParam + 10));
 
 	CBufferSizeDlg dlg(&tBufferSizes, (chcore::TBufferSizes::EBufferType)iParam);
 	if (dlg.DoModal() == IDOK)
@@ -146,22 +149,31 @@ void CustomPropertyCallbackProc(LPVOID lpParam, int iParam, CPtrList* pList, int
 		tBufferSizes = dlg.GetBufferSizes();
 
 		PROPERTYITEM* pItem;
-		TCHAR xx[32];
+		TCHAR szData[32];
 
 		pItem = (PROPERTYITEM*)pList->GetAt(pList->FindIndex(iIndex-iParam-1));
 		pItem->nPropertySelected=(tBufferSizes.IsOnlyDefault() ? 1 : 0);
 		pItem = (PROPERTYITEM*)pList->GetAt(pList->FindIndex(iIndex-iParam));
-		pItem->csProperties.SetAt(0, _itot(tBufferSizes.GetDefaultSize(), xx, 10));
+		pItem->csProperties.SetAt(0, _itot(tBufferSizes.GetDefaultSize(), szData, 10));
 		pItem = (PROPERTYITEM*)pList->GetAt(pList->FindIndex(iIndex-iParam+1));
-		pItem->csProperties.SetAt(0, _itot(tBufferSizes.GetOneDiskSize(), xx, 10));
+		pItem->csProperties.SetAt(0, _itot(tBufferSizes.GetOneDiskSize(), szData, 10));
 		pItem = (PROPERTYITEM*)pList->GetAt(pList->FindIndex(iIndex-iParam+2));
-		pItem->csProperties.SetAt(0, _itot(tBufferSizes.GetTwoDisksSize(), xx, 10));
+		pItem->csProperties.SetAt(0, _itot(tBufferSizes.GetTwoDisksSize(), szData, 10));
 		pItem = (PROPERTYITEM*)pList->GetAt(pList->FindIndex(iIndex-iParam+3));
-		pItem->csProperties.SetAt(0, _itot(tBufferSizes.GetCDSize(), xx, 10));
+		pItem->csProperties.SetAt(0, _itot(tBufferSizes.GetCDSize(), szData, 10));
 		pItem = (PROPERTYITEM*) pList->GetAt(pList->FindIndex(iIndex - iParam + 4));
-		pItem->csProperties.SetAt(0, _itot(tBufferSizes.GetLANSize(), xx, 10));
+		pItem->csProperties.SetAt(0, _itot(tBufferSizes.GetLANSize(), szData, 10));
 		pItem = (PROPERTYITEM*) pList->GetAt(pList->FindIndex(iIndex - iParam + 7));
-		pItem->csProperties.SetAt(0, _itot(tBufferSizes.GetBufferCount(), xx, 10));
+		pItem->csProperties.SetAt(0, _itot(tBufferSizes.GetBufferCount(), szData, 10));
+
+		pItem = (PROPERTYITEM*)pList->GetAt(pList->FindIndex(iIndex - iParam + 8));
+		pItem->csProperties.SetAt(0, _itot(tBufferSizes.GetMaxReadAheadBuffers(), szData, 10));
+
+		pItem = (PROPERTYITEM*)pList->GetAt(pList->FindIndex(iIndex - iParam + 9));
+		pItem->csProperties.SetAt(0, _itot(tBufferSizes.GetMaxConcurrentReads(), szData, 10));
+
+		pItem = (PROPERTYITEM*)pList->GetAt(pList->FindIndex(iIndex - iParam + 10));
+		pItem->csProperties.SetAt(0, _itot(tBufferSizes.GetMaxConcurrentWrites(), szData, 10));
 	}
 }
 
@@ -316,6 +328,9 @@ void COptionsDlg::FillPropertyList()
 	PROP_BOOL(IDS_USENOBUFFERING_STRING, GetPropValue<PP_BFUSENOBUFFERING>(GetConfig()));
 	PROP_UINT(IDS_LARGEFILESMINSIZE_STRING, GetPropValue<PP_BFBOUNDARYLIMIT>(GetConfig()));
 	PROP_UINT(IDS_BUFFER_QUEUE_DEPTH, GetPropValue<PP_BFQUEUEDEPTH>(GetConfig()));
+	PROP_UINT(IDS_BUFFER_MAX_READAHEAD, GetPropValue<PP_MAXREADAHEAD>(GetConfig()));
+	PROP_UINT(IDS_BUFFER_MAX_CONCURRENT_READS, GetPropValue<PP_MAXCONCURRENTREADS>(GetConfig()));
+	PROP_UINT(IDS_BUFFER_MAX_CONCURRENT_WRITES, GetPropValue<PP_MAXCONCURRENTWRITES>(GetConfig()));
 
 	PROP_SEPARATOR(IDS_CFGLOGFILE_STRING);
 	PROP_UINT(IDS_CFGMAXLIMIT_STRING, GetPropValue<PP_LOGMAXSIZE>(GetConfig()));
@@ -442,6 +457,9 @@ void COptionsDlg::ApplyProperties()
 	SetPropValue<PP_BFUSENOBUFFERING>(rConfig, GetBoolProp(iPosition++));
 	SetPropValue<PP_BFBOUNDARYLIMIT>(rConfig, GetUintProp(iPosition++));
 	SetPropValue<PP_BFQUEUEDEPTH>(rConfig, GetUintProp(iPosition++));
+	SetPropValue<PP_MAXREADAHEAD>(GetConfig(), GetUintProp(iPosition++));
+	SetPropValue<PP_MAXCONCURRENTREADS>(GetConfig(), GetUintProp(iPosition++));
+	SetPropValue<PP_MAXCONCURRENTWRITES>(GetConfig(), GetUintProp(iPosition++));
 
 	// log file
 	SKIP_SEPARATOR(iPosition);

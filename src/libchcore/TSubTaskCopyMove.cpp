@@ -377,6 +377,9 @@ namespace chcore
 			pData->spMemoryPool,
 			ullNextReadPos,
 			dwCurrentBufferSize,
+			pData->tBufferSizes.GetMaxReadAheadBuffers(),
+			pData->tBufferSizes.GetMaxConcurrentReads(),
+			pData->tBufferSizes.GetMaxConcurrentWrites(),
 			bNoBuffer,
 			GetTaskPropValue<eTO_ProtectReadOnlyFiles>(rConfig),
 			pData->bOnlyCreate,
@@ -402,17 +405,15 @@ namespace chcore
 			rBufferSizes = GetTaskPropBufferSizes(rConfig);
 
 			// log
-			TString strFormat;
-			strFormat = _T("Changing buffer size to [Def:%defsize2, One:%onesize2, Two:%twosize2, CD:%cdsize2, LAN:%lansize2, Count:%cnt]");
-
-			strFormat.Replace(_T("%defsize2"), boost::lexical_cast<std::wstring>(rBufferSizes.GetDefaultSize()).c_str());
-			strFormat.Replace(_T("%onesize2"), boost::lexical_cast<std::wstring>(rBufferSizes.GetOneDiskSize()).c_str());
-			strFormat.Replace(_T("%twosize2"), boost::lexical_cast<std::wstring>(rBufferSizes.GetTwoDisksSize()).c_str());
-			strFormat.Replace(_T("%cdsize2"), boost::lexical_cast<std::wstring>(rBufferSizes.GetCDSize()).c_str());
-			strFormat.Replace(_T("%lansize2"), boost::lexical_cast<std::wstring>(rBufferSizes.GetLANSize()).c_str());
-			strFormat.Replace(_T("%cnt"), boost::lexical_cast<std::wstring>(rBufferSizes.GetBufferCount()).c_str());
-
-			LOG_INFO(m_spLog) << strFormat.c_str();
+			LOG_INFO(m_spLog) << L"Changing buffer sizes. Default: " << rBufferSizes.GetDefaultSize() <<
+				L", OneDisk: " << rBufferSizes.GetOneDiskSize() <<
+				L", TwoDisks: " << rBufferSizes.GetTwoDisksSize() <<
+				L", CD: " << rBufferSizes.GetCDSize() <<
+				L", LAN: " << rBufferSizes.GetLANSize() <<
+				L", MaxBuffers: " << rBufferSizes.GetBufferCount() <<
+				L", MaxReadAhead: " << rBufferSizes.GetMaxReadAheadBuffers() <<
+				L", MaxConcurrentReads: " << rBufferSizes.GetMaxConcurrentReads() <<
+				L", MaxConcurrentWrites: " << rBufferSizes.GetMaxConcurrentWrites();
 
 			spBuffer->ReinitializeBuffers(rBufferSizes.GetBufferCount(), rBufferSizes.GetMaxSize());
 
