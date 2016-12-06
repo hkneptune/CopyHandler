@@ -869,9 +869,6 @@
     <ClCompile Include="TLocalFilesystemFind.cpp">
       <Filter>Source Files\Filesystems\Local</Filter>
     </ClCompile>
-    <ClCompile Include="Tests\TestsTSparseRangeMap.cpp">
-      <Filter>Tests</Filter>
-    </ClCompile>
     <ClCompile Include="TBaseException.cpp">
       <Filter>Source Files\Tools\Exceptions</Filter>
     </ClCompile>
