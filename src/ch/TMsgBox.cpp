@@ -21,8 +21,6 @@
 #include "ch.h"
 #include "resource.h"
 
-using namespace ictranslate;
-
 IMPLEMENT_DYNAMIC(TMsgBox, CLanguageDialog)
 
 BEGIN_MESSAGE_MAP(TMsgBox, CLanguageDialog)

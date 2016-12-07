@@ -62,186 +62,203 @@
 #include "libictranslate.h"
 #include "ResourceManager.h"
 
-BEGIN_ICTRANSLATE_NAMESPACE
-
+namespace ictranslate
+{
 #pragma pack(push, 1)
-struct DLGTEMPLATEEX
-{
-	WORD dlgVer;
-	WORD signature;
-	DWORD helpID;
-	DWORD exStyle;
-	DWORD style;
-	WORD cDlgItems;
-	short x;
-	short y;
-	short cx;
-	short cy;
-};
+	struct DLGTEMPLATEEX
+	{
+		WORD dlgVer;
+		WORD signature;
+		DWORD helpID;
+		DWORD exStyle;
+		DWORD style;
+		WORD cDlgItems;
+		short x;
+		short y;
+		short cx;
+		short cy;
+	};
 
-struct DLGITEMTEMPLATEEX
-{
-	DWORD helpID;
-	DWORD exStyle;
-	DWORD style;
-	short x;
-	short y;
-	short cx;
-	short cy;
-	WORD id;
-	WORD __DUMMY__;
-};
+	struct DLGITEMTEMPLATEEX
+	{
+		DWORD helpID;
+		DWORD exStyle;
+		DWORD style;
+		short x;
+		short y;
+		short cx;
+		short cy;
+		WORD id;
+		WORD __DUMMY__;
+	};
 #pragma pack(pop)
 
-class CDlgTemplate
-{
-public:
-	CDlgTemplate();
-	explicit CDlgTemplate(const DLGTEMPLATE* pDlgTemplate);
-	explicit CDlgTemplate(const DLGTEMPLATEEX* pDlgTemplate);
-	~CDlgTemplate();
-
-	bool Open(const DLGTEMPLATE* pDlgTemplate);
-
-protected:
-	void ConvertItemToEx(const DLGITEMTEMPLATE* pSrc, DLGITEMTEMPLATEEX* pDst);		// converts DLGITEMTEMPLATE to DLGITEMTEMPLATEEX
-	void ConvertDlgToEx(const DLGTEMPLATE* pSrc, DLGTEMPLATEEX* pDst);
-
-	const BYTE* ReadCompoundData(const BYTE* pBuffer, WORD* pwData, PTSTR* ppszStr);
-
-public:
-	struct _ITEM
+	class CDlgTemplate
 	{
-		DLGITEMTEMPLATEEX m_itemTemplate;
-		
-		WORD m_wClass = 0;
+	public:
+		CDlgTemplate();
+		explicit CDlgTemplate(const DLGTEMPLATE* pDlgTemplate);
+		explicit CDlgTemplate(const DLGTEMPLATEEX* pDlgTemplate);
+		~CDlgTemplate();
+
+		bool Open(const DLGTEMPLATE* pDlgTemplate);
+
+	protected:
+		void ConvertItemToEx(const DLGITEMTEMPLATE* pSrc, DLGITEMTEMPLATEEX* pDst);		// converts DLGITEMTEMPLATE to DLGITEMTEMPLATEEX
+		void ConvertDlgToEx(const DLGTEMPLATE* pSrc, DLGTEMPLATEEX* pDst);
+
+		const BYTE* ReadCompoundData(const BYTE* pBuffer, WORD* pwData, PTSTR* ppszStr);
+
+	public:
+		struct _ITEM
+		{
+			DLGITEMTEMPLATEEX m_itemTemplate;
+
+			WORD m_wClass = 0;
+			TCHAR *m_pszClass = nullptr;
+
+			WORD m_wTitle = 0;
+			TCHAR *m_pszTitle = 0;
+
+			WORD m_wCreationDataSize = 0;
+			BYTE *m_pbyCreationData = nullptr;
+		};
+
+		std::vector<_ITEM> m_vItems;
+
+		DLGTEMPLATEEX m_dlgTemplate;
+
+		WORD m_wMenu = (WORD)-1;
+		TCHAR *m_pszMenu = nullptr;
+
+		WORD m_wClass = (WORD)-1;
 		TCHAR *m_pszClass = nullptr;
 
-		WORD m_wTitle = 0;
-		TCHAR *m_pszTitle = 0;
+		WORD m_wTitle = (WORD)-1;		// always -1
+		TCHAR *m_pszTitle = nullptr;
 
-		WORD m_wCreationDataSize = 0;
-		BYTE *m_pbyCreationData = nullptr;
+		// font
+		WORD m_wFontSize = 0;
+		WORD m_wWeight = 0;
+		BYTE m_byItalic = 0;
+		BYTE m_byCharset = 0;
+		TCHAR *m_pszFace = nullptr;
 	};
-	vector<_ITEM> m_vItems;
 
-	DLGTEMPLATEEX m_dlgTemplate;
+	// class stores information about control initial position and offset and scaling factors
+	class CControlResizeInfo
+	{
+	public:
+		CControlResizeInfo(int iCtrlID, double dXPosFactor, double dYPosFactor, double dXScaleFactor, double dYScaleFactor);
 
-	WORD m_wMenu = (WORD)-1;
-	TCHAR *m_pszMenu = nullptr;
+		void SetInitialPosition(const CRect& rcPos);
+		void GetNewControlPlacement(const CRect& rcDlgInitial, const CRect& rcDlgCurrent, CRect& rcNewPlacement);
 
-	WORD m_wClass = (WORD)-1;
-	TCHAR *m_pszClass = nullptr;
+		void ResetInitState();
+		bool IsInitialized() const;
 
-	WORD m_wTitle = (WORD)-1;		// always -1
-	TCHAR *m_pszTitle = nullptr;
-	
-	// font
-	WORD m_wFontSize = 0;
-	WORD m_wWeight = 0;
-	BYTE m_byItalic = 0;
-	BYTE m_byCharset = 0;
-	TCHAR *m_pszFace = nullptr;
-};
+		int GetControlID() const
+		{
+			return m_iControlID;
+		}
 
-// class stores information about control initial position and offset and scaling factors
-class CControlResizeInfo
-{
-public:
-	CControlResizeInfo(int iCtrlID, double dXPosFactor, double dYPosFactor, double dXScaleFactor, double dYScaleFactor);
+	protected:
+		int m_iControlID;
+		CRect m_rcInitialPosition;
+		double m_dXOffsetFactor;
+		double m_dYOffsetFactor;
+		double m_dXScaleFactor;
+		double m_dYScaleFactor;
+	};
 
-	void SetInitialPosition(const CRect& rcPos);
-	void GetNewControlPlacement(const CRect& rcDlgInitial, const CRect& rcDlgCurrent, CRect& rcNewPlacement);
-
-	void ResetInitState();
-	bool IsInitialized() const;
-
-	int GetControlID() const { return m_iControlID; }
-
-protected:
-	int m_iControlID;
-	CRect m_rcInitialPosition;
-	double m_dXOffsetFactor;
-	double m_dYOffsetFactor;
-	double m_dXScaleFactor;
-	double m_dYScaleFactor;
-};
-
-/////////////////////////////////////////////////////////////////////////////
-// CLanguageDialog dialog
+	/////////////////////////////////////////////////////////////////////////////
+	// CLanguageDialog dialog
 #define LDF_NODIALOGSIZE 0x01
 #define LDF_NODIALOGFONT 0x02
 
-class LIBICTRANSLATE_API CLanguageDialog : public CDialog
-{
-public:
-// Construction/destruction
-	explicit CLanguageDialog(bool* pLock=nullptr);
-	explicit CLanguageDialog(PCTSTR lpszTemplateName, CWnd* pParent = nullptr, bool* pLock=nullptr);   // standard constructor
-	explicit CLanguageDialog(UINT uiIDTemplate, CWnd* pParent = nullptr, bool* pLock=nullptr);   // standard constructor
-	CLanguageDialog(const CLanguageDialog&) = delete;
+	class LIBICTRANSLATE_API CLanguageDialog : public CDialog
+	{
+	public:
+		// Construction/destruction
+		explicit CLanguageDialog(bool* pLock = nullptr);
+		explicit CLanguageDialog(PCTSTR lpszTemplateName, CWnd* pParent = nullptr, bool* pLock = nullptr);   // standard constructor
+		explicit CLanguageDialog(UINT uiIDTemplate, CWnd* pParent = nullptr, bool* pLock = nullptr);   // standard constructor
+		CLanguageDialog(const CLanguageDialog&) = delete;
 
-	CLanguageDialog& operator=(const CLanguageDialog&) = delete;
-	
-	~CLanguageDialog();
+		CLanguageDialog& operator=(const CLanguageDialog&) = delete;
 
-	// static members - initialize global pointer to a resource manager
-	static void SetResManager(CResourceManager* prm) { m_prm=prm; };
+		~CLanguageDialog();
 
-	// creation
-	INT_PTR DoModal() override;
-	virtual BOOL Create();
+		// static members - initialize global pointer to a resource manager
+		static void SetResManager(CResourceManager* prm)
+		{
+			m_prm = prm;
+		};
 
-	void MapRect(RECT* pRect);
-	CFont* GetFont() { return m_pFont ? m_pFont : ((CDialog*)this)->GetFont(); };
+		// creation
+		INT_PTR DoModal() override;
+		virtual BOOL Create();
 
-	afx_msg BOOL OnHelpInfo(HELPINFO* pHelpInfo);
-	afx_msg void OnContextMenu(CWnd* pWnd, CPoint point);
-	void OnHelpButton();
+		void MapRect(RECT* pRect);
+		CFont* GetFont()
+		{
+			return m_pFont ? m_pFont : ((CDialog*)this)->GetFont();
+		};
 
-	// Controls resize support
-	void InitializeResizableControls();
-	void ClearResizableControls();
-	void AddResizableControl(int iCtrlID, double dXPosFactor, double dYPosFactor, double dXScaleFactor, double dYScaleFactor);
-	void RepositionResizableControls();
+		afx_msg BOOL OnHelpInfo(HELPINFO* pHelpInfo);
+		afx_msg void OnContextMenu(CWnd* pWnd, CPoint point);
+		void OnHelpButton();
 
-protected:
-	void UpdateLanguage();
-	virtual UINT GetLanguageUpdateOptions() { return 0; };
-	virtual void OnLanguageChanged() { };
-	void Cleanup();
+		// Controls resize support
+		void InitializeResizableControls();
+		void ClearResizableControls();
+		void AddResizableControl(int iCtrlID, double dXPosFactor, double dYPosFactor, double dXScaleFactor, double dYScaleFactor);
+		void RepositionResizableControls();
 
-	virtual BOOL OnTooltipText(UINT /*uiID*/, TOOLTIPTEXT* /*pTip*/) { return FALSE; };
-	BOOL OnInitDialog() override;
-	void OnCancel() override;
-	void OnOK() override;
-	void PostNcDestroy() override;
-	LRESULT WindowProc(UINT message, WPARAM wParam, LPARAM lParam) override;
+	protected:
+		void UpdateLanguage();
+		virtual UINT GetLanguageUpdateOptions()
+		{
+			return 0;
+		};
+		virtual void OnLanguageChanged()
+		{
+		};
+		void Cleanup();
 
-	DECLARE_MESSAGE_MAP()
-private:
-	void CalcBaseUnits(PCTSTR pszFacename, WORD wPointSize);
+		virtual BOOL OnTooltipText(UINT /*uiID*/, TOOLTIPTEXT* /*pTip*/)
+		{
+			return FALSE;
+		};
+		BOOL OnInitDialog() override;
+		void OnCancel() override;
+		void OnOK() override;
+		void PostNcDestroy() override;
+		LRESULT WindowProc(UINT message, WPARAM wParam, LPARAM lParam) override;
 
-// Attributes
-public:
-	bool m_bAutoDelete;			// deletes this dialog when exiting
-	bool m_bLockInstance;		// allows only one instance of this dialog if set
+		DECLARE_MESSAGE_MAP()
+	private:
+		void CalcBaseUnits(PCTSTR pszFacename, WORD wPointSize);
 
-protected:
-	static CResourceManager* m_prm;		// points to the resource manager instance
+		// Attributes
+	public:
+		bool m_bAutoDelete;			// deletes this dialog when exiting
+		bool m_bLockInstance;		// allows only one instance of this dialog if set
 
-	bool *m_pbLock;				// dialog box instance lock system
-	bool m_bLockChanged;		// if this dialog changed the lock
-	PCTSTR m_pszResName;		// resource (string) name of the dialog template
-	UINT m_uiResID;				// resource ID if any of the dialog template
-	CWnd* m_pParent;			// parent window ptr
-	char m_cType;				// type of this dialog box
-	CFont* m_pFont;				// currently used font
-	int m_iBaseX, m_iBaseY;
+	protected:
+		static CResourceManager* m_prm;		// points to the resource manager instance
 
-	// controls resizing capabilities
-	CRect m_rcDialogInitialPosition;
-	std::map<int, CControlResizeInfo> m_mapResizeInfo;
-};
+		bool *m_pbLock;				// dialog box instance lock system
+		bool m_bLockChanged;		// if this dialog changed the lock
+		PCTSTR m_pszResName;		// resource (string) name of the dialog template
+		UINT m_uiResID;				// resource ID if any of the dialog template
+		CWnd* m_pParent;			// parent window ptr
+		char m_cType;				// type of this dialog box
+		CFont* m_pFont;				// currently used font
+		int m_iBaseX, m_iBaseY;
 
-END_ICTRANSLATE_NAMESPACE
+		// controls resizing capabilities
+		CRect m_rcDialogInitialPosition;
+		std::map<int, CControlResizeInfo> m_mapResizeInfo;
+	};
+}

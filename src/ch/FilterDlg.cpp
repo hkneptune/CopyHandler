@@ -32,7 +32,7 @@ static char THIS_FILE[] = __FILE__;
 // CFilterDlg dialog
 
 CFilterDlg::CFilterDlg()
-	:ictranslate::CLanguageDialog(IDD_FILTER_DIALOG)
+	:CLanguageDialog(IDD_FILTER_DIALOG)
 {
 	//{{AFX_DATA_INIT(CFilterDlg)
 	m_iArchive = FALSE;

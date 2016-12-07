@@ -25,206 +25,248 @@
 #include <vector>
 #include <list>
 
-using namespace std;
-
-BEGIN_ICTRANSLATE_NAMESPACE
-
-/////////////////////////////////////////////////////////////////////////
-// types of notifications
+namespace ictranslate
+{
+	/////////////////////////////////////////////////////////////////////////
+	// types of notifications
 #define WM_RMNOTIFY (WM_USER + 2)
 
 // RMNT_LANGCHANGE, LPARAM - HIWORD - old language, LOWORD - new language
 #define RMNT_LANGCHANGE		0x0001
 
-typedef void(*PFNNOTIFYCALLBACK)(unsigned int);
+	typedef void(*PFNNOTIFYCALLBACK)(unsigned int);
 
-class LIBICTRANSLATE_API CFormat
-{
-public:
-	CFormat();
-	explicit CFormat(const wchar_t* pszFormat);
-	~CFormat();
-
-	void SetFormat(const wchar_t* pszFormat);
-
-	CFormat& SetParam(PCTSTR pszName, PCTSTR pszText);
-	CFormat& SetParam(PCTSTR pszName, unsigned long long ullData);
-	CFormat& SetParam(PCTSTR pszName, long long llData);
-	CFormat& SetParam(PCTSTR pszName, unsigned long ulData);
-	CFormat& SetParam(PCTSTR pszName, unsigned int uiData);
-	CFormat& SetParam(PCTSTR pszName, int iData);
-	CFormat& SetParam(PCTSTR pszName, bool bData);
-
-	operator const wchar_t*() const { return m_strText.c_str(); }
-
-protected:
-	std::wstring m_strText;
-};
-
-///////////////////////////////////////////////////////////
-// language description structure
-class LIBICTRANSLATE_API CTranslationItem
-{
-public:
-	enum ECompareResult
+	class LIBICTRANSLATE_API CFormat
 	{
-		eResult_Valid,		// valid translation
-		eResult_Invalid,	// Invalid checksum or translation
-		eResult_ContentWarning	// the translation is suspicious
+	public:
+		CFormat();
+		explicit CFormat(const wchar_t* pszFormat);
+		~CFormat();
+
+		void SetFormat(const wchar_t* pszFormat);
+
+		CFormat& SetParam(PCTSTR pszName, PCTSTR pszText);
+		CFormat& SetParam(PCTSTR pszName, unsigned long long ullData);
+		CFormat& SetParam(PCTSTR pszName, long long llData);
+		CFormat& SetParam(PCTSTR pszName, unsigned long ulData);
+		CFormat& SetParam(PCTSTR pszName, unsigned int uiData);
+		CFormat& SetParam(PCTSTR pszName, int iData);
+		CFormat& SetParam(PCTSTR pszName, bool bData);
+
+		operator const wchar_t*() const
+		{
+			return m_strText.c_str();
+		}
+
+	protected:
+		std::wstring m_strText;
 	};
-public:
-	CTranslationItem();
-	CTranslationItem(const CTranslationItem& rSrc);
-	CTranslationItem(const wchar_t* pszText, unsigned int uiChecksum);
-	~CTranslationItem();
 
-	CTranslationItem& operator=(const CTranslationItem& rSrc);
+	///////////////////////////////////////////////////////////
+	// language description structure
+	class LIBICTRANSLATE_API CTranslationItem
+	{
+	public:
+		enum ECompareResult
+		{
+			eResult_Valid,		// valid translation
+			eResult_Invalid,	// Invalid checksum or translation
+			eResult_ContentWarning	// the translation is suspicious
+		};
+	public:
+		CTranslationItem();
+		CTranslationItem(const CTranslationItem& rSrc);
+		CTranslationItem(const wchar_t* pszText, unsigned int uiChecksum);
+		~CTranslationItem();
 
-	void Clear();
+		CTranslationItem& operator=(const CTranslationItem& rSrc);
 
-	const wchar_t* GetText() const;
-	void SetText(const wchar_t* pszText, bool bUnescapeString);
-	unsigned int GetChecksum() const { return m_uiChecksum; }
-	void SetChecksum(unsigned int uiChecksum) { m_uiChecksum = uiChecksum; }
+		void Clear();
 
-	void UnescapeString();
+		const wchar_t* GetText() const;
+		void SetText(const wchar_t* pszText, bool bUnescapeString);
+		unsigned int GetChecksum() const
+		{
+			return m_uiChecksum;
+		}
+		void SetChecksum(unsigned int uiChecksum)
+		{
+			m_uiChecksum = uiChecksum;
+		}
 
-	ECompareResult Compare(const CTranslationItem& rReferenceItem);
+		void UnescapeString();
 
-protected:
-	bool GetFormatStrings(std::set<std::wstring>& setFmtStrings) const;
+		ECompareResult Compare(const CTranslationItem& rReferenceItem);
 
-protected:
-	wchar_t* m_pszText = nullptr;
-	size_t m_stTextLength = 0;
-	unsigned int m_uiChecksum = 0;
-};
+	protected:
+		bool GetFormatStrings(std::set<std::wstring>& setFmtStrings) const;
 
-typedef void(*PFNENUMCALLBACK)(unsigned int, const CTranslationItem*, void*);
-typedef std::map<unsigned int, CTranslationItem> translation_map;
+	protected:
+		wchar_t* m_pszText = nullptr;
+		size_t m_stTextLength = 0;
+		unsigned int m_uiChecksum = 0;
+	};
 
-class LIBICTRANSLATE_API CLangData
-{
-public:
-// construction/destruction
-	CLangData();
-	CLangData(const CLangData& ld);
-	~CLangData();
+	typedef void(*PFNENUMCALLBACK)(unsigned int, const CTranslationItem*, void*);
+	typedef std::map<unsigned int, CTranslationItem> translation_map;
 
-	CLangData& operator=(const CLangData& rSrc);
+	class LIBICTRANSLATE_API CLangData
+	{
+	public:
+		// construction/destruction
+		CLangData();
+		CLangData(const CLangData& ld);
+		~CLangData();
 
-	void Clear();
-// operations
-	bool ReadInfo(PCTSTR pszFile);
-	bool ReadTranslation(PCTSTR pszFile, bool bReadBase = false, bool bIgnoreVersion = false);
-	void WriteTranslation(PCTSTR pszPath);
+		CLangData& operator=(const CLangData& rSrc);
 
-// translation retrieving/setting
-	const wchar_t* GetString(WORD wHiID, WORD wLoID);		// retrieves string using group id and string id
-	void EnumStrings(PFNENUMCALLBACK pfnCallback, void* pData);	// retrieves all translation items
+		void Clear();
+		// operations
+		bool ReadInfo(PCTSTR pszFile);
+		bool ReadTranslation(PCTSTR pszFile, bool bReadBase = false, bool bIgnoreVersion = false);
+		void WriteTranslation(PCTSTR pszPath);
 
-	CTranslationItem* GetTranslationItem(unsigned int uiTranslationKey, bool bCreate);	// retrieves pointer to the single translation item
-	bool Exists(unsigned int uiTranslationKey) const;
-	void CleanupTranslation(const CLangData& rReferenceTranslation);
+		// translation retrieving/setting
+		const wchar_t* GetString(WORD wHiID, WORD wLoID);		// retrieves string using group id and string id
+		void EnumStrings(PFNENUMCALLBACK pfnCallback, void* pData);	// retrieves all translation items
 
-// attributes
-	void SetFilename(PCTSTR psz);
-	PCTSTR GetFilename(bool bFullPath) const;
+		CTranslationItem* GetTranslationItem(unsigned int uiTranslationKey, bool bCreate);	// retrieves pointer to the single translation item
+		bool Exists(unsigned int uiTranslationKey) const;
+		void CleanupTranslation(const CLangData& rReferenceTranslation);
 
-	void SetLangName(PCTSTR psz);
-	PCTSTR GetLangName() const { return m_pszLngName; };
+		// attributes
+		void SetFilename(PCTSTR psz);
+		PCTSTR GetFilename(bool bFullPath) const;
 
-	void SetFontFace(PCTSTR psz);
-	PCTSTR GetFontFace() const { return m_pszFontFace; };
+		void SetLangName(PCTSTR psz);
+		PCTSTR GetLangName() const
+		{
+			return m_pszLngName;
+		};
 
-	void SetPointSize(WORD wSize) { m_wPointSize=wSize; m_bModified = true; };
-	WORD GetPointSize() const { return m_wPointSize; };
+		void SetFontFace(PCTSTR psz);
+		PCTSTR GetFontFace() const
+		{
+			return m_pszFontFace;
+		};
 
-	void SetDirection(bool brtl) { m_bRTL=brtl; m_bModified = true; };
-	bool GetDirection() const { return m_bRTL; };
+		void SetPointSize(WORD wSize)
+		{
+			m_wPointSize = wSize; m_bModified = true;
+		};
+		WORD GetPointSize() const
+		{
+			return m_wPointSize;
+		};
 
-	void SetHelpName(PCTSTR psz);
-	PCTSTR GetHelpName() const { return m_pszHelpName; };
+		void SetDirection(bool brtl)
+		{
+			m_bRTL = brtl; m_bModified = true;
+		};
+		bool GetDirection() const
+		{
+			return m_bRTL;
+		};
 
-	void SetAuthor(PCTSTR psz);
-	PCTSTR GetAuthor() const { return m_pszAuthor; };
+		void SetHelpName(PCTSTR psz);
+		PCTSTR GetHelpName() const
+		{
+			return m_pszHelpName;
+		};
 
-	bool IsModified() const { return m_bModified; }
-	void SetModified() { m_bModified = true; }
+		void SetAuthor(PCTSTR psz);
+		PCTSTR GetAuthor() const
+		{
+			return m_pszAuthor;
+		};
 
-	bool IsValidDescription() const;
+		bool IsModified() const
+		{
+			return m_bModified;
+		}
+		void SetModified()
+		{
+			m_bModified = true;
+		}
 
-protected:
-	void SetFnameData(PTSTR *ppszDst, PCTSTR pszSrc);
-	static void EnumAttributesCallback(bool bGroup, const wchar_t* pszName, const wchar_t* pszValue, void* pData);
-	static void UnescapeString(wchar_t* pszData);
+		bool IsValidDescription() const;
 
-protected:
-	TCHAR *m_pszFilename;		// file name of the language data (with path)
-	TCHAR *m_pszLngName;		// name of the language (ie. Chinese (PRC))
-	TCHAR *m_pszFontFace;		// face name of the font that will be used in dialogs
-	WORD m_wPointSize;		// font point size
-	TCHAR *m_pszHelpName;		// help name (wo the directory) for this language
-	TCHAR *m_pszAuthor;		// author name
-	bool m_bRTL;				// does the language require right-to-left reading order ?
+	protected:
+		void SetFnameData(PTSTR *ppszDst, PCTSTR pszSrc);
+		static void EnumAttributesCallback(bool bGroup, const wchar_t* pszName, const wchar_t* pszValue, void* pData);
+		static void UnescapeString(wchar_t* pszData);
 
-	// strings (for controls in dialog boxes the ID contains hi:dlg ID, lo:ctrl ID, for strings hi part is 0)
-	translation_map m_mapTranslation;		// maps string ID to the offset in pszStrings
+	protected:
+		TCHAR *m_pszFilename;		// file name of the language data (with path)
+		TCHAR *m_pszLngName;		// name of the language (ie. Chinese (PRC))
+		TCHAR *m_pszFontFace;		// face name of the font that will be used in dialogs
+		WORD m_wPointSize;		// font point size
+		TCHAR *m_pszHelpName;		// help name (wo the directory) for this language
+		TCHAR *m_pszAuthor;		// author name
+		bool m_bRTL;				// does the language require right-to-left reading order ?
 
-private:
-	unsigned int m_uiSectionID;			///< ID of the currently processed section
-	bool m_bUpdating;				///< Are we updating the language with base language ?
-	bool m_bModified;				///< States if the translation has been modified
-};
+		// strings (for controls in dialog boxes the ID contains hi:dlg ID, lo:ctrl ID, for strings hi part is 0)
+		translation_map m_mapTranslation;		// maps string ID to the offset in pszStrings
 
-/////////////////////////////////////////////////////////////////////////////////////
+	private:
+		unsigned int m_uiSectionID;			///< ID of the currently processed section
+		bool m_bUpdating;				///< Are we updating the language with base language ?
+		bool m_bModified;				///< States if the translation has been modified
+	};
 
-class LIBICTRANSLATE_API CResourceManager
-{
-protected:
-	CResourceManager();
-	~CResourceManager();
+	/////////////////////////////////////////////////////////////////////////////////////
 
-public:
-	static CResourceManager& Acquire();
+	class LIBICTRANSLATE_API CResourceManager
+	{
+	protected:
+		CResourceManager();
+		~CResourceManager();
 
-	void Init(HMODULE hrc);
+	public:
+		static CResourceManager& Acquire();
 
-	void SetCallback(PFNNOTIFYCALLBACK pfn) { m_pfnCallback=pfn; };
+		void Init(HMODULE hrc);
 
-	void Scan(LPCTSTR pszFolder, vector<CLangData>* pvData);
-	bool SetLanguage(PCTSTR pszPath);
+		void SetCallback(PFNNOTIFYCALLBACK pfn)
+		{
+			m_pfnCallback = pfn;
+		};
 
-	// loading functions
-	HGLOBAL LoadResource(LPCTSTR pszType, LPCTSTR pszName);
-	HACCEL LoadAccelerators(LPCTSTR pszName);
-	HBITMAP LoadBitmap(LPCTSTR pszName);
-	HCURSOR LoadCursor(LPCTSTR pszName);
-	HICON LoadIcon(LPCTSTR pszName);
-	HANDLE LoadImage(LPCTSTR lpszName, UINT uType, int cxDesired, int cyDesired, UINT fuLoad);
-	HMENU LoadMenu(LPCTSTR pszName);
-	LPDLGTEMPLATE LoadDialog(LPCTSTR pszName);
+		void Scan(LPCTSTR pszFolder, std::vector<CLangData>* pvData);
+		bool SetLanguage(PCTSTR pszPath);
 
-	PCTSTR LoadString(UINT uiID);
-	PCTSTR LoadString(WORD wGroup, WORD wID);
+		// loading functions
+		HGLOBAL LoadResource(LPCTSTR pszType, LPCTSTR pszName);
+		HACCEL LoadAccelerators(LPCTSTR pszName);
+		HBITMAP LoadBitmap(LPCTSTR pszName);
+		HCURSOR LoadCursor(LPCTSTR pszName);
+		HICON LoadIcon(LPCTSTR pszName);
+		HANDLE LoadImage(LPCTSTR lpszName, UINT uType, int cxDesired, int cyDesired, UINT fuLoad);
+		HMENU LoadMenu(LPCTSTR pszName);
+		LPDLGTEMPLATE LoadDialog(LPCTSTR pszName);
 
-	// res updating functions
-	void UpdateMenu(HMENU hMenu, WORD wMenuID);
+		PCTSTR LoadString(UINT uiID);
+		PCTSTR LoadString(WORD wGroup, WORD wID);
 
-	const CLangData* GetLanguageData() const { return &m_ld; }
+		// res updating functions
+		void UpdateMenu(HMENU hMenu, WORD wMenuID);
 
-public:
-	CLangData m_ld;				// current language data
-	list<CWnd*> m_lhDialogs;	// currently displayed dialog boxes (even hidden)
+		const CLangData* GetLanguageData() const
+		{
+			return &m_ld;
+		}
 
-	HMODULE m_hRes;
-	PFNNOTIFYCALLBACK m_pfnCallback;
-	CRITICAL_SECTION m_cs;
+	public:
+		CLangData m_ld;				// current language data
+		std::list<CWnd*> m_lhDialogs;	// currently displayed dialog boxes (even hidden)
 
-protected:
-	static CResourceManager S_ResourceManager;
-};
+		HMODULE m_hRes;
+		PFNNOTIFYCALLBACK m_pfnCallback;
+		CRITICAL_SECTION m_cs;
 
-END_ICTRANSLATE_NAMESPACE
+	protected:
+		static CResourceManager S_ResourceManager;
+	};
+}
 
 #endif

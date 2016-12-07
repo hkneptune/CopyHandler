@@ -48,9 +48,4 @@
 	#define LIBICTRANSLATE_API
 #endif
 
-/// Begins ch namespace
-#define BEGIN_ICTRANSLATE_NAMESPACE namespace ictranslate {
-/// Ends ch namespace
-#define END_ICTRANSLATE_NAMESPACE }
-
 #endif

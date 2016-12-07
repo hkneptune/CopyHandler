@@ -252,7 +252,7 @@ void COptionsDlg::FillPropertyList()
 	// lang
 	CString strLangs;
 	size_t stIndex=0;
-	for (vector<ictranslate::CLangData>::iterator it=m_vld.begin();it != m_vld.end();++it)
+	for (std::vector<ictranslate::CLangData>::iterator it=m_vld.begin();it != m_vld.end();++it)
 	{
 		strLangs+=(*it).GetLangName();
 		strLangs+=_T("!");

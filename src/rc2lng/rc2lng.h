@@ -28,7 +28,6 @@
 #include <map>
 #include <vector>
 #include <algorithm>
-using namespace std;
 
 #pragma warning(disable : 4786)
 

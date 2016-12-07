@@ -68,7 +68,7 @@ private:
 	std::vector<CString> m_cvShortcuts;
 
 	// for languages
-	vector<ictranslate::CLangData> m_vld;
+	std::vector<ictranslate::CLangData> m_vld;
 
 	CPropertyListCtrl m_ctlProperties;
 };
