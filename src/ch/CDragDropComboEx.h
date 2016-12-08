@@ -32,7 +32,7 @@ protected:
 	void PreSubclassWindow() override;
 
 private:
-	DECLARE_MESSAGE_MAP();
+	DECLARE_MESSAGE_MAP()
 };
 
 #endif

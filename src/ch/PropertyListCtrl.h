@@ -145,10 +145,10 @@ public:
 	void			SetPropertyBkColor(COLORREF crColor);
 	void			SetHighlightColor(COLORREF crColor);
 	void			SetLineStyle(COLORREF crColor, int nStyle = PS_SOLID);
-	inline	void	SetBoldSelection(BOOL bBoldSelection)			{ m_bBoldSelection = bBoldSelection; };
-	inline	void	SetTextColor(COLORREF crColor)					{ m_crTextColor = crColor; };
-	inline	void	SetTextHighlightColor(COLORREF crColor)			{ m_crTextHighlightColor = crColor; };
-	inline	void	SetPropertyTextColor(COLORREF crColor)			{ m_crPropertyTextColor = crColor; };
+	inline	void	SetBoldSelection(BOOL bBoldSelection)			{ m_bBoldSelection = bBoldSelection; }
+	inline	void	SetTextColor(COLORREF crColor)					{ m_crTextColor = crColor; }
+	inline	void	SetTextHighlightColor(COLORREF crColor)			{ m_crTextHighlightColor = crColor; }
+	inline	void	SetPropertyTextColor(COLORREF crColor)			{ m_crPropertyTextColor = crColor; }
 
 	// Add the data
 	BOOL	AddString(CString csText);

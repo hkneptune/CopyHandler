@@ -122,7 +122,7 @@ public:
 	bool GetItemInfoTip(HTREEITEM hItem, CString* pTip);
 	bool GetItemShellData(HTREEITEM hItem, int nFormat, PVOID pBuffer, int iSize);	
 	bool GetItemStruct(HTREEITEM hItem, PSHELLITEMDATA *ppsid);
-	bool IsEditing() const { return m_iEditType != 0; };
+	bool IsEditing() const { return m_iEditType != 0; }
 	virtual ~CDirTreeCtrl();
 
 private:

@@ -39,7 +39,7 @@ public:
 
 	void HtmlHelp(DWORD_PTR dwData, UINT nCmd) override;
 
-	PCTSTR GetHelpPath() const { return m_pszHelpFilePath; };
+	PCTSTR GetHelpPath() const { return m_pszHelpFilePath; }
 
 	friend int MsgBox(UINT uiID, UINT nType=MB_OK, UINT nIDHelp=0);
 

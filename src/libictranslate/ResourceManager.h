@@ -142,43 +142,43 @@ namespace ictranslate
 		PCTSTR GetLangName() const
 		{
 			return m_pszLngName;
-		};
+		}
 
 		void SetFontFace(PCTSTR psz);
 		PCTSTR GetFontFace() const
 		{
 			return m_pszFontFace;
-		};
+		}
 
 		void SetPointSize(WORD wSize)
 		{
 			m_wPointSize = wSize; m_bModified = true;
-		};
+		}
 		WORD GetPointSize() const
 		{
 			return m_wPointSize;
-		};
+		}
 
 		void SetDirection(bool brtl)
 		{
 			m_bRTL = brtl; m_bModified = true;
-		};
+		}
 		bool GetDirection() const
 		{
 			return m_bRTL;
-		};
+		}
 
 		void SetHelpName(PCTSTR psz);
 		PCTSTR GetHelpName() const
 		{
 			return m_pszHelpName;
-		};
+		}
 
 		void SetAuthor(PCTSTR psz);
 		PCTSTR GetAuthor() const
 		{
 			return m_pszAuthor;
-		};
+		}
 
 		bool IsModified() const
 		{
@@ -230,7 +230,7 @@ namespace ictranslate
 		void SetCallback(PFNNOTIFYCALLBACK pfn)
 		{
 			m_pfnCallback = pfn;
-		};
+		}
 
 		void Scan(LPCTSTR pszFolder, std::vector<CLangData>* pvData);
 		bool SetLanguage(PCTSTR pszPath);

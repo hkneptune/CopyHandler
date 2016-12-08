@@ -107,14 +107,14 @@ LRESULT CALLBACK InternalWindowProc(WNDPROC pfWndProc, HWND hwnd, UINT uMsg, WPA
 LRESULT CALLBACK EditWindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
 	return InternalWindowProc(__g_pfEdit, hwnd, uMsg, wParam, lParam);
-};
+}
 
 ////////////////////////////////////////////////////////////////////////////
 // procedure for combo box contained in comboboxex
 LRESULT CALLBACK ComboWindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
 	return InternalWindowProc(__g_pfBaseCombo, hwnd, uMsg, wParam, lParam);
-};
+}
 
 ////////////////////////////////////////////////////////////////////////////
 // other visual elements' window proc

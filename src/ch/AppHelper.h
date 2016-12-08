@@ -30,13 +30,13 @@ public:
 
 	bool SetAutorun(bool bState);		// changes state of "run with system" option
 
-	bool IsFirstInstance() const { return m_bFirstInstance; };
+	bool IsFirstInstance() const { return m_bFirstInstance; }
 
-	PCTSTR GetAppName() const { return m_pszAppName; };
-	PCTSTR GetAppNameVer() const { return m_pszAppNameVer; };
-	PCTSTR GetAppVersion() const { return m_pszAppVersion; };
+	PCTSTR GetAppName() const { return m_pszAppName; }
+	PCTSTR GetAppNameVer() const { return m_pszAppNameVer; }
+	PCTSTR GetAppVersion() const { return m_pszAppVersion; }
 
-	PCTSTR GetProgramName() const { return m_pszProgramName; };
+	PCTSTR GetProgramName() const { return m_pszProgramName; }
 
 	bool GetProgramDataPath(CString& rStrPath);
 	CString ExpandPath(CString strPath);

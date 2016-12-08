@@ -99,9 +99,9 @@ public:
 /** \name Class lock/unlock functions */
 /**@{*/
 	/// Locks the config class for one thread
-	void lock() { m_lock.Lock(); };
+	void lock() { m_lock.Lock(); }
 	/// Unlocks the class
-	void unlock() { m_lock.Unlock(); };
+	void unlock() { m_lock.Unlock(); }
 /**@}*/
 	
 	// property type management

@@ -193,7 +193,7 @@ namespace ictranslate
 		static void SetResManager(CResourceManager* prm)
 		{
 			m_prm = prm;
-		};
+		}
 
 		// creation
 		INT_PTR DoModal() override;
@@ -203,7 +203,7 @@ namespace ictranslate
 		CFont* GetFont()
 		{
 			return m_pFont ? m_pFont : ((CDialog*)this)->GetFont();
-		};
+		}
 
 		afx_msg BOOL OnHelpInfo(HELPINFO* pHelpInfo);
 		afx_msg void OnContextMenu(CWnd* pWnd, CPoint point);
@@ -220,16 +220,16 @@ namespace ictranslate
 		virtual UINT GetLanguageUpdateOptions()
 		{
 			return 0;
-		};
+		}
 		virtual void OnLanguageChanged()
 		{
-		};
+		}
 		void Cleanup();
 
 		virtual BOOL OnTooltipText(UINT /*uiID*/, TOOLTIPTEXT* /*pTip*/)
 		{
 			return FALSE;
-		};
+		}
 		BOOL OnInitDialog() override;
 		void OnCancel() override;
 		void OnOK() override;

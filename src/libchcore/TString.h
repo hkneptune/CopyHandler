@@ -64,19 +64,19 @@ namespace chcore
 		TString operator+(const wchar_t* pszSrc) const;
 		const TString& operator+=(const wchar_t* pszSrc);
 
-		bool operator<(const wchar_t* psz) const { return Compare(psz) < 0; };
-		bool operator<=(const wchar_t* psz) const { return Compare(psz) <= 0; };
-		bool operator==(const wchar_t* psz) const { return Compare(psz) == 0; };
-		bool operator>=(const wchar_t* psz) const { return Compare(psz) >= 0; };
-		bool operator>(const wchar_t* psz) const { return Compare(psz) > 0; };
-		bool operator!=(const wchar_t* psz) const { return Compare(psz) != 0; };
+		bool operator<(const wchar_t* psz) const { return Compare(psz) < 0; }
+		bool operator<=(const wchar_t* psz) const { return Compare(psz) <= 0; }
+		bool operator==(const wchar_t* psz) const { return Compare(psz) == 0; }
+		bool operator>=(const wchar_t* psz) const { return Compare(psz) >= 0; }
+		bool operator>(const wchar_t* psz) const { return Compare(psz) > 0; }
+		bool operator!=(const wchar_t* psz) const { return Compare(psz) != 0; }
 
-		bool operator<(const TString& str) const { return Compare(str) < 0; };
-		bool operator<=(const TString& str) const { return Compare(str) <= 0; };
-		bool operator==(const TString& str) const { return Compare(str) == 0; };
-		bool operator>=(const TString& str) const { return Compare(str) >= 0; };
-		bool operator>(const TString& str) const { return Compare(str) >= 0; };
-		bool operator!=(const TString& str) const { return Compare(str) != 0; };
+		bool operator<(const TString& str) const { return Compare(str) < 0; }
+		bool operator<=(const TString& str) const { return Compare(str) <= 0; }
+		bool operator==(const TString& str) const { return Compare(str) == 0; }
+		bool operator>=(const TString& str) const { return Compare(str) >= 0; }
+		bool operator>(const TString& str) const { return Compare(str) >= 0; }
+		bool operator!=(const TString& str) const { return Compare(str) != 0; }
 
 		// appends the given TString to this
 		void Append(const wchar_t* pszSrc);		///< Appends an unicode TString to the TString object

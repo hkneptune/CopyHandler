@@ -78,19 +78,19 @@ public:
 	/// Sets a property type
 	void init(const wchar_t* pszName, unsigned int uiType, bool bClear=true);
 	/// Retrieves a property type (with flags)
-	unsigned int get_type() const { return m_uiPropType; };
+	unsigned int get_type() const { return m_uiPropType; }
 	/// Checks if the property is array-based
-	bool is_array() const { return (m_uiPropType & flag_array) != false; };
+	bool is_array() const { return (m_uiPropType & flag_array) != false; }
 
 	/// Sets a property name
-	void set_name(const wchar_t* pszName) { m_pszName=copy_string(pszName); };
+	void set_name(const wchar_t* pszName) { m_pszName=copy_string(pszName); }
 	/// Gets a property name
-	const wchar_t* get_name() const { return m_pszName; };
+	const wchar_t* get_name() const { return m_pszName; }
 
 	/// Sets the modified flag
-	void set_modified(bool bModified) { if (bModified) m_uiPropType |= flag_modified; else m_uiPropType &= ~flag_modified; };
+	void set_modified(bool bModified) { if (bModified) m_uiPropType |= flag_modified; else m_uiPropType &= ~flag_modified; }
 	/// Gets the modified flag
-	bool is_modified() const { return (m_uiPropType & flag_modified) != false; };
+	bool is_modified() const { return (m_uiPropType & flag_modified) != false; }
 /**@}*/
 
 /** \brief Property values */

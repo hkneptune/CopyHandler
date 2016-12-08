@@ -40,7 +40,7 @@ public:
 	HTHEME OpenThemeData(HWND hwnd, LPCWSTR pszClassList);
 	HRESULT CloseThemeData(HTHEME hTheme);
 
-	bool IsThemeSupported() { return m_hThemesDll != nullptr; };
+	bool IsThemeSupported() { return m_hThemesDll != nullptr; }
 	BOOL IsAppThemed();
 
 	HRESULT DrawThemeEdge(HTHEME hTheme, HDC hdc, int iPartId, int iStateId, const RECT* pDestRect, UINT uEdge, UINT uFlags, RECT* pContentRect);

@@ -40,7 +40,7 @@ namespace chcore
 		size_t GetAvailableBufferCount() const;
 		size_t GetSingleBufferSize() const;
 
-		TBufferListPtr GetBufferList() const;;
+		TBufferListPtr GetBufferList() const;
 
 	private:
 		std::vector<std::unique_ptr<TOverlappedDataBuffer>> m_listAllBuffers;

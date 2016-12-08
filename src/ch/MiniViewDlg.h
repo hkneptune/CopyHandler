@@ -68,7 +68,7 @@ public:
 	void RefreshStatus();
 	void RecalcSize(int nHeight, bool bInitial);
 
-	UINT GetLanguageUpdateOptions() override { return LDF_NODIALOGSIZE; };
+	UINT GetLanguageUpdateOptions() override { return LDF_NODIALOGSIZE; }
 	void OnLanguageChanged() override;
 
 protected:

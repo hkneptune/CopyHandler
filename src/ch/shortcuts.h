@@ -22,7 +22,7 @@
 class CShortcut
 {
 public:
-	CShortcut() { };
+	CShortcut() { }
 	explicit CShortcut(const CString& strText);
 	operator CString();
 
