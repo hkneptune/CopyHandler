@@ -39,7 +39,7 @@ namespace chcore
 		TSQLiteStatement::~TSQLiteStatement()
 		{
 			int iResult = sqlite3_finalize(m_pStatement);
-			_ASSERTE(iResult == SQLITE_OK);
+			_ASSERTE(iResult == SQLITE_OK); iResult;
 		}
 
 		void TSQLiteStatement::Close()
