@@ -25,6 +25,7 @@
 #include "SeverityLevels.h"
 #include "TMultiLoggerConfig.h"
 #include "TLogRecord.h"
+#include "TLoggerPaths.h"
 
 namespace logger
 {
@@ -36,6 +37,8 @@ namespace logger
 		TLogFileDataPtr GetLogFileData() const;
 		ESeverityLevel GetMinSeverity() const;
 		TLogRecord OpenLogRecord(ESeverityLevel eLevel) const;
+
+		std::wstring GetLogFilePath() const;
 
 	private:
 		TLoggerLevelConfigPtr m_spLoggerConfig;
@@ -52,6 +55,8 @@ namespace logger
 	{
 		if(!spFileData)
 			throw std::invalid_argument("spFileData");
+		if(!m_spLoggerConfig)
+			throw std::invalid_argument("m_spLoggerConfig");
 	}
 
 	inline TLogFileDataPtr TLogger::GetLogFileData() const
@@ -69,10 +74,21 @@ namespace logger
 		return TLogRecord(m_spFileData, eLevel, m_strChannel);
 	}
 
+	inline std::wstring TLogger::GetLogFilePath() const
+	{
+		TLoggerPaths loggerPaths = m_spFileData->GetMainLogPath();
+		if(loggerPaths.GetCount() == 0)
+			throw std::invalid_argument("");
+		return loggerPaths.GetAt(0);
+	}
+
 	using TLoggerPtr = std::unique_ptr<TLogger>;
 
 	inline TLoggerPtr MakeLogger(const TLogFileDataPtr& spFileData, PCTSTR pszChannel)
 	{
+		if (!spFileData)
+			throw std::invalid_argument("spFileData");
+
 		return std::make_unique<TLogger>(spFileData, pszChannel);
 	}
 }

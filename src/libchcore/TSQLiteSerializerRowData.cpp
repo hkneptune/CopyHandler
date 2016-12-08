@@ -22,16 +22,16 @@
 #include <boost/format.hpp>
 #include "TSerializerException.h"
 #include "ErrorCodes.h"
-#include "SerializerTrace.h"
 #include "TPlainStringPool.h"
 
 namespace chcore
 {
 	///////////////////////////////////////////////////////////////////////////
-	TSQLiteSerializerRowData::TSQLiteSerializerRowData(object_id_t oidRowID, TSQLiteColumnsDefinition& rColumnDefinition, bool bAdded, unsigned long long* pPoolMemory, size_t stPoolMemorySizeInBytes, TPlainStringPool& poolStrings) :
+	TSQLiteSerializerRowData::TSQLiteSerializerRowData(object_id_t oidRowID, TSQLiteColumnsDefinition& rColumnDefinition, bool bAdded, unsigned long long* pPoolMemory, size_t stPoolMemorySizeInBytes, TPlainStringPool& poolStrings, const logger::TLogFileDataPtr& spLogFileData) :
 		m_pPoolMemory(pPoolMemory),
 		m_rColumns(rColumnDefinition),
-		m_poolStrings(poolStrings)
+		m_poolStrings(poolStrings),
+		m_spLog(logger::MakeLogger(spLogFileData, L"Serializer-RowData"))
 	{
 		if (!m_pPoolMemory)
 			throw TSerializerException(eErr_InvalidArgument, _T("Null memory provided"), LOCATION);
@@ -47,13 +47,6 @@ namespace chcore
 
 		if (bAdded)
 			MarkAsAdded();
-	}
-
-	TSQLiteSerializerRowData::TSQLiteSerializerRowData(const TSQLiteSerializerRowData& rSrc) :
-		m_pPoolMemory(rSrc.m_pPoolMemory),
-		m_rColumns(rSrc.m_rColumns),
-		m_poolStrings(rSrc.m_poolStrings)
-	{
 	}
 
 	TSQLiteSerializerRowData::~TSQLiteSerializerRowData()
@@ -387,6 +380,8 @@ namespace chcore
 
 	void TSQLiteSerializerRowData::BindParams(sqlite::TSQLiteStatement &tStatement, int& iSQLiteColumnNumber, size_t stSkipColumn)
 	{
+		LOG_DEBUG(m_spLog) << L"Binding parameters";
+
 		size_t stCount = m_rColumns.GetCount();
 		for (size_t stColumn = 0; stColumn < stCount; ++stColumn)
 		{
@@ -400,7 +395,7 @@ namespace chcore
 				case IColumnsDefinition::eType_bool:
 				{
 					bool bValue = GetDataForColumn(stColumn) != 0 ? true : false;
-					DBTRACE1_D(_T("- param(bool): %ld\n"), bValue ? 1l : 0l);
+					LOG_TRACE(m_spLog) << L"BindValue - column: " << stColumn << L", value(bool): " << (bValue ? 1l : 0l);
 					tStatement.BindValue(iSQLiteColumnNumber++, bValue);
 					break;
 				}
@@ -408,7 +403,7 @@ namespace chcore
 				case IColumnsDefinition::eType_short:
 				{
 					short siValue = *(short*)(unsigned short*)&GetDataForColumn(stColumn);
-					DBTRACE1_D(_T("- param(short): %d\n"), siValue);
+					LOG_TRACE(m_spLog) << L"BindValue - column: " << stColumn << L", value(short): " << siValue;
 					tStatement.BindValue(iSQLiteColumnNumber++, siValue);
 					break;
 				}
@@ -416,7 +411,7 @@ namespace chcore
 				case IColumnsDefinition::eType_ushort:
 				{
 					unsigned short usiValue = (unsigned short)GetDataForColumn(stColumn);
-					DBTRACE1_D(_T("- param(ushort): %u\n"), usiValue);
+					LOG_TRACE(m_spLog) << L"BindValue - column: " << stColumn << L", value(ushort): " << usiValue;
 					tStatement.BindValue(iSQLiteColumnNumber++, usiValue);
 					break;
 				}
@@ -424,7 +419,7 @@ namespace chcore
 				case IColumnsDefinition::eType_int:
 				{
 					int iValue = *(int*)(unsigned int*)&GetDataForColumn(stColumn);
-					DBTRACE1_D(_T("- param(int): %ld\n"), iValue);
+					LOG_TRACE(m_spLog) << L"BindValue - column: " << stColumn << L", value(int): " << iValue;
 					tStatement.BindValue(iSQLiteColumnNumber++, iValue);
 					break;
 				}
@@ -432,7 +427,7 @@ namespace chcore
 				case IColumnsDefinition::eType_uint:
 				{
 					unsigned int uiValue = (unsigned int)GetDataForColumn(stColumn);
-					DBTRACE1_D(_T("- param(uint): %lu\n"), uiValue);
+					LOG_TRACE(m_spLog) << L"BindValue - column: " << stColumn << L", value(uint): " << uiValue;
 					tStatement.BindValue(iSQLiteColumnNumber++, uiValue);
 					break;
 				}
@@ -440,7 +435,7 @@ namespace chcore
 				case IColumnsDefinition::eType_long:
 				{
 					long lValue = *(long*)(unsigned long*)&GetDataForColumn(stColumn);
-					DBTRACE1_D(_T("- param(long): %ld\n"), lValue);
+					LOG_TRACE(m_spLog) << L"BindValue - column: " << stColumn << L", value(long): " << lValue;
 					tStatement.BindValue(iSQLiteColumnNumber++, lValue);
 					break;
 				}
@@ -448,7 +443,7 @@ namespace chcore
 				case IColumnsDefinition::eType_ulong:
 				{
 					unsigned long ulValue = (unsigned long)GetDataForColumn(stColumn);
-					DBTRACE1_D(_T("- param(ulong): %lu\n"), ulValue);
+					LOG_TRACE(m_spLog) << L"BindValue - column: " << stColumn << L", value(ulong): " << ulValue;
 					tStatement.BindValue(iSQLiteColumnNumber++, ulValue);
 					break;
 				}
@@ -456,7 +451,7 @@ namespace chcore
 				case IColumnsDefinition::eType_longlong:
 				{
 					long long llValue = *(long long*)(unsigned long long*)&GetDataForColumn(stColumn);
-					DBTRACE1_D(_T("- param(llong): %I64d\n"), llValue);
+					LOG_TRACE(m_spLog) << L"BindValue - column: " << stColumn << L", value(llong): " << llValue;
 					tStatement.BindValue(iSQLiteColumnNumber++, llValue);
 					break;
 				}
@@ -464,7 +459,7 @@ namespace chcore
 				case IColumnsDefinition::eType_ulonglong:
 				{
 					unsigned long long ullValue = GetDataForColumn(stColumn);
-					DBTRACE1_D(_T("- param(ullong): %I64u\n"), ullValue);
+					LOG_TRACE(m_spLog) << L"BindValue - column: " << stColumn << L", value(ullong): " << ullValue;
 					tStatement.BindValue(iSQLiteColumnNumber++, ullValue);
 					break;
 				}
@@ -473,7 +468,7 @@ namespace chcore
 				{
 					// cppcheck-suppress invalidPointerCast
 					double dValue = *(double*)(unsigned long long*)&GetDataForColumn(stColumn);
-					DBTRACE1_D(_T("- param(double): %f\n"), dValue);
+					LOG_TRACE(m_spLog) << L"BindValue - column: " << stColumn << L", value(double): " << dValue;
 					tStatement.BindValue(iSQLiteColumnNumber++, dValue);
 					break;
 				}
@@ -481,7 +476,7 @@ namespace chcore
 				case IColumnsDefinition::eType_string:
 				{
 					const wchar_t* pszValue = (const wchar_t*)(unsigned long long*)GetDataForColumn(stColumn);
-					DBTRACE1_D(_T("- param(string): %s\n"), pszValue ? pszValue : _T(""));
+					LOG_TRACE(m_spLog) << L"BindValue - column: " << stColumn << L", value(string): " << (pszValue ? pszValue : _T(""));
 					tStatement.BindValue(iSQLiteColumnNumber++, pszValue ? pszValue : _T(""));
 					break;
 				}
@@ -489,7 +484,7 @@ namespace chcore
 				case IColumnsDefinition::eType_path:
 				{
 					const wchar_t* pszValue = (const wchar_t*)(unsigned long long*)GetDataForColumn(stColumn);
-					DBTRACE1_D(_T("- param(path): %s\n"), pszValue ? pszValue : _T(""));
+					LOG_TRACE(m_spLog) << L"BindValue - column: " << stColumn << L", value(path): " << (pszValue ? pszValue : _T(""));
 					tStatement.BindValue(iSQLiteColumnNumber++, pszValue ? PathFromString(pszValue) : TSmartPath());
 					break;
 				}
@@ -531,12 +526,5 @@ namespace chcore
 		{
 			FreeColumnData(stColumn);
 		}
-	}
-
-	TSQLiteSerializerRowData& TSQLiteSerializerRowData::operator=(const TSQLiteSerializerRowData& rSrc)
-	{
-		m_pPoolMemory = rSrc.m_pPoolMemory;
-
-		return *this;
 	}
 }

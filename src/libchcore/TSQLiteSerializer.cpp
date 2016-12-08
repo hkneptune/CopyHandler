@@ -23,15 +23,15 @@
 #include "ErrorCodes.h"
 #include "TSQLiteTransaction.h"
 #include "TSimpleTimer.h"
-#include "SerializerTrace.h"
 
 namespace chcore
 {
 	using namespace sqlite;
 
-	TSQLiteSerializer::TSQLiteSerializer(const TSmartPath& pathDB, const ISerializerSchemaPtr& spSchema) :
+	TSQLiteSerializer::TSQLiteSerializer(const TSmartPath& pathDB, const ISerializerSchemaPtr& spSchema, const logger::TLogFileDataPtr& spLogFileData) :
 		m_spDatabase(new TSQLiteDatabase(pathDB)),
-		m_spSchema(spSchema)
+		m_spSchema(spSchema),
+		m_spLog(logger::MakeLogger(spLogFileData, L"Serializer"))
 	{
 		if(!m_spDatabase)
 			throw TCoreException(eErr_InvalidArgument, L"m_spDatabase", LOCATION);
@@ -57,7 +57,7 @@ namespace chcore
 		if (iterMap == m_mapContainers.end())
 			iterMap = m_mapContainers.insert(std::make_pair(
 				strContainerName,
-				std::make_shared<TSQLiteSerializerContainer>(strContainerName, m_spDatabase, m_poolStrings))).first;
+				std::make_shared<TSQLiteSerializerContainer>(strContainerName, m_spDatabase, m_poolStrings, m_spLog->GetLogFileData()))).first;
 
 		return iterMap->second;
 	}
@@ -69,7 +69,7 @@ namespace chcore
 
 	void TSQLiteSerializer::Flush()
 	{
-		DBTRACE0(_T("   ## Serializer::Flush() - started\n"));
+		LOG_DEBUG(m_spLog) << L"Starting serializer flushing";
 
 		TSQLiteTransaction tran(m_spDatabase);
 
@@ -85,13 +85,13 @@ namespace chcore
 		tran.Commit();
 
 		unsigned long long ullFlushCommitTime = timer.Checkpoint(); ullFlushCommitTime;
-		DBTRACE2(_T("   ## Serializer::Flush() - container flushes: %I64u ms, transaction commit: %I64u ms\n"), ullFlushGatherTime, ullFlushCommitTime);
+		LOG_DEBUG(m_spLog) << L"Container flush time: " << ullFlushGatherTime << L" ms, transaction commit: " << ullFlushCommitTime << L" ms";
 
 		m_mapContainers.clear();
 		m_poolStrings.Clear();
 
 		unsigned long long ullFlushClearTime = timer.Checkpoint(); ullFlushClearTime;
-		DBTRACE1(_T("   ## Serializer::Flush() - container clearing: %I64u ms\n"), ullFlushClearTime);
+		LOG_DEBUG(m_spLog) << L"Container clearing: " << ullFlushClearTime << L" ms";
 	}
 
 	void TSQLiteSerializer::SetupDBOptions()

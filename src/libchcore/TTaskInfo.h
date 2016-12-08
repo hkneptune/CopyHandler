@@ -40,13 +40,14 @@ namespace chcore
 			eMod_Added,
 			eMod_TaskPath,
 			eMod_Order,
+			eMod_LogPath,
 
 			eMod_Last
 		};
 
 	public:
 		TTaskInfoEntry();
-		TTaskInfoEntry(object_id_t oidTaskID, const TSmartPath& pathTask, int iOrder, const TTaskPtr& spTask);
+		TTaskInfoEntry(object_id_t oidTaskID, const TSmartPath& pathTask, const TSmartPath& pathLog, int iOrder, const TTaskPtr& spTask);
 		TTaskInfoEntry(const TTaskInfoEntry& rSrc);
 
 		TTaskInfoEntry& operator=(const TTaskInfoEntry& rSrc);
@@ -55,6 +56,9 @@ namespace chcore
 
 		TSmartPath GetTaskSerializeLocation() const;
 		void SetTaskSerializeLocation(const TSmartPath& pathTask);
+
+		TSmartPath GetTaskLogPath() const;
+		void SetTaskLogPath(const TSmartPath& pathLog);
 
 		TTaskPtr GetTask() const;
 		void SetTask(const TTaskPtr& spTask);
@@ -75,6 +79,7 @@ namespace chcore
 		typedef std::bitset<eMod_Last> Bitset;
 		mutable std::bitset<eMod_Last> m_setModifications;
 		TSharedModificationTracker<TSmartPath, Bitset, eMod_TaskPath> m_pathSerializeLocation;
+		TSharedModificationTracker<TSmartPath, Bitset, eMod_LogPath> m_pathLogPath;
 		TSharedModificationTracker<int, Bitset, eMod_Order> m_iOrder;
 
 		TTaskPtr m_spTask;
@@ -89,7 +94,7 @@ namespace chcore
 
 		TTaskInfoContainer& operator=(const TTaskInfoContainer&) = delete;
 
-		void Add(const TSmartPath& strPath, int iOrder, const TTaskPtr& spTask);
+		void Add(const TSmartPath& strPath, const TSmartPath& pathLog, int iOrder, const TTaskPtr& spTask);
 		void RemoveAt(size_t stIndex);
 
 		TTaskInfoEntry& GetAt(size_t stIndex);

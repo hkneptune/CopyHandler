@@ -25,9 +25,9 @@
 #include "TCoreException.h"
 #include "ErrorCodes.h"
 #include "TTaskInfo.h"
-#include "SerializerTrace.h"
 #include "TFakeFileSerializer.h"
 #include "../liblogger/TLoggerPaths.h"
+#include "../liblogger/TAsyncMultiLogger.h"
 
 namespace chcore
 {
@@ -37,11 +37,13 @@ namespace chcore
 		const IFeedbackHandlerFactoryPtr& spFeedbackHandlerFactory,
 		const TSmartPath& pathLogDir,
 		const logger::TMultiLoggerConfigPtr& spMultiLoggerConfig,
+		const logger::TLogFileDataPtr& spLogFileData,
 		bool bForceRecreateSerializer) :
 		m_pathLogDir(pathLogDir),
 		m_spFeedbackFactory(spFeedbackHandlerFactory),
 		m_spSerializerFactory(spSerializerFactory),
-		m_spMultiLoggerConfig(spMultiLoggerConfig)
+		m_spMultiLoggerConfig(spMultiLoggerConfig),
+		m_spLog(logger::MakeLogger(spLogFileData, L"TaskManager"))
 	{
 		if(!spFeedbackHandlerFactory)
 			throw TCoreException(eErr_InvalidPointer, L"spFeedbackHandlerFactory", LOCATION);
@@ -60,9 +62,12 @@ namespace chcore
 	TTaskPtr TTaskManager::CreateTask(const TTaskDefinition& tTaskDefinition)
 	{
 		IFeedbackHandlerPtr spHandler = m_spFeedbackFactory->Create();
-		ISerializerPtr spSerializer = m_spSerializerFactory->CreateTaskSerializer(tTaskDefinition.GetTaskName());
+		TSmartPath pathLog = CreateTaskLogPath(tTaskDefinition.GetTaskName());
+		logger::TLogFileDataPtr spLogFileData = logger::TAsyncMultiLogger::GetInstance()->CreateLoggerData(pathLog.ToString(), m_spMultiLoggerConfig);
 
-		TTaskPtr spTask(new TTask(spSerializer, spHandler, tTaskDefinition, CreateTaskLogPath(tTaskDefinition.GetTaskName()), m_spMultiLoggerConfig));
+		ISerializerPtr spSerializer = m_spSerializerFactory->CreateTaskSerializer(spLogFileData, tTaskDefinition.GetTaskName());
+
+		TTaskPtr spTask(new TTask(spSerializer, spHandler, tTaskDefinition, spLogFileData));
 
 		spTask->Store(true);
 
@@ -131,7 +136,7 @@ namespace chcore
 			iOrder = rEntry.GetOrder() + 1;
 		}
 
-		m_tTasks.Add(spNewTask->GetSerializer()->GetLocation(), iOrder, spNewTask);
+		m_tTasks.Add(spNewTask->GetSerializer()->GetLocation(), spNewTask->GetLogPath(), iOrder, spNewTask);
 
 		spNewTask->OnRegisterTask();
 	}
@@ -470,7 +475,7 @@ namespace chcore
 		m_spSerializer->Flush();
 
 		unsigned long long ullFlushTime = timer.Stop(); ullFlushTime;
-		DBTRACE2(_T("TaskManager::Store() - gather: %I64u ms, flush: %I64u ms\n"), ullGatherTime, ullFlushTime);
+		//DBTRACE2(_T("TaskManager::Store() - gather: %I64u ms, flush: %I64u ms\n"), ullGatherTime, ullFlushTime);
 	}
 
 	void TTaskManager::Load()
@@ -495,7 +500,7 @@ namespace chcore
 		}
 
 		// retrieve information about tasks to load
-		std::vector<std::pair<object_id_t, TSmartPath> > vObjects;
+		std::vector<std::tuple<object_id_t, TSmartPath, TSmartPath> > vObjects;
 		{
 			boost::shared_lock<boost::shared_mutex> lock(m_lock);
 
@@ -503,7 +508,7 @@ namespace chcore
 			{
 				TTaskInfoEntry& rEntry = m_tTasks.GetAt(stIndex);
 				if (!rEntry.GetTask())
-					vObjects.push_back(std::make_pair(rEntry.GetObjectID(), rEntry.GetTaskSerializeLocation()));
+					vObjects.push_back(std::make_tuple(rEntry.GetObjectID(), rEntry.GetTaskSerializeLocation(), rEntry.GetTaskLogPath()));
 			}
 		}
 
@@ -512,9 +517,13 @@ namespace chcore
 			IFeedbackHandlerPtr spHandler = m_spFeedbackFactory->Create();
 			ISerializerPtr spSerializer;
 
+			TString pathLog = std::get<2>(rInfo).ToWString();
+			TString pathSerializer = std::get<1>(rInfo).ToWString();
+			logger::TLogFileDataPtr spLogFileData = logger::TAsyncMultiLogger::GetInstance()->CreateLoggerData(pathLog.c_str(), m_spMultiLoggerConfig);
+
 			try
 			{
-				spSerializer = m_spSerializerFactory->CreateTaskSerializer(rInfo.second.ToWString());
+				spSerializer = m_spSerializerFactory->CreateTaskSerializer(spLogFileData, pathSerializer);
 			}
 			catch (const std::exception&)
 			{
@@ -522,20 +531,20 @@ namespace chcore
 			}
 
 			if (!spSerializer)
-				spSerializer = std::make_shared<TFakeFileSerializer>(rInfo.second);
+				spSerializer = std::make_shared<TFakeFileSerializer>(std::get<1>(rInfo));
 
-			TTaskPtr spTask = TTask::Load(spSerializer, spHandler, m_spMultiLoggerConfig);
+			TTaskPtr spTask = TTask::Load(spSerializer, spHandler, spLogFileData);
 
 			boost::unique_lock<boost::shared_mutex> lock(m_lock);
 
-			TTaskInfoEntry& rInfoEntry = m_tTasks.GetAtOid(rInfo.first);
+			TTaskInfoEntry& rInfoEntry = m_tTasks.GetAtOid(std::get<0>(rInfo));
 			rInfoEntry.SetTask(spTask);
 		}
 	}
 
 	TSmartPath TTaskManager::CreateTaskLogPath(const TString& strTaskUuid) const
 	{
-		TSmartPath pathLog = m_pathLogDir + PathFromWString(TString(_T("Task-")) + strTaskUuid + _T(".log"));
+		TSmartPath pathLog = m_pathLogDir + PathFromWString(TString(strTaskUuid + _T(".log")));
 		return pathLog;
 	}
 

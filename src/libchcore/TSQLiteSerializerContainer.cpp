@@ -24,7 +24,6 @@
 #include "TSQLiteStatement.h"
 #include "TSQLiteSerializerRowReader.h"
 #include "TRemovedObjects.h"
-#include "SerializerTrace.h"
 #include <boost/pool/pool.hpp>
 #include "TSerializerException.h"
 
@@ -32,11 +31,12 @@ namespace chcore
 {
 	using namespace sqlite;
 
-	TSQLiteSerializerContainer::TSQLiteSerializerContainer(const TString& strName, const sqlite::TSQLiteDatabasePtr& spDB, TPlainStringPool& poolStrings) :
+	TSQLiteSerializerContainer::TSQLiteSerializerContainer(const TString& strName, const sqlite::TSQLiteDatabasePtr& spDB, TPlainStringPool& poolStrings, const logger::TLogFileDataPtr& spLogFileData) :
 		m_pPoolRows(nullptr),
 		m_strName(strName),
 		m_spDB(spDB),
-		m_poolStrings(poolStrings)
+		m_poolStrings(poolStrings),
+		m_spLog(logger::MakeLogger(spLogFileData, L"Serializer-Container"))
 	{
 	}
 
@@ -58,12 +58,12 @@ namespace chcore
 			if (!pMemoryBlock)
 				throw TSerializerException(eErr_InternalProblem, _T("Cannot allocate memory"), LOCATION);
 
-			iterFnd = m_mapRows.insert(std::make_pair(oidRowID, TSQLiteSerializerRowData(oidRowID, m_tColumns, bMarkAsAdded, (unsigned long long*)pMemoryBlock, GetPool().get_requested_size(), m_poolStrings))).first;
+			iterFnd = m_mapRows.insert(std::make_pair(oidRowID, std::make_unique<TSQLiteSerializerRowData>(oidRowID, m_tColumns, bMarkAsAdded, (unsigned long long*)pMemoryBlock, GetPool().get_requested_size(), m_poolStrings, m_spLog->GetLogFileData()))).first;
 		}
 		else if (bMarkAsAdded)
-			iterFnd->second.MarkAsAdded();
+			iterFnd->second->MarkAsAdded();
 
-		return (*iterFnd).second;
+		return *(*iterFnd).second.get();
 	}
 
 	void TSQLiteSerializerContainer::DeleteRow(object_id_t oidRowID)
@@ -106,7 +106,7 @@ namespace chcore
 
 	ISerializerRowReaderPtr TSQLiteSerializerContainer::GetRowReader()
 	{
-		TSQLiteSerializerRowReaderPtr spRowReader(new TSQLiteSerializerRowReader(m_spDB, m_tColumns, m_strName));
+		TSQLiteSerializerRowReaderPtr spRowReader(new TSQLiteSerializerRowReader(m_spDB, m_tColumns, m_strName, m_spLog->GetLogFileData()));
 		return spRowReader;
 	}
 
@@ -125,12 +125,12 @@ namespace chcore
 
 		for (RowMap::iterator iterRows = m_mapRows.begin(); iterRows != m_mapRows.end(); ++iterRows)
 		{
-			unsigned long long rowID = iterRows->second.GetChangeIdentification();
+			unsigned long long rowID = iterRows->second->GetChangeIdentification();
 			iterMapGroups = mapGroups.find(rowID);
 			if (iterMapGroups == mapGroups.end())
 				iterMapGroups = mapGroups.insert(std::make_pair(rowID, std::vector<TSQLiteSerializerRowData*>())).first;
 
-			iterMapGroups->second.push_back(&iterRows->second);
+			iterMapGroups->second.push_back(iterRows->second.get());
 		}
 
 		TSQLiteStatement tStatement(m_spDB);
@@ -145,7 +145,7 @@ namespace chcore
 				TString strQuery = rGroupRows.front()->GetQuery(m_strName);
 				if (!strQuery.IsEmpty())
 				{
-					DBTRACE2(_T("Preparing query for %lu records: %s\n"), (unsigned long)iterMapGroups->second.size(), strQuery.c_str());
+					LOG_DEBUG(m_spLog) << L"Preparing query for " << (unsigned long)iterMapGroups->second.size() << L" records: " << strQuery;
 
 					tStatement.Prepare(strQuery.c_str());
 
@@ -177,7 +177,7 @@ namespace chcore
 			tStatement.ClearBindings();
 			tStatement.BindValue(1, idObj);
 
-			DBTRACE1_D(_T("Executing query: %s\n"), strQuery.c_str());
+			LOG_DEBUG(m_spLog) << L"Executing query: " << strQuery;
 			tStatement.Step();
 		}
 	}

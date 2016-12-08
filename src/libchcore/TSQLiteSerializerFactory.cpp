@@ -30,8 +30,9 @@
 
 namespace chcore
 {
-	TSQLiteSerializerFactory::TSQLiteSerializerFactory(const TSmartPath& pathSerializeDir) :
-		m_pathSerializeDir(pathSerializeDir)
+	TSQLiteSerializerFactory::TSQLiteSerializerFactory(const TSmartPath& pathSerializeDir, logger::TLogFileDataPtr& spLogFileData) :
+		m_pathSerializeDir(pathSerializeDir),
+		m_spLog(logger::MakeLogger(spLogFileData, L"Serializer"))
 	{
 	}
 
@@ -55,12 +56,13 @@ namespace chcore
 
 		TSQLiteSerializerPtr spSerializer(std::make_shared<TSQLiteSerializer>(
 			pathTaskManager,
-			std::make_shared<TSQLiteTaskManagerSchema>()));
+			std::make_shared<TSQLiteTaskManagerSchema>(),
+			m_spLog->GetLogFileData()));
 
 		return spSerializer;
 	}
 
-	ISerializerPtr TSQLiteSerializerFactory::CreateTaskSerializer(const TString& strNameHint, bool bForceRecreate)
+	ISerializerPtr TSQLiteSerializerFactory::CreateTaskSerializer(const logger::TLogFileDataPtr& spLogFileData, const TString& strNameHint, bool bForceRecreate)
 	{
 		TString strName(strNameHint);
 		if (strName.IsEmpty())
@@ -90,7 +92,7 @@ namespace chcore
 			}
 		}
 
-		TSQLiteSerializerPtr spSerializer(std::make_shared<TSQLiteSerializer>(pathTask, std::make_shared<TSQLiteTaskSchema>()));
+		TSQLiteSerializerPtr spSerializer(std::make_shared<TSQLiteSerializer>(pathTask, std::make_shared<TSQLiteTaskSchema>(), spLogFileData));
 
 		return spSerializer;
 	}

@@ -21,6 +21,7 @@
 
 #include "TString.h"
 #include "ISerializer.h"
+#include "../liblogger/TLogFileData.h"
 
 namespace chcore
 {
@@ -30,7 +31,7 @@ namespace chcore
 		virtual ~ISerializerFactory();
 
 		virtual ISerializerPtr CreateTaskManagerSerializer(bool bForceRecreate = false) = 0;
-		virtual ISerializerPtr CreateTaskSerializer(const TString& strNameHint = _T(""), bool bForceRecreate = false) = 0;
+		virtual ISerializerPtr CreateTaskSerializer(const logger::TLogFileDataPtr& spLogFileData, const TString& strNameHint = _T(""), bool bForceRecreate = false) = 0;
 	};
 
 	typedef std::shared_ptr<ISerializerFactory> ISerializerFactoryPtr;

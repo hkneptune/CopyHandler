@@ -38,9 +38,6 @@ namespace chcore
 		ETaskCurrentState GetCurrentState() const;
 		void SetCurrentState(ETaskCurrentState eCurrentState);
 
-		TSmartPath GetLogPath() const;
-		void SetLogPath(const TSmartPath& pathLog);
-
 		TSmartPath GetDestinationPath() const;
 		void SetDestinationPath(const TSmartPath& pathDst);
 
@@ -55,7 +52,6 @@ namespace chcore
 			eMod_Added,
 			eMod_TaskName,
 			eMod_CurrentState,
-			eMod_LogPath,
 			eMod_DstPath,
 
 			eMod_Last
@@ -68,7 +64,6 @@ namespace chcore
 
 		TSharedModificationTracker<TString, ModBitSet, eMod_TaskName> m_strTaskName;
 		TSharedModificationTracker<volatile ETaskCurrentState, ModBitSet, eMod_CurrentState> m_eCurrentState;     // current state of processing this task represents
-		TSharedModificationTracker<TSmartPath, ModBitSet, eMod_LogPath> m_pathLog;
 		TSharedModificationTracker<TSmartPath, ModBitSet, eMod_DstPath> m_pathDestinationPath;
 #pragma warning(pop)
 	};

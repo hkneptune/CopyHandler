@@ -59,6 +59,9 @@ namespace chcore
 
 			if(tVersion.GetVersion() == 4)
 				Migrate_004_005(spDatabase, tVersion);
+
+			if(tVersion.GetVersion() == 5)
+				Migrate_005_006(spDatabase, tVersion);
 		}
 
 		tTransaction.Commit();
@@ -67,7 +70,7 @@ namespace chcore
 	void TSQLiteTaskSchema::CreateNewDatabase(const sqlite::TSQLiteDatabasePtr& spDatabase, TSerializerVersion &tVersion)
 	{
 		sqlite::TSQLiteStatement tStatement(spDatabase);
-		tStatement.Prepare(_T("CREATE TABLE task(id BIGINT UNIQUE, name varchar(256) NOT NULL, log_path VARCHAR(32768), current_state INT NOT NULL, destination_path varchar(32768) NOT NULL)"));
+		tStatement.Prepare(_T("CREATE TABLE task(id BIGINT UNIQUE, name varchar(256) NOT NULL, current_state INT NOT NULL, destination_path varchar(32768) NOT NULL)"));
 		tStatement.Step();
 
 		tStatement.Prepare(_T("CREATE TABLE base_paths(id BIGINT UNIQUE, src_path varchar(32768) NOT NULL, skip_processing boolean NOT NULL, dst_path varchar(32768) NOT NULL)"));
@@ -234,5 +237,25 @@ namespace chcore
 		tStatement.Step();
 
 		tVersion.SetVersion(5);
+	}
+
+	void TSQLiteTaskSchema::Migrate_005_006(const sqlite::TSQLiteDatabasePtr& spDatabase, TSerializerVersion &tVersion)
+	{
+		sqlite::TSQLiteStatement tStatement(spDatabase);
+
+		// remove column log_path
+		tStatement.Prepare(_T("ALTER TABLE task RENAME TO task_old"));
+		tStatement.Step();
+
+		tStatement.Prepare(_T("CREATE TABLE task(id BIGINT UNIQUE, name varchar(256) NOT NULL, current_state INT NOT NULL, destination_path varchar(32768) NOT NULL)"));
+		tStatement.Step();
+
+		tStatement.Prepare(_T("INSERT INTO task(id, name, current_state, destination_path) SELECT id, name, current_state, destination_path FROM task_old"));
+		tStatement.Step();
+
+		tStatement.Prepare(_T("DROP TABLE task_old"));
+		tStatement.Step();
+
+		tVersion.SetVersion(6);
 	}
 }

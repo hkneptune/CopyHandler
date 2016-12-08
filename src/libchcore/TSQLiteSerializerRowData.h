@@ -25,6 +25,7 @@
 #include "TSQLiteDatabase.h"
 #include "TSQLiteStatement.h"
 #include <boost/dynamic_bitset.hpp>
+#include "../liblogger/TLogger.h"
 
 namespace chcore
 {
@@ -35,14 +36,12 @@ namespace chcore
 	private:
 		static const unsigned long long AddedBit = 1;
 
-	private:
-		TSQLiteSerializerRowData(object_id_t oidRowID, TSQLiteColumnsDefinition& rColumnDefinition, bool bAdded, unsigned long long* pPoolMemory, size_t stPoolMemorySizeInBytes, TPlainStringPool& poolStrings);
-
 	public:
-		TSQLiteSerializerRowData(const TSQLiteSerializerRowData& rSrc);
+		TSQLiteSerializerRowData(object_id_t oidRowID, TSQLiteColumnsDefinition& rColumnDefinition, bool bAdded, unsigned long long* pPoolMemory, size_t stPoolMemorySizeInBytes, TPlainStringPool& poolStrings, const logger::TLogFileDataPtr& spLogFileData);
+		TSQLiteSerializerRowData(const TSQLiteSerializerRowData& rSrc) = delete;
 		virtual ~TSQLiteSerializerRowData();
 
-		TSQLiteSerializerRowData& operator=(const TSQLiteSerializerRowData& rSrc);
+		TSQLiteSerializerRowData& operator=(const TSQLiteSerializerRowData& rSrc) = delete;
 
 		ISerializerRowData& SetValue(size_t stColIndex, bool bValue) override;
 		ISerializerRowData& SetValue(size_t stColIndex, short iValue) override;
@@ -97,6 +96,10 @@ namespace chcore
 
 		TSQLiteColumnsDefinition& m_rColumns;
 		TPlainStringPool& m_poolStrings;
+#pragma warning(push)
+#pragma warning(disable: 4251)
+		logger::TLoggerPtr m_spLog;
+#pragma warning(pop)
 
 		friend class TSQLiteSerializerContainer;
 	};

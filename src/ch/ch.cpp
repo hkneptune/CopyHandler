@@ -32,7 +32,6 @@
 #include "../common/version.h"
 #include "TCommandLineParser.h"
 #include "../libchcore/TStringSet.h"
-#include "../libchcore/SerializerTrace.h"
 #include "TMsgBox.h"
 #include "resource.h"
 #include "../liblogger/TLogger.h"
@@ -260,6 +259,11 @@ BOOL CCopyHandlerApp::InitInstance()
 	m_spEngineLoggerConfig->SetLogLevel(L"ST-CopyMove", (logger::ESeverityLevel)GetPropValue<PP_LOGLEVEL_SUBTASK_COPYMOVE>(rCfg));
 	m_spEngineLoggerConfig->SetLogLevel(L"ST-Delete", (logger::ESeverityLevel)GetPropValue<PP_LOGLEVEL_SUBTASK_DELETE>(rCfg));
 	m_spEngineLoggerConfig->SetLogLevel(L"ST-ScanDirs", (logger::ESeverityLevel)GetPropValue<PP_LOGLEVEL_SUBTASK_SCANDIR>(rCfg));
+	m_spEngineLoggerConfig->SetLogLevel(L"Serializer", (logger::ESeverityLevel)GetPropValue<PP_LOGLEVEL_SERIALIZER>(rCfg));
+	m_spEngineLoggerConfig->SetLogLevel(L"Serializer-RowReader", (logger::ESeverityLevel)GetPropValue<PP_LOGLEVEL_SERIALIZER>(rCfg));
+	m_spEngineLoggerConfig->SetLogLevel(L"Serializer-RowData", (logger::ESeverityLevel)GetPropValue<PP_LOGLEVEL_SERIALIZER>(rCfg));
+	m_spEngineLoggerConfig->SetLogLevel(L"Serializer-Container", (logger::ESeverityLevel)GetPropValue<PP_LOGLEVEL_SERIALIZER>(rCfg));
+	m_spEngineLoggerConfig->SetLogLevel(L"TaskManager", (logger::ESeverityLevel)GetPropValue<PP_LOGLEVEL_ENGINEDEFAULT>(rCfg));
 
 	// initialize the global log file if it is requested by configuration file
 	CString strLogPath = strPath + _T("\\ch.log");

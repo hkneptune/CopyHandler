@@ -28,7 +28,6 @@ namespace chcore
 	TTaskBaseData::TTaskBaseData() :
 		m_strTaskName(m_setChanges),
 		m_eCurrentState(m_setChanges),
-		m_pathLog(m_setChanges),
 		m_pathDestinationPath(m_setChanges)
 	{
 		m_setChanges[eMod_Added] = true;
@@ -58,16 +57,6 @@ namespace chcore
 		m_eCurrentState = eCurrentState;
 	}
 
-	TSmartPath TTaskBaseData::GetLogPath() const
-	{
-		return m_pathLog;
-	}
-
-	void TTaskBaseData::SetLogPath(const TSmartPath& pathLog)
-	{
-		m_pathLog = pathLog;
-	}
-
 	TSmartPath TTaskBaseData::GetDestinationPath() const
 	{
 		return m_pathDestinationPath;
@@ -92,9 +81,6 @@ namespace chcore
 			if (bAdded || m_setChanges[eMod_TaskName])
 				rRow.SetValue(_T("name"), m_strTaskName);
 
-			if (bAdded || m_setChanges[eMod_LogPath])
-				rRow.SetValue(_T("log_path"), m_pathLog);
-
 			if (bAdded || m_setChanges[eMod_CurrentState])
 				rRow.SetValue(_T("current_state"), m_eCurrentState);
 
@@ -115,7 +101,6 @@ namespace chcore
 		if (bResult)
 		{
 			spRowReader->GetValue(_T("name"), m_strTaskName.Modify());
-			spRowReader->GetValue(_T("log_path"), m_pathLog.Modify());
 			spRowReader->GetValue(_T("current_state"), *(int*)(ETaskCurrentState*)&m_eCurrentState.Modify());
 			spRowReader->GetValue(_T("destination_path"), m_pathDestinationPath.Modify());
 		}
@@ -132,7 +117,6 @@ namespace chcore
 		{
 			rColumns.AddColumn(_T("id"), ColumnType<object_id_t>::value);
 			rColumns.AddColumn(_T("name"), IColumnsDefinition::eType_string);
-			rColumns.AddColumn(_T("log_path"), IColumnsDefinition::eType_path);
 			rColumns.AddColumn(_T("current_state"), IColumnsDefinition::eType_int);
 			rColumns.AddColumn(_T("destination_path"), IColumnsDefinition::eType_path);
 		}

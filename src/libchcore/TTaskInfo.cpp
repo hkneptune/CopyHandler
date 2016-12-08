@@ -27,14 +27,16 @@ namespace chcore
 	TTaskInfoEntry::TTaskInfoEntry() :
 		m_oidObjectID(0),
 		m_pathSerializeLocation(m_setModifications),
+		m_pathLogPath(m_setModifications),
 		m_iOrder(m_setModifications, 0)
 	{
 		m_setModifications[eMod_Added] = true;
 	}
 
-	TTaskInfoEntry::TTaskInfoEntry(object_id_t oidTaskID, const TSmartPath& pathTask, int iOrder, const TTaskPtr& spTask) :
+	TTaskInfoEntry::TTaskInfoEntry(object_id_t oidTaskID, const TSmartPath& pathTask, const TSmartPath& pathLog, int iOrder, const TTaskPtr& spTask) :
 		m_oidObjectID(oidTaskID),
 		m_pathSerializeLocation(m_setModifications, pathTask),
+		m_pathLogPath(m_setModifications, pathLog),
 		m_iOrder(m_setModifications, iOrder),
 		m_spTask(spTask)
 	{
@@ -45,6 +47,7 @@ namespace chcore
 		m_oidObjectID(rSrc.m_oidObjectID),
 		m_setModifications(rSrc.m_setModifications),
 		m_pathSerializeLocation(m_setModifications, rSrc.m_pathSerializeLocation),
+		m_pathLogPath(m_setModifications, rSrc.m_pathLogPath),
 		m_iOrder(m_setModifications, rSrc.m_iOrder),
 		m_spTask(rSrc.m_spTask)
 	{
@@ -56,6 +59,7 @@ namespace chcore
 		{
 			m_oidObjectID = rSrc.m_oidObjectID;
 			m_pathSerializeLocation = rSrc.m_pathSerializeLocation;
+			m_pathLogPath = rSrc.m_pathLogPath;
 			m_iOrder = rSrc.m_iOrder;
 			m_spTask = rSrc.m_spTask;
 			m_setModifications = rSrc.m_setModifications;
@@ -72,6 +76,16 @@ namespace chcore
 	void TTaskInfoEntry::SetTaskSerializeLocation(const TSmartPath& strTaskPath)
 	{
 		m_pathSerializeLocation = strTaskPath;
+	}
+
+	TSmartPath TTaskInfoEntry::GetTaskLogPath() const
+	{
+		return m_pathLogPath;
+	}
+
+	void TTaskInfoEntry::SetTaskLogPath(const TSmartPath& pathLog)
+	{
+		m_pathLogPath = pathLog;
 	}
 
 	TTaskPtr TTaskInfoEntry::GetTask() const
@@ -104,6 +118,8 @@ namespace chcore
 
 		if (bAdded || m_setModifications[eMod_TaskPath])
 			rRow.SetValue(_T("path"), m_pathSerializeLocation);
+		if (bAdded || m_setModifications[eMod_LogPath])
+			rRow.SetValue(_T("logpath"), m_pathLogPath);
 		if (bAdded || m_setModifications[eMod_Order])
 			rRow.SetValue(_T("task_order"), m_iOrder);
 
@@ -114,6 +130,7 @@ namespace chcore
 	{
 		spRowReader->GetValue(_T("id"), m_oidObjectID);
 		spRowReader->GetValue(_T("path"), m_pathSerializeLocation.Modify());
+		spRowReader->GetValue(_T("logpath"), m_pathLogPath.Modify());
 		spRowReader->GetValue(_T("task_order"), m_iOrder.Modify());
 
 		m_setModifications.reset();
@@ -123,6 +140,7 @@ namespace chcore
 	{
 		rColumnDefs.AddColumn(_T("id"), ColumnType<object_id_t>::value);
 		rColumnDefs.AddColumn(_T("path"), IColumnsDefinition::eType_path);
+		rColumnDefs.AddColumn(_T("logpath"), IColumnsDefinition::eType_path);
 		rColumnDefs.AddColumn(_T("task_order"), IColumnsDefinition::eType_int);
 	}
 
@@ -142,9 +160,9 @@ namespace chcore
 	{
 	}
 
-	void TTaskInfoContainer::Add(const TSmartPath& pathTask, int iOrder, const TTaskPtr& spTask)
+	void TTaskInfoContainer::Add(const TSmartPath& pathTask, const TSmartPath& pathLog, int iOrder, const TTaskPtr& spTask)
 	{
-		m_vTaskInfos.push_back(TTaskInfoEntry(++m_oidLastObjectID, pathTask, iOrder, spTask));
+		m_vTaskInfos.push_back(TTaskInfoEntry(++m_oidLastObjectID, pathTask, pathLog, iOrder, spTask));
 	}
 
 	void TTaskInfoContainer::RemoveAt(size_t stIndex)

@@ -28,13 +28,15 @@
 #include "TSQLiteSerializerContainer.h"
 #include "ISQLiteSerializerSchema.h"
 #include "TPlainStringPool.h"
+#include "../liblogger/TLogFileData.h"
+#include "../liblogger/TLogger.h"
 
 namespace chcore
 {
 	class LIBCHCORE_API TSQLiteSerializer : public ISerializer
 	{
 	public:
-		TSQLiteSerializer(const TSmartPath& pathDB, const ISerializerSchemaPtr& spSchema);
+		TSQLiteSerializer(const TSmartPath& pathDB, const ISerializerSchemaPtr& spSchema, const logger::TLogFileDataPtr& spLogFileData);
 		virtual ~TSQLiteSerializer();
 
 		TSmartPath GetLocation() const override;
@@ -53,6 +55,7 @@ namespace chcore
 		ContainerMap m_mapContainers;
 
 		TPlainStringPool m_poolStrings;
+		logger::TLoggerPtr m_spLog;
 #pragma warning(pop)
 	};
 

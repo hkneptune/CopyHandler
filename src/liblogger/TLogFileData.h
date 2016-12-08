@@ -37,7 +37,9 @@ namespace logger
 		TLogFileData(PCTSTR pszLogPath, const TMultiLoggerConfigPtr& spLoggerConfig, const TLoggerRotationInfoPtr& spRotationInfo);
 
 		TMultiLoggerConfigPtr GetMultiLoggerConfig() const;
+
 		void GetAllLogPaths(TLoggerPaths& rLoggerPaths) const;
+		TLoggerPaths GetMainLogPath() const;
 
 	private:
 		void PushLogEntry(std::wstring strLine);

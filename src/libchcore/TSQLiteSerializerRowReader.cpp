@@ -23,15 +23,15 @@
 #include "ErrorCodes.h"
 #include <boost/format.hpp>
 #include "TSQLiteStatement.h"
-#include "SerializerTrace.h"
 
 namespace chcore
 {
-	TSQLiteSerializerRowReader::TSQLiteSerializerRowReader(const sqlite::TSQLiteDatabasePtr& spDatabase, TSQLiteColumnsDefinition& rColumns, const TString& strContainerName) :
+	TSQLiteSerializerRowReader::TSQLiteSerializerRowReader(const sqlite::TSQLiteDatabasePtr& spDatabase, TSQLiteColumnsDefinition& rColumns, const TString& strContainerName, const logger::TLogFileDataPtr& spLogFileData) :
 		m_bInitialized(false),
 		m_spStatement(new sqlite::TSQLiteStatement(spDatabase)),
 		m_rColumns(rColumns),
-		m_strContainerName(strContainerName)
+		m_strContainerName(strContainerName),
+		m_spLog(logger::MakeLogger(spLogFileData, L"Serializer-RowReader"))
 	{
 		if (m_strContainerName.IsEmpty())
 			throw TCoreException(eErr_InvalidArgument, L"m_strContainerName", LOCATION);
@@ -52,7 +52,7 @@ namespace chcore
 			TString strQuery;
 			strQuery = boost::str(boost::wformat(L"SELECT %1% FROM %2% ORDER BY id") % m_rColumns.GetCommaSeparatedColumns().c_str() % m_strContainerName.c_str()).c_str();
 
-			DBTRACE1_D(_T("Executing query: %s\n"), strQuery.c_str());
+			LOG_TRACE(m_spLog) << L"Executing query: " << strQuery;
 			m_spStatement->Prepare(strQuery.c_str());
 			m_bInitialized = true;
 		}

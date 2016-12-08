@@ -43,6 +43,7 @@
 #include "TTaskManagerWrapper.h"
 #include "CfgProperties.h"
 #include "resource.h"
+#include "../liblogger/TAsyncMultiLogger.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -237,12 +238,16 @@ bool CMainWnd::LoadTaskManager()
 
 	CString strError;
 	CString strTasksDir = GetTasksDirectory();
-	TSQLiteSerializerFactoryPtr spSerializerFactory(new TSQLiteSerializerFactory(PathFromString(strTasksDir)));
+	TSmartPath pathEngineLog = PathFromString(strTasksDir) + PathFromString(_T("engine.log"));
+
+	logger::TLogFileDataPtr spLogFileData = logger::TAsyncMultiLogger::GetInstance()->CreateLoggerData(pathEngineLog.ToString(), GetApp().GetEngineLoggerConfig());
+
+	TSQLiteSerializerFactoryPtr spSerializerFactory(new TSQLiteSerializerFactory(PathFromString(strTasksDir), spLogFileData));
 	IFeedbackHandlerFactoryPtr spFeedbackFactory(new CFeedbackHandlerFactory);
 
 	try
 	{
-		m_spTasks.reset(new chcore::TTaskManager(spSerializerFactory, spFeedbackFactory, PathFromString(strTasksDir), GetApp().GetEngineLoggerConfig()));
+		m_spTasks.reset(new chcore::TTaskManager(spSerializerFactory, spFeedbackFactory, PathFromString(strTasksDir), GetApp().GetEngineLoggerConfig(), spLogFileData));
 	}
 	catch(const std::exception& e)
 	{
@@ -253,7 +258,7 @@ bool CMainWnd::LoadTaskManager()
 	{
 		if(MsgBox(IDS_TASKMANAGER_LOAD_FAILED, MB_ICONERROR | MB_OKCANCEL) == IDOK)
 		{
-			m_spTasks.reset(new chcore::TTaskManager(spSerializerFactory, spFeedbackFactory, PathFromString(strTasksDir), GetApp().GetEngineLoggerConfig(), true));
+			m_spTasks.reset(new chcore::TTaskManager(spSerializerFactory, spFeedbackFactory, PathFromString(strTasksDir), GetApp().GetEngineLoggerConfig(), spLogFileData, true));
 		}
 		else
 			return false;

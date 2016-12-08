@@ -60,9 +60,6 @@
     <Filter Include="Source Files\Filesystems">
       <UniqueIdentifier>{30d60be9-a936-4191-a66d-64e127f3d258}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\Tools\DebugTrace">
-      <UniqueIdentifier>{49c9ae7e-1bc4-4875-8512-e92e0c00fb19}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Source Files\Task Config">
       <UniqueIdentifier>{02c88ac8-15f7-4372-9f47-247ecbada7db}</UniqueIdentifier>
     </Filter>
@@ -385,9 +382,6 @@
     </ClInclude>
     <ClInclude Include="TWin32ErrorFormatter.h">
       <Filter>Source Files\Tools</Filter>
-    </ClInclude>
-    <ClInclude Include="SerializerTrace.h">
-      <Filter>Source Files\Tools\DebugTrace</Filter>
     </ClInclude>
     <ClInclude Include="TTaskConfigTracker.h">
       <Filter>Source Files\Task Config</Filter>

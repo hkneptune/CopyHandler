@@ -22,13 +22,14 @@
 #include "ISerializerRowReader.h"
 #include "TSQLiteStatement.h"
 #include "TSQLiteColumnDefinition.h"
+#include "../liblogger/TLogger.h"
 
 namespace chcore
 {
 	class LIBCHCORE_API TSQLiteSerializerRowReader : public ISerializerRowReader
 	{
 	public:
-		TSQLiteSerializerRowReader(const sqlite::TSQLiteDatabasePtr& spDatabase, TSQLiteColumnsDefinition& rColumns, const TString& strContainerName);
+		TSQLiteSerializerRowReader(const sqlite::TSQLiteDatabasePtr& spDatabase, TSQLiteColumnsDefinition& rColumns, const TString& strContainerName, const logger::TLogFileDataPtr& spLogFileData);
 		TSQLiteSerializerRowReader(const TSQLiteSerializerRowReader&) = delete;
 		virtual ~TSQLiteSerializerRowReader();
 
@@ -59,6 +60,7 @@ namespace chcore
 		sqlite::TSQLiteStatementPtr m_spStatement;
 		TSQLiteColumnsDefinition& m_rColumns;
 		TString m_strContainerName;
+		logger::TLoggerPtr m_spLog;
 #pragma warning(pop)
 	};
 

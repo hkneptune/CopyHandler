@@ -27,13 +27,14 @@
 #include "TSQLiteSerializerRowData.h"
 #include <boost/container/flat_map.hpp>
 #include <boost/container/flat_set.hpp>
+#include "../liblogger/TLogger.h"
 
 namespace chcore
 {
 	class LIBCHCORE_API TSQLiteSerializerContainer : public ISerializerContainer
 	{
 	public:
-		TSQLiteSerializerContainer(const TString& strName, const sqlite::TSQLiteDatabasePtr& spDB, TPlainStringPool& poolStrings);
+		TSQLiteSerializerContainer(const TString& strName, const sqlite::TSQLiteDatabasePtr& spDB, TPlainStringPool& poolStrings, const logger::TLogFileDataPtr& spLogFileData);
 		TSQLiteSerializerContainer(const TSQLiteSerializerContainer&) = delete;
 		virtual ~TSQLiteSerializerContainer();
 
@@ -61,7 +62,7 @@ namespace chcore
 
 		boost::pool<>* m_pPoolRows;
 
-		typedef boost::container::flat_map<object_id_t, TSQLiteSerializerRowData> RowMap;	// maps row id to row data
+		typedef boost::container::flat_map<object_id_t, std::unique_ptr<TSQLiteSerializerRowData>> RowMap;	// maps row id to row data
 		RowMap m_mapRows;
 
 		boost::container::flat_set<object_id_t> m_setDeleteItems;
@@ -70,6 +71,8 @@ namespace chcore
 		sqlite::TSQLiteDatabasePtr m_spDB;
 
 		TPlainStringPool& m_poolStrings;
+
+		logger::TLoggerPtr m_spLog;
 #pragma warning(pop)
 	};
 

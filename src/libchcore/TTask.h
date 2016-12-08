@@ -48,8 +48,8 @@ namespace chcore
 	{
 	private:
 		TTask(const TTask&) = delete;
-		TTask(const ISerializerPtr& spSerializer, const IFeedbackHandlerPtr& spFeedbackHandler, const TTaskBaseData& rBaseTaskData, const logger::TMultiLoggerConfigPtr& spLoggerConfig);
-		TTask(const ISerializerPtr& spSerializer, const IFeedbackHandlerPtr& spFeedbackHandler, const TTaskDefinition& rTaskDefinition, const TSmartPath& rLogPath, const logger::TMultiLoggerConfigPtr& spLoggerConfig);
+		TTask(const ISerializerPtr& spSerializer, const IFeedbackHandlerPtr& spFeedbackHandler, const logger::TLogFileDataPtr& spLogFileData);
+		TTask(const ISerializerPtr& spSerializer, const IFeedbackHandlerPtr& spFeedbackHandler, const TTaskDefinition& rTaskDefinition, const logger::TLogFileDataPtr& spLogFileData);
 
 		TTask& operator=(const TTask&) = delete;
 
@@ -72,7 +72,7 @@ namespace chcore
 		// thread
 		void SetPriority(int nPriority);
 
-		static TTaskPtr Load(const ISerializerPtr& spSerializer, const IFeedbackHandlerPtr& spFeedbackHandler, const logger::TMultiLoggerConfigPtr& spLoggerConfig);
+		static TTaskPtr Load(const ISerializerPtr& spSerializer, const IFeedbackHandlerPtr& spFeedbackHandler, const logger::TLogFileDataPtr& spLogFileData);
 		void Store(bool bForce);
 
 		void BeginProcessing();
@@ -91,11 +91,9 @@ namespace chcore
 		void RestoreFeedbackDefaults();
 
 	private:
-		void Load(const TTaskBaseData& rBaseData);
+		void Load();
 
 		void SetTaskDefinition(const TTaskDefinition& rTaskDefinition);
-
-		void SetLogPath(const TSmartPath& pathLog);
 
 		// methods are called when task is being added or removed from the global task array
 		/// Method is called when this task is being added to a TTaskManager object

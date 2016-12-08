@@ -46,7 +46,7 @@ namespace chcore
 		{
 			TSQLiteStatement tStatement(spDatabase);
 
-			tStatement.Prepare(_T("CREATE TABLE tasks(id BIGINT UNIQUE PRIMARY KEY, task_order INT NOT NULL, path VARCHAR(32768) NOT NULL)"));
+			tStatement.Prepare(_T("CREATE TABLE tasks(id BIGINT UNIQUE PRIMARY KEY, task_order INT NOT NULL, path VARCHAR(32768) NOT NULL, logpath VARCHAR(32768) NOT NULL)"));
 			tStatement.Step();
 
 			// and finally set the database version to current one
@@ -61,6 +61,26 @@ namespace chcore
 
 			// and finally set the database version to current one
 			tVersion.SetVersion(2);
+		}
+
+		if(tVersion.GetVersion() == 2)
+		{
+			TSQLiteStatement tStatement(spDatabase);
+
+			tStatement.Prepare(_T("ALTER TABLE tasks RENAME TO tasks_old"));
+			tStatement.Step();
+
+			tStatement.Prepare(_T("CREATE TABLE tasks(id BIGINT UNIQUE PRIMARY KEY, task_order INT NOT NULL, path VARCHAR(32768) NOT NULL, logpath VARCHAR(32768) NOT NULL)"));
+			tStatement.Step();
+
+
+			tStatement.Prepare(_T("INSERT INTO tasks(id, task_order, path, logpath) SELECT id, task_order, path, replace(path, '.sqlite', '.log') FROM tasks_old"));
+			tStatement.Step();
+
+			tStatement.Prepare(_T("DROP TABLE tasks_old"));
+			tStatement.Step();
+
+			tVersion.SetVersion(3);
 		}
 
 		tTransaction.Commit();

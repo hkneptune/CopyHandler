@@ -56,6 +56,13 @@ namespace logger
 		rLoggerPaths.Add(m_spLogFile->GetLogPath().c_str());
 	}
 
+	TLoggerPaths TLogFileData::GetMainLogPath() const
+	{
+		TLoggerPaths loggerPaths;
+		loggerPaths.Add(m_spLogFile->GetLogPath().c_str());
+		return loggerPaths;
+	}
+
 	std::shared_ptr<void> TLogFileData::GetEntriesEvent() const
 	{
 		return m_spHasEntriesEvent;
