@@ -893,7 +893,6 @@ void CFolderDialog::OnAddShortcut()
 	if (m_ctlShortcuts.EditLabel(iIndex) == nullptr)
 	{
 		TRACE("Couldn't edit shortcut list's item label\n");
-		return;
 	}
 }
 

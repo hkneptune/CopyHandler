@@ -133,13 +133,13 @@ namespace chcore
 	};
 
 	template<class Type>
-	inline void SetConfigValue(TConfig& rConfig, PCTSTR pszPropName, const Type& rValue)
+	void SetConfigValue(TConfig& rConfig, PCTSTR pszPropName, const Type& rValue)
 	{
 		rConfig.SetValue(pszPropName, rValue);
 	}
 
 	template<class Type>
-	inline Type GetConfigValueDef(const TConfig& rConfig, PCTSTR pszPropName, const Type& rDefault)
+	Type GetConfigValueDef(const TConfig& rConfig, PCTSTR pszPropName, const Type& rDefault)
 	{
 		Type tValue;
 		if (!rConfig.GetValue(pszPropName, tValue))
@@ -148,7 +148,7 @@ namespace chcore
 	}
 
 	template<class Type>
-	inline bool GetConfigValue(const TConfig& rConfig, PCTSTR pszPropName, Type& rValue)
+	bool GetConfigValue(const TConfig& rConfig, PCTSTR pszPropName, Type& rValue)
 	{
 		return rConfig.GetValue(pszPropName, rValue);
 	}
