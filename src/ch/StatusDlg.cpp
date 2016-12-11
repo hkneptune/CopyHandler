@@ -18,17 +18,14 @@
 ***************************************************************************/
 #include "stdafx.h"
 #include "ch.h"
-#include "../libchcore/TTaskManager.h"
-#include "../libchcore/TTask.h"
 #include "resource.h"
 #include "StatusDlg.h"
 #include "BufferSizeDlg.h"
 #include "StringHelpers.h"
 #include "StaticEx.h"
 #include "Structs.h"
-#include "../libchcore/TTaskStatsSnapshot.h"
-#include "../libchcore/TTaskManagerStatsSnapshot.h"
 #include "CfgProperties.h"
+#include "../libchengine/TTaskManager.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -41,10 +38,10 @@ bool CStatusDlg::m_bLock=false;
 /////////////////////////////////////////////////////////////////////////////
 // CStatusDlg dialog
 
-CStatusDlg::CStatusDlg(chcore::TTaskManager* pTasks, CWnd* pParent /*=nullptr*/)
+CStatusDlg::CStatusDlg(chengine::TTaskManager* pTasks, CWnd* pParent /*=nullptr*/)
 	: ictranslate::CLanguageDialog(IDD_STATUS_DIALOG, pParent, &m_bLock),
 	m_pTasks(pTasks),
-	m_spTaskMgrStats(new chcore::TTaskManagerStatsSnapshot)
+	m_spTaskMgrStats(new chengine::TTaskManagerStatsSnapshot)
 {
 	RegisterStaticExControl(AfxGetInstanceHandle());
 }
@@ -176,7 +173,7 @@ void CStatusDlg::SelectInitialTask()
 	bool bSelected = false;
 	while(stIndex < m_pTasks->GetSize())
 	{
-		chcore::TTaskPtr spTask = m_pTasks->GetAt(stIndex);
+		chengine::TTaskPtr spTask = m_pTasks->GetAt(stIndex);
 		if(m_spInitialSelection)
 		{
 			if(spTask == m_spInitialSelection)
@@ -259,38 +256,38 @@ void CStatusDlg::OnTimer(UINT_PTR nIDEvent)
 
 void CStatusDlg::OnSetBuffersizeButton()
 {
-	chcore::TTaskPtr spTask = GetSelectedItemPointer();
+	chengine::TTaskPtr spTask = GetSelectedItemPointer();
 	if(!spTask)
 		return;
 
 	int iCurrentBufferIndex = 0;
-	chcore::TTaskStatsSnapshotPtr spTaskStats = m_spTaskMgrStats->GetTaskStatsForTaskID(boost::numeric_cast<chcore::taskid_t>(GetSelectedItemSessionUniqueID()));
+	chengine::TTaskStatsSnapshotPtr spTaskStats = m_spTaskMgrStats->GetTaskStatsForTaskID(boost::numeric_cast<chengine::taskid_t>(GetSelectedItemSessionUniqueID()));
 	if(spTaskStats)
 	{
-		chcore::TSubTaskStatsSnapshotPtr spSubTaskStats = spTaskStats->GetSubTasksStats().GetCurrentSubTaskSnapshot();
+		chengine::TSubTaskStatsSnapshotPtr spSubTaskStats = spTaskStats->GetSubTasksStats().GetCurrentSubTaskSnapshot();
 		if(spSubTaskStats)
 			iCurrentBufferIndex = spSubTaskStats->GetCurrentBufferIndex();
 	}
 
-	chcore::TBufferSizes tBufferSizes;
+	chengine::TBufferSizes tBufferSizes;
 	spTask->GetBufferSizes(tBufferSizes);
 
-	CBufferSizeDlg dlg(&tBufferSizes, (chcore::TBufferSizes::EBufferType)iCurrentBufferIndex);
+	CBufferSizeDlg dlg(&tBufferSizes, (chengine::TBufferSizes::EBufferType)iCurrentBufferIndex);
 	if(dlg.DoModal() == IDOK)
 		spTask->SetBufferSizes(dlg.GetBufferSizes());
 }
 
-chcore::TTaskPtr CStatusDlg::GetSelectedItemPointer()
+chengine::TTaskPtr CStatusDlg::GetSelectedItemPointer()
 {
 	// returns ptr to a TTask for a given element in listview
 	if(m_ctlStatusList.GetSelectedCount() == 1)
 	{
 		POSITION pos = m_ctlStatusList.GetFirstSelectedItemPosition();
 		int nPos = m_ctlStatusList.GetNextSelectedItem(pos);
-		return m_pTasks->GetTaskByTaskID(boost::numeric_cast<chcore::taskid_t>(m_ctlStatusList.GetItemData(nPos)));
+		return m_pTasks->GetTaskByTaskID(boost::numeric_cast<chengine::taskid_t>(m_ctlStatusList.GetItemData(nPos)));
 	}
 
-	return chcore::TTaskPtr();
+	return chengine::TTaskPtr();
 }
 
 size_t CStatusDlg::GetSelectedItemSessionUniqueID()
@@ -321,12 +318,12 @@ void CStatusDlg::StickDialogToScreenEdge()
 void CStatusDlg::ApplyButtonsState()
 {
 	// remember ptr to TTask
-	chcore::TTaskPtr spSelectedTask = GetSelectedItemPointer();
+	chengine::TTaskPtr spSelectedTask = GetSelectedItemPointer();
 
 	// set status of buttons pause/resume/cancel
 	if (spSelectedTask != nullptr)
 	{
-		if(spSelectedTask->GetTaskState() == chcore::eTaskState_LoadError)
+		if(spSelectedTask->GetTaskState() == chengine::eTaskState_LoadError)
 		{
 			GetDlgItem(IDC_SHOW_LOG_BUTTON)->EnableWindow(true);
 			GetDlgItem(IDC_PAUSE_BUTTON)->EnableWindow(false);
@@ -341,7 +338,7 @@ void CStatusDlg::ApplyButtonsState()
 			GetDlgItem(IDC_SHOW_LOG_BUTTON)->EnableWindow(true);
 			GetDlgItem(IDC_DELETE_BUTTON)->EnableWindow(true);
 
-			if (spSelectedTask->GetTaskState() == chcore::eTaskState_Finished || spSelectedTask->GetTaskState() == chcore::eTaskState_Cancelled)
+			if (spSelectedTask->GetTaskState() == chengine::eTaskState_Finished || spSelectedTask->GetTaskState() == chengine::eTaskState_Cancelled)
 			{
 				GetDlgItem(IDC_CANCEL_BUTTON)->EnableWindow(false);
 				GetDlgItem(IDC_PAUSE_BUTTON)->EnableWindow(false);
@@ -350,7 +347,7 @@ void CStatusDlg::ApplyButtonsState()
 			else
 			{
 				// pause/resume
-				if (spSelectedTask->GetTaskState() == chcore::eTaskState_Paused)
+				if (spSelectedTask->GetTaskState() == chengine::eTaskState_Paused)
 				{
 					GetDlgItem(IDC_PAUSE_BUTTON)->EnableWindow(false);
 					GetDlgItem(IDC_RESUME_BUTTON)->EnableWindow(true);
@@ -358,7 +355,7 @@ void CStatusDlg::ApplyButtonsState()
 				else
 				{
 					GetDlgItem(IDC_PAUSE_BUTTON)->EnableWindow(true);
-					if (spSelectedTask->GetTaskState() == chcore::eTaskState_Waiting)
+					if (spSelectedTask->GetTaskState() == chengine::eTaskState_Waiting)
 						GetDlgItem(IDC_RESUME_BUTTON)->EnableWindow(true);
 					else
 						GetDlgItem(IDC_RESUME_BUTTON)->EnableWindow(false);
@@ -430,7 +427,7 @@ BOOL CStatusDlg::OnCommand(WPARAM wParam, LPARAM lParam)
 		if (LOWORD(wParam) >= ID_POPUP_TIME_CRITICAL && LOWORD(wParam) <= ID_POPUP_IDLE)
 		{
 			// processing priority
-			chcore::TTaskPtr spSelectedTask = GetSelectedItemPointer();
+			chengine::TTaskPtr spSelectedTask = GetSelectedItemPointer();
 
 			if(spSelectedTask == nullptr)
 				return ictranslate::CLanguageDialog::OnCommand(wParam, lParam);
@@ -470,7 +467,7 @@ BOOL CStatusDlg::OnCommand(WPARAM wParam, LPARAM lParam)
 		else if(LOWORD(wParam) == ID_POPUP_RESET_APPLY_TO_ALL)
 		{
 			// processing priority
-			chcore::TTaskPtr spSelectedTask = GetSelectedItemPointer();
+			chengine::TTaskPtr spSelectedTask = GetSelectedItemPointer();
 
 			if(spSelectedTask == nullptr)
 				return ictranslate::CLanguageDialog::OnCommand(wParam, lParam);
@@ -483,7 +480,7 @@ BOOL CStatusDlg::OnCommand(WPARAM wParam, LPARAM lParam)
 
 void CStatusDlg::OnPauseButton() 
 {
-	chcore::TTaskPtr spTask = GetSelectedItemPointer();
+	chengine::TTaskPtr spTask = GetSelectedItemPointer();
 	if(spTask)
 	{
 		TRACE("PauseProcessing call...\n");
@@ -495,10 +492,10 @@ void CStatusDlg::OnPauseButton()
 
 void CStatusDlg::OnResumeButton() 
 {
-	chcore::TTaskPtr spTask = GetSelectedItemPointer();
+	chengine::TTaskPtr spTask = GetSelectedItemPointer();
 	if(spTask)
 	{
-		if(spTask->GetTaskState() == chcore::eTaskState_Waiting)
+		if(spTask->GetTaskState() == chengine::eTaskState_Waiting)
 			spTask->SetForceFlag();
 		else
 			spTask->ResumeProcessing();
@@ -509,7 +506,7 @@ void CStatusDlg::OnResumeButton()
 
 void CStatusDlg::OnCancelButton() 
 {
-	chcore::TTaskPtr spTask = GetSelectedItemPointer();
+	chengine::TTaskPtr spTask = GetSelectedItemPointer();
 	if(spTask)
 	{
 		spTask->CancelProcessing();
@@ -519,7 +516,7 @@ void CStatusDlg::OnCancelButton()
 
 void CStatusDlg::OnRestartButton() 
 {
-	chcore::TTaskPtr spTask = GetSelectedItemPointer();
+	chengine::TTaskPtr spTask = GetSelectedItemPointer();
 	if(spTask)
 	{
 		spTask->RestartProcessing();
@@ -529,15 +526,15 @@ void CStatusDlg::OnRestartButton()
 
 void CStatusDlg::OnDeleteButton() 
 {
-	chcore::TTaskPtr spTask = GetSelectedItemPointer();
+	chengine::TTaskPtr spTask = GetSelectedItemPointer();
 	if(spTask)
 	{
-		chcore::ETaskCurrentState eTaskState = spTask->GetTaskState();
+		chengine::ETaskCurrentState eTaskState = spTask->GetTaskState();
 		switch(eTaskState)
 		{
-		case chcore::eTaskState_Finished:
-		case chcore::eTaskState_Cancelled:
-		case chcore::eTaskState_LoadError:
+		case chengine::eTaskState_Finished:
+		case chengine::eTaskState_Cancelled:
+		case chengine::eTaskState_LoadError:
 			break;	// allow processing as-is
 
 		default:
@@ -597,11 +594,11 @@ void CStatusDlg::OnKeydownStatusList(NMHDR* pNMHDR, LRESULT* pResult)
 		break;
 	case VK_SPACE:
 		{
-			chcore::TTaskPtr spTask = GetSelectedItemPointer();
+			chengine::TTaskPtr spTask = GetSelectedItemPointer();
 			if (!spTask)
 				return;
 		
-			if(spTask->GetTaskState() == chcore::eTaskState_Paused)
+			if(spTask->GetTaskState() == chengine::eTaskState_Paused)
 				OnResumeButton();
 			else
 				OnPauseButton();
@@ -612,20 +609,20 @@ void CStatusDlg::OnKeydownStatusList(NMHDR* pNMHDR, LRESULT* pResult)
 	*pResult = 0;
 }
 
-int CStatusDlg::GetImageFromStatus(chcore::ETaskCurrentState eState)
+int CStatusDlg::GetImageFromStatus(chengine::ETaskCurrentState eState)
 {
 	switch(eState)
 	{
-	case chcore::eTaskState_Cancelled:
+	case chengine::eTaskState_Cancelled:
 		return 4;
-	case chcore::eTaskState_Finished:
+	case chengine::eTaskState_Finished:
 		return 3;
-	case chcore::eTaskState_Waiting:
+	case chengine::eTaskState_Waiting:
 		return 5;
-	case chcore::eTaskState_Paused:
+	case chengine::eTaskState_Paused:
 		return 2;
-	case chcore::eTaskState_Error:
-	case chcore::eTaskState_LoadError:
+	case chengine::eTaskState_Error:
+	case chengine::eTaskState_LoadError:
 		return 1;
 	default:
 		return 0;
@@ -678,7 +675,7 @@ void CStatusDlg::RefreshStatus()
 	// add task info
 	for(size_t stIndex = 0; stIndex < m_spTaskMgrStats->GetTaskStatsCount(); ++stIndex)
 	{
-		chcore::TTaskStatsSnapshotPtr spTaskStats = m_spTaskMgrStats->GetTaskStatsAt(stIndex);
+		chengine::TTaskStatsSnapshotPtr spTaskStats = m_spTaskMgrStats->GetTaskStatsAt(stIndex);
 		// set (update/add new) entry in the task list (on the left)
 		SetTaskListEntry(stIndex, spTaskStats);
 
@@ -732,7 +729,7 @@ void CStatusDlg::OnCancel()
 void CStatusDlg::OnShowLogButton() 
 {
 	// show log
-	chcore::TTaskPtr spTask = GetSelectedItemPointer();
+	chengine::TTaskPtr spTask = GetSelectedItemPointer();
 	if(!spTask)
 		return;
 
@@ -766,19 +763,19 @@ void CStatusDlg::SetBufferSizesString(unsigned long long ullValue, int iIndex)
 	CString strResult;
 	switch(iIndex)
 	{
-	case chcore::TBufferSizes::eBuffer_Default:
+	case chengine::TBufferSizes::eBuffer_Default:
 		strResult = GetResManager().LoadString(IDS_BSDEFAULT_STRING);
 		break;
-	case chcore::TBufferSizes::eBuffer_OneDisk:
+	case chengine::TBufferSizes::eBuffer_OneDisk:
 		strResult = GetResManager().LoadString(IDS_BSONEDISK_STRING);
 		break;
-	case chcore::TBufferSizes::eBuffer_TwoDisks:
+	case chengine::TBufferSizes::eBuffer_TwoDisks:
 		strResult = GetResManager().LoadString(IDS_BSTWODISKS_STRING);
 		break;
-	case chcore::TBufferSizes::eBuffer_CD:
+	case chengine::TBufferSizes::eBuffer_CD:
 		strResult = GetResManager().LoadString(IDS_BSCD_STRING);
 		break;
-	case chcore::TBufferSizes::eBuffer_LAN:
+	case chengine::TBufferSizes::eBuffer_LAN:
 		strResult = GetResManager().LoadString(IDS_BSLAN_STRING);
 		break;
 	default:
@@ -950,76 +947,76 @@ void CStatusDlg::PrepareResizableControls()
 	InitializeResizableControls();
 }
 
-CString CStatusDlg::GetStatusString(const chcore::TTaskStatsSnapshotPtr& spTaskStats)
+CString CStatusDlg::GetStatusString(const chengine::TTaskStatsSnapshotPtr& spTaskStats)
 {
 	CString strStatusText;
 	// status string
 	// first
 	switch(spTaskStats->GetTaskState())
 	{
-	case chcore::eTaskState_Error:
+	case chengine::eTaskState_Error:
 		{
 			strStatusText = GetResManager().LoadString(IDS_STATUS_ERROR_STRING);
 			strStatusText += _T("/");
 			break;
 		}
-	case chcore::eTaskState_LoadError:
+	case chengine::eTaskState_LoadError:
 		{
 			strStatusText = GetResManager().LoadString(IDS_STATUS_LOADERROR_STRING);
 			strStatusText += _T("/");
 			break;
 		}
-	case chcore::eTaskState_Paused:
+	case chengine::eTaskState_Paused:
 		{
 			strStatusText = GetResManager().LoadString(IDS_STATUS_PAUSED_STRING);
 			strStatusText += _T("/");
 			break;
 		}
-	case chcore::eTaskState_Finished:
+	case chengine::eTaskState_Finished:
 		{
 			strStatusText = GetResManager().LoadString(IDS_STATUS_FINISHED_STRING);
 			strStatusText += _T("/");
 			break;
 		}
-	case chcore::eTaskState_Waiting:
+	case chengine::eTaskState_Waiting:
 		{
 			strStatusText = GetResManager().LoadString(IDS_STATUS_WAITING_STRING);
 			strStatusText += _T("/");
 			break;
 		}
-	case chcore::eTaskState_Cancelled:
+	case chengine::eTaskState_Cancelled:
 		{
 			strStatusText = GetResManager().LoadString(IDS_STATUS_CANCELLED_STRING);
 			strStatusText += _T("/");
 			break;
 		}
-	case chcore::eTaskState_None:
+	case chengine::eTaskState_None:
 		{
 			strStatusText = GetResManager().LoadString(IDS_STATUS_INITIALIZING_STRING);
 			strStatusText += _T("/");
 			break;
 		}
-	case chcore::eTaskState_Processing:
+	case chengine::eTaskState_Processing:
 		break;
 	default:
 		BOOST_ASSERT(false);		// not implemented state
 	}
 
 	// second part
-	chcore::ESubOperationType eSubOperationType = chcore::eSubOperation_None;
-	chcore::TSubTaskStatsSnapshotPtr spSubtaskStats = spTaskStats->GetSubTasksStats().GetCurrentSubTaskSnapshot();
+	chengine::ESubOperationType eSubOperationType = chengine::eSubOperation_None;
+	chengine::TSubTaskStatsSnapshotPtr spSubtaskStats = spTaskStats->GetSubTasksStats().GetCurrentSubTaskSnapshot();
 	if(spSubtaskStats)
 		eSubOperationType = spSubtaskStats->GetSubOperationType();
 
-	if(eSubOperationType == chcore::eSubOperation_Deleting)
+	if(eSubOperationType == chengine::eSubOperation_Deleting)
 		strStatusText += GetResManager().LoadString(IDS_STATUS_DELETING_STRING);
-	else if(eSubOperationType == chcore::eSubOperation_Scanning)
+	else if(eSubOperationType == chengine::eSubOperation_Scanning)
 		strStatusText += GetResManager().LoadString(IDS_STATUS_SEARCHING_STRING);
-	else if(eSubOperationType == chcore::eSubOperation_FastMove)
+	else if(eSubOperationType == chengine::eSubOperation_FastMove)
 		strStatusText += GetResManager().LoadString(IDS_STATUS_FASTMOVE_STRING);
-	else if(spTaskStats->GetOperationType() == chcore::eOperation_Copy)
+	else if(spTaskStats->GetOperationType() == chengine::eOperation_Copy)
 		strStatusText += GetResManager().LoadString(IDS_STATUS_COPYING_STRING);
-	else if(spTaskStats->GetOperationType() == chcore::eOperation_Move)
+	else if(spTaskStats->GetOperationType() == chengine::eOperation_Move)
 		strStatusText += GetResManager().LoadString(IDS_STATUS_MOVING_STRING);
 	else
 		strStatusText += GetResManager().LoadString(IDS_STATUS_UNKNOWN_STRING);
@@ -1042,21 +1039,21 @@ CString CStatusDlg::GetStatusString(const chcore::TTaskStatsSnapshotPtr& spTaskS
 	return strStatusText;
 }
 
-CString CStatusDlg::GetSubtaskName(chcore::ESubOperationType eSubtask) const
+CString CStatusDlg::GetSubtaskName(chengine::ESubOperationType eSubtask) const
 {
-	if(eSubtask == chcore::eSubOperation_Deleting)
+	if(eSubtask == chengine::eSubOperation_Deleting)
 		return GetResManager().LoadString(IDS_STATUS_DELETING_STRING);
-	else if(eSubtask == chcore::eSubOperation_Scanning)
+	else if(eSubtask == chengine::eSubOperation_Scanning)
 		return GetResManager().LoadString(IDS_STATUS_SEARCHING_STRING);
-	else if(eSubtask == chcore::eSubOperation_FastMove)
+	else if(eSubtask == chengine::eSubOperation_FastMove)
 		return GetResManager().LoadString(IDS_STATUS_FASTMOVE_STRING);
-	else if(eSubtask == chcore::eSubOperation_Copying)
+	else if(eSubtask == chengine::eSubOperation_Copying)
 		return GetResManager().LoadString(IDS_STATUS_COPYING_STRING);
 	else
 		return GetResManager().LoadString(IDS_STATUS_UNKNOWN_STRING);
 }
 
-void CStatusDlg::SetTaskListEntry(size_t stPos, const chcore::TTaskStatsSnapshotPtr& spTaskStats)
+void CStatusDlg::SetTaskListEntry(size_t stPos, const chengine::TTaskStatsSnapshotPtr& spTaskStats)
 {
 	// index subitem
 	CString strStatusText = GetStatusString(spTaskStats);
@@ -1073,7 +1070,7 @@ void CStatusDlg::SetTaskListEntry(size_t stPos, const chcore::TTaskStatsSnapshot
 	else
 		m_ctlStatusList.InsertItem(&lvi);
 
-	chcore::TString strCurrentPath = spTaskStats->GetSourcePath();
+	string::TString strCurrentPath = spTaskStats->GetSourcePath();
 
 	// input file
 	lvi.mask=LVIF_TEXT;
@@ -1087,7 +1084,7 @@ void CStatusDlg::SetTaskListEntry(size_t stPos, const chcore::TTaskStatsSnapshot
 
 	// destination path
 	lvi.iSubItem = 2;
-	chcore::TString strDestinationPath = spTaskStats->GetDestinationPath();
+	string::TString strDestinationPath = spTaskStats->GetDestinationPath();
 	lvi.pszText = (PTSTR)strDestinationPath.c_str();
 	lvi.cchTextMax = lstrlen(lvi.pszText);
 	m_ctlStatusList.SetItem(&lvi);
@@ -1129,13 +1126,13 @@ CString CStatusDlg::GetSpeedString(double dSizeSpeed, double dAvgSizeSpeed, doub
 	return strFmt;
 }
 
-void CStatusDlg::UpdateTaskStatsDetails(const chcore::TTaskStatsSnapshotPtr& spTaskStats)
+void CStatusDlg::UpdateTaskStatsDetails(const chengine::TTaskStatsSnapshotPtr& spTaskStats)
 {
 	unsigned long long timeTotalEstimated = 0;
 	unsigned long long timeElapsed = 0;
 	unsigned long long timeRemaining = 0;
 
-	chcore::TSubTaskStatsSnapshotPtr spSubTaskStats = spTaskStats->GetSubTasksStats().GetCurrentSubTaskSnapshot();
+	chengine::TSubTaskStatsSnapshotPtr spSubTaskStats = spTaskStats->GetSubTasksStats().GetCurrentSubTaskSnapshot();
 	if(spSubTaskStats)
 	{
 		// text progress
@@ -1165,12 +1162,12 @@ void CStatusDlg::UpdateTaskStatsDetails(const chcore::TTaskStatsSnapshotPtr& spT
 		GetDlgItem(IDC_SUBTASKTRANSFER_STATIC)->SetWindowText(strSpeed);
 
 		// subtask name
-		chcore::ESubOperationType eSubOperationType = spSubTaskStats->GetSubOperationType();
+		chengine::ESubOperationType eSubOperationType = spSubTaskStats->GetSubOperationType();
 		CString strSubtaskName = GetSubtaskName(eSubOperationType);
 		GetDlgItem(IDC_SUBTASKNAME_STATIC)->SetWindowText(strSubtaskName);
 
 		// current path
-		chcore::TString strPath = spSubTaskStats->GetCurrentPath();
+		string::TString strPath = spSubTaskStats->GetCurrentPath();
 		if(strPath.IsEmpty())
 			strPath = GetResManager().LoadString(IDS_NONEINPUTFILE_STRING);
 

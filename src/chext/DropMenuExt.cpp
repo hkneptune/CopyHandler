@@ -20,7 +20,7 @@
 #include "chext.h"
 #include "DropMenuExt.h"
 #include "../Common/ipcstructs.h"
-#include "../libchcore/TTaskDefinition.h"
+#include "../libchengine/TTaskDefinition.h"
 #include "../common/TShellExtMenuConfig.h"
 #include "../libchcore/TSharedMemory.h"
 #include "Logger.h"
@@ -174,7 +174,7 @@ STDMETHODIMP CDropMenuExt::InvokeCommand(LPCMINVOKECOMMANDINFO lpici)
 
 		chcore::TPathContainer vSourcePaths;
 		chcore::TSmartPath spDestinationPath;
-		chcore::EOperationType eOperationType = chcore::eOperation_None;
+		chengine::EOperationType eOperationType = chengine::eOperation_None;
 
 		if(!m_tShellExtData.GetSourcePathsByItem(spSelectedItem, vSourcePaths))
 			return E_FAIL;
@@ -183,13 +183,13 @@ STDMETHODIMP CDropMenuExt::InvokeCommand(LPCMINVOKECOMMANDINFO lpici)
 		if(!m_tShellExtData.GetOperationTypeByItem(spSelectedItem, eOperationType))
 			return E_FAIL;
 
-		chcore::TTaskDefinition tTaskDefinition;
+		chengine::TTaskDefinition tTaskDefinition;
 		tTaskDefinition.SetSourcePaths(vSourcePaths);
 		tTaskDefinition.SetDestinationPath(spDestinationPath);
 		tTaskDefinition.SetOperationType(eOperationType);
 
 		// get task data as xml
-		chcore::TString wstrData;
+		string::TString wstrData;
 		tTaskDefinition.StoreInString(wstrData);
 
 		// fill struct

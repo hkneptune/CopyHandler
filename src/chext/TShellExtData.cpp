@@ -210,7 +210,7 @@ bool TShellExtData::VerifyItemCanBeExecuted(const TShellMenuItemPtr& spMenuItem)
 
 bool TShellExtData::IsDefaultItem(const TShellMenuItemPtr& spMenuItem) const
 {
-	if(!spMenuItem || spMenuItem->IsGroupItem() || spMenuItem->GetDefaultItemHint() == chcore::eOperation_None)
+	if(!spMenuItem || spMenuItem->IsGroupItem() || spMenuItem->GetDefaultItemHint() == chengine::eOperation_None)
 		return false;
 
 	// check if there was a state defined by reading the current context menu
@@ -219,10 +219,10 @@ bool TShellExtData::IsDefaultItem(const TShellMenuItemPtr& spMenuItem) const
 		switch(m_eDefaultSystemMenuAction)
 		{
 		case eAction_Copy:
-			return spMenuItem->GetDefaultItemHint() == chcore::eOperation_Copy;
+			return spMenuItem->GetDefaultItemHint() == chengine::eOperation_Copy;
 
 		case eAction_Move:
-			return spMenuItem->GetDefaultItemHint() == chcore::eOperation_Move;
+			return spMenuItem->GetDefaultItemHint() == chengine::eOperation_Move;
 
 		default:
 			return false;
@@ -237,8 +237,8 @@ bool TShellExtData::IsDefaultItem(const TShellMenuItemPtr& spMenuItem) const
 			if(m_dwClipboardDropEffect == 0)
 				break;
 
-			if(m_dwClipboardDropEffect & DROPEFFECT_MOVE && spMenuItem->GetDefaultItemHint() == chcore::eOperation_Move ||
-				m_dwClipboardDropEffect & DROPEFFECT_COPY && spMenuItem->GetDefaultItemHint() == chcore::eOperation_Copy)
+			if(m_dwClipboardDropEffect & DROPEFFECT_MOVE && spMenuItem->GetDefaultItemHint() == chengine::eOperation_Move ||
+				m_dwClipboardDropEffect & DROPEFFECT_COPY && spMenuItem->GetDefaultItemHint() == chengine::eOperation_Copy)
 				return true;
 
 			return false;
@@ -255,8 +255,8 @@ bool TShellExtData::IsDefaultItem(const TShellMenuItemPtr& spMenuItem) const
 			if(m_dwIDataObjectDropEffect == 0)
 				break;
 
-			if(m_dwIDataObjectDropEffect & DROPEFFECT_MOVE && spMenuItem->GetDefaultItemHint() == chcore::eOperation_Move ||
-				m_dwIDataObjectDropEffect & DROPEFFECT_COPY && spMenuItem->GetDefaultItemHint() == chcore::eOperation_Copy)
+			if(m_dwIDataObjectDropEffect & DROPEFFECT_MOVE && spMenuItem->GetDefaultItemHint() == chengine::eOperation_Move ||
+				m_dwIDataObjectDropEffect & DROPEFFECT_COPY && spMenuItem->GetDefaultItemHint() == chengine::eOperation_Copy)
 				return true;
 
 			return false;
@@ -270,9 +270,9 @@ bool TShellExtData::IsDefaultItem(const TShellMenuItemPtr& spMenuItem) const
 	// check keyboard buttons
 	if(m_ulKeysState & eKey_Ctrl || m_ulKeysState & eKey_Shift)
 	{
-		if(m_ulKeysState & eKey_Ctrl && spMenuItem->GetDefaultItemHint() == chcore::eOperation_Copy)
+		if(m_ulKeysState & eKey_Ctrl && spMenuItem->GetDefaultItemHint() == chengine::eOperation_Copy)
 			return true;
-		if(m_ulKeysState & eKey_Shift && spMenuItem->GetDefaultItemHint() == chcore::eOperation_Move)
+		if(m_ulKeysState & eKey_Shift && spMenuItem->GetDefaultItemHint() == chengine::eOperation_Move)
 			return true;
 
 		return false;
@@ -324,12 +324,12 @@ bool TShellExtData::IsDefaultItem(const TShellMenuItemPtr& spMenuItem) const
 	// and since there is no other definition of operation to be performed, we assume either copy or move as default
 	if(bIsSameDriveOrServerName)
 	{
-		if(spMenuItem->GetDefaultItemHint() == chcore::eOperation_Move)
+		if(spMenuItem->GetDefaultItemHint() == chengine::eOperation_Move)
 			return true;
 	}
 	else
 	{
-		if(spMenuItem->GetDefaultItemHint() == chcore::eOperation_Copy)
+		if(spMenuItem->GetDefaultItemHint() == chengine::eOperation_Copy)
 			return true;
 	}
 
@@ -433,12 +433,12 @@ bool TShellExtData::GetDestinationPathByItem(const TShellMenuItemPtr& spMenuItem
 	return true;
 }
 
-bool TShellExtData::GetOperationTypeByItem(const TShellMenuItemPtr& spMenuItem, chcore::EOperationType& eOperationType) const
+bool TShellExtData::GetOperationTypeByItem(const TShellMenuItemPtr& spMenuItem, chengine::EOperationType& eOperationType) const
 {
 	if(!spMenuItem || spMenuItem->IsGroupItem())
 		return false;
 
-	eOperationType = chcore::eOperation_None;
+	eOperationType = chengine::eOperation_None;
 
 	switch(spMenuItem->GetOperationTypeInfo().GetOperationTypeSource())
 	{
@@ -448,11 +448,11 @@ bool TShellExtData::GetOperationTypeByItem(const TShellMenuItemPtr& spMenuItem, 
 			switch(spMenuItem->GetSourcePathsInfo().GetSrcPathsSource())
 			{
 			case TSourcePathsInfo::eSrcType_Clipboard:
-				eOperationType = (m_dwClipboardDropEffect & DROPEFFECT_MOVE) ? chcore::eOperation_Move : chcore::eOperation_Copy;
+				eOperationType = (m_dwClipboardDropEffect & DROPEFFECT_MOVE) ? chengine::eOperation_Move : chengine::eOperation_Copy;
 				break;
 			case TSourcePathsInfo::eSrcType_InitializeIDataObject:
 			case TSourcePathsInfo::eSrcType_InitializeAuto:
-				eOperationType = (m_dwIDataObjectDropEffect & DROPEFFECT_MOVE) ? chcore::eOperation_Move : chcore::eOperation_Copy;
+				eOperationType = (m_dwIDataObjectDropEffect & DROPEFFECT_MOVE) ? chengine::eOperation_Move : chengine::eOperation_Copy;
 				break;
 			case TSourcePathsInfo::eSrcType_InitializePidlFolder:
 				return false;

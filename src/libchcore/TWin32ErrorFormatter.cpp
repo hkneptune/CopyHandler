@@ -21,6 +21,8 @@
 #include <algorithm>
 #include <atltrace.h>
 
+using namespace string;
+
 namespace chcore
 {
 	TString TWin32ErrorFormatter::FormatWin32ErrorCode(DWORD dwErrorCode, bool bUseNumberFallback)

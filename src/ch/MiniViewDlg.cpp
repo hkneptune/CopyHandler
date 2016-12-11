@@ -17,15 +17,14 @@
 *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
 ***************************************************************************/
 #include "stdafx.h"
-#include "../libchcore/TTaskManager.h"
-#include "../libchcore/TTask.h"
 #include "MiniViewDlg.h"
 #include "ch.h"
 #include <assert.h>
 #include "MemDC.h"
-#include "../libchcore/TTaskManagerStatsSnapshot.h"
 #include "CfgProperties.h"
 #include "resource.h"
+#include "../libchengine/TTaskManager.h"
+#include "../libchengine/TTask.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -46,7 +45,7 @@ bool CMiniViewDlg::m_bLock=false;
 /////////////////////////////////////////////////////////////////////////////
 // CMiniViewDlg dialog
 
-CMiniViewDlg::CMiniViewDlg(chcore::TTaskManager* pTaskManager, bool *pbHide, CWnd* pParent /*=nullptr*/)
+CMiniViewDlg::CMiniViewDlg(chengine::TTaskManager* pTaskManager, bool *pbHide, CWnd* pParent /*=nullptr*/)
 	:ictranslate::CLanguageDialog(IDD_MINIVIEW_DIALOG, pParent, &m_bLock),
 	m_pTasks(pTaskManager),
 	m_iLastHeight(0),
@@ -195,7 +194,7 @@ void CMiniViewDlg::RefreshStatus()
 	if(!m_pTasks)
 		return;
 
-	chcore::TTaskManagerStatsSnapshotPtr spTaskMgrStats(new chcore::TTaskManagerStatsSnapshot);
+	chengine::TTaskManagerStatsSnapshotPtr spTaskMgrStats(new chengine::TTaskManagerStatsSnapshot);
 
 	m_pTasks->GetStatsSnapshot(spTaskMgrStats);
 
@@ -207,25 +206,25 @@ void CMiniViewDlg::RefreshStatus()
 		size_t stTasksCount = spTaskMgrStats->GetTaskStatsCount();
 		for(size_t stIndex = 0; stIndex < stTasksCount; ++stIndex)
 		{
-			chcore::TTaskStatsSnapshotPtr spTaskStats = spTaskMgrStats->GetTaskStatsAt(stIndex);
-			chcore::ETaskCurrentState eTaskState = spTaskStats->GetTaskState();
+			chengine::TTaskStatsSnapshotPtr spTaskStats = spTaskMgrStats->GetTaskStatsAt(stIndex);
+			chengine::ETaskCurrentState eTaskState = spTaskStats->GetTaskState();
 
-			if(eTaskState != chcore::eTaskState_Finished && eTaskState != chcore::eTaskState_Cancelled && eTaskState != chcore::eTaskState_LoadError)
+			if(eTaskState != chengine::eTaskState_Finished && eTaskState != chengine::eTaskState_Cancelled && eTaskState != chengine::eTaskState_LoadError)
 			{
 				pItem = m_ctlStatus.GetItemAddress(index++);
 
 				// load
-				if(eTaskState == chcore::eTaskState_Error)
+				if(eTaskState == chengine::eTaskState_Error)
 					pItem->m_crColor=RGB(255, 0, 0);
-				else if(eTaskState == chcore::eTaskState_Paused)
+				else if(eTaskState == chengine::eTaskState_Paused)
 					pItem->m_crColor=RGB(255, 255, 0);
-				else if(eTaskState == chcore::eTaskState_Waiting)
+				else if(eTaskState == chengine::eTaskState_Waiting)
 					pItem->m_crColor=RGB(0, 0, 255);
 				else
 					pItem->m_crColor=RGB(0, 255, 0);
 
-				chcore::TString strPath;
-				chcore::TSubTaskStatsSnapshotPtr spSubtaskStats = spTaskStats->GetSubTasksStats().GetCurrentSubTaskSnapshot();
+				string::TString strPath;
+				chengine::TSubTaskStatsSnapshotPtr spSubtaskStats = spTaskStats->GetSubTasksStats().GetCurrentSubTaskSnapshot();
 				if(spSubtaskStats)
 					strPath = spSubtaskStats->GetCurrentPath();
 
@@ -277,7 +276,7 @@ void CMiniViewDlg::RefreshStatus()
 	pItem->m_crColor=GetSysColor(COLOR_HIGHLIGHT);
 	pItem->m_strText=GetResManager().LoadString(IDS_MINIVIEWALL_STRING);
 	pItem->m_uiPos = boost::numeric_cast<int>(spTaskMgrStats->GetCombinedProgress() * 100.0);
-	pItem->m_tTaskID = chcore::NoTaskID;
+	pItem->m_tTaskID = chengine::NoTaskID;
 
 	// get rid of the rest
 	m_ctlStatus.SetSmoothProgress(GetPropValue<PP_MVUSESMOOTHPROGRESS>(GetConfig()));
@@ -438,7 +437,7 @@ void OnPause(CMiniViewDlg* pDlg, UINT uiMsg, CMiniViewDlg::_BTNDATA_* pData, CDC
 			if (iSel == LB_ERR || (size_t)iSel >= pDlg->m_ctlStatus.m_vItems.size())
 				return;
 
-			chcore::TTaskPtr spTask = pDlg->m_pTasks->GetTaskByTaskID(pDlg->m_ctlStatus.m_vItems.at(iSel)->m_tTaskID);
+			chengine::TTaskPtr spTask = pDlg->m_pTasks->GetTaskByTaskID(pDlg->m_ctlStatus.m_vItems.at(iSel)->m_tTaskID);
 			if(spTask)
 				spTask->PauseProcessing();
 			else
@@ -546,10 +545,10 @@ void OnResume(CMiniViewDlg* pDlg, UINT uiMsg, CMiniViewDlg::_BTNDATA_* pData, CD
 			if (iSel == LB_ERR || (size_t)iSel >= pDlg->m_ctlStatus.m_vItems.size())
 				return;
 
-			chcore::TTaskPtr spTask = pDlg->m_pTasks->GetTaskByTaskID(pDlg->m_ctlStatus.m_vItems.at(iSel)->m_tTaskID);
+			chengine::TTaskPtr spTask = pDlg->m_pTasks->GetTaskByTaskID(pDlg->m_ctlStatus.m_vItems.at(iSel)->m_tTaskID);
 			if (spTask)
 			{
-				if(spTask->GetTaskState() == chcore::eTaskState_Waiting)
+				if(spTask->GetTaskState() == chengine::eTaskState_Waiting)
 					spTask->SetForceFlag(true);
 				else
 					spTask->ResumeProcessing();
@@ -591,7 +590,7 @@ void OnCancelBtn(CMiniViewDlg* pDlg, UINT uiMsg, CMiniViewDlg::_BTNDATA_* pData,
 		if (iSel == LB_ERR || (size_t)iSel >= pDlg->m_ctlStatus.m_vItems.size())
 			return;
 
-		chcore::TTaskPtr spTask = pDlg->m_pTasks->GetTaskByTaskID(pDlg->m_ctlStatus.m_vItems.at(iSel)->m_tTaskID);
+		chengine::TTaskPtr spTask = pDlg->m_pTasks->GetTaskByTaskID(pDlg->m_ctlStatus.m_vItems.at(iSel)->m_tTaskID);
 		if(spTask)
 			spTask->CancelProcessing();
 		else
@@ -646,7 +645,7 @@ void OnRestartBtn(CMiniViewDlg* pDlg, UINT uiMsg, CMiniViewDlg::_BTNDATA_* pData
 			if (iSel == LB_ERR || (size_t)iSel >= pDlg->m_ctlStatus.m_vItems.size())
 				return;
 
-			chcore::TTaskPtr spTask = pDlg->m_pTasks->GetTaskByTaskID(pDlg->m_ctlStatus.m_vItems.at(iSel)->m_tTaskID);
+			chengine::TTaskPtr spTask = pDlg->m_pTasks->GetTaskByTaskID(pDlg->m_ctlStatus.m_vItems.at(iSel)->m_tTaskID);
 			if(spTask)
 				spTask->RestartProcessing();
 			else
@@ -804,7 +803,7 @@ void CMiniViewDlg::OnDblclkProgressList()
 	if(iSel == LB_ERR || (size_t)iSel >= m_ctlStatus.m_vItems.size())
 		return;
 
-	chcore::taskid_t tTaskID = m_ctlStatus.m_vItems.at(iSel)->m_tTaskID;
+	chengine::taskid_t tTaskID = m_ctlStatus.m_vItems.at(iSel)->m_tTaskID;
 	GetParent()->PostMessage(WM_MINIVIEWDBLCLK, 0, boost::numeric_cast<LPARAM>(tTaskID));
 }
 

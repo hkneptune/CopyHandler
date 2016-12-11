@@ -24,7 +24,7 @@
 #define __TSHELLEXTDATA_H__
 
 #include "../libchcore/TPath.h"
-#include "../libchcore/EOperationTypes.h"
+#include "../libchengine/EOperationTypes.h"
 #include "../libchcore/TPathContainer.h"
 
 class TShellMenuItem;
@@ -86,7 +86,7 @@ public:
 	bool GetSourcePathsByItem(const TShellMenuItemPtr& spMenuItem, chcore::TPathContainer& tSourcePaths) const;
 	bool GetDestinationPathByItem(const TShellMenuItemPtr& spMenuItem, chcore::TSmartPath& tDestinationPath) const;
 
-	bool GetOperationTypeByItem(const TShellMenuItemPtr& spMenuItem, chcore::EOperationType& eOperationType) const;
+	bool GetOperationTypeByItem(const TShellMenuItemPtr& spMenuItem, chengine::EOperationType& eOperationType) const;
 
 	EActionSource GetActionSource() const;
 

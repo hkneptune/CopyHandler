@@ -40,7 +40,7 @@ std::wstring HResultFormatter::FormatHResult(HRESULT hResult)
 
 	default:
 		{
-			chcore::TString strDesc = chcore::TWin32ErrorFormatter::FormatWin32ErrorCodeWithFallback(hResult, nullptr, false);
+			string::TString strDesc = chcore::TWin32ErrorFormatter::FormatWin32ErrorCodeWithFallback(hResult, nullptr, false);
 			if(!strDesc.IsEmpty())
 				wstr << L" (" << strDesc.c_str() << ")";
 		}

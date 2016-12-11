@@ -67,7 +67,7 @@ BOOL CFeedbackFileErrorDlg::OnInitDialog()
 	strFmt += rResManager.LoadString(IDS_INFO_REASON_STRING);
 
 	// get system error string
-	chcore::TString strError = chcore::TWin32ErrorFormatter::FormatWin32ErrorCode(m_ulSysError, true);
+	string::TString strError = chcore::TWin32ErrorFormatter::FormatWin32ErrorCode(m_ulSysError, true);
 
 	ictranslate::CFormat fmt(strFmt);
 	fmt.SetParam(_T("%filename"), m_strSrcPath);
@@ -83,29 +83,29 @@ BOOL CFeedbackFileErrorDlg::OnInitDialog()
 void CFeedbackFileErrorDlg::OnBnClickedRetryButton()
 {
 	UpdateData(TRUE);
-	EndDialog(chcore::EFeedbackResult::eResult_Retry);
+	EndDialog(chengine::EFeedbackResult::eResult_Retry);
 }
 
 void CFeedbackFileErrorDlg::OnBnClickedSkipButton()
 {
 	UpdateData(TRUE);
-	EndDialog(chcore::EFeedbackResult::eResult_Skip);
+	EndDialog(chengine::EFeedbackResult::eResult_Skip);
 }
 
 void CFeedbackFileErrorDlg::OnBnClickedPauseButton()
 {
 	UpdateData(TRUE);
-	EndDialog(chcore::EFeedbackResult::eResult_Pause);
+	EndDialog(chengine::EFeedbackResult::eResult_Pause);
 }
 
 void CFeedbackFileErrorDlg::OnBnClickedCancel()
 {
 	UpdateData(TRUE);
-	EndDialog(chcore::EFeedbackResult::eResult_Cancel);
+	EndDialog(chengine::EFeedbackResult::eResult_Cancel);
 }
 
 void CFeedbackFileErrorDlg::OnCancel()
 {
 	UpdateData(TRUE);
-	EndDialog(chcore::EFeedbackResult::eResult_Cancel);
+	EndDialog(chengine::EFeedbackResult::eResult_Cancel);
 }

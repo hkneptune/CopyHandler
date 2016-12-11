@@ -3,17 +3,17 @@
 
 #include "stdafx.h"
 #include "ch.h"
-#include "../libchcore/TFileInfo.h"
 #include "FeedbackReplaceDlg.h"
 #include "../libictranslate/ResourceManager.h"
 #include "FeedbackHandler.h"
 #include "resource.h"
+#include "../libchengine/TFileInfo.h"
 
 // CFeedbackReplaceDlg dialog
 
 IMPLEMENT_DYNAMIC(CFeedbackReplaceDlg, ictranslate::CLanguageDialog)
 
-CFeedbackReplaceDlg::CFeedbackReplaceDlg(const chcore::TFileInfo& spSrcFile, const chcore::TFileInfo& spDstFile, CWnd* pParent /*=nullptr*/)
+CFeedbackReplaceDlg::CFeedbackReplaceDlg(const chengine::TFileInfo& spSrcFile, const chengine::TFileInfo& spDstFile, CWnd* pParent /*=nullptr*/)
 	: ictranslate::CLanguageDialog(IDD_FEEDBACK_REPLACE_DIALOG, pParent),
 	m_bAllItems(FALSE),
 	m_rSrcFile(spSrcFile),
@@ -187,37 +187,37 @@ void CFeedbackReplaceDlg::RefreshImages()
 void CFeedbackReplaceDlg::OnBnClickedReplaceButton()
 {
 	UpdateData(TRUE);
-	EndDialog(chcore::EFeedbackResult::eResult_Overwrite);
+	EndDialog(chengine::EFeedbackResult::eResult_Overwrite);
 }
 
 void CFeedbackReplaceDlg::OnBnClickedCopyRestButton()
 {
 	UpdateData(TRUE);
-	EndDialog(chcore::EFeedbackResult::eResult_CopyRest);
+	EndDialog(chengine::EFeedbackResult::eResult_CopyRest);
 }
 
 void CFeedbackReplaceDlg::OnBnClickedSkipButton()
 {
 	UpdateData(TRUE);
-	EndDialog(chcore::EFeedbackResult::eResult_Skip);
+	EndDialog(chengine::EFeedbackResult::eResult_Skip);
 }
 
 void CFeedbackReplaceDlg::OnBnClickedPauseButton()
 {
 	UpdateData(TRUE);
-	EndDialog(chcore::EFeedbackResult::eResult_Pause);
+	EndDialog(chengine::EFeedbackResult::eResult_Pause);
 }
 
 void CFeedbackReplaceDlg::OnBnClickedCancelButton()
 {
 	UpdateData(TRUE);
-	EndDialog(chcore::EFeedbackResult::eResult_Cancel);
+	EndDialog(chengine::EFeedbackResult::eResult_Cancel);
 }
 
 void CFeedbackReplaceDlg::OnCancel()
 {
 	UpdateData(TRUE);
-	EndDialog(chcore::EFeedbackResult::eResult_Cancel);
+	EndDialog(chengine::EFeedbackResult::eResult_Cancel);
 }
 
 bool CFeedbackReplaceDlg::IsApplyToAllItemsChecked() const

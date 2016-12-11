@@ -30,7 +30,7 @@ static char THIS_FILE[] = __FILE__;
 /////////////////////////////////////////////////////////////////////////////
 // CBufferSizeDlg dialog
 
-CBufferSizeDlg::CBufferSizeDlg(chcore::TBufferSizes* pInitialBufferSizes, chcore::TBufferSizes::EBufferType eSelectedBuffer) :
+CBufferSizeDlg::CBufferSizeDlg(chengine::TBufferSizes* pInitialBufferSizes, chengine::TBufferSizes::EBufferType eSelectedBuffer) :
 	ictranslate::CLanguageDialog(IDD_BUFFERSIZE_DIALOG),
 	m_eSelectedBuffer(eSelectedBuffer)
 {
@@ -114,23 +114,23 @@ BOOL CBufferSizeDlg::OnInitDialog()
 	// set focus to the requested control
 	switch (m_eSelectedBuffer)
 	{
-	case chcore::TBufferSizes::eBuffer_Default:
+	case chengine::TBufferSizes::eBuffer_Default:
 		GetDlgItem(IDC_DEFAULTSIZE_EDIT)->SetFocus();
 		static_cast<CEdit*>(GetDlgItem(IDC_DEFAULTSIZE_EDIT))->SetSel(0, -1);
 		break;
-	case chcore::TBufferSizes::eBuffer_OneDisk:
+	case chengine::TBufferSizes::eBuffer_OneDisk:
 		GetDlgItem(IDC_ONEDISKSIZE_EDIT)->SetFocus();
 		static_cast<CEdit*>(GetDlgItem(IDC_ONEDISKSIZE_EDIT))->SetSel(0, -1);
 		break;
-	case chcore::TBufferSizes::eBuffer_TwoDisks:
+	case chengine::TBufferSizes::eBuffer_TwoDisks:
 		GetDlgItem(IDC_TWODISKSSIZE_EDIT)->SetFocus();
 		static_cast<CEdit*>(GetDlgItem(IDC_TWODISKSSIZE_EDIT))->SetSel(0, -1);
 		break;
-	case chcore::TBufferSizes::eBuffer_CD:
+	case chengine::TBufferSizes::eBuffer_CD:
 		GetDlgItem(IDC_CDROMSIZE_EDIT)->SetFocus();
 		static_cast<CEdit*>(GetDlgItem(IDC_CDROMSIZE_EDIT))->SetSel(0, -1);
 		break;
-	case chcore::TBufferSizes::eBuffer_LAN:
+	case chengine::TBufferSizes::eBuffer_LAN:
 		GetDlgItem(IDC_LANSIZE_EDIT)->SetFocus();
 		static_cast<CEdit*>(GetDlgItem(IDC_LANSIZE_EDIT))->SetSel(0, -1);
 		break;

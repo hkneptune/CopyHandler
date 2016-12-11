@@ -19,7 +19,6 @@
 #include "stdafx.h"
 #include <boost/shared_array.hpp>
 #include "resource.h"
-#include "../libchcore/TFileInfo.h"
 #include "CustomCopyDlg.h"
 #include "structs.h"
 #include "dialogs.h"
@@ -27,8 +26,9 @@
 #include "FilterDlg.h"
 #include "StringHelpers.h"
 #include "ch.h"
-#include "../libchcore/TTaskConfigBufferSizes.h"
 #include "CfgProperties.h"
+#include "../libchengine/TTaskDefinition.h"
+#include "../libchengine/TTaskConfigBufferSizes.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -46,7 +46,7 @@ CCustomCopyDlg::CCustomCopyDlg() :
 	GetConfig().ExtractSubConfig(BRANCH_TASK_SETTINGS, m_tTaskDefinition.GetConfiguration());
 }
 
-CCustomCopyDlg::CCustomCopyDlg(const chcore::TTaskDefinition& rTaskDefinition) :
+CCustomCopyDlg::CCustomCopyDlg(const chengine::TTaskDefinition& rTaskDefinition) :
 	ictranslate::CLanguageDialog(IDD_CUSTOM_COPY_DIALOG),
 	m_tTaskDefinition(rTaskDefinition)
 {
@@ -211,7 +211,7 @@ BOOL CCustomCopyDlg::OnInitDialog()
 	m_ctlOperation.AddString(GetResManager().LoadString(IDS_CCDMOVE_STRING));
 
 	// copying/moving
-	m_ctlOperation.SetCurSel(m_tTaskDefinition.GetOperationType() == chcore::eOperation_Move ? 1 : 0);
+	m_ctlOperation.SetCurSel(m_tTaskDefinition.GetOperationType() == chengine::eOperation_Move ? 1 : 0);
 
 	// fill priority combo
 	for (int stIndex=0;stIndex<7;stIndex++)
@@ -219,7 +219,7 @@ BOOL CCustomCopyDlg::OnInitDialog()
 		m_ctlPriority.AddString(GetResManager().LoadString(IDS_PRIORITY0_STRING+stIndex));
 	}
 
-	m_ctlPriority.SetCurSel(PriorityToIndex(chcore::GetTaskPropValue<chcore::eTO_ThreadPriority>(m_tTaskDefinition.GetConfiguration())));
+	m_ctlPriority.SetCurSel(PriorityToIndex(chengine::GetTaskPropValue<chengine::eTO_ThreadPriority>(m_tTaskDefinition.GetConfiguration())));
 
 	// fill buffer sizes listbox
 	SetBuffersizesString();
@@ -277,9 +277,9 @@ BOOL CCustomCopyDlg::OnInitDialog()
 	m_bFilters = !m_tTaskDefinition.GetFilters().IsEmpty();
 
 	// other custom flags
-	m_bIgnoreFolders = chcore::GetTaskPropValue<chcore::eTO_IgnoreDirectories>(m_tTaskDefinition.GetConfiguration());
-	m_bForceDirectories = chcore::GetTaskPropValue<chcore::eTO_CreateDirectoriesRelativeToRoot>(m_tTaskDefinition.GetConfiguration());
-	m_bOnlyCreate = chcore::GetTaskPropValue<chcore::eTO_CreateEmptyFiles>(m_tTaskDefinition.GetConfiguration());
+	m_bIgnoreFolders = chengine::GetTaskPropValue<chengine::eTO_IgnoreDirectories>(m_tTaskDefinition.GetConfiguration());
+	m_bForceDirectories = chengine::GetTaskPropValue<chengine::eTO_CreateDirectoriesRelativeToRoot>(m_tTaskDefinition.GetConfiguration());
+	m_bOnlyCreate = chengine::GetTaskPropValue<chengine::eTO_CreateEmptyFiles>(m_tTaskDefinition.GetConfiguration());
 	m_bAdvanced = (m_bIgnoreFolders | m_bForceDirectories | m_bOnlyCreate);
 
 	UpdateData(FALSE);
@@ -369,11 +369,11 @@ void CCustomCopyDlg::OnLanguageChanged()
 	m_ctlFilters.InsertColumn(6, &lvc);
 
 	// refresh the entries in filters' list
-	const chcore::TFileFiltersArray& afFilters = m_tTaskDefinition.GetFilters();
+	const chengine::TFileFiltersArray& afFilters = m_tTaskDefinition.GetFilters();
 	m_ctlFilters.DeleteAllItems();
 	for(size_t stIndex = 0; stIndex < afFilters.GetSize(); ++stIndex)
 	{
-		const chcore::TFileFilter* pFilter = afFilters.GetAt(stIndex);
+		const chengine::TFileFilter* pFilter = afFilters.GetAt(stIndex);
 		if(pFilter)
 			AddFilter(*pFilter, boost::numeric_cast<int>(stIndex));
 	}
@@ -477,7 +477,7 @@ void CCustomCopyDlg::SetBuffersizesString()
 	// fill the list
 	ictranslate::CFormat fmt;
 
-	chcore::TBufferSizes bsSizes = chcore::GetTaskPropBufferSizes(m_tTaskDefinition.GetConfiguration());
+	chengine::TBufferSizes bsSizes = GetTaskPropBufferSizes(m_tTaskDefinition.GetConfiguration());
 
 	fmt.SetFormat(GetResManager().LoadString(IDS_BSEDEFAULT_STRING));
 	fmt.SetParam(_T("%size"), GetSizeString(bsSizes.GetDefaultSize(), true));
@@ -505,7 +505,7 @@ void CCustomCopyDlg::SetBuffersizesString()
 
 void CCustomCopyDlg::OnChangebufferButton()
 {
-	chcore::TBufferSizes tBufferSizes = GetTaskPropBufferSizes(m_tTaskDefinition.GetConfiguration());
+	chengine::TBufferSizes tBufferSizes = GetTaskPropBufferSizes(m_tTaskDefinition.GetConfiguration());
 
 	CBufferSizeDlg dlg(&tBufferSizes);
 	if(dlg.DoModal() == IDOK)
@@ -540,10 +540,10 @@ void CCustomCopyDlg::OnAddfilterButton()
 {
 	CFilterDlg dlg;
 
-	chcore::TFileFiltersArray& afFilters = m_tTaskDefinition.GetFilters();
+	chengine::TFileFiltersArray& afFilters = m_tTaskDefinition.GetFilters();
 	for (size_t i = 0; i < afFilters.GetSize(); i++)
 	{
-		const chcore::TFileFilter* pFilter = afFilters.GetAt(i);
+		const chengine::TFileFilter* pFilter = afFilters.GetAt(i);
 		BOOST_ASSERT(pFilter);
 		if(pFilter)
 		{
@@ -566,7 +566,7 @@ void CCustomCopyDlg::OnAddfilterButton()
 	}
 }
 
-void CCustomCopyDlg::AddFilter(const chcore::TFileFilter &rFilter, int iPos)
+void CCustomCopyDlg::AddFilter(const chengine::TFileFilter &rFilter, int iPos)
 {
 	LVITEM lvi;
 	CString strLoaded;
@@ -579,7 +579,7 @@ void CCustomCopyDlg::AddFilter(const chcore::TFileFilter &rFilter, int iPos)
 	
 	if (rFilter.GetUseMask())
 	{
-		chcore::TString strData = rFilter.GetCombinedMask();
+		string::TString strData = rFilter.GetCombinedMask();
 		strLoaded = strData.c_str();
 	}
 	else
@@ -594,7 +594,7 @@ void CCustomCopyDlg::AddFilter(const chcore::TFileFilter &rFilter, int iPos)
 	
 	if(rFilter.GetUseExcludeMask())
 	{
-		chcore::TString strData = rFilter.GetCombinedExcludeMask();
+		string::TString strData = rFilter.GetCombinedExcludeMask();
 		strLoaded = strData.c_str();
 	}
 	else
@@ -630,7 +630,7 @@ void CCustomCopyDlg::AddFilter(const chcore::TFileFilter &rFilter, int iPos)
 	{
 		strLoaded.Format(_T("%s %s"), GetResManager().LoadString(IDS_DATECREATED_STRING+rFilter.GetDateType()), GetResManager().LoadString(IDS_LT_STRING+rFilter.GetDateCmpType1()));
 
-		chcore::TString strFmtDateTime = rFilter.GetDateTime1().Format(rFilter.GetUseDate1(), rFilter.GetUseTime1());
+		string::TString strFmtDateTime = rFilter.GetDateTime1().Format(rFilter.GetUseDate1(), rFilter.GetUseTime1());
 		strLoaded += strFmtDateTime.c_str();
 
 		if (rFilter.GetUseDateTime2())
@@ -700,7 +700,7 @@ void CCustomCopyDlg::AddFilter(const chcore::TFileFilter &rFilter, int iPos)
 
 void CCustomCopyDlg::OnRemovefilterButton() 
 {
-	chcore::TFileFiltersArray& afFilters = m_tTaskDefinition.GetFilters();
+	chengine::TFileFiltersArray& afFilters = m_tTaskDefinition.GetFilters();
 
 	POSITION pos;
 	int iItem;
@@ -759,11 +759,11 @@ void CCustomCopyDlg::OnDblclkFiltersList(NMHDR* /*pNMHDR*/, LRESULT* pResult)
 	POSITION pos = m_ctlFilters.GetFirstSelectedItemPosition();
 	if(pos != nullptr)
 	{
-		chcore::TFileFiltersArray& afFilters = m_tTaskDefinition.GetFilters();
+		chengine::TFileFiltersArray& afFilters = m_tTaskDefinition.GetFilters();
 
 		int iItem = m_ctlFilters.GetNextSelectedItem(pos);
 		CFilterDlg dlg;
-		const chcore::TFileFilter* pFilter = afFilters.GetAt(iItem);
+		const chengine::TFileFilter* pFilter = afFilters.GetAt(iItem);
 		BOOST_ASSERT(pFilter);
 		if(pFilter)
 			dlg.m_ffFilter = *pFilter;
@@ -805,8 +805,8 @@ void CCustomCopyDlg::OnDblclkBuffersizesList()
 	int iItem = m_ctlBufferSizes.GetCurSel();
 	if(iItem != LB_ERR)
 	{
-		chcore::TBufferSizes tBufferSizes = GetTaskPropBufferSizes(m_tTaskDefinition.GetConfiguration());
-		CBufferSizeDlg dlg(&tBufferSizes, (chcore::TBufferSizes::EBufferType)iItem);
+		chengine::TBufferSizes tBufferSizes = GetTaskPropBufferSizes(m_tTaskDefinition.GetConfiguration());
+		CBufferSizeDlg dlg(&tBufferSizes, (chengine::TBufferSizes::EBufferType)iItem);
 
 		if(dlg.DoModal() == IDOK)
 		{
@@ -1020,14 +1020,14 @@ void CCustomCopyDlg::UpdateInternalTaskDefinition()
 	}
 
 	// operation type
-	m_tTaskDefinition.SetOperationType(m_ctlOperation.GetCurSel() == 0 ? chcore::eOperation_Copy : chcore::eOperation_Move);
+	m_tTaskDefinition.SetOperationType(m_ctlOperation.GetCurSel() == 0 ? chengine::eOperation_Copy : chengine::eOperation_Move);
 
 	// priority
-	chcore::SetTaskPropValue<chcore::eTO_ThreadPriority>(m_tTaskDefinition.GetConfiguration(), IndexToPriority(m_ctlPriority.GetCurSel()));
+	chengine::SetTaskPropValue<chengine::eTO_ThreadPriority>(m_tTaskDefinition.GetConfiguration(), IndexToPriority(m_ctlPriority.GetCurSel()));
 
-	chcore::SetTaskPropValue<chcore::eTO_IgnoreDirectories>(m_tTaskDefinition.GetConfiguration(), (m_bIgnoreFolders != 0));
-	chcore::SetTaskPropValue<chcore::eTO_CreateDirectoriesRelativeToRoot>(m_tTaskDefinition.GetConfiguration(), (m_bForceDirectories != 0));
-	chcore::SetTaskPropValue<chcore::eTO_CreateEmptyFiles>(m_tTaskDefinition.GetConfiguration(), (m_bOnlyCreate != 0));
+	chengine::SetTaskPropValue<chengine::eTO_IgnoreDirectories>(m_tTaskDefinition.GetConfiguration(), (m_bIgnoreFolders != 0));
+	chengine::SetTaskPropValue<chengine::eTO_CreateDirectoriesRelativeToRoot>(m_tTaskDefinition.GetConfiguration(), (m_bForceDirectories != 0));
+	chengine::SetTaskPropValue<chengine::eTO_CreateEmptyFiles>(m_tTaskDefinition.GetConfiguration(), (m_bOnlyCreate != 0));
 }
 
 bool CCustomCopyDlg::HasBasicTaskData()

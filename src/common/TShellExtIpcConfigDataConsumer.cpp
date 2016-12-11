@@ -19,11 +19,11 @@
 #include "stdafx.h"
 #include "TShellExtIpcConfigDataConsumer.h"
 
-chcore::TString TShellExtIpcConfigDataConsumer::GetConfigData()
+string::TString TShellExtIpcConfigDataConsumer::GetConfigData()
 {
 	chcore::TSharedMemory shmConfigData;
 
-	chcore::TString strData;
+	string::TString strData;
 	shmConfigData.Open(L"CHShellExtConfig");
 	shmConfigData.Read(strData);
 

@@ -19,18 +19,19 @@
 #ifndef __TWIN32ERRORFORMATTER_H__
 #define __TWIN32ERRORFORMATTER_H__
 
-#include "TString.h"
+#include "../libstring/TString.h"
+#include "libchcore.h"
 
 namespace chcore
 {
 	class LIBCHCORE_API TWin32ErrorFormatter
 	{
 	public:
-		static TString FormatWin32ErrorCode(DWORD dwErrorCode, bool bUseNumberFallback);
-		static TString FormatWin32ErrorCodeWithFallback(DWORD dwErrorCode, const wchar_t* pszModuleName, bool bUseNumberFallback);
+		static string::TString FormatWin32ErrorCode(DWORD dwErrorCode, bool bUseNumberFallback);
+		static string::TString FormatWin32ErrorCodeWithFallback(DWORD dwErrorCode, const wchar_t* pszModuleName, bool bUseNumberFallback);
 
 	private:
-		static TString FormatWin32ErrorCodeWithModule(DWORD dwErrorCode, HMODULE hModule, bool bUseNumberFallback);
+		static string::TString FormatWin32ErrorCodeWithModule(DWORD dwErrorCode, HMODULE hModule, bool bUseNumberFallback);
 	};
 }
 

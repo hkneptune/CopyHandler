@@ -19,20 +19,21 @@
 #ifndef __TTASKMANAGERWRAPPER_H__
 #define __TTASKMANAGERWRAPPER_H__
 
-#include "../libchcore/TTaskManager.h"
+#include "../libchengine/TTask.h"
+#include "../libchengine/TTaskManager.h"
 
 class TTaskManagerWrapper
 {
 public:
-	explicit TTaskManagerWrapper(const chcore::TTaskManagerPtr& spTaskManager);
+	explicit TTaskManagerWrapper(const chengine::TTaskManagerPtr& spTaskManager);
 
-	chcore::TTaskPtr CreateTask(chcore::TTaskDefinition& rTaskDefinition);
-
-private:
-	void UpdateFileNamingFormat(chcore::TConfig& rTaskConfig);
+	chengine::TTaskPtr CreateTask(chengine::TTaskDefinition& rTaskDefinition);
 
 private:
-	chcore::TTaskManagerPtr m_spTaskManager;
+	void UpdateFileNamingFormat(chengine::TConfig& rTaskConfig);
+
+private:
+	chengine::TTaskManagerPtr m_spTaskManager;
 };
 
 #endif

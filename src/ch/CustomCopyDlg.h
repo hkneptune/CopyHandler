@@ -19,20 +19,23 @@
 #ifndef __CUSTOMCOPYDLG_H__
 #define __CUSTOMCOPYDLG_H__
 
-#include "../libchcore/TFileFilter.h"
-#include "../libchcore/TTaskDefinition.h"
 #include "CDragDropListCtrl.h"
 #include "CDragDropComboEx.h"
+#include "../libchengine/TTaskDefinition.h"
 
 /////////////////////////////////////////////////////////////////////////////
 // CCustomCopyDlg dialog
+
+namespace chengine {
+	class TFileFilter;
+}
 
 class CCustomCopyDlg : public ictranslate::CLanguageDialog
 {
 // Construction
 public:
 	CCustomCopyDlg();   // standard constructor
-	explicit CCustomCopyDlg(const chcore::TTaskDefinition& rTaskDefinition);
+	explicit CCustomCopyDlg(const chengine::TTaskDefinition& rTaskDefinition);
 
 // Overrides
 protected:
@@ -46,7 +49,7 @@ protected:
 
 	void UpdateComboIcon();
 	void EnableControls();
-	void AddFilter(const chcore::TFileFilter& rFilter, int iPos=-1);
+	void AddFilter(const chengine::TFileFilter& rFilter, int iPos=-1);
 	void AddPath(CString strPath);
 
 	void SetBuffersizesString();
@@ -80,7 +83,7 @@ protected:
 	DECLARE_MESSAGE_MAP()
 
 public:
-	chcore::TTaskDefinition m_tTaskDefinition;
+	chengine::TTaskDefinition m_tTaskDefinition;
 	std::vector<CString> m_vRecent;						// recently selected paths
 
 	CDragDropComboEx	m_ctlDstPath;

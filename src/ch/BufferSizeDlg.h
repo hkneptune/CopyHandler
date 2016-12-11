@@ -19,17 +19,17 @@
 #ifndef __BUFFERSIZEDLG_H__
 #define __BUFFERSIZEDLG_H__
 
-#include "../libchcore/TBufferSizes.h"
-
 /////////////////////////////////////////////////////////////////////////////
 // CBufferSizeDlg dialog
+
+#include "../libchengine/TBufferSizes.h"
 
 class CBufferSizeDlg : public ictranslate::CLanguageDialog
 {
 public:
-	explicit CBufferSizeDlg(chcore::TBufferSizes* pInitialBufferSizes, chcore::TBufferSizes::EBufferType eSelectedBuffer = chcore::TBufferSizes::eBuffer_Default);
+	explicit CBufferSizeDlg(chengine::TBufferSizes* pInitialBufferSizes, chengine::TBufferSizes::EBufferType eSelectedBuffer = chengine::TBufferSizes::eBuffer_Default);
 
-	const chcore::TBufferSizes& GetBufferSizes() const { return m_bsSizes; }
+	const chengine::TBufferSizes& GetBufferSizes() const { return m_bsSizes; }
 
 protected:
 	void DoDataExchange(CDataExchange* pDX) override;    // DDX/DDV support
@@ -69,8 +69,8 @@ private:
 	unsigned int m_uiMaxConcurrentReads = 0;
 	unsigned int m_uiMaxConcurrentWrites = 0;
 
-	chcore::TBufferSizes::EBufferType m_eSelectedBuffer;
-	chcore::TBufferSizes m_bsSizes;
+	chengine::TBufferSizes::EBufferType m_eSelectedBuffer;
+	chengine::TBufferSizes m_bsSizes;
 };
 
 #endif

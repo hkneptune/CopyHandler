@@ -20,19 +20,17 @@
 #include "TTaskManagerWrapper.h"
 #include "resource.h"
 #include "../libictranslate/ResourceManager.h"
-#include "../libchcore/TTaskConfiguration.h"
-#include "../libchcore/TTaskDefinition.h"
-#include "../libchcore/TTask.h"
 #include "../libchcore/TBaseException.h"
 #include "CfgProperties.h"
 #include "ch.h"
+#include "../libchengine/TConfigSerializers.h"
 
-TTaskManagerWrapper::TTaskManagerWrapper(const chcore::TTaskManagerPtr& spTaskManager) :
+TTaskManagerWrapper::TTaskManagerWrapper(const chengine::TTaskManagerPtr& spTaskManager) :
 	m_spTaskManager(spTaskManager)
 {
 }
 
-chcore::TTaskPtr TTaskManagerWrapper::CreateTask(chcore::TTaskDefinition& rTaskDefinition)
+chengine::TTaskPtr TTaskManagerWrapper::CreateTask(chengine::TTaskDefinition& rTaskDefinition)
 {
 	UpdateFileNamingFormat(rTaskDefinition.GetConfiguration());
 
@@ -40,7 +38,7 @@ chcore::TTaskPtr TTaskManagerWrapper::CreateTask(chcore::TTaskDefinition& rTaskD
 	try
 	{
 		// create task with the above definition
-		chcore::TTaskPtr spTask = m_spTaskManager->CreateTask(rTaskDefinition);
+		chengine::TTaskPtr spTask = m_spTaskManager->CreateTask(rTaskDefinition);
 
 		// add to task list and start processing
 		spTask->BeginProcessing();
@@ -70,7 +68,7 @@ chcore::TTaskPtr TTaskManagerWrapper::CreateTask(chcore::TTaskDefinition& rTaskD
 	return nullptr;
 }
 
-void TTaskManagerWrapper::UpdateFileNamingFormat(chcore::TConfig& rTaskConfig)
+void TTaskManagerWrapper::UpdateFileNamingFormat(chengine::TConfig& rTaskConfig)
 {
 	ictranslate::CResourceManager& rResourceManager = ictranslate::CResourceManager::Acquire();
 
@@ -89,6 +87,6 @@ void TTaskManagerWrapper::UpdateFileNamingFormat(chcore::TConfig& rTaskConfig)
 	}
 
 	// load resource strings
-	chcore::SetTaskPropValue<chcore::eTO_AlternateFilenameFormatString_First>(rTaskConfig, (PCTSTR)strFirstCopyFormat);
-	chcore::SetTaskPropValue<chcore::eTO_AlternateFilenameFormatString_AfterFirst>(rTaskConfig, (PCTSTR)strSubsequentCopyFormat);
+	chengine::SetTaskPropValue<chengine::eTO_AlternateFilenameFormatString_First>(rTaskConfig, (PCTSTR)strFirstCopyFormat);
+	chengine::SetTaskPropValue<chengine::eTO_AlternateFilenameFormatString_AfterFirst>(rTaskConfig, (PCTSTR)strSubsequentCopyFormat);
 }

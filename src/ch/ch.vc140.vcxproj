@@ -1993,11 +1993,20 @@ echo.
     <ProjectReference Include="..\libchcore\libchcore.vc140.vcxproj">
       <Project>{cbbf380b-7b16-4a1e-8194-758dad7d8011}</Project>
     </ProjectReference>
+    <ProjectReference Include="..\libchengine\libchengine.vcxproj">
+      <Project>{6840f785-917f-46ee-bd56-c296c7a5b9e9}</Project>
+    </ProjectReference>
     <ProjectReference Include="..\libictranslate\libictranslate.vc140.vcxproj">
       <Project>{dd1f3242-7ee4-4f41-8b8d-d833300c445f}</Project>
     </ProjectReference>
     <ProjectReference Include="..\liblogger\liblogger.vc140.vcxproj">
       <Project>{df9957d4-3d95-4ac3-ad3f-dcbea058f79d}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\libserializer\libserializer.vcxproj">
+      <Project>{9490ec08-9cab-4f99-99d8-0297e5bf6ea7}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\libstring\libstring.vcxproj">
+      <Project>{5bd38175-9f48-417d-8e5b-7093b1873ce5}</Project>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

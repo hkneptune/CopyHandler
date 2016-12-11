@@ -26,6 +26,7 @@
 #include <assert.h>
 #include "structs.h"
 #include "CfgProperties.h"
+#include "../libchengine/TConfigSerializers.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -104,7 +105,7 @@ BOOL COptionsDlg::OnInitDialog()
 	m_ctlProperties.Init();
 
 	// copy shortcut and recent paths
-	chcore::TConfig& rConfig = GetConfig();
+	chengine::TConfig& rConfig = GetConfig();
 
 	m_cvRecent.clear();
 	GetPropValue<PP_RECENTPATHS>(rConfig, m_cvRecent);
@@ -132,7 +133,7 @@ void CustomPropertyCallbackProc(LPVOID lpParam, int iParam, CPtrList* pList, int
 {
 	COptionsDlg* pDlg=static_cast<COptionsDlg*>(lpParam);
 
-	chcore::TBufferSizes tBufferSizes(pDlg->GetBoolProp(iIndex - iParam - 1),
+	chengine::TBufferSizes tBufferSizes(pDlg->GetBoolProp(iIndex - iParam - 1),
 		pDlg->GetUintProp(iIndex - iParam + 7),
 		pDlg->GetUintProp(iIndex - iParam),
 		pDlg->GetUintProp(iIndex - iParam + 1),
@@ -143,7 +144,7 @@ void CustomPropertyCallbackProc(LPVOID lpParam, int iParam, CPtrList* pList, int
 		pDlg->GetUintProp(iIndex - iParam + 9),
 		pDlg->GetUintProp(iIndex - iParam + 10));
 
-	CBufferSizeDlg dlg(&tBufferSizes, (chcore::TBufferSizes::EBufferType)iParam);
+	CBufferSizeDlg dlg(&tBufferSizes, (chengine::TBufferSizes::EBufferType)iParam);
 	if (dlg.DoModal() == IDOK)
 	{
 		tBufferSizes = dlg.GetBufferSizes();
@@ -363,7 +364,7 @@ void COptionsDlg::ApplyProperties()
 	// counter
 	int iPosition=0;
 
-	chcore::TConfig& rConfig = GetConfig();
+	chengine::TConfig& rConfig = GetConfig();
 	rConfig.DelayNotifications();
 
 	SKIP_SEPARATOR(iPosition);

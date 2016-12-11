@@ -15,6 +15,9 @@ xcopy "%WORKSPACE%\License.txt" "%TmpDir%\32bit\" || exit /B 1
 xcopy "%WORKSPACE%\bin\release\chext.dll" "%TmpDir%\32bit\" || exit /B 1
 xcopy "%WORKSPACE%\bin\release\regchext.exe" "%TmpDir%\32bit\" || exit /B 1
 xcopy "%WORKSPACE%\bin\release\libchcore32u.dll" "%TmpDir%\32bit\" || exit /B 1
+xcopy "%WORKSPACE%\bin\release\libchengine32u.dll" "%TmpDir%\32bit\" || exit /B 1
+xcopy "%WORKSPACE%\bin\release\libserializer32u.dll" "%TmpDir%\32bit\" || exit /B 1
+xcopy "%WORKSPACE%\bin\release\libstring32u.dll" "%TmpDir%\32bit\" || exit /B 1
 xcopy "%WORKSPACE%\bin\release\liblogger32u.dll" "%TmpDir%\32bit\" || exit /B 1
 xcopy "%WORKSPACE%\bin\release\libictranslate32u.dll" "%TmpDir%\32bit\" || exit /B 1
 xcopy "%WORKSPACE%\bin\release\ictranslate.exe" "%TmpDir%\32bit\" || exit /B 1
@@ -33,6 +36,9 @@ xcopy "%WORKSPACE%\bin\release\chext64.dll" "%TmpDir%\64bit\" || exit /B 1
 xcopy "%WORKSPACE%\bin\release\regchext64.exe" "%TmpDir%\64bit\" || exit /B 1
 xcopy "%WORKSPACE%\bin\release\libchcore64u.dll" "%TmpDir%\64bit\" || exit /B 1
 xcopy "%WORKSPACE%\bin\release\liblogger64u.dll" "%TmpDir%\64bit\" || exit /B 1
+xcopy "%WORKSPACE%\bin\release\libchengine64u.dll" "%TmpDir%\64bit\" || exit /B 1
+xcopy "%WORKSPACE%\bin\release\libserializer64u.dll" "%TmpDir%\64bit\" || exit /B 1
+xcopy "%WORKSPACE%\bin\release\libstring64u.dll" "%TmpDir%\64bit\" || exit /B 1
 xcopy "%WORKSPACE%\bin\release\libictranslate64u.dll" "%TmpDir%\64bit\" || exit /B 1
 xcopy "%WORKSPACE%\bin\release\ictranslate64.exe" "%TmpDir%\64bit\" || exit /B 1
 xcopy "%WORKSPACE%\bin\release\sqlite3_64.dll" "%TmpDir%\64bit\" || exit /B 1
@@ -46,6 +52,9 @@ xcopy /E /I "%WORKSPACE%\bin\release\langs" "%TmpDir%\64bit\langs" || exit /B 1
 rem Prepare 32bit shell extension for 64bit build
 xcopy "%WORKSPACE%\bin\release\chext.dll" "%TmpDir%\64bit\ShellExt32\" || exit /B 1
 xcopy "%WORKSPACE%\bin\release\libchcore32u.dll" "%TmpDir%\64bit\ShellExt32\" || exit /B 1
+xcopy "%WORKSPACE%\bin\release\libchengine32u.dll" "%TmpDir%\64bit\ShellExt32\" || exit /B 1
+xcopy "%WORKSPACE%\bin\release\libserializer32u.dll" "%TmpDir%\64bit\ShellExt32\" || exit /B 1
+xcopy "%WORKSPACE%\bin\release\libstring32u.dll" "%TmpDir%\64bit\ShellExt32\" || exit /B 1
 xcopy "%WORKSPACE%\bin\release\liblogger32u.dll" "%TmpDir%\64bit\ShellExt32\" || exit /B 1
 xcopy "%WORKSPACE%\bin\release\sqlite3_32.dll" "%TmpDir%\64bit\ShellExt32\" || exit /B 1
 xcopy "%VSInstallDirX86%\VC\redist\x86\Microsoft.VC120.CRT\*" "%TmpDir%\64bit\ShellExt32\" || exit /B 1

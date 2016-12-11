@@ -25,10 +25,10 @@
 #include <boost/shared_array.hpp>
 #include "../common/TShellExtMenuConfig.h"
 #include "../libchcore/TSharedMemory.h"
-#include "../libchcore/TTaskDefinition.h"
 #include <boost/numeric/conversion/cast.hpp>
 #include "ShellExtensionVerifier.h"
 #include "Logger.h"
+#include "../libchengine/TTaskDefinition.h"
 
 // globals
 static void CutAmpersands(LPTSTR lpszString)
@@ -217,7 +217,7 @@ STDMETHODIMP CMenuExt::InvokeCommand(LPCMINVOKECOMMANDINFO lpici)
 
 		chcore::TPathContainer vSourcePaths;
 		chcore::TSmartPath spDestinationPath;
-		chcore::EOperationType eOperationType = chcore::eOperation_None;
+		chengine::EOperationType eOperationType = chengine::eOperation_None;
 
 		if(!m_tShellExtData.GetSourcePathsByItem(spSelectedItem, vSourcePaths))
 			return E_FAIL;
@@ -226,13 +226,13 @@ STDMETHODIMP CMenuExt::InvokeCommand(LPCMINVOKECOMMANDINFO lpici)
 		if(!m_tShellExtData.GetOperationTypeByItem(spSelectedItem, eOperationType))
 			return E_FAIL;
 
-		chcore::TTaskDefinition tTaskDefinition;
+		chengine::TTaskDefinition tTaskDefinition;
 		tTaskDefinition.SetSourcePaths(vSourcePaths);
 		tTaskDefinition.SetDestinationPath(spDestinationPath);
 		tTaskDefinition.SetOperationType(eOperationType);
 
 		// get task data as xml
-		chcore::TString wstrData;
+		string::TString wstrData;
 		tTaskDefinition.StoreInString(wstrData);
 
 		// fill struct

@@ -23,6 +23,7 @@
 #include "CfgProperties.h"
 #include "resource.h"
 #include "shortcuts.h"
+#include "../libchengine/TConfigSerializers.h"
 
 TShellExtensionConfig::TShellExtensionConfig(const logger::TLogFileDataPtr& spLogData) :
 	m_spLog(logger::MakeLogger(spLogData, L"ShellExtConfig"))
@@ -33,7 +34,7 @@ void TShellExtensionConfig::PrepareConfig()
 {
 	try
 	{
-		chcore::TConfig& rConfig = GetConfig();
+		chengine::TConfig& rConfig = GetConfig();
 
 		TShellExtMenuConfig cfgShellExt;
 
@@ -57,8 +58,8 @@ void TShellExtensionConfig::PrepareConfig()
 		PrepareDragAndDropMenuItems(cfgShellExt);
 		PrepareNormalMenuItems(cfgShellExt);
 
-		chcore::TConfig cfgStorage;
-		chcore::TString wstrData;
+		chengine::TConfig cfgStorage;
+		string::TString wstrData;
 
 		cfgShellExt.StoreInConfig(cfgStorage, _T("ShellExtCfg"));
 		cfgStorage.WriteToString(wstrData);
@@ -75,7 +76,7 @@ void TShellExtensionConfig::PrepareConfig()
 
 void TShellExtensionConfig::PrepareDragAndDropMenuItems(TShellExtMenuConfig &cfgShellExt) const
 {
-	chcore::TConfig& rConfig = GetConfig();
+	chengine::TConfig& rConfig = GetConfig();
 	ictranslate::CResourceManager& rResManager = GetResManager();
 
 	TShellMenuItemPtr spDragAndDropRootItem = cfgShellExt.GetDragAndDropRoot();
@@ -83,25 +84,25 @@ void TShellExtensionConfig::PrepareDragAndDropMenuItems(TShellExtMenuConfig &cfg
 	if(GetPropValue<PP_SHSHOWCOPY>(rConfig))
 	{
 		spDragAndDropRootItem->AddChild(std::make_shared<TShellMenuItem>(rResManager.LoadString(IDS_MENUCOPY_STRING), rResManager.LoadString(IDS_MENUTIPCOPY_STRING),
-			TOperationTypeInfo(TOperationTypeInfo::eOpType_Specified, chcore::eOperation_Copy),
+			TOperationTypeInfo(TOperationTypeInfo::eOpType_Specified, chengine::eOperation_Copy),
 			TSourcePathsInfo(TSourcePathsInfo::eSrcType_InitializeIDataObject),
-			TDestinationPathInfo(TDestinationPathInfo::eDstType_InitializePidlFolder, chcore::TSmartPath()), false, chcore::eOperation_Copy));
+			TDestinationPathInfo(TDestinationPathInfo::eDstType_InitializePidlFolder, chcore::TSmartPath()), false, chengine::eOperation_Copy));
 		bAddedAnyOption = true;
 	}
 
 	if(GetPropValue<PP_SHSHOWMOVE>(rConfig))
 	{
 		spDragAndDropRootItem->AddChild(std::make_shared<TShellMenuItem>(rResManager.LoadString(IDS_MENUMOVE_STRING), rResManager.LoadString(IDS_MENUTIPMOVE_STRING),
-			TOperationTypeInfo(TOperationTypeInfo::eOpType_Specified, chcore::eOperation_Move),
+			TOperationTypeInfo(TOperationTypeInfo::eOpType_Specified, chengine::eOperation_Move),
 			TSourcePathsInfo(TSourcePathsInfo::eSrcType_InitializeIDataObject),
-			TDestinationPathInfo(TDestinationPathInfo::eDstType_InitializePidlFolder, chcore::TSmartPath()), false, chcore::eOperation_Move));
+			TDestinationPathInfo(TDestinationPathInfo::eDstType_InitializePidlFolder, chcore::TSmartPath()), false, chengine::eOperation_Move));
 		bAddedAnyOption = true;
 	}
 
 	if(GetPropValue<PP_SHSHOWCOPYMOVE>(rConfig))
 	{
 		spDragAndDropRootItem->AddChild(std::make_shared<TShellMenuItem>(rResManager.LoadString(IDS_MENUCOPYMOVESPECIAL_STRING), rResManager.LoadString(IDS_MENUTIPCOPYMOVESPECIAL_STRING),
-			TOperationTypeInfo(TOperationTypeInfo::eOpType_Autodetect, chcore::eOperation_Copy),
+			TOperationTypeInfo(TOperationTypeInfo::eOpType_Autodetect, chengine::eOperation_Copy),
 			TSourcePathsInfo(TSourcePathsInfo::eSrcType_InitializeIDataObject),
 			TDestinationPathInfo(TDestinationPathInfo::eDstType_InitializePidlFolder, chcore::TSmartPath()), true));
 		bAddedAnyOption = true;
@@ -116,7 +117,7 @@ void TShellExtensionConfig::PrepareDragAndDropMenuItems(TShellExtMenuConfig &cfg
 
 void TShellExtensionConfig::PrepareNormalMenuItems(TShellExtMenuConfig &cfgShellExt) const
 {
-	chcore::TConfig& rConfig = GetConfig();
+	chengine::TConfig& rConfig = GetConfig();
 	ictranslate::CResourceManager& rResManager = GetResManager();
 
 	TShellMenuItemPtr spNormalRootItem = cfgShellExt.GetNormalRoot();
@@ -124,7 +125,7 @@ void TShellExtensionConfig::PrepareNormalMenuItems(TShellExtMenuConfig &cfgShell
 	if(GetPropValue<PP_SHSHOWPASTE>(rConfig))
 	{
 		spNormalRootItem->AddChild(std::make_shared<TShellMenuItem>(rResManager.LoadString(IDS_MENUPASTE_STRING), rResManager.LoadString(IDS_MENUTIPPASTE_STRING),
-			TOperationTypeInfo(TOperationTypeInfo::eOpType_Autodetect, chcore::eOperation_Copy),
+			TOperationTypeInfo(TOperationTypeInfo::eOpType_Autodetect, chengine::eOperation_Copy),
 			TSourcePathsInfo(TSourcePathsInfo::eSrcType_Clipboard),
 			TDestinationPathInfo(TDestinationPathInfo::eDstType_InitializeAuto, chcore::TSmartPath()), false));
 	}
@@ -132,7 +133,7 @@ void TShellExtensionConfig::PrepareNormalMenuItems(TShellExtMenuConfig &cfgShell
 	if(GetPropValue<PP_SHSHOWPASTESPECIAL>(rConfig))
 	{
 		spNormalRootItem->AddChild(std::make_shared<TShellMenuItem>(rResManager.LoadString(IDS_MENUPASTESPECIAL_STRING), rResManager.LoadString(IDS_MENUTIPPASTESPECIAL_STRING),
-			TOperationTypeInfo(TOperationTypeInfo::eOpType_Autodetect, chcore::eOperation_Copy),
+			TOperationTypeInfo(TOperationTypeInfo::eOpType_Autodetect, chengine::eOperation_Copy),
 			TSourcePathsInfo(TSourcePathsInfo::eSrcType_Clipboard),
 			TDestinationPathInfo(TDestinationPathInfo::eDstType_InitializeAuto, chcore::TSmartPath()), true));
 	}
@@ -160,7 +161,7 @@ void TShellExtensionConfig::PrepareNormalMenuItems(TShellExtMenuConfig &cfgShell
 			for(const CShortcut& tShortcut : vShortcuts)
 			{
 				menuItem->AddChild(std::make_shared<TShellMenuItem>((PCTSTR)tShortcut.m_strName, (PCTSTR)tShortcut.m_strPath,
-					TOperationTypeInfo(TOperationTypeInfo::eOpType_Specified, chcore::eOperation_Copy),
+					TOperationTypeInfo(TOperationTypeInfo::eOpType_Specified, chengine::eOperation_Copy),
 					TSourcePathsInfo(TSourcePathsInfo::eSrcType_InitializeAuto),
 					TDestinationPathInfo(TDestinationPathInfo::eDstType_Specified, chcore::PathFromString((PCTSTR)tShortcut.m_strPath)), false));
 			}
@@ -173,7 +174,7 @@ void TShellExtensionConfig::PrepareNormalMenuItems(TShellExtMenuConfig &cfgShell
 
 			// "Choose" menu option
 			menuItem->AddChild(std::make_shared<TShellMenuItem>(rResManager.LoadString(IDS_SHELLEXT_CHOOSE_DIR_STRING), rResManager.LoadString(IDS_SHELLEXT_CHOOSE_DIR_TOOLTIP_STRING),
-				TOperationTypeInfo(TOperationTypeInfo::eOpType_Specified, chcore::eOperation_Copy),
+				TOperationTypeInfo(TOperationTypeInfo::eOpType_Specified, chengine::eOperation_Copy),
 				TSourcePathsInfo(TSourcePathsInfo::eSrcType_InitializeAuto),
 				TDestinationPathInfo(TDestinationPathInfo::eDstType_Choose, chcore::TSmartPath()), false));
 		}
@@ -184,7 +185,7 @@ void TShellExtensionConfig::PrepareNormalMenuItems(TShellExtMenuConfig &cfgShell
 			for(const CShortcut& tShortcut : vShortcuts)
 			{
 				menuItem->AddChild(std::make_shared<TShellMenuItem>((PCTSTR)tShortcut.m_strName, (PCTSTR)tShortcut.m_strPath,
-					TOperationTypeInfo(TOperationTypeInfo::eOpType_Specified, chcore::eOperation_Move),
+					TOperationTypeInfo(TOperationTypeInfo::eOpType_Specified, chengine::eOperation_Move),
 					TSourcePathsInfo(TSourcePathsInfo::eSrcType_InitializeAuto),
 					TDestinationPathInfo(TDestinationPathInfo::eDstType_Specified, chcore::PathFromString((PCTSTR)tShortcut.m_strPath)), false));
 			}
@@ -197,7 +198,7 @@ void TShellExtensionConfig::PrepareNormalMenuItems(TShellExtMenuConfig &cfgShell
 
 			// "Choose" menu option
 			menuItem->AddChild(std::make_shared<TShellMenuItem>(rResManager.LoadString(IDS_SHELLEXT_CHOOSE_DIR_STRING), rResManager.LoadString(IDS_SHELLEXT_CHOOSE_DIR_TOOLTIP_STRING),
-				TOperationTypeInfo(TOperationTypeInfo::eOpType_Specified, chcore::eOperation_Move),
+				TOperationTypeInfo(TOperationTypeInfo::eOpType_Specified, chengine::eOperation_Move),
 				TSourcePathsInfo(TSourcePathsInfo::eSrcType_InitializeAuto),
 				TDestinationPathInfo(TDestinationPathInfo::eDstType_Choose, chcore::TSmartPath()), false));
 		}
@@ -208,7 +209,7 @@ void TShellExtensionConfig::PrepareNormalMenuItems(TShellExtMenuConfig &cfgShell
 			for(const CShortcut& tShortcut : vShortcuts)
 			{
 				menuItem->AddChild(std::make_shared<TShellMenuItem>((PCTSTR)tShortcut.m_strName, (PCTSTR)tShortcut.m_strPath,
-					TOperationTypeInfo(TOperationTypeInfo::eOpType_Specified, chcore::eOperation_Copy),
+					TOperationTypeInfo(TOperationTypeInfo::eOpType_Specified, chengine::eOperation_Copy),
 					TSourcePathsInfo(TSourcePathsInfo::eSrcType_InitializeAuto),
 					TDestinationPathInfo(TDestinationPathInfo::eDstType_Specified, chcore::PathFromString((PCTSTR)tShortcut.m_strPath)), true));
 			}
@@ -221,7 +222,7 @@ void TShellExtensionConfig::PrepareNormalMenuItems(TShellExtMenuConfig &cfgShell
 
 			// "Choose" menu option
 			menuItem->AddChild(std::make_shared<TShellMenuItem>(rResManager.LoadString(IDS_SHELLEXT_CHOOSE_DIR_STRING), rResManager.LoadString(IDS_SHELLEXT_CHOOSE_DIR_TOOLTIP_STRING),
-				TOperationTypeInfo(TOperationTypeInfo::eOpType_Specified, chcore::eOperation_Copy),
+				TOperationTypeInfo(TOperationTypeInfo::eOpType_Specified, chengine::eOperation_Copy),
 				TSourcePathsInfo(TSourcePathsInfo::eSrcType_InitializeAuto),
 				TDestinationPathInfo(TDestinationPathInfo::eDstType_Choose, chcore::TSmartPath()), true));
 		}

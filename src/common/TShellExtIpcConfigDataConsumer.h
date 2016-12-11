@@ -24,7 +24,7 @@
 class TShellExtIpcConfigDataConsumer
 {
 public:
-	static chcore::TString GetConfigData();
+	static string::TString GetConfigData();
 };
 
 #endif

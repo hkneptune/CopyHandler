@@ -39,7 +39,7 @@ TContextMenuHandler::~TContextMenuHandler()
 }
 
 void TContextMenuHandler::Init(const TShellMenuItemPtr& spRootMenuItem, HMENU hMenu, UINT uiFirstItemID, UINT uiFirstItemPosition, const TShellExtData& rShellExtData,
-	const chcore::TSizeFormatterPtr& spFormatter, bool bShowFreeSpace, bool bEnableOwnerDrawnPaths, bool bOverrideDefaultItem)
+	const chengine::TSizeFormatterPtr& spFormatter, bool bShowFreeSpace, bool bEnableOwnerDrawnPaths, bool bOverrideDefaultItem)
 {
 	Clear();
 
@@ -51,7 +51,7 @@ void TContextMenuHandler::Init(const TShellMenuItemPtr& spRootMenuItem, HMENU hM
 }
 
 void TContextMenuHandler::UpdateMenuRecursive(const TShellMenuItemPtr& spRootMenuItem, HMENU hMenu, UINT uiFirstItemPosition,
-	const TShellExtData& rShellExtData, const chcore::TSizeFormatterPtr& spFormatter, bool bShowFreeSpace, bool bOverrideDefaultItem)
+	const TShellExtData& rShellExtData, const chengine::TSizeFormatterPtr& spFormatter, bool bShowFreeSpace, bool bOverrideDefaultItem)
 {
 	for(size_t stIndex = 0; stIndex < spRootMenuItem->GetChildrenCount(); ++stIndex)
 	{
@@ -105,7 +105,7 @@ void TContextMenuHandler::UpdateMenuRecursive(const TShellMenuItemPtr& spRootMen
 	}
 }
 
-std::wstring TContextMenuHandler::GetDisplayText(const TShellMenuItemPtr& spMenuItem, const chcore::TSizeFormatterPtr& spFormatter, bool bShowFreeSpace)
+std::wstring TContextMenuHandler::GetDisplayText(const TShellMenuItemPtr& spMenuItem, const chengine::TSizeFormatterPtr& spFormatter, bool bShowFreeSpace)
 {
 	std::wstring wstrItemName = spMenuItem->GetLocalName(false).c_str();
 

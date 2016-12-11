@@ -24,7 +24,7 @@
 class TShellExtIpcConfigDataProvider
 {
 public:
-	void SetConfigData(const chcore::TString& pszConfigData);
+	void SetConfigData(const string::TString& pszConfigData);
 
 private:
 	chcore::TSharedMemory m_shmConfigData;

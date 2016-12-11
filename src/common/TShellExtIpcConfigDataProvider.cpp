@@ -19,7 +19,7 @@
 #include "stdafx.h"
 #include "TShellExtIpcConfigDataProvider.h"
 
-void TShellExtIpcConfigDataProvider::SetConfigData(const chcore::TString& strConfigData)
+void TShellExtIpcConfigDataProvider::SetConfigData(const string::TString& strConfigData)
 {
 	m_shmConfigData.Close();
 	m_shmConfigData.Create(L"CHShellExtConfig", strConfigData);

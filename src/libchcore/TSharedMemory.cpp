@@ -27,6 +27,8 @@
 #include "TCoreException.h"
 #include "TIpcMutexLock.h"
 
+using namespace string;
+
 namespace chcore
 {
 	#define MUTEX_SUFFIX _T("_Mutex")

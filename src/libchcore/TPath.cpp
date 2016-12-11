@@ -26,7 +26,9 @@
 #include "TCoreException.h"
 #include "ErrorCodes.h"
 #include "TPathContainer.h"
-#include "TStringArray.h"
+#include "../libstring/TStringArray.h"
+
+using namespace string;
 
 namespace chcore
 {

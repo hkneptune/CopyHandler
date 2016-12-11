@@ -19,11 +19,11 @@
 #ifndef __TPATH_H__
 #define __TPATH_H__
 
-#include "TString.h"
+#include "../libstring/TString.h"
+#include "libchcore.h"
 
 namespace chcore
 {
-	class TSmartPath;
 	class TPathContainer;
 
 	class LIBCHCORE_API TSmartPath
@@ -46,10 +46,10 @@ namespace chcore
 
 		// from/to string conversions
 		void FromString(const wchar_t* pszPath);
-		void FromString(const TString& strPath);
+		void FromString(const string::TString& strPath);
 
 		const wchar_t* ToString() const;
-		TString ToWString() const;
+		string::TString ToWString() const;
 
 		// other operations
 		void Clear() throw();
@@ -119,11 +119,11 @@ namespace chcore
 		static bool IsSeparator(wchar_t wchSeparator);
 
 	protected:
-		TString m_strPath;
+		string::TString m_strPath;
 	};
 
 	LIBCHCORE_API TSmartPath PathFromString(const wchar_t* pszPath);
-	LIBCHCORE_API TSmartPath PathFromWString(const TString& strPath);
+	LIBCHCORE_API TSmartPath PathFromWString(const string::TString& strPath);
 
 	inline std::wostream& operator<<(std::wostream& os, const TSmartPath& rPath)
 	{

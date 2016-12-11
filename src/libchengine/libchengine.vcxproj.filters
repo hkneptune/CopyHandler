@@ -1,0 +1,995 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Source Files\Library files">
+      <UniqueIdentifier>{e160d2cd-2a88-40ef-97b4-6b7d3b7ed6b1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav</Extensions>
+    </Filter>
+    <Filter Include="Source Files\Feedback">
+      <UniqueIdentifier>{fc917d04-8853-43b8-b72c-d3e79ede544c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\SubTasks">
+      <UniqueIdentifier>{291aa467-7b12-4be2-9740-45afb314fe7b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Task">
+      <UniqueIdentifier>{0f791663-0a08-4f3f-89b5-7b5f40a467ee}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Task Manager">
+      <UniqueIdentifier>{76d85b5b-fa45-4693-9701-d6b5fce941df}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Tools">
+      <UniqueIdentifier>{1fddd996-c723-4b09-9c98-868df98fe204}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Serialization">
+      <UniqueIdentifier>{2a642b1a-83b2-4643-ac85-d040e8904d4d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Serialization\SQLite">
+      <UniqueIdentifier>{3ce71f46-ef32-4c71-9ac0-bcb36d6b6e99}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Serialization\SQLite\SQLite Schemas">
+      <UniqueIdentifier>{0b6550bf-a20b-4f12-9469-bd3e3bfa40fa}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Tools\SQLite">
+      <UniqueIdentifier>{e6da867d-b0bd-42d5-a0c8-43542984582f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Tools\Config">
+      <UniqueIdentifier>{e4894f9f-1e1d-451a-9a02-60b9d682b60f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Tools\Config\details">
+      <UniqueIdentifier>{0f10fd6b-7813-419a-a276-cedaa42bc7bc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Tools\ModificationTrackers">
+      <UniqueIdentifier>{d920c603-b44c-47ce-89c3-ead84fc29116}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Tests">
+      <UniqueIdentifier>{b7eef53f-fb70-4f50-aa6d-0a699bb20f25}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Stats">
+      <UniqueIdentifier>{28670d3c-b5d8-4acb-91aa-c886efae641c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Serialization\Fake">
+      <UniqueIdentifier>{9d121063-367c-4424-8009-12b3635e0fed}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Filesystems">
+      <UniqueIdentifier>{30d60be9-a936-4191-a66d-64e127f3d258}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Task Config">
+      <UniqueIdentifier>{02c88ac8-15f7-4372-9f47-247ecbada7db}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Filesystems\Local">
+      <UniqueIdentifier>{3de9b5f5-44fa-4e4b-9a63-f93d940d537a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Tools\Exceptions">
+      <UniqueIdentifier>{a77c6575-b7b7-4683-9295-d5173da8c76b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Filesystems\Exceptions">
+      <UniqueIdentifier>{b5e932b3-5a5a-465b-8ade-3354c81e1996}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Tests\TaskConfig">
+      <UniqueIdentifier>{953a12ea-2aa5-4c7a-a310-a461ce8b962f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Tests\DataBuffer">
+      <UniqueIdentifier>{64486dcc-0c2a-468c-9498-c4ff0c2183af}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Shared">
+      <UniqueIdentifier>{076cbf8f-0110-48a9-9cbe-9929534ba1d1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Tools\Queues">
+      <UniqueIdentifier>{70510fff-69c9-4ba7-beb1-55024077e6b5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Tools\Threading">
+      <UniqueIdentifier>{4d6af45e-ee39-4520-830b-1eff232b8f0a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Filesystems\OverlappedIO">
+      <UniqueIdentifier>{2bf8bd08-c6de-45fd-a047-8c90c07ac481}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Filesystems\OverlappedIO\Data Buffer">
+      <UniqueIdentifier>{202d13d3-126b-4811-8c1c-a14b4f0476b7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Filesystems\OverlappedIO\Data Buffer\Buffers">
+      <UniqueIdentifier>{301c07b0-8112-4a01-9e47-9b32f6637be8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Filesystems\OverlappedIO\ReaderWriter">
+      <UniqueIdentifier>{2e089b8f-c085-4bce-a342-64c2611a717a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Filesystems\OverlappedIO\ReaderWriter\Queues">
+      <UniqueIdentifier>{94659973-1dd0-4e22-83c6-2fc26d3bf56e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Filesystems\OverlappedIO\ReaderWriter\Queues\Simple">
+      <UniqueIdentifier>{cc825cb7-bb97-45eb-86ed-ac031e1ca9e6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Filesystems\OverlappedIO\ReaderWriter\Queues\Complex">
+      <UniqueIdentifier>{712c0e1a-c6e3-4aab-8322-a9eea42e6d81}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Filesystems\OverlappedIO\Data Buffer\BufferConfig">
+      <UniqueIdentifier>{da2a09b3-c940-46ca-8161-a9f97fddf23e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Filesystems\OverlappedIO\Feedback Wrappers">
+      <UniqueIdentifier>{0015d34a-19cb-41da-a52d-1aedece5682c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Filesystems\OverlappedIO\ThreadSupport">
+      <UniqueIdentifier>{1412ea6d-b28c-4a96-b076-3094c476ce45}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="ESubTaskTypes.h">
+      <Filter>Source Files\SubTasks</Filter>
+    </ClInclude>
+    <ClInclude Include="TSubTaskArray.h">
+      <Filter>Source Files\SubTasks</Filter>
+    </ClInclude>
+    <ClInclude Include="TSubTaskBase.h">
+      <Filter>Source Files\SubTasks</Filter>
+    </ClInclude>
+    <ClInclude Include="TSubTaskCopyMove.h">
+      <Filter>Source Files\SubTasks</Filter>
+    </ClInclude>
+    <ClInclude Include="TSubTaskDelete.h">
+      <Filter>Source Files\SubTasks</Filter>
+    </ClInclude>
+    <ClInclude Include="TSubTaskFastMove.h">
+      <Filter>Source Files\SubTasks</Filter>
+    </ClInclude>
+    <ClInclude Include="TSubTaskScanDirectory.h">
+      <Filter>Source Files\SubTasks</Filter>
+    </ClInclude>
+    <ClInclude Include="TSubTaskStatsInfo.h">
+      <Filter>Source Files\SubTasks</Filter>
+    </ClInclude>
+    <ClInclude Include="TSubTaskStatsSnapshot.h">
+      <Filter>Source Files\SubTasks</Filter>
+    </ClInclude>
+    <ClInclude Include="TTask.h">
+      <Filter>Source Files\Task</Filter>
+    </ClInclude>
+    <ClInclude Include="TTaskLocalStats.h">
+      <Filter>Source Files\Task</Filter>
+    </ClInclude>
+    <ClInclude Include="TTaskStatsSnapshot.h">
+      <Filter>Source Files\Task</Filter>
+    </ClInclude>
+    <ClInclude Include="TTaskManager.h">
+      <Filter>Source Files\Task Manager</Filter>
+    </ClInclude>
+    <ClInclude Include="TTaskManagerStatsSnapshot.h">
+      <Filter>Source Files\Task Manager</Filter>
+    </ClInclude>
+    <ClInclude Include="TAutoHandles.h">
+      <Filter>Source Files\Tools</Filter>
+    </ClInclude>
+    <ClInclude Include="TBasePathData.h">
+      <Filter>Source Files\Tools</Filter>
+    </ClInclude>
+    <ClInclude Include="TFileFilter.h">
+      <Filter>Source Files\Tools</Filter>
+    </ClInclude>
+    <ClInclude Include="TFileFiltersArray.h">
+      <Filter>Source Files\Tools</Filter>
+    </ClInclude>
+    <ClInclude Include="TFileInfo.h">
+      <Filter>Source Files\Tools</Filter>
+    </ClInclude>
+    <ClInclude Include="TFileInfoArray.h">
+      <Filter>Source Files\Tools</Filter>
+    </ClInclude>
+    <ClInclude Include="libchengine.h">
+      <Filter>Source Files\Library files</Filter>
+    </ClInclude>
+    <ClInclude Include="stdafx.h">
+      <Filter>Source Files\Library files</Filter>
+    </ClInclude>
+    <ClInclude Include="ErrorCodes.h">
+      <Filter>Source Files\Tools</Filter>
+    </ClInclude>
+    <ClInclude Include="TConfigSerializers.h">
+      <Filter>Source Files\Tools</Filter>
+    </ClInclude>
+    <ClInclude Include="TDateTime.h">
+      <Filter>Source Files\Tools</Filter>
+    </ClInclude>
+    <ClInclude Include="TPath.h">
+      <Filter>Source Files\Tools</Filter>
+    </ClInclude>
+    <ClInclude Include="TSharedMemory.h">
+      <Filter>Source Files\Tools</Filter>
+    </ClInclude>
+    <ClInclude Include="TString.h">
+      <Filter>Source Files\Tools</Filter>
+    </ClInclude>
+    <ClInclude Include="TStringArray.h">
+      <Filter>Source Files\Tools</Filter>
+    </ClInclude>
+    <ClInclude Include="TStringSet.h">
+      <Filter>Source Files\Tools</Filter>
+    </ClInclude>
+    <ClInclude Include="TTaskDefinition.h">
+      <Filter>Source Files\Tools</Filter>
+    </ClInclude>
+    <ClInclude Include="TTaskOperationPlan.h">
+      <Filter>Source Files\Tools</Filter>
+    </ClInclude>
+    <ClInclude Include="TWorkerThreadController.h">
+      <Filter>Source Files\Tools</Filter>
+    </ClInclude>
+    <ClInclude Include="IFeedbackHandler.h">
+      <Filter>Source Files\Feedback</Filter>
+    </ClInclude>
+    <ClInclude Include="IFeedbackHandlerFactory.h">
+      <Filter>Source Files\Feedback</Filter>
+    </ClInclude>
+    <ClInclude Include="ISQLiteSerializerSchema.h">
+      <Filter>Source Files\Serialization\SQLite\SQLite Schemas</Filter>
+    </ClInclude>
+    <ClInclude Include="TSQLiteTaskManagerSchema.h">
+      <Filter>Source Files\Serialization\SQLite\SQLite Schemas</Filter>
+    </ClInclude>
+    <ClInclude Include="TSQLiteTaskSchema.h">
+      <Filter>Source Files\Serialization\SQLite\SQLite Schemas</Filter>
+    </ClInclude>
+    <ClInclude Include="TSerializerVersion.h">
+      <Filter>Source Files\Serialization\SQLite</Filter>
+    </ClInclude>
+    <ClInclude Include="TSQLiteColumnDefinition.h">
+      <Filter>Source Files\Serialization\SQLite</Filter>
+    </ClInclude>
+    <ClInclude Include="TSQLiteSerializer.h">
+      <Filter>Source Files\Serialization\SQLite</Filter>
+    </ClInclude>
+    <ClInclude Include="TSQLiteSerializerContainer.h">
+      <Filter>Source Files\Serialization\SQLite</Filter>
+    </ClInclude>
+    <ClInclude Include="TSQLiteSerializerFactory.h">
+      <Filter>Source Files\Serialization\SQLite</Filter>
+    </ClInclude>
+    <ClInclude Include="TSQLiteSerializerRowData.h">
+      <Filter>Source Files\Serialization\SQLite</Filter>
+    </ClInclude>
+    <ClInclude Include="TSQLiteSerializerRowReader.h">
+      <Filter>Source Files\Serialization\SQLite</Filter>
+    </ClInclude>
+    <ClInclude Include="IColumnsDefinition.h">
+      <Filter>Source Files\Serialization</Filter>
+    </ClInclude>
+    <ClInclude Include="ISerializer.h">
+      <Filter>Source Files\Serialization</Filter>
+    </ClInclude>
+    <ClInclude Include="ISerializerContainer.h">
+      <Filter>Source Files\Serialization</Filter>
+    </ClInclude>
+    <ClInclude Include="ISerializerFactory.h">
+      <Filter>Source Files\Serialization</Filter>
+    </ClInclude>
+    <ClInclude Include="ISerializerRowData.h">
+      <Filter>Source Files\Serialization</Filter>
+    </ClInclude>
+    <ClInclude Include="ISerializerRowReader.h">
+      <Filter>Source Files\Serialization</Filter>
+    </ClInclude>
+    <ClInclude Include="TSerializerException.h">
+      <Filter>Source Files\Serialization</Filter>
+    </ClInclude>
+    <ClInclude Include="TSubTaskArrayStatsSnapshot.h">
+      <Filter>Source Files\SubTasks</Filter>
+    </ClInclude>
+    <ClInclude Include="TSubTaskContext.h">
+      <Filter>Source Files\SubTasks</Filter>
+    </ClInclude>
+    <ClInclude Include="TaskID.h">
+      <Filter>Source Files\Task</Filter>
+    </ClInclude>
+    <ClInclude Include="TTaskInfo.h">
+      <Filter>Source Files\Task Manager</Filter>
+    </ClInclude>
+    <ClInclude Include="TSQLiteDatabase.h">
+      <Filter>Source Files\Tools\SQLite</Filter>
+    </ClInclude>
+    <ClInclude Include="TSQLiteException.h">
+      <Filter>Source Files\Tools\SQLite</Filter>
+    </ClInclude>
+    <ClInclude Include="TSQLiteStatement.h">
+      <Filter>Source Files\Tools\SQLite</Filter>
+    </ClInclude>
+    <ClInclude Include="TSQLiteTransaction.h">
+      <Filter>Source Files\Tools\SQLite</Filter>
+    </ClInclude>
+    <ClInclude Include="ITimestampProvider.h">
+      <Filter>Source Files\Tools</Filter>
+    </ClInclude>
+    <ClInclude Include="MathFunctions.h">
+      <Filter>Source Files\Tools</Filter>
+    </ClInclude>
+    <ClInclude Include="TPathContainer.h">
+      <Filter>Source Files\Tools</Filter>
+    </ClInclude>
+    <ClInclude Include="TSimpleTimer.h">
+      <Filter>Source Files\Tools</Filter>
+    </ClInclude>
+    <ClInclude Include="TSpeedTracker.h">
+      <Filter>Source Files\Tools</Filter>
+    </ClInclude>
+    <ClInclude Include="TStringException.h">
+      <Filter>Source Files\Tools</Filter>
+    </ClInclude>
+    <ClInclude Include="TTimestampProviderTickCount.h">
+      <Filter>Source Files\Tools</Filter>
+    </ClInclude>
+    <ClInclude Include="TConfig.h">
+      <Filter>Source Files\Tools\Config</Filter>
+    </ClInclude>
+    <ClInclude Include="ConfigNode.h">
+      <Filter>Source Files\Tools\Config\details</Filter>
+    </ClInclude>
+    <ClInclude Include="ConfigNodeContainer.h">
+      <Filter>Source Files\Tools\Config\details</Filter>
+    </ClInclude>
+    <ClInclude Include="TConfigArray.h">
+      <Filter>Source Files\Tools\Config</Filter>
+    </ClInclude>
+    <ClInclude Include="TConfigNotifier.h">
+      <Filter>Source Files\Tools\Config</Filter>
+    </ClInclude>
+    <ClInclude Include="TSharedModificationTracker.h">
+      <Filter>Source Files\Tools\ModificationTrackers</Filter>
+    </ClInclude>
+    <ClInclude Include="TModificationTracker.h">
+      <Filter>Source Files\Tools\ModificationTrackers</Filter>
+    </ClInclude>
+    <ClInclude Include="TRemovedObjects.h">
+      <Filter>Source Files\Serialization</Filter>
+    </ClInclude>
+    <ClInclude Include="TTaskBaseData.h">
+      <Filter>Source Files\Task</Filter>
+    </ClInclude>
+    <ClInclude Include="TFileTime.h">
+      <Filter>Source Files\Tools</Filter>
+    </ClInclude>
+    <ClInclude Include="TPlainStringPool.h">
+      <Filter>Source Files\Tools</Filter>
+    </ClInclude>
+    <ClInclude Include="TObsoleteFiles.h">
+      <Filter>Source Files\Tools</Filter>
+    </ClInclude>
+    <ClInclude Include="TFeedbackHandlerWrapper.h">
+      <Filter>Source Files\Feedback</Filter>
+    </ClInclude>
+    <ClInclude Include="TScopedRunningTimeTracker.h">
+      <Filter>Source Files\Stats</Filter>
+    </ClInclude>
+    <ClInclude Include="TScopedRunningTimeTrackerPause.h">
+      <Filter>Source Files\Stats</Filter>
+    </ClInclude>
+    <ClInclude Include="IRunningTimeControl.h">
+      <Filter>Source Files\Stats</Filter>
+    </ClInclude>
+    <ClInclude Include="TFeedbackHandlerBase.h">
+      <Filter>Source Files\Feedback</Filter>
+    </ClInclude>
+    <ClInclude Include="EFeedbackResult.h">
+      <Filter>Source Files\Feedback</Filter>
+    </ClInclude>
+    <ClInclude Include="TFakeFileSerializer.h">
+      <Filter>Source Files\Serialization\Fake</Filter>
+    </ClInclude>
+    <ClInclude Include="RoundingFunctions.h">
+      <Filter>Source Files\Tools</Filter>
+    </ClInclude>
+    <ClInclude Include="TWin32ErrorFormatter.h">
+      <Filter>Source Files\Tools</Filter>
+    </ClInclude>
+    <ClInclude Include="TTaskConfigTracker.h">
+      <Filter>Source Files\Task Config</Filter>
+    </ClInclude>
+    <ClInclude Include="TTaskConfiguration.h">
+      <Filter>Source Files\Task Config</Filter>
+    </ClInclude>
+    <ClInclude Include="TTaskConfigBufferSizes.h">
+      <Filter>Source Files\Task Config</Filter>
+    </ClInclude>
+    <ClInclude Include="EFileError.h">
+      <Filter>Source Files\Feedback</Filter>
+    </ClInclude>
+    <ClInclude Include="TStringPattern.h">
+      <Filter>Source Files\Tools</Filter>
+    </ClInclude>
+    <ClInclude Include="TStringPatternArray.h">
+      <Filter>Source Files\Tools</Filter>
+    </ClInclude>
+    <ClInclude Include="IFilesystem.h">
+      <Filter>Source Files\Filesystems</Filter>
+    </ClInclude>
+    <ClInclude Include="TFileInfoFwd.h">
+      <Filter>Source Files\Tools</Filter>
+    </ClInclude>
+    <ClInclude Include="TBasePathDataFwd.h">
+      <Filter>Source Files\Tools</Filter>
+    </ClInclude>
+    <ClInclude Include="IFilesystemFile.h">
+      <Filter>Source Files\Filesystems</Filter>
+    </ClInclude>
+    <ClInclude Include="IFilesystemFind.h">
+      <Filter>Source Files\Filesystems</Filter>
+    </ClInclude>
+    <ClInclude Include="TLocalFilesystem.h">
+      <Filter>Source Files\Filesystems\Local</Filter>
+    </ClInclude>
+    <ClInclude Include="TLocalFilesystemFile.h">
+      <Filter>Source Files\Filesystems\Local</Filter>
+    </ClInclude>
+    <ClInclude Include="TLocalFilesystemFind.h">
+      <Filter>Source Files\Filesystems\Local</Filter>
+    </ClInclude>
+    <ClInclude Include="SerializerDataTypes.h">
+      <Filter>Source Files\Tools</Filter>
+    </ClInclude>
+    <ClInclude Include="CommonDataTypes.h">
+      <Filter>Source Files\Tools</Filter>
+    </ClInclude>
+    <ClInclude Include="EOperationTypes.h">
+      <Filter>Source Files\Tools</Filter>
+    </ClInclude>
+    <ClInclude Include="ETaskCurrentState.h">
+      <Filter>Source Files\Tools</Filter>
+    </ClInclude>
+    <ClInclude Include="TBaseException.h">
+      <Filter>Source Files\Tools\Exceptions</Filter>
+    </ClInclude>
+    <ClInclude Include="TCoreException.h">
+      <Filter>Source Files\Tools\Exceptions</Filter>
+    </ClInclude>
+    <ClInclude Include="TCoreWin32Exception.h">
+      <Filter>Source Files\Tools\Exceptions</Filter>
+    </ClInclude>
+    <ClInclude Include="TFileException.h">
+      <Filter>Source Files\Filesystems\Exceptions</Filter>
+    </ClInclude>
+    <ClInclude Include="TFeedbackResult.h">
+      <Filter>Source Files\Feedback</Filter>
+    </ClInclude>
+    <ClInclude Include="TDestinationPathProvider.h">
+      <Filter>Source Files\SubTasks</Filter>
+    </ClInclude>
+    <ClInclude Include="TTaskConfigVerifier.h">
+      <Filter>Source Files\Task Config</Filter>
+    </ClInclude>
+    <ClInclude Include="TCoreEngine.h">
+      <Filter>Source Files\Library files</Filter>
+    </ClInclude>
+    <ClInclude Include="StreamingHelpers.h">
+      <Filter>Source Files\Tools</Filter>
+    </ClInclude>
+    <ClInclude Include="GTestMacros.h">
+      <Filter>Tests</Filter>
+    </ClInclude>
+    <ClInclude Include="TOverlappedWriter.h">
+      <Filter>Source Files\Filesystems\OverlappedIO\ReaderWriter</Filter>
+    </ClInclude>
+    <ClInclude Include="TOverlappedReader.h">
+      <Filter>Source Files\Filesystems\OverlappedIO\ReaderWriter</Filter>
+    </ClInclude>
+    <ClInclude Include="TOverlappedMemoryPool.h">
+      <Filter>Source Files\Filesystems\OverlappedIO\Data Buffer\Buffers</Filter>
+    </ClInclude>
+    <ClInclude Include="TOverlappedDataBuffer.h">
+      <Filter>Source Files\Filesystems\OverlappedIO\Data Buffer\Buffers</Filter>
+    </ClInclude>
+    <ClInclude Include="TBufferList.h">
+      <Filter>Source Files\Filesystems\OverlappedIO\ReaderWriter\Queues\Simple</Filter>
+    </ClInclude>
+    <ClInclude Include="TOrderedBufferQueue.h">
+      <Filter>Source Files\Filesystems\OverlappedIO\ReaderWriter\Queues\Simple</Filter>
+    </ClInclude>
+    <ClInclude Include="TSimpleOrderedBufferQueue.h">
+      <Filter>Source Files\Filesystems\OverlappedIO\ReaderWriter\Queues\Simple</Filter>
+    </ClInclude>
+    <ClInclude Include="TReadBufferQueueWrapper.h">
+      <Filter>Source Files\Filesystems\OverlappedIO\ReaderWriter\Queues\Complex</Filter>
+    </ClInclude>
+    <ClInclude Include="TWriteBufferQueueWrapper.h">
+      <Filter>Source Files\Filesystems\OverlappedIO\ReaderWriter\Queues\Complex</Filter>
+    </ClInclude>
+    <ClInclude Include="TSizeFormatter.h">
+      <Filter>Source Files\Tools</Filter>
+    </ClInclude>
+    <ClInclude Include="TIpcMutex.h">
+      <Filter>Source Files\Tools</Filter>
+    </ClInclude>
+    <ClInclude Include="TIpcMutexLock.h">
+      <Filter>Source Files\Tools</Filter>
+    </ClInclude>
+    <ClInclude Include="resource.h" />
+    <ClInclude Include="EngineConstants.h">
+      <Filter>Source Files\Shared</Filter>
+    </ClInclude>
+    <ClInclude Include="TFilesystemFeedbackWrapper.h">
+      <Filter>Source Files\Filesystems\OverlappedIO\Feedback Wrappers</Filter>
+    </ClInclude>
+    <ClInclude Include="TFilesystemFileFeedbackWrapper.h">
+      <Filter>Source Files\Filesystems\OverlappedIO\Feedback Wrappers</Filter>
+    </ClInclude>
+    <ClInclude Include="TOverlappedReaderFB.h">
+      <Filter>Source Files\Filesystems\OverlappedIO\Feedback Wrappers</Filter>
+    </ClInclude>
+    <ClInclude Include="TOverlappedReaderWriterFB.h">
+      <Filter>Source Files\Filesystems\OverlappedIO\Feedback Wrappers</Filter>
+    </ClInclude>
+    <ClInclude Include="TOverlappedWriterFB.h">
+      <Filter>Source Files\Filesystems\OverlappedIO\Feedback Wrappers</Filter>
+    </ClInclude>
+    <ClInclude Include="TOverlappedProcessorRange.h">
+      <Filter>Source Files\Filesystems\OverlappedIO\ReaderWriter</Filter>
+    </ClInclude>
+    <ClInclude Include="WaitableQueue.h">
+      <Filter>Source Files\Tools\Queues</Filter>
+    </ClInclude>
+    <ClInclude Include="TThreadedQueueRunner.h">
+      <Filter>Source Files\Tools\Threading</Filter>
+    </ClInclude>
+    <ClInclude Include="TBufferSizes.h">
+      <Filter>Source Files\Filesystems\OverlappedIO\Data Buffer\BufferConfig</Filter>
+    </ClInclude>
+    <ClInclude Include="OverlappedCallbacks.h">
+      <Filter>Source Files\Filesystems\OverlappedIO\ReaderWriter</Filter>
+    </ClInclude>
+    <ClInclude Include="TOverlappedThreadPool.h">
+      <Filter>Source Files\Filesystems\OverlappedIO\ThreadSupport</Filter>
+    </ClInclude>
+    <ClInclude Include="TEvent.h">
+      <Filter>Source Files\Tools\Threading</Filter>
+    </ClInclude>
+    <ClInclude Include="TEventGuard.h">
+      <Filter>Source Files\Tools\Threading</Filter>
+    </ClInclude>
+    <ClInclude Include="TEventCounter.h">
+      <Filter>Source Files\Tools\Threading</Filter>
+    </ClInclude>
+    <ClInclude Include="TSharedCount.h">
+      <Filter>Source Files\Tools\Threading</Filter>
+    </ClInclude>
+    <ClInclude Include="TSharedCountMT.h">
+      <Filter>Source Files\Tools\Threading</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="TSubTaskArray.cpp">
+      <Filter>Source Files\SubTasks</Filter>
+    </ClCompile>
+    <ClCompile Include="TSubTaskBase.cpp">
+      <Filter>Source Files\SubTasks</Filter>
+    </ClCompile>
+    <ClCompile Include="TSubTaskCopyMove.cpp">
+      <Filter>Source Files\SubTasks</Filter>
+    </ClCompile>
+    <ClCompile Include="TSubTaskDelete.cpp">
+      <Filter>Source Files\SubTasks</Filter>
+    </ClCompile>
+    <ClCompile Include="TSubTaskFastMove.cpp">
+      <Filter>Source Files\SubTasks</Filter>
+    </ClCompile>
+    <ClCompile Include="TSubTaskScanDirectory.cpp">
+      <Filter>Source Files\SubTasks</Filter>
+    </ClCompile>
+    <ClCompile Include="TSubTaskStatsInfo.cpp">
+      <Filter>Source Files\SubTasks</Filter>
+    </ClCompile>
+    <ClCompile Include="TSubTaskStatsSnapshot.cpp">
+      <Filter>Source Files\SubTasks</Filter>
+    </ClCompile>
+    <ClCompile Include="TTask.cpp">
+      <Filter>Source Files\Task</Filter>
+    </ClCompile>
+    <ClCompile Include="TTaskLocalStats.cpp">
+      <Filter>Source Files\Task</Filter>
+    </ClCompile>
+    <ClCompile Include="TTaskStatsSnapshot.cpp">
+      <Filter>Source Files\Task</Filter>
+    </ClCompile>
+    <ClCompile Include="TTaskManager.cpp">
+      <Filter>Source Files\Task Manager</Filter>
+    </ClCompile>
+    <ClCompile Include="TTaskManagerStatsSnapshot.cpp">
+      <Filter>Source Files\Task Manager</Filter>
+    </ClCompile>
+    <ClCompile Include="TBasePathData.cpp">
+      <Filter>Source Files\Tools</Filter>
+    </ClCompile>
+    <ClCompile Include="TFileFilter.cpp">
+      <Filter>Source Files\Tools</Filter>
+    </ClCompile>
+    <ClCompile Include="TFileFiltersArray.cpp">
+      <Filter>Source Files\Tools</Filter>
+    </ClCompile>
+    <ClCompile Include="TFileInfo.cpp">
+      <Filter>Source Files\Tools</Filter>
+    </ClCompile>
+    <ClCompile Include="TFileInfoArray.cpp">
+      <Filter>Source Files\Tools</Filter>
+    </ClCompile>
+    <ClCompile Include="dllmain.cpp">
+      <Filter>Source Files\Library files</Filter>
+    </ClCompile>
+    <ClCompile Include="stdafx.cpp">
+      <Filter>Source Files\Library files</Filter>
+    </ClCompile>
+    <ClCompile Include="TDateTime.cpp">
+      <Filter>Source Files\Tools</Filter>
+    </ClCompile>
+    <ClCompile Include="TPath.cpp">
+      <Filter>Source Files\Tools</Filter>
+    </ClCompile>
+    <ClCompile Include="TSharedMemory.cpp">
+      <Filter>Source Files\Tools</Filter>
+    </ClCompile>
+    <ClCompile Include="TString.cpp">
+      <Filter>Source Files\Tools</Filter>
+    </ClCompile>
+    <ClCompile Include="TStringArray.cpp">
+      <Filter>Source Files\Tools</Filter>
+    </ClCompile>
+    <ClCompile Include="TStringSet.cpp">
+      <Filter>Source Files\Tools</Filter>
+    </ClCompile>
+    <ClCompile Include="TTaskDefinition.cpp">
+      <Filter>Source Files\Tools</Filter>
+    </ClCompile>
+    <ClCompile Include="TTaskOperationPlan.cpp">
+      <Filter>Source Files\Tools</Filter>
+    </ClCompile>
+    <ClCompile Include="TWorkerThreadController.cpp">
+      <Filter>Source Files\Tools</Filter>
+    </ClCompile>
+    <ClCompile Include="IFeedbackHandler.cpp">
+      <Filter>Source Files\Feedback</Filter>
+    </ClCompile>
+    <ClCompile Include="IFeedbackHandlerFactory.cpp">
+      <Filter>Source Files\Feedback</Filter>
+    </ClCompile>
+    <ClCompile Include="ISQLiteSerializerSchema.cpp">
+      <Filter>Source Files\Serialization\SQLite\SQLite Schemas</Filter>
+    </ClCompile>
+    <ClCompile Include="TSQLiteTaskManagerSchema.cpp">
+      <Filter>Source Files\Serialization\SQLite\SQLite Schemas</Filter>
+    </ClCompile>
+    <ClCompile Include="TSQLiteTaskSchema.cpp">
+      <Filter>Source Files\Serialization\SQLite\SQLite Schemas</Filter>
+    </ClCompile>
+    <ClCompile Include="TSerializerVersion.cpp">
+      <Filter>Source Files\Serialization\SQLite</Filter>
+    </ClCompile>
+    <ClCompile Include="TSQLiteColumnDefinition.cpp">
+      <Filter>Source Files\Serialization\SQLite</Filter>
+    </ClCompile>
+    <ClCompile Include="TSQLiteSerializer.cpp">
+      <Filter>Source Files\Serialization\SQLite</Filter>
+    </ClCompile>
+    <ClCompile Include="TSQLiteSerializerContainer.cpp">
+      <Filter>Source Files\Serialization\SQLite</Filter>
+    </ClCompile>
+    <ClCompile Include="TSQLiteSerializerFactory.cpp">
+      <Filter>Source Files\Serialization\SQLite</Filter>
+    </ClCompile>
+    <ClCompile Include="TSQLiteSerializerRowData.cpp">
+      <Filter>Source Files\Serialization\SQLite</Filter>
+    </ClCompile>
+    <ClCompile Include="TSQLiteSerializerRowReader.cpp">
+      <Filter>Source Files\Serialization\SQLite</Filter>
+    </ClCompile>
+    <ClCompile Include="IColumnsDefinition.cpp">
+      <Filter>Source Files\Serialization</Filter>
+    </ClCompile>
+    <ClCompile Include="ISerializer.cpp">
+      <Filter>Source Files\Serialization</Filter>
+    </ClCompile>
+    <ClCompile Include="ISerializerContainer.cpp">
+      <Filter>Source Files\Serialization</Filter>
+    </ClCompile>
+    <ClCompile Include="ISerializerFactory.cpp">
+      <Filter>Source Files\Serialization</Filter>
+    </ClCompile>
+    <ClCompile Include="ISerializerRowData.cpp">
+      <Filter>Source Files\Serialization</Filter>
+    </ClCompile>
+    <ClCompile Include="ISerializerRowReader.cpp">
+      <Filter>Source Files\Serialization</Filter>
+    </ClCompile>
+    <ClCompile Include="TSerializerException.cpp">
+      <Filter>Source Files\Serialization</Filter>
+    </ClCompile>
+    <ClCompile Include="TSubTaskArrayStatsSnapshot.cpp">
+      <Filter>Source Files\SubTasks</Filter>
+    </ClCompile>
+    <ClCompile Include="TSubTaskContext.cpp">
+      <Filter>Source Files\SubTasks</Filter>
+    </ClCompile>
+    <ClCompile Include="TTaskInfo.cpp">
+      <Filter>Source Files\Task Manager</Filter>
+    </ClCompile>
+    <ClCompile Include="TSQLiteDatabase.cpp">
+      <Filter>Source Files\Tools\SQLite</Filter>
+    </ClCompile>
+    <ClCompile Include="TSQLiteException.cpp">
+      <Filter>Source Files\Tools\SQLite</Filter>
+    </ClCompile>
+    <ClCompile Include="TSQLiteStatement.cpp">
+      <Filter>Source Files\Tools\SQLite</Filter>
+    </ClCompile>
+    <ClCompile Include="TSQLiteTransaction.cpp">
+      <Filter>Source Files\Tools\SQLite</Filter>
+    </ClCompile>
+    <ClCompile Include="MathFunctions.cpp">
+      <Filter>Source Files\Tools</Filter>
+    </ClCompile>
+    <ClCompile Include="TPathContainer.cpp">
+      <Filter>Source Files\Tools</Filter>
+    </ClCompile>
+    <ClCompile Include="TSimpleTimer.cpp">
+      <Filter>Source Files\Tools</Filter>
+    </ClCompile>
+    <ClCompile Include="TSpeedTracker.cpp">
+      <Filter>Source Files\Tools</Filter>
+    </ClCompile>
+    <ClCompile Include="TStringException.cpp">
+      <Filter>Source Files\Tools</Filter>
+    </ClCompile>
+    <ClCompile Include="TTimestampProviderTickCount.cpp">
+      <Filter>Source Files\Tools</Filter>
+    </ClCompile>
+    <ClCompile Include="TConfig.cpp">
+      <Filter>Source Files\Tools\Config</Filter>
+    </ClCompile>
+    <ClCompile Include="ConfigNode.cpp">
+      <Filter>Source Files\Tools\Config\details</Filter>
+    </ClCompile>
+    <ClCompile Include="ConfigNodeContainer.cpp">
+      <Filter>Source Files\Tools\Config\details</Filter>
+    </ClCompile>
+    <ClCompile Include="TConfigArray.cpp">
+      <Filter>Source Files\Tools\Config</Filter>
+    </ClCompile>
+    <ClCompile Include="TConfigNotifier.cpp">
+      <Filter>Source Files\Tools\Config</Filter>
+    </ClCompile>
+    <ClCompile Include="TRemovedObjects.cpp">
+      <Filter>Source Files\Serialization</Filter>
+    </ClCompile>
+    <ClCompile Include="TTaskBaseData.cpp">
+      <Filter>Source Files\Task</Filter>
+    </ClCompile>
+    <ClCompile Include="TFileTime.cpp">
+      <Filter>Source Files\Tools</Filter>
+    </ClCompile>
+    <ClCompile Include="Tests\TestsTSimpleTimer.cpp">
+      <Filter>Tests</Filter>
+    </ClCompile>
+    <ClCompile Include="Tests\TestsTSmartPath.cpp">
+      <Filter>Tests</Filter>
+    </ClCompile>
+    <ClCompile Include="Tests\TestsTSpeedTracker.cpp">
+      <Filter>Tests</Filter>
+    </ClCompile>
+    <ClCompile Include="Tests\TestsTSQLiteDatabase.cpp">
+      <Filter>Tests</Filter>
+    </ClCompile>
+    <ClCompile Include="Tests\TestsTSQLiteStatement.cpp">
+      <Filter>Tests</Filter>
+    </ClCompile>
+    <ClCompile Include="Tests\TestsTSQLiteTransaction.cpp">
+      <Filter>Tests</Filter>
+    </ClCompile>
+    <ClCompile Include="Tests\TestsTString.cpp">
+      <Filter>Tests</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\tests\tests_shared\TestsExports.cpp">
+      <Filter>Tests</Filter>
+    </ClCompile>
+    <ClCompile Include="TPlainStringPool.cpp">
+      <Filter>Source Files\Tools</Filter>
+    </ClCompile>
+    <ClCompile Include="Tests\TestsTConfig.cpp">
+      <Filter>Tests</Filter>
+    </ClCompile>
+    <ClCompile Include="TObsoleteFiles.cpp">
+      <Filter>Source Files\Tools</Filter>
+    </ClCompile>
+    <ClCompile Include="TFeedbackHandlerWrapper.cpp">
+      <Filter>Source Files\Feedback</Filter>
+    </ClCompile>
+    <ClCompile Include="TScopedRunningTimeTracker.cpp">
+      <Filter>Source Files\Stats</Filter>
+    </ClCompile>
+    <ClCompile Include="TScopedRunningTimeTrackerPause.cpp">
+      <Filter>Source Files\Stats</Filter>
+    </ClCompile>
+    <ClCompile Include="IRunningTimeControl.cpp">
+      <Filter>Source Files\Stats</Filter>
+    </ClCompile>
+    <ClCompile Include="TFeedbackHandlerBase.cpp">
+      <Filter>Source Files\Feedback</Filter>
+    </ClCompile>
+    <ClCompile Include="TFakeFileSerializer.cpp">
+      <Filter>Source Files\Serialization\Fake</Filter>
+    </ClCompile>
+    <ClCompile Include="TWin32ErrorFormatter.cpp">
+      <Filter>Source Files\Tools</Filter>
+    </ClCompile>
+    <ClCompile Include="TTaskConfigTracker.cpp">
+      <Filter>Source Files\Task Config</Filter>
+    </ClCompile>
+    <ClCompile Include="TTaskConfigBufferSizes.cpp">
+      <Filter>Source Files\Task Config</Filter>
+    </ClCompile>
+    <ClCompile Include="Tests\TestsTModificationTracker.cpp">
+      <Filter>Tests</Filter>
+    </ClCompile>
+    <ClCompile Include="Tests\TestsTSharedModificationTracker.cpp">
+      <Filter>Tests</Filter>
+    </ClCompile>
+    <ClCompile Include="TStringPattern.cpp">
+      <Filter>Source Files\Tools</Filter>
+    </ClCompile>
+    <ClCompile Include="TStringPatternArray.cpp">
+      <Filter>Source Files\Tools</Filter>
+    </ClCompile>
+    <ClCompile Include="Tests\TestsTStringPatternArray.cpp">
+      <Filter>Tests</Filter>
+    </ClCompile>
+    <ClCompile Include="Tests\TestsTFileFilter.cpp">
+      <Filter>Tests</Filter>
+    </ClCompile>
+    <ClCompile Include="Tests\TestsTStringPattern.cpp">
+      <Filter>Tests</Filter>
+    </ClCompile>
+    <ClCompile Include="IFilesystem.cpp">
+      <Filter>Source Files\Filesystems</Filter>
+    </ClCompile>
+    <ClCompile Include="IFilesystemFile.cpp">
+      <Filter>Source Files\Filesystems</Filter>
+    </ClCompile>
+    <ClCompile Include="IFilesystemFind.cpp">
+      <Filter>Source Files\Filesystems</Filter>
+    </ClCompile>
+    <ClCompile Include="TLocalFilesystem.cpp">
+      <Filter>Source Files\Filesystems\Local</Filter>
+    </ClCompile>
+    <ClCompile Include="TLocalFilesystemFile.cpp">
+      <Filter>Source Files\Filesystems\Local</Filter>
+    </ClCompile>
+    <ClCompile Include="TLocalFilesystemFind.cpp">
+      <Filter>Source Files\Filesystems\Local</Filter>
+    </ClCompile>
+    <ClCompile Include="TBaseException.cpp">
+      <Filter>Source Files\Tools\Exceptions</Filter>
+    </ClCompile>
+    <ClCompile Include="TCoreException.cpp">
+      <Filter>Source Files\Tools\Exceptions</Filter>
+    </ClCompile>
+    <ClCompile Include="TCoreWin32Exception.cpp">
+      <Filter>Source Files\Tools\Exceptions</Filter>
+    </ClCompile>
+    <ClCompile Include="TFileException.cpp">
+      <Filter>Source Files\Filesystems\Exceptions</Filter>
+    </ClCompile>
+    <ClCompile Include="TFeedbackResult.cpp">
+      <Filter>Source Files\Feedback</Filter>
+    </ClCompile>
+    <ClCompile Include="TDestinationPathProvider.cpp">
+      <Filter>Source Files\SubTasks</Filter>
+    </ClCompile>
+    <ClCompile Include="Tests\TestsTDestinationPathProvider.cpp">
+      <Filter>Tests</Filter>
+    </ClCompile>
+    <ClCompile Include="TTaskConfigVerifier.cpp">
+      <Filter>Source Files\Task Config</Filter>
+    </ClCompile>
+    <ClCompile Include="Tests\TestsTTaskConfigVerifier.cpp">
+      <Filter>Tests\TaskConfig</Filter>
+    </ClCompile>
+    <ClCompile Include="TCoreEngine.cpp">
+      <Filter>Source Files\Library files</Filter>
+    </ClCompile>
+    <ClCompile Include="Tests\TOverlappedDataBufferTests.cpp">
+      <Filter>Tests\DataBuffer</Filter>
+    </ClCompile>
+    <ClCompile Include="Tests\TestsTBufferSizes.cpp">
+      <Filter>Tests\DataBuffer</Filter>
+    </ClCompile>
+    <ClCompile Include="Tests\TBufferListTests.cpp">
+      <Filter>Tests\DataBuffer</Filter>
+    </ClCompile>
+    <ClCompile Include="Tests\TOverlappedMemoryPoolTests.cpp">
+      <Filter>Tests\DataBuffer</Filter>
+    </ClCompile>
+    <ClCompile Include="Tests\TOrderedBufferQueueTests.cpp">
+      <Filter>Tests\DataBuffer</Filter>
+    </ClCompile>
+    <ClCompile Include="Tests\TOverlappedReaderTests.cpp">
+      <Filter>Tests\DataBuffer</Filter>
+    </ClCompile>
+    <ClCompile Include="Tests\TOverlappedWriterTests.cpp">
+      <Filter>Tests\DataBuffer</Filter>
+    </ClCompile>
+    <ClCompile Include="Tests\TReadBufferQueueWrapperTests.cpp">
+      <Filter>Tests\DataBuffer</Filter>
+    </ClCompile>
+    <ClCompile Include="Tests\TWriteBufferQueueWrapperTests.cpp">
+      <Filter>Tests\DataBuffer</Filter>
+    </ClCompile>
+    <ClCompile Include="Tests\TSimpleOrderedBufferQueueTests.cpp">
+      <Filter>Tests\DataBuffer</Filter>
+    </ClCompile>
+    <ClCompile Include="TOverlappedWriter.cpp">
+      <Filter>Source Files\Filesystems\OverlappedIO\ReaderWriter</Filter>
+    </ClCompile>
+    <ClCompile Include="TOverlappedReader.cpp">
+      <Filter>Source Files\Filesystems\OverlappedIO\ReaderWriter</Filter>
+    </ClCompile>
+    <ClCompile Include="TOverlappedMemoryPool.cpp">
+      <Filter>Source Files\Filesystems\OverlappedIO\Data Buffer\Buffers</Filter>
+    </ClCompile>
+    <ClCompile Include="TOverlappedDataBuffer.cpp">
+      <Filter>Source Files\Filesystems\OverlappedIO\Data Buffer\Buffers</Filter>
+    </ClCompile>
+    <ClCompile Include="TOrderedBufferQueue.cpp">
+      <Filter>Source Files\Filesystems\OverlappedIO\ReaderWriter\Queues\Simple</Filter>
+    </ClCompile>
+    <ClCompile Include="TReadBufferQueueWrapper.cpp">
+      <Filter>Source Files\Filesystems\OverlappedIO\ReaderWriter\Queues\Complex</Filter>
+    </ClCompile>
+    <ClCompile Include="TWriteBufferQueueWrapper.cpp">
+      <Filter>Source Files\Filesystems\OverlappedIO\ReaderWriter\Queues\Complex</Filter>
+    </ClCompile>
+    <ClCompile Include="TSizeFormatter.cpp">
+      <Filter>Source Files\Tools</Filter>
+    </ClCompile>
+    <ClCompile Include="TIpcMutex.cpp">
+      <Filter>Source Files\Tools</Filter>
+    </ClCompile>
+    <ClCompile Include="TIpcMutexLock.cpp">
+      <Filter>Source Files\Tools</Filter>
+    </ClCompile>
+    <ClCompile Include="TFilesystemFeedbackWrapper.cpp">
+      <Filter>Source Files\Filesystems\OverlappedIO\Feedback Wrappers</Filter>
+    </ClCompile>
+    <ClCompile Include="TFilesystemFileFeedbackWrapper.cpp">
+      <Filter>Source Files\Filesystems\OverlappedIO\Feedback Wrappers</Filter>
+    </ClCompile>
+    <ClCompile Include="TOverlappedReaderFB.cpp">
+      <Filter>Source Files\Filesystems\OverlappedIO\Feedback Wrappers</Filter>
+    </ClCompile>
+    <ClCompile Include="TOverlappedReaderWriterFB.cpp">
+      <Filter>Source Files\Filesystems\OverlappedIO\Feedback Wrappers</Filter>
+    </ClCompile>
+    <ClCompile Include="TOverlappedWriterFB.cpp">
+      <Filter>Source Files\Filesystems\OverlappedIO\Feedback Wrappers</Filter>
+    </ClCompile>
+    <ClCompile Include="TOverlappedProcessorRange.cpp">
+      <Filter>Source Files\Filesystems\OverlappedIO\ReaderWriter</Filter>
+    </ClCompile>
+    <ClCompile Include="TBufferSizes.cpp">
+      <Filter>Source Files\Filesystems\OverlappedIO\Data Buffer\BufferConfig</Filter>
+    </ClCompile>
+    <ClCompile Include="OverlappedCallbacks.cpp">
+      <Filter>Source Files\Filesystems\OverlappedIO\ReaderWriter</Filter>
+    </ClCompile>
+    <ClCompile Include="TOverlappedThreadPool.cpp">
+      <Filter>Source Files\Filesystems\OverlappedIO\ThreadSupport</Filter>
+    </ClCompile>
+    <ClCompile Include="TEvent.cpp">
+      <Filter>Source Files\Tools\Threading</Filter>
+    </ClCompile>
+    <ClCompile Include="TEventGuard.cpp">
+      <Filter>Source Files\Tools\Threading</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="libchengine.rc">
+      <Filter>Resource Files</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+</Project>

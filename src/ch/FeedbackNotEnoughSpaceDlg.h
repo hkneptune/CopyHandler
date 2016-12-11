@@ -18,7 +18,8 @@
 ***************************************************************************/
 #ifndef __FEEDBACKNOTENOUGHSPACEDLG_H__
 #define __FEEDBACKNOTENOUGHSPACEDLG_H__
-#include "../libchcore/TLocalFilesystem.h"
+
+#include "../libchengine/TLocalFilesystem.h"
 
 /////////////////////////////////////////////////////////////////////////////
 // CFeedbackNotEnoughSpaceDlg dialog
@@ -57,7 +58,7 @@ public:
 	BOOL m_bAllItems;
 
 private:
-	chcore::TLocalFilesystem m_fsLocal;
+	chengine::TLocalFilesystem m_fsLocal;
 };
 
 #endif

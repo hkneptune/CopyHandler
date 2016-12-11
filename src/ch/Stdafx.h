@@ -45,7 +45,6 @@
 
 #include "debug.h"
 #include "../libictranslate/LanguageDialog.h"
-#include "../libchcore/TConfigSerializers.h"
 
 #ifdef _UNICODE
 #if defined _M_IX86

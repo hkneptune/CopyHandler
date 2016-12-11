@@ -24,14 +24,15 @@
 #include "../libchcore/TPath.h"
 #include "CfgProperties.h"
 #include "resource.h"
+#include "../libchengine/TConfigSerializers.h"
 
 namespace DirectoryChooser
 {
-INT_PTR ChooseDirectory(chcore::EOperationType eOperation, const chcore::TPathContainer& rInputPaths, chcore::TSmartPath& rSelectedPath)
+INT_PTR ChooseDirectory(chengine::EOperationType eOperation, const chcore::TPathContainer& rInputPaths, chcore::TSmartPath& rSelectedPath)
 {
 	rSelectedPath.Clear();
 
-	chcore::TConfig& rConfig = GetConfig();
+	chengine::TConfig& rConfig = GetConfig();
 
 	// get dest folder
 	CFolderDialog dlg;
@@ -47,9 +48,9 @@ INT_PTR ChooseDirectory(chcore::EOperationType eOperation, const chcore::TPathCo
 
 	dlg.m_bdData.strInitialDir=(dlg.m_bdData.cvRecent.size() > 0) ? dlg.m_bdData.cvRecent.at(0) : _T("");
 
-	if(eOperation == chcore::eOperation_Copy)
+	if(eOperation == chengine::eOperation_Copy)
 		dlg.m_bdData.strCaption = GetResManager().LoadString(IDS_TITLECOPY_STRING);
-	else if(eOperation == chcore::eOperation_Move)
+	else if(eOperation == chengine::eOperation_Move)
 		dlg.m_bdData.strCaption = GetResManager().LoadString(IDS_TITLEMOVE_STRING);
 	else
 		dlg.m_bdData.strCaption = GetResManager().LoadString(IDS_TITLEUNKNOWNOPERATION_STRING);

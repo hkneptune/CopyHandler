@@ -32,18 +32,16 @@
 #include "ClipboardMonitor.h"
 #include <boost/shared_array.hpp>
 #include "../common/TShellExtMenuConfig.h"
-#include "../libchcore/TConfig.h"
 #include "../libchcore/TCoreException.h"
-#include "../libchcore/TTaskManagerStatsSnapshot.h"
-#include "../libchcore/TSQLiteSerializerFactory.h"
 #include "TRecentPathsTools.h"
 #include "DirectoryChooser.h"
 #include "FeedbackHandlerFactory.h"
-#include "../libchcore/TTask.h"
 #include "TTaskManagerWrapper.h"
 #include "CfgProperties.h"
 #include "resource.h"
 #include "../liblogger/TAsyncMultiLogger.h"
+#include "../libchengine/TConfigSerializers.h"
+#include "../libserializer/TSQLiteSerializerFactory.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -81,7 +79,7 @@ enum ETimers
 /////////////////////////////////////////////////////////////////////////////
 // CMainWnd construction/destruction
 CMainWnd::CMainWnd() :
-	m_spTaskMgrStats(new chcore::TTaskManagerStatsSnapshot),
+	m_spTaskMgrStats(new chengine::TTaskManagerStatsSnapshot),
 	m_spLog(logger::MakeLogger(GetLogFileData(), L"MainWnd"))
 {
 }
@@ -242,12 +240,12 @@ bool CMainWnd::LoadTaskManager()
 
 	logger::TLogFileDataPtr spLogFileData = logger::TAsyncMultiLogger::GetInstance()->CreateLoggerData(pathEngineLog.ToString(), GetApp().GetEngineLoggerConfig());
 
-	TSQLiteSerializerFactoryPtr spSerializerFactory(new TSQLiteSerializerFactory(PathFromString(strTasksDir), spLogFileData));
-	IFeedbackHandlerFactoryPtr spFeedbackFactory(new CFeedbackHandlerFactory);
+	serializer::TSQLiteSerializerFactoryPtr spSerializerFactory(new serializer::TSQLiteSerializerFactory(PathFromString(strTasksDir), spLogFileData));
+	chengine::IFeedbackHandlerFactoryPtr spFeedbackFactory(new CFeedbackHandlerFactory);
 
 	try
 	{
-		m_spTasks.reset(new chcore::TTaskManager(spSerializerFactory, spFeedbackFactory, PathFromString(strTasksDir), GetApp().GetEngineLoggerConfig(), spLogFileData));
+		m_spTasks.reset(new chengine::TTaskManager(spSerializerFactory, spFeedbackFactory, PathFromString(strTasksDir), GetApp().GetEngineLoggerConfig(), spLogFileData));
 	}
 	catch(const std::exception& e)
 	{
@@ -258,7 +256,7 @@ bool CMainWnd::LoadTaskManager()
 	{
 		if(MsgBox(IDS_TASKMANAGER_LOAD_FAILED, MB_ICONERROR | MB_OKCANCEL) == IDOK)
 		{
-			m_spTasks.reset(new chcore::TTaskManager(spSerializerFactory, spFeedbackFactory, PathFromString(strTasksDir), GetApp().GetEngineLoggerConfig(), spLogFileData, true));
+			m_spTasks.reset(new chengine::TTaskManager(spSerializerFactory, spFeedbackFactory, PathFromString(strTasksDir), GetApp().GetEngineLoggerConfig(), spLogFileData, true));
 		}
 		else
 			return false;
@@ -363,7 +361,7 @@ LRESULT CMainWnd::OnTrayNotification(WPARAM wParam, LPARAM lParam)
 /////////////////////////////////////////////////////////////////////////////
 // CMainWnd/CTrayIcon menu message handlers
 
-void CMainWnd::ShowStatusWindow(const chcore::TTaskPtr& spSelect)
+void CMainWnd::ShowStatusWindow(const chengine::TTaskPtr& spSelect)
 {
 	m_pdlgStatus=new CStatusDlg(m_spTasks.get(), this);	// self deleting
 	m_pdlgStatus->m_spInitialSelection = spSelect;
@@ -495,11 +493,11 @@ BOOL CMainWnd::OnCopyData(CWnd* pWnd, COPYDATASTRUCT* pCopyDataStruct)
 			if(!pszBuffer || ulLen == 0 || pszBuffer[ulLen - 1] != L'\0')
 				return FALSE;
 
-			chcore::TString wstrData(pszBuffer);
+			string::TString wstrData(pszBuffer);
 
 			LOG_DEBUG(m_spLog) << L"Received task definition to process: " << wstrData;
 
-			chcore::TTaskDefinition tTaskDefinition;
+			chengine::TTaskDefinition tTaskDefinition;
 			CString strError;
 			try
 			{
@@ -531,7 +529,7 @@ BOOL CMainWnd::OnCopyData(CWnd* pWnd, COPYDATASTRUCT* pCopyDataStruct)
 			}
 
 			// apply current options from global config; in the future we might want to merge the incoming options with global ones instead of overwriting...
-			chcore::TConfig& rConfig = GetConfig();
+			chengine::TConfig& rConfig = GetConfig();
 			rConfig.ExtractSubConfig(BRANCH_TASK_SETTINGS, tTaskDefinition.GetConfiguration());
 
 			// special operation - modify stuff
@@ -608,7 +606,7 @@ void CMainWnd::ProcessCommandLine(const TCommandLineParser& rCommandLine)
 
 			try
 			{
-				chcore::TTaskPtr spTask = m_spTasks->ImportTask(strPath);
+				chengine::TTaskPtr spTask = m_spTasks->ImportTask(strPath);
 				if(spTask)
 					spTask->Store(true);
 				bImported = true;
@@ -649,7 +647,7 @@ void CMainWnd::OnShowMiniView()
 
 void CMainWnd::OnPopupCustomCopy() 
 {
-	chcore::TConfig& rConfig = GetConfig();
+	chengine::TConfig& rConfig = GetConfig();
 
 	CCustomCopyDlg dlg;
 
@@ -661,7 +659,7 @@ void CMainWnd::OnPopupCustomCopy()
 
 		SetPropValue<PP_RECENTPATHS>(rConfig, dlg.m_vRecent);
 
-		chcore::TTaskDefinition tTaskDefinition = dlg.m_tTaskDefinition;
+		chengine::TTaskDefinition tTaskDefinition = dlg.m_tTaskDefinition;
 
 		TTaskManagerWrapper tTaskManager(m_spTasks);
 		tTaskManager.CreateTask(tTaskDefinition);
@@ -674,7 +672,7 @@ LRESULT CMainWnd::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 	{
 	case WM_MINIVIEWDBLCLK:
 		{
-			chcore::TTaskPtr spTask = m_spTasks->GetTaskByTaskID(boost::numeric_cast<chcore::taskid_t>(lParam));
+			chengine::TTaskPtr spTask = m_spTasks->GetTaskByTaskID(boost::numeric_cast<chengine::taskid_t>(lParam));
 			ShowStatusWindow(spTask);
 			break;
 		}
@@ -856,7 +854,7 @@ void CMainWnd::CheckForUpdates()
 			pDlg->m_bAutoDelete = true;
 
 			pDlg->Create();
-			chcore::TConfig& rConfig = GetConfig();
+			chengine::TConfig& rConfig = GetConfig();
 			try
 			{
 				SetPropValue<PP_LAST_UPDATE_TIMESTAMP>(rConfig, _time64(nullptr));

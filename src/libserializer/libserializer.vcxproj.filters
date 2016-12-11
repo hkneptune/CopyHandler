@@ -1,0 +1,242 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Source Files\Library files">
+      <UniqueIdentifier>{e160d2cd-2a88-40ef-97b4-6b7d3b7ed6b1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav</Extensions>
+    </Filter>
+    <Filter Include="Source Files\Tools">
+      <UniqueIdentifier>{1fddd996-c723-4b09-9c98-868df98fe204}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Serialization">
+      <UniqueIdentifier>{2a642b1a-83b2-4643-ac85-d040e8904d4d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Serialization\SQLite">
+      <UniqueIdentifier>{3ce71f46-ef32-4c71-9ac0-bcb36d6b6e99}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Serialization\SQLite\SQLite Schemas">
+      <UniqueIdentifier>{0b6550bf-a20b-4f12-9469-bd3e3bfa40fa}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Tools\SQLite">
+      <UniqueIdentifier>{e6da867d-b0bd-42d5-a0c8-43542984582f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Tests">
+      <UniqueIdentifier>{b7eef53f-fb70-4f50-aa6d-0a699bb20f25}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Serialization\Fake">
+      <UniqueIdentifier>{9d121063-367c-4424-8009-12b3635e0fed}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Tools\ModificationTrackers">
+      <UniqueIdentifier>{5e2ee854-6783-4e6e-b8a9-65ee8b6dec5c}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="libserializer.h">
+      <Filter>Source Files\Library files</Filter>
+    </ClInclude>
+    <ClInclude Include="stdafx.h">
+      <Filter>Source Files\Library files</Filter>
+    </ClInclude>
+    <ClInclude Include="ISQLiteSerializerSchema.h">
+      <Filter>Source Files\Serialization\SQLite\SQLite Schemas</Filter>
+    </ClInclude>
+    <ClInclude Include="TSQLiteTaskManagerSchema.h">
+      <Filter>Source Files\Serialization\SQLite\SQLite Schemas</Filter>
+    </ClInclude>
+    <ClInclude Include="TSQLiteTaskSchema.h">
+      <Filter>Source Files\Serialization\SQLite\SQLite Schemas</Filter>
+    </ClInclude>
+    <ClInclude Include="TSerializerVersion.h">
+      <Filter>Source Files\Serialization\SQLite</Filter>
+    </ClInclude>
+    <ClInclude Include="TSQLiteColumnDefinition.h">
+      <Filter>Source Files\Serialization\SQLite</Filter>
+    </ClInclude>
+    <ClInclude Include="TSQLiteSerializer.h">
+      <Filter>Source Files\Serialization\SQLite</Filter>
+    </ClInclude>
+    <ClInclude Include="TSQLiteSerializerContainer.h">
+      <Filter>Source Files\Serialization\SQLite</Filter>
+    </ClInclude>
+    <ClInclude Include="TSQLiteSerializerFactory.h">
+      <Filter>Source Files\Serialization\SQLite</Filter>
+    </ClInclude>
+    <ClInclude Include="TSQLiteSerializerRowData.h">
+      <Filter>Source Files\Serialization\SQLite</Filter>
+    </ClInclude>
+    <ClInclude Include="TSQLiteSerializerRowReader.h">
+      <Filter>Source Files\Serialization\SQLite</Filter>
+    </ClInclude>
+    <ClInclude Include="IColumnsDefinition.h">
+      <Filter>Source Files\Serialization</Filter>
+    </ClInclude>
+    <ClInclude Include="ISerializer.h">
+      <Filter>Source Files\Serialization</Filter>
+    </ClInclude>
+    <ClInclude Include="ISerializerContainer.h">
+      <Filter>Source Files\Serialization</Filter>
+    </ClInclude>
+    <ClInclude Include="ISerializerFactory.h">
+      <Filter>Source Files\Serialization</Filter>
+    </ClInclude>
+    <ClInclude Include="ISerializerRowData.h">
+      <Filter>Source Files\Serialization</Filter>
+    </ClInclude>
+    <ClInclude Include="ISerializerRowReader.h">
+      <Filter>Source Files\Serialization</Filter>
+    </ClInclude>
+    <ClInclude Include="TSerializerException.h">
+      <Filter>Source Files\Serialization</Filter>
+    </ClInclude>
+    <ClInclude Include="TSQLiteDatabase.h">
+      <Filter>Source Files\Tools\SQLite</Filter>
+    </ClInclude>
+    <ClInclude Include="TSQLiteException.h">
+      <Filter>Source Files\Tools\SQLite</Filter>
+    </ClInclude>
+    <ClInclude Include="TSQLiteStatement.h">
+      <Filter>Source Files\Tools\SQLite</Filter>
+    </ClInclude>
+    <ClInclude Include="TSQLiteTransaction.h">
+      <Filter>Source Files\Tools\SQLite</Filter>
+    </ClInclude>
+    <ClInclude Include="TPlainStringPool.h">
+      <Filter>Source Files\Tools</Filter>
+    </ClInclude>
+    <ClInclude Include="TObsoleteFiles.h">
+      <Filter>Source Files\Tools</Filter>
+    </ClInclude>
+    <ClInclude Include="TFakeFileSerializer.h">
+      <Filter>Source Files\Serialization\Fake</Filter>
+    </ClInclude>
+    <ClInclude Include="SerializerDataTypes.h">
+      <Filter>Source Files\Tools</Filter>
+    </ClInclude>
+    <ClInclude Include="GTestMacros.h">
+      <Filter>Tests</Filter>
+    </ClInclude>
+    <ClInclude Include="resource.h" />
+    <ClInclude Include="TRemovedObjects.h">
+      <Filter>Source Files\Tools</Filter>
+    </ClInclude>
+    <ClInclude Include="TModificationTracker.h">
+      <Filter>Source Files\Tools\ModificationTrackers</Filter>
+    </ClInclude>
+    <ClInclude Include="TSharedModificationTracker.h">
+      <Filter>Source Files\Tools\ModificationTrackers</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="dllmain.cpp">
+      <Filter>Source Files\Library files</Filter>
+    </ClCompile>
+    <ClCompile Include="stdafx.cpp">
+      <Filter>Source Files\Library files</Filter>
+    </ClCompile>
+    <ClCompile Include="ISQLiteSerializerSchema.cpp">
+      <Filter>Source Files\Serialization\SQLite\SQLite Schemas</Filter>
+    </ClCompile>
+    <ClCompile Include="TSQLiteTaskManagerSchema.cpp">
+      <Filter>Source Files\Serialization\SQLite\SQLite Schemas</Filter>
+    </ClCompile>
+    <ClCompile Include="TSQLiteTaskSchema.cpp">
+      <Filter>Source Files\Serialization\SQLite\SQLite Schemas</Filter>
+    </ClCompile>
+    <ClCompile Include="TSerializerVersion.cpp">
+      <Filter>Source Files\Serialization\SQLite</Filter>
+    </ClCompile>
+    <ClCompile Include="TSQLiteColumnDefinition.cpp">
+      <Filter>Source Files\Serialization\SQLite</Filter>
+    </ClCompile>
+    <ClCompile Include="TSQLiteSerializer.cpp">
+      <Filter>Source Files\Serialization\SQLite</Filter>
+    </ClCompile>
+    <ClCompile Include="TSQLiteSerializerContainer.cpp">
+      <Filter>Source Files\Serialization\SQLite</Filter>
+    </ClCompile>
+    <ClCompile Include="TSQLiteSerializerFactory.cpp">
+      <Filter>Source Files\Serialization\SQLite</Filter>
+    </ClCompile>
+    <ClCompile Include="TSQLiteSerializerRowData.cpp">
+      <Filter>Source Files\Serialization\SQLite</Filter>
+    </ClCompile>
+    <ClCompile Include="TSQLiteSerializerRowReader.cpp">
+      <Filter>Source Files\Serialization\SQLite</Filter>
+    </ClCompile>
+    <ClCompile Include="IColumnsDefinition.cpp">
+      <Filter>Source Files\Serialization</Filter>
+    </ClCompile>
+    <ClCompile Include="ISerializer.cpp">
+      <Filter>Source Files\Serialization</Filter>
+    </ClCompile>
+    <ClCompile Include="ISerializerContainer.cpp">
+      <Filter>Source Files\Serialization</Filter>
+    </ClCompile>
+    <ClCompile Include="ISerializerFactory.cpp">
+      <Filter>Source Files\Serialization</Filter>
+    </ClCompile>
+    <ClCompile Include="ISerializerRowData.cpp">
+      <Filter>Source Files\Serialization</Filter>
+    </ClCompile>
+    <ClCompile Include="ISerializerRowReader.cpp">
+      <Filter>Source Files\Serialization</Filter>
+    </ClCompile>
+    <ClCompile Include="TSerializerException.cpp">
+      <Filter>Source Files\Serialization</Filter>
+    </ClCompile>
+    <ClCompile Include="TSQLiteDatabase.cpp">
+      <Filter>Source Files\Tools\SQLite</Filter>
+    </ClCompile>
+    <ClCompile Include="TSQLiteException.cpp">
+      <Filter>Source Files\Tools\SQLite</Filter>
+    </ClCompile>
+    <ClCompile Include="TSQLiteStatement.cpp">
+      <Filter>Source Files\Tools\SQLite</Filter>
+    </ClCompile>
+    <ClCompile Include="TSQLiteTransaction.cpp">
+      <Filter>Source Files\Tools\SQLite</Filter>
+    </ClCompile>
+    <ClCompile Include="Tests\TestsTSQLiteDatabase.cpp">
+      <Filter>Tests</Filter>
+    </ClCompile>
+    <ClCompile Include="Tests\TestsTSQLiteStatement.cpp">
+      <Filter>Tests</Filter>
+    </ClCompile>
+    <ClCompile Include="Tests\TestsTSQLiteTransaction.cpp">
+      <Filter>Tests</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\tests\tests_shared\TestsExports.cpp">
+      <Filter>Tests</Filter>
+    </ClCompile>
+    <ClCompile Include="TPlainStringPool.cpp">
+      <Filter>Source Files\Tools</Filter>
+    </ClCompile>
+    <ClCompile Include="TObsoleteFiles.cpp">
+      <Filter>Source Files\Tools</Filter>
+    </ClCompile>
+    <ClCompile Include="TFakeFileSerializer.cpp">
+      <Filter>Source Files\Serialization\Fake</Filter>
+    </ClCompile>
+    <ClCompile Include="Tests\TestsTModificationTracker.cpp">
+      <Filter>Tests</Filter>
+    </ClCompile>
+    <ClCompile Include="Tests\TestsTSharedModificationTracker.cpp">
+      <Filter>Tests</Filter>
+    </ClCompile>
+    <ClCompile Include="TRemovedObjects.cpp">
+      <Filter>Source Files\Tools</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="libserializer.rc">
+      <Filter>Resource Files</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+</Project>

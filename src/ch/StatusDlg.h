@@ -22,11 +22,11 @@
 #include "FFListCtrl.h"
 #include "TProgressCtrlEx.h"
 #include "TExplorerTaskBarProgress.h"
+#include "../libchengine/TTask.h"
+#include "../libchengine/TTaskManager.h"
 
-namespace chcore
-{
+namespace chengine {
 	class TTaskManager;
-	class TTask;
 }
 
 #define WM_UPDATESTATUS WM_USER+6
@@ -38,17 +38,17 @@ class CStatusDlg : public ictranslate::CLanguageDialog
 {
 // Construction
 public:
-	explicit CStatusDlg(chcore::TTaskManager* pTasks, CWnd* pParent = nullptr);   // standard constructor
+	explicit CStatusDlg(chengine::TTaskManager* pTasks, CWnd* pParent = nullptr);   // standard constructor
 	virtual ~CStatusDlg();
 
 	void PostCloseMessage();
 	void SetBufferSizesString(unsigned long long ullValue, int iIndex);
 	void RefreshStatus();
 
-	int GetImageFromStatus(chcore::ETaskCurrentState eState);
+	int GetImageFromStatus(chengine::ETaskCurrentState eState);
 
 	void ApplyButtonsState();
-	chcore::TTaskPtr GetSelectedItemPointer();
+	chengine::TTaskPtr GetSelectedItemPointer();
 	size_t GetSelectedItemSessionUniqueID();
 
 	void EnableControls(bool bEnable=true);
@@ -61,7 +61,7 @@ protected:
 	void OnLanguageChanged() override;
 
 	void PrepareResizableControls();
-	CString GetStatusString(const chcore::TTaskStatsSnapshotPtr& spTaskStats);
+	CString GetStatusString(const chengine::TTaskStatsSnapshotPtr& spTaskStats);
 
 	void StickDialogToScreenEdge();
 
@@ -69,9 +69,9 @@ protected:
 	CString FormatTimeMiliseconds(unsigned long long timeMiliSeconds);
 
 	CString GetProcessedText(unsigned long long ullProcessedCount, unsigned long long ullTotalCount, unsigned long long ullProcessedSize, unsigned long long ullTotalSize);
-	void UpdateTaskStatsDetails(const chcore::TTaskStatsSnapshotPtr& spTaskStats);
-	void SetTaskListEntry(size_t stPos, const chcore::TTaskStatsSnapshotPtr& spTaskStats);
-	CString GetSubtaskName(chcore::ESubOperationType eSubtask) const;
+	void UpdateTaskStatsDetails(const chengine::TTaskStatsSnapshotPtr& spTaskStats);
+	void SetTaskListEntry(size_t stPos, const chengine::TTaskStatsSnapshotPtr& spTaskStats);
+	CString GetSubtaskName(chengine::ESubOperationType eSubtask) const;
 
 	CString GetProgressWindowTitleText() const;
 	void UpdateTaskBarProgress() const;
@@ -106,12 +106,12 @@ protected:
 	DECLARE_MESSAGE_MAP()
 
 public:
-	chcore::TTaskPtr m_spInitialSelection;
+	chengine::TTaskPtr m_spInitialSelection;
 
 	static bool m_bLock;				// locker
 
 protected:
-	chcore::TTaskManager* m_pTasks;
+	chengine::TTaskManager* m_pTasks;
 
 	CImageList m_images;
 	CFFListCtrl m_ctlStatusList;
@@ -123,7 +123,7 @@ protected:
 	TProgressCtrlEx m_ctlSubTaskSizeProgress;
 	TProgressCtrlEx	m_ctlProgressAll;
 
-	chcore::TTaskManagerStatsSnapshotPtr m_spTaskMgrStats;
+	chengine::TTaskManagerStatsSnapshotPtr m_spTaskMgrStats;
 	TExplorerTaskBarProgress m_taskBarProgress;
 };
 

@@ -20,7 +20,7 @@
 #include "TPathContainer.h"
 #include "TCoreException.h"
 #include "ErrorCodes.h"
-#include "TStringArray.h"
+#include "../libstring/TStringArray.h"
 
 namespace chcore
 {
@@ -158,35 +158,5 @@ namespace chcore
 	bool TPathContainer::IsEmpty() const
 	{
 		return m_vPaths.empty();
-	}
-
-	void TPathContainer::StoreInConfig(TConfig& rConfig, PCTSTR pszPropName) const
-	{
-		TStringArray vPaths;
-
-		// store as vector of strings (ineffective; should be done better)
-		for(const TSmartPath& spPath : m_vPaths)
-		{
-			vPaths.Add(spPath.ToWString());
-		}
-
-		rConfig.SetValue(pszPropName, vPaths);
-	}
-
-	bool TPathContainer::ReadFromConfig(const TConfig& rConfig, PCTSTR pszPropName)
-	{
-		m_vPaths.clear();
-
-		TStringArray vPaths;
-		if (rConfig.GetValue(pszPropName, vPaths))
-		{
-			for (size_t stIndex = 0; stIndex < vPaths.GetCount(); ++stIndex)
-			{
-				m_vPaths.push_back(PathFromWString(vPaths.GetAt(stIndex)));
-			}
-			return true;
-		}
-		else
-			return false;
 	}
 }

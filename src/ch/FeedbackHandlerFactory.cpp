@@ -28,7 +28,7 @@ CFeedbackHandlerFactory::~CFeedbackHandlerFactory()
 {
 }
 
-chcore::IFeedbackHandlerPtr CFeedbackHandlerFactory::Create()
+chengine::IFeedbackHandlerPtr CFeedbackHandlerFactory::Create()
 {
 	return std::make_shared<CFeedbackHandler>();
 }

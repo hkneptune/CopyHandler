@@ -19,16 +19,15 @@
 #ifndef __FEEDBACKHANDLERFACTORY_H__
 #define __FEEDBACKHANDLERFACTORY_H__
 
-#include "../libchcore/IFeedbackHandlerFactory.h"
-#include "../libchcore/IFeedbackHandler.h"
+#include "../libchengine/IFeedbackHandlerFactory.h"
 
-class CFeedbackHandlerFactory : public chcore::IFeedbackHandlerFactory
+class CFeedbackHandlerFactory : public chengine::IFeedbackHandlerFactory
 {
 public:
 	CFeedbackHandlerFactory();
 	virtual ~CFeedbackHandlerFactory();
 
-	chcore::IFeedbackHandlerPtr Create() override;
+	chengine::IFeedbackHandlerPtr Create() override;
 };
 
 typedef std::shared_ptr<CFeedbackHandlerFactory> CFeedbackHandlerFactoryPtr;

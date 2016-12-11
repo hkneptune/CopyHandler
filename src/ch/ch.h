@@ -21,12 +21,12 @@
 
 #include "AppHelper.h"
 #include "../libictranslate/ResourceManager.h"
-#include "../libchcore/TConfig.h"
 #include "TShellExtensionClient.h"
 #include "TCommandLineParser.h"
 #include "../liblogger/TLogger.h"
-#include "../libchcore/TCoreEngine.h"
 #include "TShellExtensionConfig.h"
+#include "../libchengine/TConfig.h"
+#include "../libchengine/TCoreEngine.h"
 
 class CCopyHandlerApp : public CWinApp, public CAppHelper
 {
@@ -45,7 +45,7 @@ public:
 
 	friend CCopyHandlerApp& GetApplication();
 	static ictranslate::CResourceManager& GetResManager();
-	static chcore::TConfig& GetConfig();
+	static chengine::TConfig& GetConfig();
 
 	logger::TLogFileDataPtr GetLogFileData() const;
 	logger::TMultiLoggerConfigPtr GetEngineLoggerConfig() const;
@@ -54,7 +54,7 @@ public:
 	void RegisterShellExtension();
 	void UnregisterShellExtension();
 
-	void OnConfigNotify(const chcore::TStringSet& setPropNames);
+	void OnConfigNotify(const string::TStringSet& setPropNames);
 	void OnResManNotify(UINT uiType);
 
 	const TCommandLineParser& GetCommandLine() const { return m_cmdLineParser; }
@@ -74,7 +74,7 @@ protected:
 
 	TCommandLineParser m_cmdLineParser;
 
-	chcore::TCoreEngine m_chEngine;
+	chengine::TCoreEngine m_chEngine;
 
 	TShellExtensionConfigPtr m_shellExtConfig;
 	TShellExtensionClient m_tShellExtClient;
@@ -103,7 +103,7 @@ inline ictranslate::CResourceManager& GetResManager()
 	return CCopyHandlerApp::GetResManager();
 }
 
-inline chcore::TConfig& GetConfig()
+inline chengine::TConfig& GetConfig()
 {
 	return CCopyHandlerApp::GetConfig();
 }

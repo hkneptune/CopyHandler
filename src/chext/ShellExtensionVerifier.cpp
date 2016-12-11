@@ -19,7 +19,7 @@
 #include "stdafx.h"
 #include "ShellExtensionVerifier.h"
 #include "Logger.h"
-#include "../libchcore/TConfig.h"
+#include "../libchengine/TConfig.h"
 #include "../liblogger/TLogger.h"
 #include "../common/TShellExtMenuConfig.h"
 #include <stdlib.h>
@@ -74,8 +74,8 @@ HRESULT ShellExtensionVerifier::ReadShellConfig(IShellExtControl* piShellExtCont
 
 		LOG_DEBUG(spLogger) << L"Requesting CH configuration";
 
-		chcore::TString wstrData = TShellExtIpcConfigDataConsumer::GetConfigData();
-		chcore::TConfig cfgShellExtData;
+		string::TString wstrData = TShellExtIpcConfigDataConsumer::GetConfigData();
+		chengine::TConfig cfgShellExtData;
 
 		LOG_TRACE(spLogger) << L"Retrieved shell ext config: " << wstrData;
 

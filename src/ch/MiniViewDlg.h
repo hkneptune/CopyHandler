@@ -24,6 +24,10 @@
 #include "ProgressListBox.h"
 #include <array>
 
+namespace chengine {
+	class TTaskManager;
+}
+
 namespace chcore
 {
 	class TTaskManager;
@@ -54,7 +58,7 @@ public:
 
 // Construction
 public:
-	CMiniViewDlg(chcore::TTaskManager* pArray, bool* pbHide, CWnd* pParent = nullptr);   // standard constructor
+	CMiniViewDlg(chengine::TTaskManager* pArray, bool* pbHide, CWnd* pParent = nullptr);   // standard constructor
 
 	void ShowWindow();
 	void HideWindow();
@@ -96,7 +100,7 @@ public:
 
 private:
 	// from CMainWnd
-	chcore::TTaskManager *m_pTasks;
+	chengine::TTaskManager *m_pTasks;
 
 	CBrush m_brBackground;
 	int m_iLastHeight;

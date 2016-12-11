@@ -19,21 +19,24 @@
 #ifndef __FEEDBACKHANDLER_H__
 #define __FEEDBACKHANDLER_H__
 
-#include "../libchcore/TFeedbackHandlerBase.h"
-#include "../libchcore/EFileError.h"
-#include "../libchcore/TFeedbackResult.h"
+#include "../libchengine/TFeedbackHandlerBase.h"
 
-class CFeedbackHandler : public chcore::TFeedbackHandlerBase
+namespace string
+{
+	class TString;
+}
+
+class CFeedbackHandler : public chengine::TFeedbackHandlerBase
 {
 public:
 	CFeedbackHandler();
 	virtual ~CFeedbackHandler();
 
-	chcore::TFeedbackResult FileError(const chcore::TString& strSrcPath, const chcore::TString& strDstPath, chcore::EFileError eFileError, unsigned long ulError) override;
-	chcore::TFeedbackResult FileAlreadyExists(const chcore::TFileInfo& spSrcFileInfo, const chcore::TFileInfo& spDstFileInfo) override;
-	chcore::TFeedbackResult NotEnoughSpace(const chcore::TString& strSrcPath, const chcore::TString& strDstPath, unsigned long long ullRequiredSize) override;
-	chcore::TFeedbackResult OperationFinished() override;
-	chcore::TFeedbackResult OperationError() override;
+	chengine::TFeedbackResult FileError(const string::TString& strSrcPath, const string::TString& strDstPath, chengine::EFileError eFileError, unsigned long ulError) override;
+	chengine::TFeedbackResult FileAlreadyExists(const chengine::TFileInfo& spSrcFileInfo, const chengine::TFileInfo& spDstFileInfo) override;
+	chengine::TFeedbackResult NotEnoughSpace(const string::TString& strSrcPath, const string::TString& strDstPath, unsigned long long ullRequiredSize) override;
+	chengine::TFeedbackResult OperationFinished() override;
+	chengine::TFeedbackResult OperationError() override;
 
 protected:
 	friend class CFeedbackHandlerFactory;

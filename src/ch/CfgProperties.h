@@ -21,10 +21,8 @@
 
 #pragma once
 
-#include "../libchcore/TTaskConfiguration.h"
 #include "UpdateVersionInfo.h"
-
-namespace chcore { class TConfig; }
+#include "../libchengine/TTaskConfiguration.h"
 
 // properties definitions
 enum ECHProperties
@@ -186,9 +184,9 @@ template<ECHProperties PropID> struct PropData;
 #define ADAPT_TASK_PROPERTY(enum_id, task_enum_id)\
 	template<> struct PropData<enum_id>\
 {\
-	typedef chcore::TaskPropData<task_enum_id>::value_type value_type;\
-	static value_type GetDefaultValue() { return chcore::TaskPropData<task_enum_id>::GetDefaultValue(); }\
-	static const wchar_t* GetPropertyName() { return chcore::TaskPropData<task_enum_id>::GetPropertyName(); }\
+	typedef chengine::TaskPropData<task_enum_id>::value_type value_type;\
+	static value_type GetDefaultValue() { return chengine::TaskPropData<task_enum_id>::GetDefaultValue(); }\
+	static const wchar_t* GetPropertyName() { return chengine::TaskPropData<task_enum_id>::GetPropertyName(); }\
 	static const wchar_t* GetPropertyNamePrefix() { return BRANCH_TASK_SETTINGS _T("."); }\
 }
 
@@ -257,26 +255,26 @@ PROPERTY(PP_SNDFINISHEDSOUNDPATH, CString, _T("CHConfig.Core.Notifications.Sound
 PROPERTY(PP_CMLIMITMAXOPERATIONS, unsigned int, _T("CHConfig.Core.Operation.LimitMaxOperations"), 1);
 
 // Task default settings (see TTaskConfiguration.h)
-ADAPT_TASK_PROPERTY(PP_BFUSEONLYDEFAULT, chcore::eTO_UseOnlyDefaultBuffer);
-ADAPT_TASK_PROPERTY(PP_BFDEFAULT, chcore::eTO_DefaultBufferSize);
-ADAPT_TASK_PROPERTY(PP_BFONEDISK, chcore::eTO_OneDiskBufferSize);
-ADAPT_TASK_PROPERTY(PP_BFTWODISKS, chcore::eTO_TwoDisksBufferSize);
-ADAPT_TASK_PROPERTY(PP_BFCD, chcore::eTO_CDBufferSize);
-ADAPT_TASK_PROPERTY(PP_BFLAN, chcore::eTO_LANBufferSize);
-ADAPT_TASK_PROPERTY(PP_BFUSENOBUFFERING, chcore::eTO_DisableBuffering);
-ADAPT_TASK_PROPERTY(PP_BFBOUNDARYLIMIT, chcore::eTO_DisableBufferingMinSize);
-ADAPT_TASK_PROPERTY(PP_BFQUEUEDEPTH, chcore::eTO_BufferQueueDepth);
-ADAPT_TASK_PROPERTY(PP_MAXREADAHEAD, chcore::eTO_MaxReadAheadBuffers);
-ADAPT_TASK_PROPERTY(PP_MAXCONCURRENTREADS, chcore::eTO_MaxConcurrentReads);
-ADAPT_TASK_PROPERTY(PP_MAXCONCURRENTWRITES, chcore::eTO_MaxConcurrentWrites);
+ADAPT_TASK_PROPERTY(PP_BFUSEONLYDEFAULT, chengine::eTO_UseOnlyDefaultBuffer);
+ADAPT_TASK_PROPERTY(PP_BFDEFAULT, chengine::eTO_DefaultBufferSize);
+ADAPT_TASK_PROPERTY(PP_BFONEDISK, chengine::eTO_OneDiskBufferSize);
+ADAPT_TASK_PROPERTY(PP_BFTWODISKS, chengine::eTO_TwoDisksBufferSize);
+ADAPT_TASK_PROPERTY(PP_BFCD, chengine::eTO_CDBufferSize);
+ADAPT_TASK_PROPERTY(PP_BFLAN, chengine::eTO_LANBufferSize);
+ADAPT_TASK_PROPERTY(PP_BFUSENOBUFFERING, chengine::eTO_DisableBuffering);
+ADAPT_TASK_PROPERTY(PP_BFBOUNDARYLIMIT, chengine::eTO_DisableBufferingMinSize);
+ADAPT_TASK_PROPERTY(PP_BFQUEUEDEPTH, chengine::eTO_BufferQueueDepth);
+ADAPT_TASK_PROPERTY(PP_MAXREADAHEAD, chengine::eTO_MaxReadAheadBuffers);
+ADAPT_TASK_PROPERTY(PP_MAXCONCURRENTREADS, chengine::eTO_MaxConcurrentReads);
+ADAPT_TASK_PROPERTY(PP_MAXCONCURRENTWRITES, chengine::eTO_MaxConcurrentWrites);
 
-ADAPT_TASK_PROPERTY(PP_CMSETDESTATTRIBUTES, chcore::eTO_SetDestinationAttributes);
-ADAPT_TASK_PROPERTY(PP_CMPROTECTROFILES, chcore::eTO_ProtectReadOnlyFiles);
-ADAPT_TASK_PROPERTY(PP_CMREADSIZEBEFOREBLOCKING, chcore::eTO_ScanDirectoriesBeforeBlocking);
-ADAPT_TASK_PROPERTY(PP_CMFASTMOVEBEFOREBLOCKING, chcore::eTO_FastMoveBeforeBlocking);
-ADAPT_TASK_PROPERTY(PP_CMDEFAULTPRIORITY, chcore::eTO_ThreadPriority);
-ADAPT_TASK_PROPERTY(PP_CMDISABLEPRIORITYBOOST, chcore::eTO_DisablePriorityBoost);
-ADAPT_TASK_PROPERTY(PP_CMDELETEAFTERFINISHED, chcore::eTO_DeleteInSeparateSubTask);
+ADAPT_TASK_PROPERTY(PP_CMSETDESTATTRIBUTES, chengine::eTO_SetDestinationAttributes);
+ADAPT_TASK_PROPERTY(PP_CMPROTECTROFILES, chengine::eTO_ProtectReadOnlyFiles);
+ADAPT_TASK_PROPERTY(PP_CMREADSIZEBEFOREBLOCKING, chengine::eTO_ScanDirectoriesBeforeBlocking);
+ADAPT_TASK_PROPERTY(PP_CMFASTMOVEBEFOREBLOCKING, chengine::eTO_FastMoveBeforeBlocking);
+ADAPT_TASK_PROPERTY(PP_CMDEFAULTPRIORITY, chengine::eTO_ThreadPriority);
+ADAPT_TASK_PROPERTY(PP_CMDISABLEPRIORITYBOOST, chengine::eTO_DisablePriorityBoost);
+ADAPT_TASK_PROPERTY(PP_CMDELETEAFTERFINISHED, chengine::eTO_DeleteInSeparateSubTask);
 
 PROPERTY(PP_USECUSTOMNAMING, bool, _T("CHConfig.Core.Naming.UseCustomNaming"), false);
 PROPERTY(PP_CUSTOMNAME_FIRST, CString, _T("CHConfig.Core.Naming.FirstCustomName"), _T(""));
@@ -308,7 +306,7 @@ PROPERTY_MINMAX(PP_LAST_UPDATE_TIMESTAMP, long long, _T("CHConfig.RuntimeState.L
 // Properties retrieval
 
 template<ECHProperties PropID>
-typename PropData<PropID>::value_type GetPropValue(const chcore::TConfig& rConfig)
+typename PropData<PropID>::value_type GetPropValue(const chengine::TConfig& rConfig)
 {
 	typename PropData<PropID>::value_type tValue;
 	if(!GetConfigValue(rConfig, CString(PropData<PropID>::GetPropertyNamePrefix()) + PropData<PropID>::GetPropertyName(), tValue))
@@ -317,7 +315,7 @@ typename PropData<PropID>::value_type GetPropValue(const chcore::TConfig& rConfi
 }
 
 template<ECHProperties PropID>
-bool GetPropValue(const chcore::TConfig& rConfig, typename PropData<PropID>::value_type& rValue)
+bool GetPropValue(const chengine::TConfig& rConfig, typename PropData<PropID>::value_type& rValue)
 {
 	bool bResult = GetConfigValue(rConfig, CString(PropData<PropID>::GetPropertyNamePrefix()) + PropData<PropID>::GetPropertyName(), rValue);
 	if(!bResult)
@@ -327,7 +325,7 @@ bool GetPropValue(const chcore::TConfig& rConfig, typename PropData<PropID>::val
 }
 
 template<ECHProperties PropID>
-void SetPropValue(chcore::TConfig& rConfig, const typename PropData<PropID>::value_type& rValue)
+void SetPropValue(chengine::TConfig& rConfig, const typename PropData<PropID>::value_type& rValue)
 {
 	SetConfigValue(rConfig, CString(PropData<PropID>::GetPropertyNamePrefix()) + PropData<PropID>::GetPropertyName(), rValue);
 }

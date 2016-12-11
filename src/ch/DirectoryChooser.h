@@ -19,12 +19,17 @@
 #ifndef __DIRECTORYCHOOSER_H__
 #define __DIRECTORYCHOOSER_H__
 
-#include "../libchcore/EOperationTypes.h"
+#include "../libchengine/EOperationTypes.h"
+
+namespace chcore
+{
+	class TPathContainer;
+	class TSmartPath;
+}
 
 namespace DirectoryChooser
 {
-	INT_PTR ChooseDirectory(chcore::EOperationType eOperation, const chcore::TPathContainer& rInputPaths, chcore::TSmartPath& rSelectedPath);
+	INT_PTR ChooseDirectory(chengine::EOperationType eOperation, const chcore::TPathContainer& rInputPaths, chcore::TSmartPath& rSelectedPath);
 }
-
 
 #endif

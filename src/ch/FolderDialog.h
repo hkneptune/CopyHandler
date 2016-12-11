@@ -35,7 +35,7 @@
 #include "DirTreeCtrl.h"
 #include "ThemedButton.h"
 #include "../libictranslate/LanguageDialog.h"
-#include "../libchcore/TLocalFilesystem.h"
+#include "../libchengine/TLocalFilesystem.h"
 
 /////////////////////////////////////////////////////////////////////////////
 // CFolderDialog dialog
@@ -146,7 +146,7 @@ protected:
 	DECLARE_MESSAGE_MAP()
 
 private:
-	chcore::TLocalFilesystem m_fsLocal;
+	chengine::TLocalFilesystem m_fsLocal;
 };
 
 #endif

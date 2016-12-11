@@ -18,6 +18,7 @@
 ***************************************************************************/
 #ifndef __FILTERDLG_H__
 #define __FILTERDLG_H__
+#include "../libchengine/TFileFilter.h"
 
 /////////////////////////////////////////////////////////////////////////////
 // CFilterDlg dialog
@@ -72,7 +73,7 @@ public:
 	// Implementation
 public:
 	void SetSize2(unsigned __int64 ullSize);
-	chcore::TFileFilter m_ffFilter;
+	chengine::TFileFilter m_ffFilter;
 	CStringArray m_astrAddMask;
 	CStringArray m_astrAddExcludeMask;
 

@@ -17,7 +17,6 @@
 *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
 ***************************************************************************/
 #include "stdafx.h"
-#include "../libchcore/TFileFilter.h"
 #include "ch.h"
 #include "FilterDlg.h"
 #include "resource.h"
@@ -348,27 +347,27 @@ void CFilterDlg::OnOK()
 	m_ffFilter.SetUseSize1(m_bSize != 0);
 	m_ffFilter.SetUseSize2(m_bSize2 != 0);
 
-	m_ffFilter.SetSizeType1((chcore::TFileFilter::ESizeCompareType)m_ctlSizeType1.GetCurSel());
-	m_ffFilter.SetSizeType2((chcore::TFileFilter::ESizeCompareType)m_ctlSizeType2.GetCurSel());
+	m_ffFilter.SetSizeType1((chengine::TFileFilter::ESizeCompareType)m_ctlSizeType1.GetCurSel());
+	m_ffFilter.SetSizeType2((chengine::TFileFilter::ESizeCompareType)m_ctlSizeType2.GetCurSel());
 
 	m_ffFilter.SetSize1(static_cast<unsigned __int64>(m_uiSize1)*static_cast<unsigned __int64>(GetMultiplier(m_ctlSize1Multi.GetCurSel())));
 	m_ffFilter.SetSize2(static_cast<unsigned __int64>(m_uiSize2)*static_cast<unsigned __int64>(GetMultiplier(m_ctlSize2Multi.GetCurSel())));
 
 	// date
-	m_ffFilter.SetDateType((chcore::TFileFilter::EDateType)m_ctlDateType.GetCurSel());
+	m_ffFilter.SetDateType((chengine::TFileFilter::EDateType)m_ctlDateType.GetCurSel());
 
-	m_ffFilter.SetDateCmpType1((chcore::TFileFilter::EDateCompareType)m_ctlDateType1.GetCurSel());
-	m_ffFilter.SetDateCmpType2((chcore::TFileFilter::EDateCompareType)m_ctlDateType2.GetCurSel());
+	m_ffFilter.SetDateCmpType1((chengine::TFileFilter::EDateCompareType)m_ctlDateType1.GetCurSel());
+	m_ffFilter.SetDateCmpType2((chengine::TFileFilter::EDateCompareType)m_ctlDateType2.GetCurSel());
 
 	CTime tDate;
 	CTime tTime;
 	m_ffFilter.SetUseDate1(m_ctlDate1.GetTime(tDate) == GDT_VALID);
 	m_ffFilter.SetUseTime1(m_ctlTime1.GetTime(tTime) == GDT_VALID);
-	m_ffFilter.SetDateTime1(chcore::TDateTime(tDate.GetYear(), tDate.GetMonth(), tDate.GetDay(), tTime.GetHour(), tTime.GetMinute(), tTime.GetSecond()));
+	m_ffFilter.SetDateTime1(chengine::TDateTime(tDate.GetYear(), tDate.GetMonth(), tDate.GetDay(), tTime.GetHour(), tTime.GetMinute(), tTime.GetSecond()));
 	
 	m_ffFilter.SetUseDate2(m_ctlDate2.GetTime(tDate) == GDT_VALID);
 	m_ffFilter.SetUseTime2(m_ctlTime2.GetTime(tTime) == GDT_VALID);
-	m_ffFilter.SetDateTime2(chcore::TDateTime(tDate.GetYear(), tDate.GetMonth(), tDate.GetDay(), tTime.GetHour(), tTime.GetMinute(), tTime.GetSecond()));
+	m_ffFilter.SetDateTime2(chengine::TDateTime(tDate.GetYear(), tDate.GetMonth(), tDate.GetDay(), tTime.GetHour(), tTime.GetMinute(), tTime.GetSecond()));
 
 	m_ffFilter.SetUseDateTime1((m_bDate1 != 0) && (m_ffFilter.GetUseDate1() || m_ffFilter.GetUseTime1()));
 	m_ffFilter.SetUseDateTime2((m_bDate2 != 0) && (m_ffFilter.GetUseDate2() || m_ffFilter.GetUseTime2()));

@@ -19,12 +19,17 @@
 #ifndef __FEEDBACKREPLACEDLG_H__
 #define __FEEDBACKREPLACEDLG_H__
 
+namespace chengine
+{
+	class TFileInfo;
+}
+
 class CFeedbackReplaceDlg : public ictranslate::CLanguageDialog
 {
 	DECLARE_DYNAMIC(CFeedbackReplaceDlg)
 
 public:
-	CFeedbackReplaceDlg(const chcore::TFileInfo& spSrcFile, const chcore::TFileInfo& spDstFile, CWnd* pParent = nullptr);   // standard constructor
+	CFeedbackReplaceDlg(const chengine::TFileInfo& spSrcFile, const chengine::TFileInfo& spDstFile, CWnd* pParent = nullptr);   // standard constructor
 	virtual ~CFeedbackReplaceDlg();
 
 	BOOL OnInitDialog() override;
@@ -57,8 +62,8 @@ private:
 	BOOL m_bAllItems;
 
 protected:
-	const chcore::TFileInfo& m_rSrcFile;
-	const chcore::TFileInfo& m_rDstFile;
+	const chengine::TFileInfo& m_rSrcFile;
+	const chengine::TFileInfo& m_rDstFile;
 
 public:
 	afx_msg void OnBnClickedReplaceButton();

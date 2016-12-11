@@ -17,7 +17,6 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 #include "stdafx.h"
-#include "../libchcore/TFileInfo.h"
 #include "FeedbackHandler.h"
 #include "FeedbackReplaceDlg.h"
 #include "FeedbackFileErrorDlg.h"
@@ -25,8 +24,11 @@
 #include "ch.h"
 #include "mmsystem.h"
 #include "CfgProperties.h"
+#include "../libchengine/TConfigSerializers.h"
 
 using namespace chcore;
+using namespace chengine;
+using namespace string;
 
 CFeedbackHandler::CFeedbackHandler() :
 	TFeedbackHandlerBase()

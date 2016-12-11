@@ -23,7 +23,7 @@
 #ifndef __TSHAREDMEMORY_H__
 #define __TSHAREDMEMORY_H__
 
-#include "TString.h"
+#include "../libstring/TString.h"
 #include "TIpcMutex.h"
 
 namespace chcore
@@ -41,14 +41,14 @@ namespace chcore
 		TSharedMemory& operator=(const TSharedMemory&) = delete;
 
 		void Create(const wchar_t* pszName, shm_size_t stSize);
-		void Create(const wchar_t* pszName, const TString& wstrData);
+		void Create(const wchar_t* pszName, const string::TString& wstrData);
 		void Create(const wchar_t* pszName, const BYTE* pbyData, shm_size_t stSize);
 
 		void Open(const wchar_t* pszName);
 		void Close() throw();
 
-		void Read(TString& wstrData) const;
-		void Write(const TString& wstrData);
+		void Read(string::TString& wstrData) const;
+		void Write(const string::TString& wstrData);
 		void Write(const BYTE* pbyData, shm_size_t stSize);
 
 		// below are the unsafe functions (i.e. not protected with mutex)

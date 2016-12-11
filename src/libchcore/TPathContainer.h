@@ -20,7 +20,6 @@
 #define __TPATHCONTAINER_H__
 
 #include "TPath.h"
-#include "TConfig.h"
 
 namespace chcore
 {
@@ -44,9 +43,6 @@ namespace chcore
 		size_t GetCount() const;
 		bool IsEmpty() const;
 
-		void StoreInConfig(TConfig& rConfig, PCTSTR pszPropName) const;
-		bool ReadFromConfig(const TConfig& rConfig, PCTSTR pszPropName);
-
 	private:
 #pragma warning(push)
 #pragma warning(disable: 4251)
@@ -54,7 +50,5 @@ namespace chcore
 #pragma warning(pop)
 	};
 }
-
-CONFIG_MEMBER_SERIALIZATION(TPathContainer)
 
 #endif

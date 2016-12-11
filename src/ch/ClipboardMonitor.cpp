@@ -23,8 +23,6 @@
 #include "../libchcore/TWorkerThreadController.h"
 #include "ClipboardMonitor.h"
 #include "ch.h"
-#include "../libchcore/TTaskManager.h"
-#include "../libchcore/TTask.h"
 #include "CfgProperties.h"
 #include "FolderDialog.h"
 #include "ShutdownDlg.h"
@@ -45,7 +43,7 @@ CClipboardMonitor::~CClipboardMonitor()
 	Stop();
 }
 
-void CClipboardMonitor::StartMonitor(chcore::TTaskManagerPtr spTasks)
+void CClipboardMonitor::StartMonitor(chengine::TTaskManagerPtr spTasks)
 {
 	CClipboardMonitor::S_ClipboardMonitor.Start(spTasks);
 }
@@ -55,7 +53,7 @@ void CClipboardMonitor::StopMonitor()
 	return CClipboardMonitor::S_ClipboardMonitor.Stop();
 }
 
-void CClipboardMonitor::Start(chcore::TTaskManagerPtr spTasks)
+void CClipboardMonitor::Start(chengine::TTaskManagerPtr spTasks)
 {
 	m_spTasks = spTasks;
 
@@ -78,7 +76,7 @@ DWORD WINAPI CClipboardMonitor::ClipboardMonitorProc(LPVOID pParam)
 	UINT nFormat=RegisterClipboardFormat(_T("Preferred DropEffect"));
 	UINT uiCounter=0, uiShutCounter=0;
 
-	chcore::TConfig& rConfig = GetConfig();
+	chengine::TConfig& rConfig = GetConfig();
 	for(;;)
 	{
 		if (uiCounter == 0 && GetPropValue<PP_PCLIPBOARDMONITORING>(rConfig) && IsClipboardFormatAvailable(CF_HDROP))
@@ -89,7 +87,7 @@ DWORD WINAPI CClipboardMonitor::ClipboardMonitorProc(LPVOID pParam)
 
 			UINT nCount=DragQueryFile(static_cast<HDROP>(handle), 0xffffffff, nullptr, 0);
 
-			chcore::TTaskDefinition tTaskDefinition;
+			chengine::TTaskDefinition tTaskDefinition;
 
 			// list of files
 			for(UINT stIndex = 0; stIndex < nCount; stIndex++)
@@ -100,7 +98,7 @@ DWORD WINAPI CClipboardMonitor::ClipboardMonitorProc(LPVOID pParam)
 			}
 
 			// operation type
-			chcore::EOperationType eOperation = chcore::eOperation_Copy;
+			chengine::EOperationType eOperation = chengine::eOperation_Copy;
 
 			if(IsClipboardFormatAvailable(nFormat))
 			{
@@ -109,14 +107,14 @@ DWORD WINAPI CClipboardMonitor::ClipboardMonitorProc(LPVOID pParam)
 
 				DWORD dwData=((DWORD*)addr)[0];
 				if(dwData & DROPEFFECT_COPY)
-					eOperation = chcore::eOperation_Copy;	// copy
+					eOperation = chengine::eOperation_Copy;	// copy
 				else if(dwData & DROPEFFECT_MOVE)
-					eOperation = chcore::eOperation_Move;	// move
+					eOperation = chengine::eOperation_Move;	// move
 
 				GlobalUnlock(handle);
 			}
 			else
-				eOperation = chcore::eOperation_Copy;	// default - copy
+				eOperation = chengine::eOperation_Copy;	// default - copy
 
 			tTaskDefinition.SetOperationType(eOperation);	// copy
 

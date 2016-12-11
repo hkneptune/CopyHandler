@@ -22,11 +22,15 @@
 // ============================================================================
 #include "stdafx.h"
 #include "TShellExtMenuConfig.h"
-#include "../libchcore/TConfig.h"
-#include "../libchcore/TConfigArray.h"
+#include "../libchengine/TConfig.h"
 #include <memory>
 #include <boost/assert.hpp>
 #include <boost/lexical_cast.hpp>
+#include "../libchengine/TConfig.h"
+#include "../libchengine/TConfigArray.h"
+
+using namespace chcore;
+using namespace chengine;
 
 // helper method for concatenating strings
 namespace
@@ -51,17 +55,17 @@ namespace
 
 TOperationTypeInfo::TOperationTypeInfo() :
 	m_eOperationTypeSource(eOpType_Autodetect),
-	m_eDefaultOperationType(chcore::eOperation_None)
+	m_eDefaultOperationType(eOperation_None)
 {
 }
 
-TOperationTypeInfo::TOperationTypeInfo(TOperationTypeInfo::EOperationTypeSource eType, chcore::EOperationType eDefaultOperationType) :
+TOperationTypeInfo::TOperationTypeInfo(TOperationTypeInfo::EOperationTypeSource eType, EOperationType eDefaultOperationType) :
 	m_eOperationTypeSource(eType),
 	m_eDefaultOperationType(eDefaultOperationType)
 {
 }
 
-void TOperationTypeInfo::SetOperationTypeInfo(TOperationTypeInfo::EOperationTypeSource eType, chcore::EOperationType eDefaultOperationType)
+void TOperationTypeInfo::SetOperationTypeInfo(TOperationTypeInfo::EOperationTypeSource eType, EOperationType eDefaultOperationType)
 {
 	m_eOperationTypeSource = eType;
 	m_eDefaultOperationType = eDefaultOperationType;
@@ -72,7 +76,7 @@ TOperationTypeInfo::EOperationTypeSource TOperationTypeInfo::GetOperationTypeSou
 	return m_eOperationTypeSource;
 }
 
-chcore::EOperationType TOperationTypeInfo::GetDefaultOperationType() const
+EOperationType TOperationTypeInfo::GetDefaultOperationType() const
 {
 	return m_eDefaultOperationType;
 }
@@ -80,17 +84,17 @@ chcore::EOperationType TOperationTypeInfo::GetDefaultOperationType() const
 void TOperationTypeInfo::Clear()
 {
 	m_eOperationTypeSource = eOpType_Autodetect;
-	m_eDefaultOperationType = chcore::eOperation_None;
+	m_eDefaultOperationType = eOperation_None;
 }
 
-void TOperationTypeInfo::StoreInConfig(chcore::TConfig& rConfig, PCTSTR pszNodeName) const
+void TOperationTypeInfo::StoreInConfig(TConfig& rConfig, PCTSTR pszNodeName) const
 {
 	std::wstring wstrBuffer;
 	SetConfigValue(rConfig, Concat(wstrBuffer, pszNodeName, _T("OperationTypeSource")), m_eOperationTypeSource);
 	SetConfigValue(rConfig, Concat(wstrBuffer, pszNodeName, _T("DefaultOperationType")), m_eDefaultOperationType);
 }
 
-bool TOperationTypeInfo::ReadFromConfig(chcore::TConfig& rConfig, PCTSTR pszNodeName)
+bool TOperationTypeInfo::ReadFromConfig(TConfig& rConfig, PCTSTR pszNodeName)
 {
 	std::wstring wstrBuffer;
 	if(!GetConfigValue(rConfig, Concat(wstrBuffer, pszNodeName, _T("OperationTypeSource")), *(int*)&m_eOperationTypeSource))
@@ -126,13 +130,13 @@ void TSourcePathsInfo::Clear()
 	m_eSrcPathsSource = eSrcType_InitializeAuto;
 }
 
-void TSourcePathsInfo::StoreInConfig(chcore::TConfig& rConfig, PCTSTR pszNodeName) const
+void TSourcePathsInfo::StoreInConfig(TConfig& rConfig, PCTSTR pszNodeName) const
 {
 	std::wstring wstrBuffer;
 	SetConfigValue(rConfig, Concat(wstrBuffer, pszNodeName, _T("SrcPathsSource")), m_eSrcPathsSource);
 }
 
-bool TSourcePathsInfo::ReadFromConfig(chcore::TConfig& rConfig, PCTSTR pszNodeName)
+bool TSourcePathsInfo::ReadFromConfig(TConfig& rConfig, PCTSTR pszNodeName)
 {
 	std::wstring wstrBuffer;
 	return GetConfigValue(rConfig, Concat(wstrBuffer, pszNodeName, _T("SrcPathsSource")), *(int*)&m_eSrcPathsSource);
@@ -176,14 +180,14 @@ void TDestinationPathInfo::Clear()
 	m_pathDestination.Clear();
 }
 
-void TDestinationPathInfo::StoreInConfig(chcore::TConfig& rConfig, PCTSTR pszNodeName) const
+void TDestinationPathInfo::StoreInConfig(TConfig& rConfig, PCTSTR pszNodeName) const
 {
 	std::wstring wstrBuffer;
 	SetConfigValue(rConfig, Concat(wstrBuffer, pszNodeName, _T("DstPathSource")), m_eDstPathSource);
 	SetConfigValue(rConfig, Concat(wstrBuffer, pszNodeName, _T("DefaultDestinationPath")), m_pathDestination);
 }
 
-bool TDestinationPathInfo::ReadFromConfig(chcore::TConfig& rConfig, PCTSTR pszNodeName)
+bool TDestinationPathInfo::ReadFromConfig(TConfig& rConfig, PCTSTR pszNodeName)
 {
 	std::wstring wstrBuffer;
 	if(!GetConfigValue(rConfig, Concat(wstrBuffer, pszNodeName, _T("DstPathSource")), *(int*)&m_eDstPathSource))
@@ -200,11 +204,11 @@ TShellMenuItem::TShellMenuItem() :
 	m_tDestinationPath(),
 	m_tSourcePaths(),
 	m_bSpecialOperation(false),
-	m_eDefaultItemHint(chcore::eOperation_None)
+	m_eDefaultItemHint(eOperation_None)
 {
 }
 
-TShellMenuItem::TShellMenuItem(const chcore::TString& wstrName, const chcore::TString& wstrItemTip, const TOperationTypeInfo& rOperationType, const TSourcePathsInfo& rSourcePaths, const TDestinationPathInfo& rDestinationPath, bool bSpecialOperation, chcore::EOperationType eDefaultItemHint) :
+TShellMenuItem::TShellMenuItem(const string::TString& wstrName, const string::TString& wstrItemTip, const TOperationTypeInfo& rOperationType, const TSourcePathsInfo& rSourcePaths, const TDestinationPathInfo& rDestinationPath, bool bSpecialOperation, EOperationType eDefaultItemHint) :
 	m_eItemType(eStandardItem),
 	m_strName(wstrName),
 	m_strItemTip(wstrItemTip),
@@ -216,7 +220,7 @@ TShellMenuItem::TShellMenuItem(const chcore::TString& wstrName, const chcore::TS
 {
 }
 
-TShellMenuItem::TShellMenuItem(const chcore::TString& wstrName, const chcore::TString& wstrItemTip) :
+TShellMenuItem::TShellMenuItem(const string::TString& wstrName, const string::TString& wstrItemTip) :
 	m_eItemType(eGroupItem),
 	m_strName(wstrName),
 	m_strItemTip(wstrItemTip),
@@ -224,7 +228,7 @@ TShellMenuItem::TShellMenuItem(const chcore::TString& wstrName, const chcore::TS
 	m_tDestinationPath(),
 	m_tSourcePaths(),
 	m_bSpecialOperation(false),
-	m_eDefaultItemHint(chcore::eOperation_None)
+	m_eDefaultItemHint(eOperation_None)
 {
 }
 
@@ -244,17 +248,17 @@ void TShellMenuItem::Clear()
 	m_tDestinationPath.Clear();
 
 	m_bSpecialOperation = false;
-	m_eDefaultItemHint = chcore::eOperation_None;
+	m_eDefaultItemHint = eOperation_None;
 
 	m_vChildItems.clear();
 }
 
-const chcore::TString& TShellMenuItem::GetName() const
+const string::TString& TShellMenuItem::GetName() const
 {
 	return m_strName;
 }
 
-const chcore::TString& TShellMenuItem::GetLocalName(bool bUseFallback) const
+const string::TString& TShellMenuItem::GetLocalName(bool bUseFallback) const
 {
 	if(bUseFallback && m_strLocalName.IsEmpty())
 		return m_strName;
@@ -262,7 +266,7 @@ const chcore::TString& TShellMenuItem::GetLocalName(bool bUseFallback) const
 	return m_strLocalName;
 }
 
-void TShellMenuItem::SetLocalName(const chcore::TString& strLocalName)
+void TShellMenuItem::SetLocalName(const string::TString& strLocalName)
 {
 	m_strLocalName = strLocalName;
 }
@@ -274,7 +278,7 @@ void TShellMenuItem::InitSeparatorItem()
 	m_eItemType = eSeparatorItem;
 }
 
-void TShellMenuItem::InitStandardItem(const chcore::TString& wstrName, const chcore::TString& wstrItemTip, const TOperationTypeInfo& rOperationType, const TSourcePathsInfo& rSourcePaths, const TDestinationPathInfo& rDestinationPath, bool bSpecialOperation, chcore::EOperationType eDefaultItemHint)
+void TShellMenuItem::InitStandardItem(const string::TString& wstrName, const string::TString& wstrItemTip, const TOperationTypeInfo& rOperationType, const TSourcePathsInfo& rSourcePaths, const TDestinationPathInfo& rDestinationPath, bool bSpecialOperation, EOperationType eDefaultItemHint)
 {
 	Clear();
 
@@ -290,7 +294,7 @@ void TShellMenuItem::InitStandardItem(const chcore::TString& wstrName, const chc
 	m_eDefaultItemHint = eDefaultItemHint;
 }
 
-void TShellMenuItem::InitGroupItem(const chcore::TString& wstrName, const chcore::TString& wstrItemTip)
+void TShellMenuItem::InitGroupItem(const string::TString& wstrName, const string::TString& wstrItemTip)
 {
 	Clear();
 
@@ -344,7 +348,7 @@ void TShellMenuItem::RemoveAllChildren()
 	m_vChildItems.clear();
 }
 
-void TShellMenuItem::StoreInConfig(chcore::TConfig& rConfig, PCTSTR pszNodeName) const
+void TShellMenuItem::StoreInConfig(TConfig& rConfig, PCTSTR pszNodeName) const
 {
 	std::wstring wstrBuffer;
 
@@ -360,7 +364,7 @@ void TShellMenuItem::StoreInConfig(chcore::TConfig& rConfig, PCTSTR pszNodeName)
 
 			for(const TShellMenuItemPtr& rItem : m_vChildItems)
 			{
-				chcore::TConfig cfgItem;
+				TConfig cfgItem;
 				rItem->StoreInConfig(cfgItem, _T(""));
 				rConfig.AddSubConfig(Concat(wstrBuffer, pszNodeName, _T("Subitems.Subitem")), cfgItem);
 			}
@@ -385,7 +389,7 @@ void TShellMenuItem::StoreInConfig(chcore::TConfig& rConfig, PCTSTR pszNodeName)
 	}
 }
 
-bool TShellMenuItem::ReadFromConfig(chcore::TConfig& rConfig, PCTSTR pszNodeName)
+bool TShellMenuItem::ReadFromConfig(TConfig& rConfig, PCTSTR pszNodeName)
 {
 	Clear();
 
@@ -403,12 +407,12 @@ bool TShellMenuItem::ReadFromConfig(chcore::TConfig& rConfig, PCTSTR pszNodeName
 			if(!GetConfigValue(rConfig, Concat(wstrBuffer, pszNodeName, _T("ItemDescription")), m_strItemTip))
 				return false;
 
-			chcore::TConfigArray vCfgs;
+			TConfigArray vCfgs;
 			if(rConfig.ExtractMultiSubConfigs(Concat(wstrBuffer, pszNodeName, _T("Subitems.Subitem")), vCfgs))
 			{
 				for(size_t stIndex = 0; stIndex < vCfgs.GetCount(); ++stIndex)
 				{
-					chcore::TConfig& rCfg = vCfgs.GetAt(stIndex);
+					TConfig& rCfg = vCfgs.GetAt(stIndex);
 
 					TShellMenuItemPtr spItem(std::make_shared<TShellMenuItem>());
 					spItem->ReadFromConfig(rCfg, nullptr);
@@ -452,7 +456,7 @@ bool TShellMenuItem::ReadFromConfig(chcore::TConfig& rConfig, PCTSTR pszNodeName
 TShellExtMenuConfig::TShellExtMenuConfig() :
 	m_spDragAndDropRoot(std::make_shared<TShellMenuItem>(_T(""), _T(""))),
 	m_spNormalRoot(std::make_shared<TShellMenuItem>(_T(""), _T(""))),
-	m_spFmtSize(std::make_shared<chcore::TSizeFormatter>()),
+	m_spFmtSize(std::make_shared<TSizeFormatter>()),
 	m_bInterceptDragAndDrop(false),
 	m_bInterceptKeyboardActions(false),
 	m_bInterceptCtxMenuActions(false),
@@ -485,12 +489,12 @@ TShellMenuItemPtr TShellExtMenuConfig::GetNormalRoot()
 	return m_spNormalRoot;
 }
 
-chcore::TSizeFormatterPtr TShellExtMenuConfig::GetFormatter() const
+TSizeFormatterPtr TShellExtMenuConfig::GetFormatter() const
 {
 	return m_spFmtSize;
 }
 
-void TShellExtMenuConfig::StoreInConfig(chcore::TConfig& rConfig, PCTSTR pszNodeName) const
+void TShellExtMenuConfig::StoreInConfig(TConfig& rConfig, PCTSTR pszNodeName) const
 {
 	std::wstring strBuffer;
 	SetConfigValue(rConfig, Concat(strBuffer, pszNodeName, _T("InterceptDragAndDrop")), m_bInterceptDragAndDrop);
@@ -505,7 +509,7 @@ void TShellExtMenuConfig::StoreInConfig(chcore::TConfig& rConfig, PCTSTR pszNode
 	m_spNormalRoot->StoreInConfig(rConfig, Concat(strBuffer, pszNodeName, _T("NormalRootItem")));
 }
 
-bool TShellExtMenuConfig::ReadFromConfig(chcore::TConfig& rConfig, PCTSTR pszNodeName)
+bool TShellExtMenuConfig::ReadFromConfig(TConfig& rConfig, PCTSTR pszNodeName)
 {
 	Clear();
 

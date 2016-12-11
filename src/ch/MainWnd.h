@@ -21,8 +21,9 @@
 #define __MAINFRM_H__
 
 #include "TrayIcon.h"
-#include "../libchcore/TTaskManager.h"
 #include "../libchcore/TSharedMemory.h"
+#include "../libchengine/TTask.h"
+#include "../libchengine/TTaskManager.h"
 
 class TShellExtMenuConfig;
 class CMiniViewDlg;
@@ -43,7 +44,7 @@ protected:
 
 	BOOL RegisterClass();
 	int ShowTrayIcon();
-	void ShowStatusWindow(const chcore::TTaskPtr& spSelect = chcore::TTaskPtr());
+	void ShowStatusWindow(const chengine::TTaskPtr& spSelect = chengine::TTaskPtr());
 	void PrepareToExit();
 
 	void ProcessCommandLine(const TCommandLineParser& rCommandLine);
@@ -75,11 +76,11 @@ protected:
 	DECLARE_MESSAGE_MAP()
 
 private:
-	chcore::TTaskManagerStatsSnapshotPtr m_spTaskMgrStats;
+	chengine::TTaskManagerStatsSnapshotPtr m_spTaskMgrStats;
 
 	CTrayIcon m_ctlTray;
 
-	chcore::TTaskManagerPtr m_spTasks;
+	chengine::TTaskManagerPtr m_spTasks;
 	chcore::TSharedMemory m_tCHExtharedMemory;
 
 	CMiniViewDlg* m_pdlgMiniView = nullptr;

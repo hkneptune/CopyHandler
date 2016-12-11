@@ -150,7 +150,7 @@ void CUpdateChecker::Cleanup()
 // ============================================================================
 void CUpdateChecker::SetResult(ECheckResult eCheckResult, DWORD dwError)
 {
-	chcore::TString strError;
+	string::TString strError;
 	if(eCheckResult == eResult_Error && dwError != 0)
 		strError = chcore::TWin32ErrorFormatter::FormatWin32ErrorCodeWithFallback(dwError, _T("wininet.dll"), true);
 

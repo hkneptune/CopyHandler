@@ -13,6 +13,7 @@
 #include "resource.h"
 #include "CfgProperties.h"
 #include "../liblogger/TLogger.h"
+#include "../libchengine/TConfigSerializers.h"
 
 #define UPDATER_TIMER 639
 

@@ -31,12 +31,13 @@
 #include "CrashDlg.h"
 #include "../common/version.h"
 #include "TCommandLineParser.h"
-#include "../libchcore/TStringSet.h"
+#include "../libstring/TStringSet.h"
 #include "TMsgBox.h"
 #include "resource.h"
 #include "../liblogger/TLogger.h"
 #include "../liblogger/TAsyncMultiLogger.h"
 #include "TWindowMessageFilterHelper.h"
+#include "../libchengine/TConfigSerializers.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -85,7 +86,7 @@ void ResManCallback(unsigned int uiMsg)
 	theApp.OnResManNotify(uiMsg);
 }
 
-void ConfigPropertyChangedCallback(const chcore::TStringSet& setPropNames, void* /*pParam*/)
+void ConfigPropertyChangedCallback(const string::TStringSet& setPropNames, void* /*pParam*/)
 {
 	theApp.OnConfigNotify(setPropNames);
 }
@@ -123,9 +124,9 @@ ictranslate::CResourceManager& CCopyHandlerApp::GetResManager()
 	return ictranslate::CResourceManager::Acquire();
 }
 
-chcore::TConfig& CCopyHandlerApp::GetConfig()
+chengine::TConfig& CCopyHandlerApp::GetConfig()
 {
-	static chcore::TConfig tCfg;
+	static chengine::TConfig tCfg;
 	return tCfg;
 }
 
@@ -233,7 +234,7 @@ BOOL CCopyHandlerApp::InitInstance()
 	strCfgPath = strPath + _T("\\ch.xml");
 
 	// initialize configuration file
-	chcore::TConfig& rCfg = GetConfig();
+	chengine::TConfig& rCfg = GetConfig();
 	rCfg.ConnectToNotifier(ConfigPropertyChangedCallback, nullptr);
 
 	// read the configuration
@@ -475,7 +476,7 @@ bool CCopyHandlerApp::ParseCommandLine()
 
 void CCopyHandlerApp::InitLoggers()
 {
-	chcore::TConfig& rConfig = GetConfig();
+	chengine::TConfig& rConfig = GetConfig();
 
 	logger::TAsyncMultiLogger::GetInstance()->SetMaxLogSize(GetPropValue<PP_LOGMAXSIZE>(rConfig));
 	logger::TAsyncMultiLogger::GetInstance()->SetMaxRotatedCount(GetPropValue<PP_LOGROTATECOUNT>(rConfig));
@@ -488,7 +489,7 @@ void CCopyHandlerApp::InitShellExtension()
 	long lExtensionVersion = 0;
 	INT_PTR iDlgResult = IDNO;
 
-	chcore::TConfig& rConfig = GetConfig();
+	chengine::TConfig& rConfig = GetConfig();
 
 	int iDoNotShowAgain_Unregistered = GetPropValue<PP_HIDE_SHELLEXT_UNREGISTERED>(rConfig);
 	int iDoNotShowAgain_VersionMismatch = GetPropValue<PP_HIDE_SHELLEXT_VERSIONMISMATCH>(rConfig);
@@ -629,9 +630,9 @@ void CCopyHandlerApp::UnregisterShellExtension()
 	}
 }
 
-void CCopyHandlerApp::OnConfigNotify(const chcore::TStringSet& setPropNames)
+void CCopyHandlerApp::OnConfigNotify(const string::TStringSet& setPropNames)
 {
-	chcore::TConfig& rCfg = GetConfig();
+	chengine::TConfig& rCfg = GetConfig();
 
 	// is this language
 	if(setPropNames.HasValue(PropData<PP_PLANGUAGE>::GetPropertyName()))

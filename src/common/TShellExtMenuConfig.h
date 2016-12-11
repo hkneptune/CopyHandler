@@ -23,12 +23,10 @@
 #ifndef __TSHELLEXTMENUCONFIG_H__
 #define __TSHELLEXTMENUCONFIG_H__
 
-#include "../libchcore/EOperationTypes.h"
+#include "../libchengine/EOperationTypes.h"
 #include "../libchcore/TPath.h"
 #include <memory>
-#include "../libchcore/TSizeFormatter.h"
-
-namespace chcore { class TConfig; }
+#include "../libchengine/TSizeFormatter.h"
 
 class TShellMenuItem;
 
@@ -46,21 +44,21 @@ public:
 
 public:
 	TOperationTypeInfo();
-	TOperationTypeInfo(EOperationTypeSource eType, chcore::EOperationType eDefaultOperationType);
+	TOperationTypeInfo(EOperationTypeSource eType, chengine::EOperationType eDefaultOperationType);
 
-	void SetOperationTypeInfo(EOperationTypeSource eType, chcore::EOperationType eDefaultOperationType);
+	void SetOperationTypeInfo(EOperationTypeSource eType, chengine::EOperationType eDefaultOperationType);
 
 	EOperationTypeSource GetOperationTypeSource() const;
-	chcore::EOperationType GetDefaultOperationType() const;
+	chengine::EOperationType GetDefaultOperationType() const;
 
 	void Clear();
 
-	void StoreInConfig(chcore::TConfig& rConfig, PCTSTR pszNodeName) const;
-	bool ReadFromConfig(chcore::TConfig& rConfig, PCTSTR pszNodeName);
+	void StoreInConfig(chengine::TConfig& rConfig, PCTSTR pszNodeName) const;
+	bool ReadFromConfig(chengine::TConfig& rConfig, PCTSTR pszNodeName);
 
 private:
 	EOperationTypeSource m_eOperationTypeSource;
-	chcore::EOperationType m_eDefaultOperationType;	// default operation type
+	chengine::EOperationType m_eDefaultOperationType;	// default operation type
 };
 
 // specifies information about source paths
@@ -84,8 +82,8 @@ public:
 
 	void Clear();
 
-	void StoreInConfig(chcore::TConfig& rConfig, PCTSTR pszNodeName) const;
-	bool ReadFromConfig(chcore::TConfig& rConfig, PCTSTR pszNodeName);
+	void StoreInConfig(chengine::TConfig& rConfig, PCTSTR pszNodeName) const;
+	bool ReadFromConfig(chengine::TConfig& rConfig, PCTSTR pszNodeName);
 
 private:
 	ESrcPathsSource m_eSrcPathsSource;
@@ -115,8 +113,8 @@ public:
 
 	void Clear();
 
-	void StoreInConfig(chcore::TConfig& rConfig, PCTSTR pszNodeName) const;
-	bool ReadFromConfig(chcore::TConfig& rConfig, PCTSTR pszNodeName);
+	void StoreInConfig(chengine::TConfig& rConfig, PCTSTR pszNodeName) const;
+	bool ReadFromConfig(chengine::TConfig& rConfig, PCTSTR pszNodeName);
 
 private:
 	EDstPathsSource m_eDstPathSource;
@@ -136,9 +134,9 @@ public:
 
 public:
 	TShellMenuItem();
-	TShellMenuItem(const chcore::TString& wstrName, const chcore::TString& wstrItemTip, const TOperationTypeInfo& rOperationType, const TSourcePathsInfo& rSourcePaths, const TDestinationPathInfo& rDestinationPath,
-		bool bSpecialOperation, chcore::EOperationType eDefaultItemHint = chcore::eOperation_None);
-	TShellMenuItem(const chcore::TString& wstrName, const chcore::TString& wstrItemTip);
+	TShellMenuItem(const string::TString& wstrName, const string::TString& wstrItemTip, const TOperationTypeInfo& rOperationType, const TSourcePathsInfo& rSourcePaths, const TDestinationPathInfo& rDestinationPath,
+		bool bSpecialOperation, chengine::EOperationType eDefaultItemHint = chengine::eOperation_None);
+	TShellMenuItem(const string::TString& wstrName, const string::TString& wstrItemTip);
 
 	~TShellMenuItem();
 
@@ -146,28 +144,28 @@ public:
 	void InitSeparatorItem();
 	
 	// initializer for standard item
-	void InitStandardItem(const chcore::TString& wstrName, const chcore::TString& wstrItemTip, const TOperationTypeInfo& rOperationType, const TSourcePathsInfo& rSourcePaths, const TDestinationPathInfo& rDestinationPath,
-		bool bSpecialOperation, chcore::EOperationType eDefaultItemHint = chcore::eOperation_None);
+	void InitStandardItem(const string::TString& wstrName, const string::TString& wstrItemTip, const TOperationTypeInfo& rOperationType, const TSourcePathsInfo& rSourcePaths, const TDestinationPathInfo& rDestinationPath,
+		bool bSpecialOperation, chengine::EOperationType eDefaultItemHint = chengine::eOperation_None);
 
 	// initializer for group item
-	void InitGroupItem(const chcore::TString& wstrName, const chcore::TString& wstrItemTip);
+	void InitGroupItem(const string::TString& wstrName, const string::TString& wstrItemTip);
 
 	// clears everything
 	void Clear();
 
 	// retrieving attributes - common ones
-	const chcore::TString& GetName() const;
-	const chcore::TString& GetItemTip() const { return m_strItemTip; }
+	const string::TString& GetName() const;
+	const string::TString& GetItemTip() const { return m_strItemTip; }
 
-	const chcore::TString& GetLocalName(bool bUseFallback = true) const;
-	void SetLocalName(const chcore::TString& strLocalName);
+	const string::TString& GetLocalName(bool bUseFallback = true) const;
+	void SetLocalName(const string::TString& strLocalName);
 
 	// retrieving attributes - standard items only
 	const TOperationTypeInfo& GetOperationTypeInfo() const { return m_tOperationType; }
 	const TDestinationPathInfo& GetDestinationPathInfo() const { return m_tDestinationPath; }
 	const TSourcePathsInfo& GetSourcePathsInfo() const { return m_tSourcePaths; }
 
-	chcore::EOperationType GetDefaultItemHint() const { return m_eDefaultItemHint; }
+	chengine::EOperationType GetDefaultItemHint() const { return m_eDefaultItemHint; }
 
 	bool IsGroupItem() const { return m_eItemType == eGroupItem; }
 	bool IsSeparator() const { return m_eItemType == eSeparatorItem; }
@@ -193,15 +191,15 @@ public:
 	void RemoveAllChildren();
 
 	// serialization
-	void StoreInConfig(chcore::TConfig& rConfig, PCTSTR pszNodeName) const;
-	bool ReadFromConfig(chcore::TConfig& rConfig, PCTSTR pszNodeName);
+	void StoreInConfig(chengine::TConfig& rConfig, PCTSTR pszNodeName) const;
+	bool ReadFromConfig(chengine::TConfig& rConfig, PCTSTR pszNodeName);
 
 private:
 	EItemType m_eItemType;
 
-	chcore::TString m_strName;
-	chcore::TString m_strLocalName;		// locally updated name; not serialized
-	chcore::TString m_strItemTip;
+	string::TString m_strName;
+	string::TString m_strLocalName;		// locally updated name; not serialized
+	string::TString m_strItemTip;
 
 	// where to get the operation type from? (specified here / autodetect (with fallback specified here))
 	TOperationTypeInfo m_tOperationType;
@@ -216,7 +214,7 @@ private:
 	bool m_bSpecialOperation;
 
 	// hints that this item is to be made default (bold), when detected operation type is equal to this operation type
-	chcore::EOperationType m_eDefaultItemHint;
+	chengine::EOperationType m_eDefaultItemHint;
 
 	std::vector<TShellMenuItemPtr> m_vChildItems;
 };
@@ -234,7 +232,7 @@ public:
 	TShellMenuItemPtr GetNormalRoot();
 
 	// formatter
-	chcore::TSizeFormatterPtr GetFormatter() const;
+	chengine::TSizeFormatterPtr GetFormatter() const;
 
 	// options
 	void SetInterceptDragAndDrop(bool bEnable) { m_bInterceptDragAndDrop = bEnable; }
@@ -253,14 +251,14 @@ public:
 	bool GetShowFreeSpace() const { return m_bShowFreeSpace; }
 
 	// serialize/unserialize
-	void StoreInConfig(chcore::TConfig& rConfig, PCTSTR pszNodeName) const;
-	bool ReadFromConfig(chcore::TConfig& rConfig, PCTSTR pszNodeName);
+	void StoreInConfig(chengine::TConfig& rConfig, PCTSTR pszNodeName) const;
+	bool ReadFromConfig(chengine::TConfig& rConfig, PCTSTR pszNodeName);
 
 private:
 	TShellMenuItemPtr m_spDragAndDropRoot;		// root under which there are commands placed
 	TShellMenuItemPtr m_spNormalRoot;		// root under which there are commands placed
 
-	chcore::TSizeFormatterPtr m_spFmtSize;
+	chengine::TSizeFormatterPtr m_spFmtSize;
 
 	bool m_bInterceptDragAndDrop = false;
 	bool m_bInterceptKeyboardActions = false;

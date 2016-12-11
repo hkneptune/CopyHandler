@@ -11,20 +11,37 @@
 
 #define ExeFilename32 "ch.exe"
 #define ExeFilename64 "ch64.exe"
+
 #define ShellExtFilename32 "chext.dll"
 #define ShellExtFilename64 "chext64.dll"
+
 #define LibCHCoreFilename32 "libchcore32u.dll"
 #define LibCHCoreFilename64 "libchcore64u.dll"
+
+#define LibCHEngineFilename32 "libchengine32u.dll"
+#define LibCHEngineFilename64 "libchengine64u.dll"
+
+#define LibSerializerFilename32 "libserializer32u.dll"
+#define LibSerializerFilename64 "libserializer64u.dll"
+
+#define LibStringFilename32 "libstring32u.dll"
+#define LibStringFilename64 "libstring64u.dll"
+
 #define LibLoggerFilename32 "liblogger32u.dll"
 #define LibLoggerFilename64 "liblogger64u.dll"
+
 #define LibictranslateFilename32 "libictranslate32u.dll"
 #define LibictranslateFilename64 "libictranslate64u.dll"
+
 #define ICTranslateFilename32 "ictranslate.exe"
 #define ICTranslateFilename64 "ictranslate64.exe"
+
 #define SQLite32 "sqlite3_32.dll"
 #define SQLite64 "sqlite3_64.dll"
+
 #define RegCHExtFilename32 "regchext.exe"
 #define RegCHExtFilename64 "regchext64.exe"
+
 #define MSRedistDir32 "C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\redist\x86"
 #define MSRedistDir64 "C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\redist\x64"
 #define DbgHelp32 "C:\Program Files (x86)\Microsoft Visual Studio 12.0\Common7\IDE\Remote Debugger\x86"
@@ -99,6 +116,9 @@ Source: "..\bin\release\{#ExeFilename32}"; DestDir: "{app}"; Flags: ignoreversio
 Source: "..\bin\release\{#ShellExtFilename32}"; DestDir: "{app}"; Flags: restartreplace uninsrestartdelete regserver replacesameversion; Check: not Is64BitInstallMode
 Source: "..\bin\release\{#RegCHExtFilename32}"; DestDir: "{app}"; Flags: ignoreversion restartreplace uninsrestartdelete; Check: not Is64BitInstallMode
 Source: "..\bin\release\{#LibCHCoreFilename32}"; DestDir: "{app}"; Flags: ignoreversion restartreplace uninsrestartdelete; Check: not Is64BitInstallMode
+Source: "..\bin\release\{#LibCHEngineFilename32}"; DestDir: "{app}"; Flags: ignoreversion restartreplace uninsrestartdelete; Check: not Is64BitInstallMode
+Source: "..\bin\release\{#LibSerializerFilename32}"; DestDir: "{app}"; Flags: ignoreversion restartreplace uninsrestartdelete; Check: not Is64BitInstallMode
+Source: "..\bin\release\{#LibStringFilename32}"; DestDir: "{app}"; Flags: ignoreversion restartreplace uninsrestartdelete; Check: not Is64BitInstallMode
 Source: "..\bin\release\{#LibLoggerFilename32}"; DestDir: "{app}"; Flags: ignoreversion restartreplace uninsrestartdelete; Check: not Is64BitInstallMode
 Source: "..\bin\release\{#LibictranslateFilename32}"; DestDir: "{app}"; Flags: ignoreversion restartreplace uninsrestartdelete; Check: not Is64BitInstallMode
 Source: "..\bin\release\{#ICTranslateFilename32}"; DestDir: "{app}"; Flags: ignoreversion restartreplace uninsrestartdelete; Check: not Is64BitInstallMode
@@ -113,6 +133,9 @@ Source: "..\bin\release\{#ExeFilename64}"; DestDir: "{app}"; Flags: ignoreversio
 Source: "..\bin\release\{#ShellExtFilename64}"; DestDir: "{app}"; Flags: restartreplace uninsrestartdelete regserver replacesameversion; Check: Is64BitInstallMode
 Source: "..\bin\release\{#RegCHExtFilename64}"; DestDir: "{app}"; Flags: ignoreversion restartreplace uninsrestartdelete; Check: Is64BitInstallMode
 Source: "..\bin\release\{#LibCHCoreFilename64}"; DestDir: "{app}"; Flags: ignoreversion restartreplace uninsrestartdelete; Check: Is64BitInstallMode
+Source: "..\bin\release\{#LibCHEngineFilename64}"; DestDir: "{app}"; Flags: ignoreversion restartreplace uninsrestartdelete; Check: not Is64BitInstallMode
+Source: "..\bin\release\{#LibSerializerFilename64}"; DestDir: "{app}"; Flags: ignoreversion restartreplace uninsrestartdelete; Check: not Is64BitInstallMode
+Source: "..\bin\release\{#LibStringFilename64}"; DestDir: "{app}"; Flags: ignoreversion restartreplace uninsrestartdelete; Check: not Is64BitInstallMode
 Source: "..\bin\release\{#LibLoggerFilename64}"; DestDir: "{app}"; Flags: ignoreversion restartreplace uninsrestartdelete; Check: Is64BitInstallMode
 Source: "..\bin\release\{#LibictranslateFilename64}"; DestDir: "{app}"; Flags: ignoreversion restartreplace uninsrestartdelete; Check: Is64BitInstallMode
 Source: "..\bin\release\{#ICTranslateFilename64}"; DestDir: "{app}"; Flags: ignoreversion restartreplace uninsrestartdelete; Check: Is64BitInstallMode
@@ -125,6 +148,9 @@ Source: "{#DbgHelp64}\dbghelp.dll"; DestDir: "{app}"; Flags: ignoreversion resta
 ; binaries - 32bit shellext on 64bit system
 Source: "..\bin\release\{#ShellExtFilename32}"; DestDir: "{app}\ShellExt32"; Flags: restartreplace uninsrestartdelete regserver replacesameversion; Check: Is64BitInstallMode
 Source: "..\bin\release\{#LibCHCoreFilename32}"; DestDir: "{app}\ShellExt32"; Flags: ignoreversion restartreplace uninsrestartdelete; Check: Is64BitInstallMode
+Source: "..\bin\release\{#LibCHEngineFilename32}"; DestDir: "{app}"; Flags: ignoreversion restartreplace uninsrestartdelete; Check: not Is64BitInstallMode
+Source: "..\bin\release\{#LibSerializerFilename32}"; DestDir: "{app}"; Flags: ignoreversion restartreplace uninsrestartdelete; Check: not Is64BitInstallMode
+Source: "..\bin\release\{#LibStringFilename32}"; DestDir: "{app}"; Flags: ignoreversion restartreplace uninsrestartdelete; Check: not Is64BitInstallMode
 Source: "..\bin\release\{#LibLoggerFilename32}"; DestDir: "{app}\ShellExt32"; Flags: ignoreversion restartreplace uninsrestartdelete; Check: Is64BitInstallMode
 Source: "..\bin\release\{#SQLite32}"; DestDir: "{app}\ShellExt32"; Flags: ignoreversion restartreplace uninsrestartdelete; Check: Is64BitInstallMode
 Source: "{#MSRedistDir32}\Microsoft.VC120.CRT\*"; DestDir: "{app}\ShellExt32"; Flags: ignoreversion restartreplace uninsrestartdelete; Check: Is64BitInstallMode

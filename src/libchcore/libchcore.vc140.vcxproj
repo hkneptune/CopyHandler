@@ -471,152 +471,29 @@ goto end
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="CommonDataTypes.h" />
-    <ClInclude Include="ConfigNode.h" />
-    <ClInclude Include="ConfigNodeContainer.h" />
-    <ClInclude Include="EFeedbackResult.h" />
-    <ClInclude Include="EFileError.h" />
-    <ClInclude Include="EngineConstants.h" />
-    <ClInclude Include="EOperationTypes.h" />
-    <ClInclude Include="ESubTaskTypes.h" />
-    <ClInclude Include="ETaskCurrentState.h" />
     <ClInclude Include="GTestMacros.h" />
-    <ClInclude Include="IColumnsDefinition.h" />
-    <ClInclude Include="IFeedbackHandler.h" />
-    <ClInclude Include="IFeedbackHandlerFactory.h" />
-    <ClInclude Include="IFilesystem.h" />
-    <ClInclude Include="IFilesystemFile.h" />
-    <ClInclude Include="IFilesystemFind.h" />
-    <ClInclude Include="IRunningTimeControl.h" />
-    <ClInclude Include="ISerializer.h" />
-    <ClInclude Include="ISerializerContainer.h" />
-    <ClInclude Include="ISerializerFactory.h" />
-    <ClInclude Include="ISerializerRowData.h" />
-    <ClInclude Include="ISerializerRowReader.h" />
-    <ClInclude Include="ISQLiteSerializerSchema.h" />
     <ClInclude Include="ITimestampProvider.h" />
     <ClInclude Include="MathFunctions.h" />
-    <ClInclude Include="OverlappedCallbacks.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="RoundingFunctions.h" />
-    <ClInclude Include="SerializerDataTypes.h" />
     <ClInclude Include="StreamingHelpers.h" />
-    <ClInclude Include="TaskID.h" />
     <ClInclude Include="TBaseException.h" />
-    <ClInclude Include="TBasePathDataFwd.h" />
-    <ClInclude Include="TConfigArray.h" />
-    <ClInclude Include="TConfigNotifier.h" />
-    <ClInclude Include="TCoreEngine.h" />
     <ClInclude Include="TCoreWin32Exception.h" />
-    <ClInclude Include="TDestinationPathProvider.h" />
-    <ClInclude Include="TEvent.h" />
-    <ClInclude Include="TEventCounter.h" />
-    <ClInclude Include="TEventGuard.h" />
-    <ClInclude Include="TFakeFileSerializer.h" />
-    <ClInclude Include="TFeedbackHandlerBase.h" />
-    <ClInclude Include="TFeedbackHandlerWrapper.h" />
-    <ClInclude Include="TFeedbackResult.h" />
-    <ClInclude Include="TFilesystemFeedbackWrapper.h" />
-    <ClInclude Include="TFileInfoFwd.h" />
-    <ClInclude Include="TFilesystemFileFeedbackWrapper.h" />
     <ClInclude Include="TFileTime.h" />
-    <ClInclude Include="TFileException.h" />
-    <ClInclude Include="TOverlappedThreadPool.h" />
-    <ClInclude Include="TSharedCount.h" />
-    <ClInclude Include="TSharedCountMT.h" />
-    <ClInclude Include="TThreadedQueueRunner.h" />
     <ClInclude Include="TIpcMutex.h" />
     <ClInclude Include="TIpcMutexLock.h" />
-    <ClInclude Include="TLocalFilesystemFile.h" />
-    <ClInclude Include="TLocalFilesystemFind.h" />
-    <ClInclude Include="TModificationTracker.h" />
-    <ClInclude Include="TObsoleteFiles.h" />
-    <ClInclude Include="TOrderedBufferQueue.h" />
-    <ClInclude Include="TOverlappedMemoryPool.h" />
-    <ClInclude Include="TOverlappedProcessorRange.h" />
-    <ClInclude Include="TOverlappedReader.h" />
-    <ClInclude Include="TOverlappedReaderFB.h" />
-    <ClInclude Include="TOverlappedReaderWriterFB.h" />
-    <ClInclude Include="TOverlappedWriter.h" />
-    <ClInclude Include="TOverlappedWriterFB.h" />
     <ClInclude Include="TPathContainer.h" />
-    <ClInclude Include="TPlainStringPool.h" />
-    <ClInclude Include="TRemovedObjects.h" />
-    <ClInclude Include="TScopedRunningTimeTracker.h" />
-    <ClInclude Include="TScopedRunningTimeTrackerPause.h" />
-    <ClInclude Include="TSerializerException.h" />
-    <ClInclude Include="TSerializerVersion.h" />
-    <ClInclude Include="TSharedModificationTracker.h" />
-    <ClInclude Include="TSimpleOrderedBufferQueue.h" />
     <ClInclude Include="TSimpleTimer.h" />
-    <ClInclude Include="TSizeFormatter.h" />
-    <ClInclude Include="TSpeedTracker.h" />
-    <ClInclude Include="TSQLiteColumnDefinition.h" />
-    <ClInclude Include="TSQLiteDatabase.h" />
-    <ClInclude Include="TSQLiteException.h" />
-    <ClInclude Include="TSQLiteSerializer.h" />
-    <ClInclude Include="TSQLiteSerializerContainer.h" />
-    <ClInclude Include="TSQLiteSerializerFactory.h" />
-    <ClInclude Include="TSQLiteSerializerRowData.h" />
-    <ClInclude Include="TSQLiteSerializerRowReader.h" />
-    <ClInclude Include="TSQLiteStatement.h" />
-    <ClInclude Include="TSQLiteTaskManagerSchema.h" />
-    <ClInclude Include="TSQLiteTaskSchema.h" />
-    <ClInclude Include="TSQLiteTransaction.h" />
-    <ClInclude Include="TStringException.h" />
-    <ClInclude Include="TStringPattern.h" />
-    <ClInclude Include="TStringPatternArray.h" />
-    <ClInclude Include="TSubTaskArray.h" />
-    <ClInclude Include="TSubTaskArrayStatsSnapshot.h" />
-    <ClInclude Include="TSubTaskBase.h" />
-    <ClInclude Include="TSubTaskCopyMove.h" />
-    <ClInclude Include="TSubTaskDelete.h" />
-    <ClInclude Include="TSubTaskFastMove.h" />
-    <ClInclude Include="TSubTaskScanDirectory.h" />
-    <ClInclude Include="TSubTaskStatsInfo.h" />
-    <ClInclude Include="TSubTaskStatsSnapshot.h" />
-    <ClInclude Include="TTask.h" />
-    <ClInclude Include="TTaskBaseData.h" />
-    <ClInclude Include="TTaskConfigBufferSizes.h" />
-    <ClInclude Include="TTaskConfigTracker.h" />
-    <ClInclude Include="TTaskConfiguration.h" />
-    <ClInclude Include="TTaskConfigVerifier.h" />
-    <ClInclude Include="TTaskInfo.h" />
-    <ClInclude Include="TTaskLocalStats.h" />
-    <ClInclude Include="TTaskStatsSnapshot.h" />
-    <ClInclude Include="TTaskManager.h" />
-    <ClInclude Include="TTaskManagerStatsSnapshot.h" />
-    <ClInclude Include="TBufferSizes.h" />
     <ClInclude Include="TAutoHandles.h" />
-    <ClInclude Include="TBasePathData.h" />
-    <ClInclude Include="TOverlappedDataBuffer.h" />
-    <ClInclude Include="TFileFilter.h" />
-    <ClInclude Include="TFileFiltersArray.h" />
-    <ClInclude Include="TFileInfo.h" />
-    <ClInclude Include="TFileInfoArray.h" />
-    <ClInclude Include="TLocalFilesystem.h" />
-    <ClInclude Include="TSubTaskContext.h" />
     <ClInclude Include="ErrorCodes.h" />
-    <ClInclude Include="TConfig.h" />
-    <ClInclude Include="TConfigSerializers.h" />
     <ClInclude Include="TCoreException.h" />
-    <ClInclude Include="TDateTime.h" />
     <ClInclude Include="TPath.h" />
     <ClInclude Include="TSharedMemory.h" />
-    <ClInclude Include="TString.h" />
-    <ClInclude Include="TStringArray.h" />
-    <ClInclude Include="TStringSet.h" />
-    <ClInclude Include="TTaskDefinition.h" />
-    <ClInclude Include="TTaskOperationPlan.h" />
     <ClInclude Include="TTimestampProviderTickCount.h" />
-    <ClInclude Include="TBufferList.h" />
-    <ClInclude Include="TReadBufferQueueWrapper.h" />
     <ClInclude Include="TWin32ErrorFormatter.h" />
     <ClInclude Include="TWorkerThreadController.h" />
     <ClInclude Include="libchcore.h" />
     <ClInclude Include="stdafx.h" />
-    <ClInclude Include="TWriteBufferQueueWrapper.h" />
-    <ClInclude Include="WaitableQueue.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\tests\tests_shared\TestsExports.cpp">
@@ -633,71 +510,9 @@ goto end
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Testing Debug|x64'">NotUsing</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="ConfigNode.cpp" />
-    <ClCompile Include="ConfigNodeContainer.cpp" />
-    <ClCompile Include="IColumnsDefinition.cpp" />
-    <ClCompile Include="IFeedbackHandler.cpp" />
-    <ClCompile Include="IFeedbackHandlerFactory.cpp" />
-    <ClCompile Include="IFilesystem.cpp" />
-    <ClCompile Include="IFilesystemFile.cpp" />
-    <ClCompile Include="IFilesystemFind.cpp" />
-    <ClCompile Include="IRunningTimeControl.cpp" />
-    <ClCompile Include="ISerializer.cpp" />
-    <ClCompile Include="ISerializerContainer.cpp" />
-    <ClCompile Include="ISerializerFactory.cpp" />
-    <ClCompile Include="ISerializerRowData.cpp" />
-    <ClCompile Include="ISerializerRowReader.cpp" />
-    <ClCompile Include="ISQLiteSerializerSchema.cpp" />
     <ClCompile Include="MathFunctions.cpp" />
-    <ClCompile Include="OverlappedCallbacks.cpp" />
     <ClCompile Include="TBaseException.cpp" />
-    <ClCompile Include="TConfigArray.cpp" />
-    <ClCompile Include="TConfigNotifier.cpp" />
-    <ClCompile Include="TCoreEngine.cpp" />
     <ClCompile Include="TCoreWin32Exception.cpp" />
-    <ClCompile Include="TDestinationPathProvider.cpp" />
-    <ClCompile Include="Tests\TBufferListTests.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="Tests\TestsTDestinationPathProvider.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="Tests\TestsTBufferSizes.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="Tests\TestsTConfig.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="Tests\TestsTFileFilter.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="Tests\TestsTModificationTracker.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="Tests\TestsTSharedModificationTracker.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
-    </ClCompile>
     <ClCompile Include="Tests\TestsTSimpleTimer.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
@@ -710,191 +525,15 @@ goto end
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
-    <ClCompile Include="Tests\TestsTSpeedTracker.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="Tests\TestsTSQLiteDatabase.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="Tests\TestsTSQLiteStatement.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="Tests\TestsTSQLiteTransaction.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="Tests\TestsTString.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="Tests\TestsTStringPattern.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="Tests\TestsTStringPatternArray.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="Tests\TestsTTaskConfigVerifier.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="Tests\TOrderedBufferQueueTests.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="Tests\TOverlappedMemoryPoolTests.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="Tests\TOverlappedReaderTests.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="Tests\TOverlappedDataBufferTests.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="Tests\TOverlappedWriterTests.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="Tests\TReadBufferQueueWrapperTests.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="Tests\TSimpleOrderedBufferQueueTests.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="Tests\TWriteBufferQueueWrapperTests.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="TEvent.cpp" />
-    <ClCompile Include="TEventGuard.cpp" />
-    <ClCompile Include="TFakeFileSerializer.cpp" />
-    <ClCompile Include="TFeedbackResult.cpp" />
-    <ClCompile Include="TFilesystemFeedbackWrapper.cpp" />
-    <ClCompile Include="TFeedbackHandlerBase.cpp" />
-    <ClCompile Include="TFeedbackHandlerWrapper.cpp" />
-    <ClCompile Include="TFilesystemFileFeedbackWrapper.cpp" />
     <ClCompile Include="TFileTime.cpp" />
-    <ClCompile Include="TFileException.cpp" />
     <ClCompile Include="TIpcMutex.cpp" />
     <ClCompile Include="TIpcMutexLock.cpp" />
-    <ClCompile Include="TLocalFilesystemFile.cpp" />
-    <ClCompile Include="TLocalFilesystemFind.cpp" />
-    <ClCompile Include="TObsoleteFiles.cpp" />
-    <ClCompile Include="TOrderedBufferQueue.cpp" />
-    <ClCompile Include="TOverlappedMemoryPool.cpp" />
-    <ClCompile Include="TOverlappedProcessorRange.cpp" />
-    <ClCompile Include="TOverlappedReader.cpp" />
-    <ClCompile Include="TOverlappedReaderFB.cpp" />
-    <ClCompile Include="TOverlappedReaderWriterFB.cpp" />
-    <ClCompile Include="TOverlappedThreadPool.cpp" />
-    <ClCompile Include="TOverlappedWriter.cpp" />
-    <ClCompile Include="TOverlappedWriterFB.cpp" />
     <ClCompile Include="TPathContainer.cpp" />
-    <ClCompile Include="TPlainStringPool.cpp" />
-    <ClCompile Include="TRemovedObjects.cpp" />
-    <ClCompile Include="TScopedRunningTimeTracker.cpp" />
-    <ClCompile Include="TScopedRunningTimeTrackerPause.cpp" />
-    <ClCompile Include="TSerializerException.cpp" />
-    <ClCompile Include="TSerializerVersion.cpp" />
     <ClCompile Include="TSimpleTimer.cpp" />
-    <ClCompile Include="TSizeFormatter.cpp" />
-    <ClCompile Include="TSpeedTracker.cpp" />
-    <ClCompile Include="TSQLiteColumnDefinition.cpp" />
-    <ClCompile Include="TSQLiteDatabase.cpp" />
-    <ClCompile Include="TSQLiteException.cpp" />
-    <ClCompile Include="TSQLiteSerializer.cpp" />
-    <ClCompile Include="TSQLiteSerializerContainer.cpp" />
-    <ClCompile Include="TSQLiteSerializerFactory.cpp" />
-    <ClCompile Include="TSQLiteSerializerRowData.cpp" />
-    <ClCompile Include="TSQLiteSerializerRowReader.cpp" />
-    <ClCompile Include="TSQLiteStatement.cpp" />
-    <ClCompile Include="TSQLiteTaskManagerSchema.cpp" />
-    <ClCompile Include="TSQLiteTaskSchema.cpp" />
-    <ClCompile Include="TSQLiteTransaction.cpp" />
-    <ClCompile Include="TStringException.cpp" />
-    <ClCompile Include="TStringPattern.cpp" />
-    <ClCompile Include="TStringPatternArray.cpp" />
-    <ClCompile Include="TSubTaskArray.cpp" />
-    <ClCompile Include="TSubTaskArrayStatsSnapshot.cpp" />
-    <ClCompile Include="TSubTaskBase.cpp" />
-    <ClCompile Include="TSubTaskCopyMove.cpp" />
-    <ClCompile Include="TSubTaskDelete.cpp" />
-    <ClCompile Include="TSubTaskFastMove.cpp" />
-    <ClCompile Include="TSubTaskScanDirectory.cpp" />
-    <ClCompile Include="TSubTaskStatsInfo.cpp" />
-    <ClCompile Include="TSubTaskStatsSnapshot.cpp" />
-    <ClCompile Include="TTask.cpp" />
-    <ClCompile Include="TTaskBaseData.cpp" />
-    <ClCompile Include="TTaskConfigBufferSizes.cpp" />
-    <ClCompile Include="TTaskConfigTracker.cpp" />
-    <ClCompile Include="TTaskConfigVerifier.cpp" />
-    <ClCompile Include="TTaskInfo.cpp" />
-    <ClCompile Include="TTaskLocalStats.cpp" />
-    <ClCompile Include="TTaskStatsSnapshot.cpp" />
-    <ClCompile Include="TTaskManager.cpp" />
-    <ClCompile Include="TTaskManagerStatsSnapshot.cpp" />
-    <ClCompile Include="TBufferSizes.cpp" />
-    <ClCompile Include="TBasePathData.cpp" />
-    <ClCompile Include="TOverlappedDataBuffer.cpp" />
-    <ClCompile Include="TFileFilter.cpp" />
-    <ClCompile Include="TFileFiltersArray.cpp" />
-    <ClCompile Include="TFileInfo.cpp" />
-    <ClCompile Include="TFileInfoArray.cpp" />
-    <ClCompile Include="TLocalFilesystem.cpp" />
-    <ClCompile Include="TSubTaskContext.cpp" />
-    <ClCompile Include="TConfig.cpp" />
     <ClCompile Include="TCoreException.cpp" />
-    <ClCompile Include="TDateTime.cpp" />
     <ClCompile Include="TPath.cpp" />
     <ClCompile Include="TSharedMemory.cpp" />
-    <ClCompile Include="TString.cpp" />
-    <ClCompile Include="TStringArray.cpp" />
-    <ClCompile Include="TStringSet.cpp" />
-    <ClCompile Include="TTaskDefinition.cpp" />
-    <ClCompile Include="TTaskOperationPlan.cpp" />
     <ClCompile Include="TTimestampProviderTickCount.cpp" />
-    <ClCompile Include="TReadBufferQueueWrapper.cpp" />
     <ClCompile Include="TWin32ErrorFormatter.cpp" />
     <ClCompile Include="TWorkerThreadController.cpp" />
     <ClCompile Include="dllmain.cpp">
@@ -933,18 +572,14 @@ goto end
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Testing Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="TWriteBufferQueueWrapper.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\..\ext\sqlite3\sqlite3.vc140.vcxproj">
-      <Project>{d41831f5-b2a5-4c92-9f15-1d9ab04722cc}</Project>
-    </ProjectReference>
-    <ProjectReference Include="..\liblogger\liblogger.vc140.vcxproj">
-      <Project>{df9957d4-3d95-4ac3-ad3f-dcbea058f79d}</Project>
-    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="libchcore.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\libstring\libstring.vcxproj">
+      <Project>{5bd38175-9f48-417d-8e5b-7093b1873ce5}</Project>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

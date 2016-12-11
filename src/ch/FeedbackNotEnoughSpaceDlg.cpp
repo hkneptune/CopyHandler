@@ -20,9 +20,8 @@
 #include "ch.h"
 #include "FeedbackNotEnoughSpaceDlg.h"
 #include "StringHelpers.h"
-#include "FeedbackHandler.h"
 #include "resource.h"
-#include "../libchcore/TLocalFilesystem.h"
+#include "../libchengine/EFeedbackResult.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -163,7 +162,7 @@ void CFeedbackNotEnoughSpaceDlg::OnTimer(UINT_PTR nIDEvent)
 			if (m_ullRequired <= ullFree)
 			{
 				CLanguageDialog::OnTimer(nIDEvent);
-				EndDialog(chcore::EFeedbackResult::eResult_Retry);
+				EndDialog(chengine::EFeedbackResult::eResult_Retry);
 			}
 		}
 	}
@@ -174,13 +173,13 @@ void CFeedbackNotEnoughSpaceDlg::OnTimer(UINT_PTR nIDEvent)
 void CFeedbackNotEnoughSpaceDlg::OnRetryButton() 
 {
 	UpdateData(TRUE);
-	EndDialog(chcore::EFeedbackResult::eResult_Retry);
+	EndDialog(chengine::EFeedbackResult::eResult_Retry);
 }
 
 void CFeedbackNotEnoughSpaceDlg::OnIgnoreButton() 
 {
 	UpdateData(TRUE);
-	EndDialog(chcore::EFeedbackResult::eResult_Ignore);
+	EndDialog(chengine::EFeedbackResult::eResult_Ignore);
 }
 
 void CFeedbackNotEnoughSpaceDlg::OnLanguageChanged()
@@ -191,11 +190,11 @@ void CFeedbackNotEnoughSpaceDlg::OnLanguageChanged()
 void CFeedbackNotEnoughSpaceDlg::OnCancel()
 {
 	UpdateData(TRUE);
-	EndDialog(chcore::EFeedbackResult::eResult_Cancel);
+	EndDialog(chengine::EFeedbackResult::eResult_Cancel);
 }
 
 void CFeedbackNotEnoughSpaceDlg::OnBnClickedCancel()
 {
 	UpdateData(TRUE);
-	EndDialog(chcore::EFeedbackResult::eResult_Cancel);
+	EndDialog(chengine::EFeedbackResult::eResult_Cancel);
 }

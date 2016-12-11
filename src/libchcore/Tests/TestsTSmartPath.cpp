@@ -6,6 +6,7 @@
 #include "../TPathContainer.h"
 
 using namespace chcore;
+using namespace string;
 
 TEST(TSmartPathTests, EmptyPathToString)
 {
