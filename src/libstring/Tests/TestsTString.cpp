@@ -4,7 +4,6 @@
 #include "../TString.h"
 #include "../TStringException.h"
 #include "../TStringArray.h"
-#include "../TCoreException.h"
 
 using namespace string;
 
@@ -426,7 +425,7 @@ TEST(TStringTests, Split_NormalStringSingleSeparator)
 	EXPECT_EQ(arrSplitted.GetAt(6), _T(""));
 	EXPECT_EQ(arrSplitted.GetAt(7), _T(""));
 	EXPECT_EQ(arrSplitted.GetAt(8), _T(""));
-	EXPECT_THROW(arrSplitted.GetAt(9), TCoreException);
+	EXPECT_THROW(arrSplitted.GetAt(9), TStringException);
 }
 
 TEST(TStringTests, Split_NormalStringMultipleSeparators)
@@ -443,7 +442,7 @@ TEST(TStringTests, Split_NormalStringMultipleSeparators)
 	EXPECT_EQ(arrSplitted.GetAt(6), _T(""));
 	EXPECT_EQ(arrSplitted.GetAt(7), _T(""));
 	EXPECT_EQ(arrSplitted.GetAt(8), _T(""));
-	EXPECT_THROW(arrSplitted.GetAt(9), TCoreException);
+	EXPECT_THROW(arrSplitted.GetAt(9), TStringException);
 }
 
 TEST(TStringTests, CompareCaseSensitive_WithPtrToString)

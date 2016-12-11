@@ -6,10 +6,12 @@
 #include <codecvt>
 #include <boost/algorithm/string/replace.hpp>
 #include "../TConfig.h"
-#include "../TStringArray.h"
 #include "../TConfigArray.h"
+#include "../../libstring/TStringArray.h"
 
 using namespace chengine;
+using namespace string;
+using namespace chcore;
 
 namespace
 {

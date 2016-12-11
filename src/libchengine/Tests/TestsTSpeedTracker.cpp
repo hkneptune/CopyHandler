@@ -2,7 +2,7 @@
 #include "gtest/gtest.h"
 #include "gmock/gmock.h"
 #include "../TSpeedTracker.h"
-#include "../TCoreException.h"
+#include "../../libchcore/TCoreException.h"
 
 using namespace chengine;
 
@@ -88,7 +88,7 @@ TEST(TSpeedTrackerTests, MultipleSamplesRecedingInTime_ThrowsException)
 	TSpeedTracker tTracker(1000, 100);		// track last second with 100ms samples
 	tTracker.AddSample(0, 0);			// start
 	tTracker.AddSample(8000, 110);
-	EXPECT_THROW(tTracker.AddSample(4000, 40), TCoreException);
+	EXPECT_THROW(tTracker.AddSample(4000, 40), chcore::TCoreException);
 }
 
 TEST(TSpeedTrackerTests, MultipleSamplesCornerCase_VeryLargeInterval)
@@ -160,9 +160,9 @@ TEST(TSpeedTrackerTests, MultipleSamplesWithTrackTimeAndSampleTimeDoesntMatch)
 TEST(TSpeedTrackerTests, ConstructionWithBadParams)
 {
 	// zero length sample is not allowed
-	EXPECT_THROW(TSpeedTracker tTracker(5000, 0), TCoreException);
+	EXPECT_THROW(TSpeedTracker tTracker(5000, 0), chcore::TCoreException);
 	// tracking time less than sample time is not allowed
-	EXPECT_THROW(TSpeedTracker tTracker(0, 1000), TCoreException);
+	EXPECT_THROW(TSpeedTracker tTracker(0, 1000), chcore::TCoreException);
 }
 
 TEST(TSpeedTrackerTests, MultipleVeryShortSamplesWithZeroIntervalData_CornerCase)

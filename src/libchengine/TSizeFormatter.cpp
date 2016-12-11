@@ -94,7 +94,7 @@ namespace chengine
 	bool TSizeFormatter::ReadFromConfig(chengine::TConfig& rConfig, PCTSTR pszNodeName)
 	{
 		std::wstring strBuffer;
-		chengine::TString strValue;
+		string::TString strValue;
 
 		if(!GetConfigValue(rConfig, Concat(strBuffer, pszNodeName, _T("Bytes")), strValue))
 			return false;

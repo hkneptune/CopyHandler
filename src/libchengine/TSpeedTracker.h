@@ -1,7 +1,7 @@
 #ifndef __TSPEEDTRACKER_H__
 #define __TSPEEDTRACKER_H__
 
-#include "TString.h"
+#include "../libstring/TString.h"
 
 namespace chengine
 {
@@ -19,8 +19,8 @@ namespace chengine
 		// retrieves speed per second
 		double GetSpeed() const;
 
-		TString ToString() const;
-		void FromString(const TString& strData);
+		string::TString ToString() const;
+		void FromString(const string::TString& strData);
 
 	private:
 		static double NormalizeValueByTime(unsigned long long ullValue, unsigned long long ullTime, unsigned long long ullNormalizeTime = 1000);

@@ -7,6 +7,8 @@
 
 using namespace testing;
 using namespace chengine;
+using namespace string;
+using namespace chcore;
 
 class IFilesystemMock : public IFilesystem
 {

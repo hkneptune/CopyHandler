@@ -19,11 +19,11 @@
 #ifndef __TASKID_H__
 #define __TASKID_H__
 
-#include "SerializerDataTypes.h"
+#include "../libserializer/SerializerDataTypes.h"
 
 namespace chengine
 {
-	typedef object_id_t taskid_t;
+	typedef serializer::object_id_t taskid_t;
 	enum ENoTaskID { NoTaskID = 0 };
 }
 

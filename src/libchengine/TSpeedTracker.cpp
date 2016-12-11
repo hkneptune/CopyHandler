@@ -2,11 +2,14 @@
 #include "TSpeedTracker.h"
 #include <boost/numeric/conversion/cast.hpp>
 #include <numeric>
-#include "ErrorCodes.h"
-#include "TCoreException.h"
-#include "MathFunctions.h"
+#include "../libchcore/ErrorCodes.h"
 #include <boost/lexical_cast.hpp>
-#include "TStringArray.h"
+#include "../libchcore/TCoreException.h"
+#include "../libchcore/MathFunctions.h"
+#include "../libstring/TStringArray.h"
+
+using namespace chcore;
+using namespace string;
 
 namespace chengine
 {
