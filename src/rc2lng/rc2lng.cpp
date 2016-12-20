@@ -33,6 +33,9 @@ static char THIS_FILE[] = __FILE__;
 #endif
 
 #ifndef TESTING
+
+using namespace std;
+
 int _tmain(int argc, TCHAR* argv[], TCHAR* /*envp*/[])
 {
 	// initialize MFC and print and error on failure
