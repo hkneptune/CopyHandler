@@ -119,9 +119,6 @@
     <ClInclude Include="SerializerDataTypes.h">
       <Filter>Source Files\Tools</Filter>
     </ClInclude>
-    <ClInclude Include="GTestMacros.h">
-      <Filter>Tests</Filter>
-    </ClInclude>
     <ClInclude Include="resource.h" />
     <ClInclude Include="TRemovedObjects.h">
       <Filter>Source Files\Tools</Filter>

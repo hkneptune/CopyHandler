@@ -471,7 +471,6 @@ goto end
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="GTestMacros.h" />
     <ClInclude Include="IColumnsDefinition.h" />
     <ClInclude Include="ISerializer.h" />
     <ClInclude Include="ISerializerContainer.h" />
