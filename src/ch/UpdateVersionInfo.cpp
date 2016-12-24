@@ -18,9 +18,9 @@
 // ============================================================================
 #include "stdafx.h"
 #include "UpdateVersionInfo.h"
-#include <boost\algorithm\string\split.hpp>
+#include <boost/algorithm/string/split.hpp>
 #include <boost/algorithm/string/classification.hpp>
-#include <boost\lexical_cast.hpp>
+#include <boost/lexical_cast.hpp>
 #include <boost/date_time/gregorian/gregorian_types.hpp>
 
 UpdateVersionInfo::UpdateVersionInfo(const std::wstring& strNumericVersion, const std::wstring& strReadableVersion, boost::gregorian::date dateRelease, const std::wstring& strDownloadLink, const std::wstring& strReleaseNotes) :

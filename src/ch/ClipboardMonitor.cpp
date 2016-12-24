@@ -179,7 +179,7 @@ DWORD WINAPI CClipboardMonitor::ClipboardMonitorProc(LPVOID pParam)
 						// some kind of error
 						ictranslate::CFormat fmt(GetResManager().LoadString(IDS_SHUTDOWNERROR_STRING));
 						fmt.SetParam(_T("%errno"), GetLastError());
-						AfxMessageBox(fmt, MB_ICONERROR | MB_OK | MB_SYSTEMMODAL);
+						AfxMessageBox(fmt.ToString(), MB_ICONERROR | MB_OK | MB_SYSTEMMODAL);
 					}
 				}
 			}

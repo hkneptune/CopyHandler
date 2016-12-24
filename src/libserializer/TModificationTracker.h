@@ -64,7 +64,7 @@ namespace serializer
 			return *this;
 		}
 
-		operator const T&() const
+		explicit operator const T&() const
 		{
 			return m_tValue;
 		}

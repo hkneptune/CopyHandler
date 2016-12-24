@@ -39,7 +39,7 @@ namespace chengine
 		TSharedCountMT& operator=(const TSharedCountMT& rSrc) = delete;
 
 		// conversion from/to T
-		operator T() const
+		explicit operator T() const
 		{
 			return GetValue();
 		}

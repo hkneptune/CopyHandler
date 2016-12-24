@@ -627,6 +627,9 @@ void CCopyHandlerApp::UnregisterShellExtension()
 	case eFailure:
 		MsgBox(IDS_UNREGISTERERR_STRING, MB_ICONERROR | MB_OK);
 		break;
+	case eSuccessNeedRestart:
+	default:
+		break;
 	}
 }
 

@@ -81,7 +81,7 @@ void CAboutDlg::UpdateProgramVersion()
 		fmt.SetParam(_T("%langname"), pLangData->GetLangName());
 		fmt.SetParam(_T("%authors"), pLangData->GetAuthor());
 
-		pctlLanguage->SetWindowText(fmt);
+		pctlLanguage->SetWindowText(fmt.ToString());
 	}
 }
 

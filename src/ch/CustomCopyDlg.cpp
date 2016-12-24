@@ -481,25 +481,25 @@ void CCustomCopyDlg::SetBuffersizesString()
 
 	fmt.SetFormat(GetResManager().LoadString(IDS_BSEDEFAULT_STRING));
 	fmt.SetParam(_T("%size"), GetSizeString(bsSizes.GetDefaultSize(), true));
-	m_ctlBufferSizes.AddString(fmt);
+	m_ctlBufferSizes.AddString(fmt.ToString());
 	
 	if (!bsSizes.IsOnlyDefault())
 	{
 		fmt.SetFormat(GetResManager().LoadString(IDS_BSEONEDISK_STRING));
 		fmt.SetParam(_T("%size"), GetSizeString(bsSizes.GetOneDiskSize(), true));
-		m_ctlBufferSizes.AddString(fmt);
+		m_ctlBufferSizes.AddString(fmt.ToString());
 		
 		fmt.SetFormat(GetResManager().LoadString(IDS_BSETWODISKS_STRING));
 		fmt.SetParam(_T("%size"), GetSizeString(bsSizes.GetTwoDisksSize(), true));
-		m_ctlBufferSizes.AddString(fmt);
+		m_ctlBufferSizes.AddString(fmt.ToString());
 		
 		fmt.SetFormat(GetResManager().LoadString(IDS_BSECD_STRING));
 		fmt.SetParam(_T("%size"), GetSizeString(bsSizes.GetCDSize(), true));
-		m_ctlBufferSizes.AddString(fmt);
+		m_ctlBufferSizes.AddString(fmt.ToString());
 		
 		fmt.SetFormat(GetResManager().LoadString(IDS_BSELAN_STRING));
 		fmt.SetParam(_T("%size"), GetSizeString(bsSizes.GetLANSize(), true));
-		m_ctlBufferSizes.AddString(fmt);
+		m_ctlBufferSizes.AddString(fmt.ToString());
 	}
 }
 
@@ -949,7 +949,7 @@ void CCustomCopyDlg::OnImportButton()
 		// report
 		ictranslate::CFormat fmt(GetResManager().LoadString(IDS_IMPORTREPORT_STRING));
 		fmt.SetParam(_T("%count"), uiCount);
-		AfxMessageBox(fmt);
+		AfxMessageBox(fmt.ToString());
 	}
 }
 
@@ -998,7 +998,7 @@ void CCustomCopyDlg::OnExportButtonClicked()
 			fmt.SetFormat(GetResManager().LoadString(IDS_EXPORTING_TASK_FAILED));
 			fmt.SetParam(_T("%reason"), strError);
 
-			AfxMessageBox(fmt, MB_OK | MB_ICONERROR);
+			AfxMessageBox(fmt.ToString(), MB_OK | MB_ICONERROR);
 		}
 	}
 }

@@ -26,7 +26,7 @@ namespace string
 	class LIBSTRING_API TStringException : public std::exception
 	{
 	public:
-		TStringException(const char* pszMsg);
+		explicit TStringException(const char* pszMsg);
 	};
 }
 

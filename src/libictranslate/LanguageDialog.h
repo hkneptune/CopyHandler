@@ -118,7 +118,7 @@ namespace ictranslate
 			TCHAR *m_pszClass = nullptr;
 
 			WORD m_wTitle = 0;
-			TCHAR *m_pszTitle = 0;
+			TCHAR *m_pszTitle = nullptr;
 
 			WORD m_wCreationDataSize = 0;
 			BYTE *m_pbyCreationData = nullptr;

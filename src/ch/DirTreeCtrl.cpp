@@ -720,7 +720,7 @@ bool CDirTreeCtrl::GetItemInfoTip(HTREEITEM hItem, CString* pTip)
 
 	// get interface
 	IQueryInfo *pqi;
-	if (psid->lpsfParent->GetUIObjectOf(this->GetSafeHwnd(), 1, (const struct _ITEMIDLIST**)&psid->lpiidlRelative, IID_IQueryInfo, 0, (void**)&pqi) != NOERROR)
+	if (psid->lpsfParent->GetUIObjectOf(this->GetSafeHwnd(), 1, (const struct _ITEMIDLIST**)&psid->lpiidlRelative, IID_IQueryInfo, nullptr, (void**)&pqi) != NOERROR)
 		return false;
 
 	// get tip

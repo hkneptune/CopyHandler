@@ -45,7 +45,7 @@ namespace serializer
 		}
 
 		template<class... V>
-		TSharedModificationTracker(Bitset& rBitset, const V&... rValues) :
+		explicit TSharedModificationTracker(Bitset& rBitset, const V&... rValues) :
 			m_tValue(rValues...),
 			m_rBitset(rBitset)
 		{

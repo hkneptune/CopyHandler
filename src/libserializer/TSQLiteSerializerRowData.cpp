@@ -519,6 +519,19 @@ namespace serializer
 
 			break;
 		}
+		case IColumnsDefinition::eType_bool:
+		case IColumnsDefinition::eType_short:
+		case IColumnsDefinition::eType_ushort:
+		case IColumnsDefinition::eType_int:
+		case IColumnsDefinition::eType_uint:
+		case IColumnsDefinition::eType_long:
+		case IColumnsDefinition::eType_ulong:
+		case IColumnsDefinition::eType_longlong:
+		case IColumnsDefinition::eType_ulonglong:
+		case IColumnsDefinition::eType_double:
+		case IColumnsDefinition::eType_Last:
+		default:
+			break;
 		}
 	}
 

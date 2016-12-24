@@ -45,7 +45,7 @@ namespace chengine
 		m_fcCurrentIndex(0),
 		m_eSubOperationType(eSubOperation_None),
 		m_iCurrentBufferIndex(TBufferSizes::eBuffer_Default),
-		m_strCurrentPath(0),
+		m_strCurrentPath(),
 		m_timeElapsed(0)
 	{
 	}
@@ -58,7 +58,7 @@ namespace chengine
 		m_fcTotalCount = 0;
 		m_fcProcessedCount = 0;
 		m_iCurrentBufferIndex = TBufferSizes::eBuffer_Default;
-		m_strCurrentPath = 0;
+		m_strCurrentPath.Clear();
 		m_timeElapsed = 0;
 		m_dSizeSpeed = 0;
 		m_dCountSpeed = 0;

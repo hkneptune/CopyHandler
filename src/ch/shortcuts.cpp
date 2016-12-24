@@ -42,7 +42,7 @@ CShortcut::CShortcut(const CString& strText)
 	FromString(strText);
 }
 
-CShortcut::operator CString()
+CString CShortcut::ToString() const
 {
 	if (m_strPath.IsEmpty())
 		return _T("");

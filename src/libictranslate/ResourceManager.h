@@ -53,7 +53,7 @@ namespace ictranslate
 		CFormat& SetParam(PCTSTR pszName, int iData);
 		CFormat& SetParam(PCTSTR pszName, bool bData);
 
-		operator const wchar_t*() const
+		const wchar_t* ToString() const
 		{
 			return m_strText.c_str();
 		}

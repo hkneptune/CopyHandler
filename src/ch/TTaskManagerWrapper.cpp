@@ -63,7 +63,7 @@ chengine::TTaskPtr TTaskManagerWrapper::CreateTask(chengine::TTaskDefinition& rT
 
 	fmt.SetFormat(rResourceManager.LoadString(IDS_TASK_CREATE_FAILED));
 	fmt.SetParam(_T("%reason"), strMessage);
-	AfxMessageBox(fmt, MB_OK | MB_ICONERROR);
+	AfxMessageBox(fmt.ToString(), MB_OK | MB_ICONERROR);
 
 	return nullptr;
 }

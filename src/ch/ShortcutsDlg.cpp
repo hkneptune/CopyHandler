@@ -236,7 +236,7 @@ void CShortcutsDlg::OnAddButton()
 	m_ctlPath.GetWindowText(sc.m_strPath);
 
 	// add to an array
-	m_cvShortcuts.push_back((CString)sc);
+	m_cvShortcuts.push_back(sc.ToString());
 
 	// add with an icon
 	SHFILEINFO sfi;
@@ -262,7 +262,7 @@ void CShortcutsDlg::OnChangeButton()
 		m_ctlPath.GetWindowText(sc.m_strPath);
 
 		// array update
-		m_cvShortcuts[iPos] = (CString)sc;
+		m_cvShortcuts[iPos] = sc.ToString();
 
 		// list
 		SHFILEINFO sfi;

@@ -180,7 +180,7 @@ void CUpdaterDlg::OnTimer(UINT_PTR nIDEvent)
 			fmt.SetParam(_T("%officialver"), m_ucChecker.GetReadableVersion());
 			fmt.SetParam(L"%reldate", m_ucChecker.GetReleaseDate());
 
-			CString strEntireText = (PCTSTR)fmt;
+			CString strEntireText = fmt.ToString();
 			CString strReleaseNotes = m_ucChecker.GetReleaseNotes();
 			strReleaseNotes = strReleaseNotes.Trim();
 			if(!strReleaseNotes.IsEmpty())
@@ -188,7 +188,7 @@ void CUpdaterDlg::OnTimer(UINT_PTR nIDEvent)
 				fmt.SetFormat(L"\n\n%relnoteshdr\n%relnotestxt");
 				fmt.SetParam(L"%relnoteshdr", rResManager.LoadString(IDS_UPDATER_RELEASENOTES));
 				fmt.SetParam(L"%relnotestxt", m_ucChecker.GetReleaseNotes());
-				strEntireText += fmt;
+				strEntireText += fmt.ToString();
 			}
 
 			UpdateSecondaryText(strEntireText);

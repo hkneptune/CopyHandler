@@ -739,7 +739,7 @@ void CStatusDlg::OnShowLogButton()
 		ictranslate::CFormat fmt(GetResManager().LoadString(IDS_SHELLEXECUTEERROR_STRING));
 		fmt.SetParam(_T("%errno"), hResult);
 		fmt.SetParam(_T("%path"), spTask->GetLogPath().ToString());
-		AfxMessageBox(fmt);
+		AfxMessageBox(fmt.ToString());
 	}
 }
 

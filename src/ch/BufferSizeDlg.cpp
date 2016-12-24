@@ -134,6 +134,9 @@ BOOL CBufferSizeDlg::OnInitDialog()
 		GetDlgItem(IDC_LANSIZE_EDIT)->SetFocus();
 		static_cast<CEdit*>(GetDlgItem(IDC_LANSIZE_EDIT))->SetSel(0, -1);
 		break;
+	case chengine::TBufferSizes::eBuffer_Last:
+	default:
+		break;
 	}
 
 	return FALSE;

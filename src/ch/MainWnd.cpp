@@ -410,7 +410,7 @@ void CMainWnd::OnClose()
 
 		fmt.SetFormat(GetResManager().LoadString(IDS_FINALIZE_CH_ERROR));
 		fmt.SetParam(_T("%reason"), strMessage);
-		AfxMessageBox(fmt, MB_OK | MB_ICONERROR);
+		AfxMessageBox(fmt.ToString(), MB_OK | MB_ICONERROR);
 	}
 
 	CWnd::OnClose();
@@ -436,7 +436,7 @@ void CMainWnd::OnTimer(UINT_PTR nIDEvent)
 				fmt.SetFormat(_T("Failed to autosave task. Error: %err."));
 				fmt.SetParam(_T("%err"), (PCTSTR)strError);
 
-				LOG_ERROR(m_spLog) << fmt;
+				LOG_ERROR(m_spLog) << fmt.ToString();
 			}
 
 			SetTimer(eTimer_Autosave, GetPropValue<PP_PAUTOSAVEINTERVAL>(GetConfig()), nullptr);
@@ -519,11 +519,11 @@ BOOL CMainWnd::OnCopyData(CWnd* pWnd, COPYDATASTRUCT* pCopyDataStruct)
 				fmt.SetParam(_T("%xml"), wstrData.c_str());
 				fmt.SetParam(_T("%err"), (PCTSTR)strError);
 
-				LOG_ERROR(m_spLog) << fmt;
+				LOG_ERROR(m_spLog) << fmt.ToString();
 
 				fmt.SetFormat(GetResManager().LoadString(IDS_SHELLEXT_XML_IMPORT_FAILED));
 				fmt.SetParam(_T("%err"), (PCTSTR)strError);
-				AfxMessageBox(fmt, MB_OK | MB_ICONERROR);
+				AfxMessageBox(fmt.ToString(), MB_OK | MB_ICONERROR);
 
 				break;
 			}
@@ -627,11 +627,11 @@ void CMainWnd::ProcessCommandLine(const TCommandLineParser& rCommandLine)
 				fmt.SetParam(_T("%path"), strPath.ToString());
 				fmt.SetParam(_T("%err"), szBuffer.get());
 
-				LOG_ERROR(m_spLog) << fmt;
+				LOG_ERROR(m_spLog) << fmt.ToString();
 
 				fmt.SetFormat(GetResManager().LoadString(IDS_TASK_IMPORT_FAILED));
 				fmt.SetParam(_T("%path"), strPath.ToString());
-				AfxMessageBox(fmt, MB_OK | MB_ICONERROR);
+				AfxMessageBox(fmt.ToString(), MB_OK | MB_ICONERROR);
 			}
 		}
 	}

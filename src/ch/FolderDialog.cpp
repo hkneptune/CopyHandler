@@ -200,7 +200,7 @@ int CFolderDialog::CreateControls()
 	CRect rc(0, 0, 0, 0);
 
 	if (!m_ctlTitle.Create(_T(""), WS_CHILD | WS_VISIBLE, rc, this, IDC_TITLE_STATIC) ||
-		(__g_pfStatic=(WNDPROC)SetWindowLongPtr(m_ctlTitle.GetSafeHwnd(), GWLP_WNDPROC, (LONG_PTR)CustomWindowProc)) == 0)
+		(__g_pfStatic=(WNDPROC)SetWindowLongPtr(m_ctlTitle.GetSafeHwnd(), GWLP_WNDPROC, (LONG_PTR)CustomWindowProc)) == nullptr)
 	{
 		TRACE("Error creating control...");
 		return -1;
@@ -245,7 +245,7 @@ int CFolderDialog::CreateControls()
 
 	// listview
 	if (!m_ctlShortcuts.Create(WS_CHILD | WS_VISIBLE | LVS_SINGLESEL | LVS_SHAREIMAGELISTS | LVS_EDITLABELS | WS_TABSTOP | LVS_SMALLICON | LVS_SHOWSELALWAYS, rc, this, IDC_SHORTCUT_LIST) ||
-		(__g_pfList=(WNDPROC)SetWindowLongPtr(m_ctlShortcuts.GetSafeHwnd(), GWLP_WNDPROC, (LONG_PTR)CustomWindowProc)) == 0)
+		(__g_pfList=(WNDPROC)SetWindowLongPtr(m_ctlShortcuts.GetSafeHwnd(), GWLP_WNDPROC, (LONG_PTR)CustomWindowProc)) == nullptr)
 	{
 		TRACE("Error creating control...");
 		return -1;
@@ -266,22 +266,22 @@ int CFolderDialog::CreateControls()
 	// combobox
 	rc.bottom=rc.top+200;
 	if (!m_ctlPath.Create(WS_CHILD | WS_VISIBLE | CBS_AUTOHSCROLL | CBS_DROPDOWN | CBS_SORT | CBS_OWNERDRAWFIXED | CBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_TABSTOP | WS_CLIPSIBLINGS | WS_CLIPCHILDREN, rc, this, IDC_PATH_COMBOBOXEX) ||
-		(__g_pfCombo=(WNDPROC)SetWindowLongPtr(m_ctlPath.GetSafeHwnd(), GWLP_WNDPROC, (LONG_PTR)CustomWindowProc)) == 0)
+		(__g_pfCombo=(WNDPROC)SetWindowLongPtr(m_ctlPath.GetSafeHwnd(), GWLP_WNDPROC, (LONG_PTR)CustomWindowProc)) == nullptr)
 	{
 		TRACE("Error creating control...");
 		return -1;
 	}
 	HWND hCombo=(HWND)m_ctlPath.SendMessage(CBEM_GETCOMBOCONTROL, 0, 0);
-	if ((__g_pfBaseCombo=(WNDPROC)SetWindowLongPtr(hCombo, GWLP_WNDPROC, (LONG_PTR)ComboWindowProc)) == 0)
+	if ((__g_pfBaseCombo=(WNDPROC)SetWindowLongPtr(hCombo, GWLP_WNDPROC, (LONG_PTR)ComboWindowProc)) == nullptr)
 		return -1;
 	HWND hEdit=(HWND)m_ctlPath.SendMessage(CBEM_GETEDITCONTROL, 0, 0);
-	if ((__g_pfEdit=(WNDPROC)SetWindowLongPtr(hEdit, GWLP_WNDPROC, (LONG_PTR)EditWindowProc)) == 0)
+	if ((__g_pfEdit=(WNDPROC)SetWindowLongPtr(hEdit, GWLP_WNDPROC, (LONG_PTR)EditWindowProc)) == nullptr)
 		return -1;
 
 	// buttons OK & Cancel
 	rc.bottom=rc.top;
 	if (!m_ctlOk.Create(_T(""), WS_CHILD | WS_VISIBLE | BS_DEFPUSHBUTTON, rc, this, IDOK) ||
-		(__g_pfButton=(WNDPROC)SetWindowLongPtr(m_ctlOk.GetSafeHwnd(), GWLP_WNDPROC, (LONG_PTR)CustomWindowProc)) == 0)
+		(__g_pfButton=(WNDPROC)SetWindowLongPtr(m_ctlOk.GetSafeHwnd(), GWLP_WNDPROC, (LONG_PTR)CustomWindowProc)) == nullptr)
 	{
 		TRACE("Error creating control...");
 		return -1;
@@ -883,7 +883,7 @@ void CFolderDialog::OnAddShortcut()
 	SHGetFileInfo(sc.m_strPath, FILE_ATTRIBUTE_NORMAL, &sfi, sizeof(sfi), SHGFI_SYSICONINDEX | SHGFI_LARGEICON);
 
 	// add to an array and to shortcuts list
-	m_bdData.cvShortcuts.push_back(sc);
+	m_bdData.cvShortcuts.push_back(sc.ToString());
 	int iIndex = boost::numeric_cast<int>(m_bdData.cvShortcuts.size() - 1);
 	m_ctlShortcuts.InsertItem(iIndex, sc.m_strName, sfi.iIcon);
 	m_ctlShortcuts.SetItem(iIndex, 1, LVIF_TEXT, sc.m_strPath, 0, 0, 0, 0);
@@ -940,7 +940,7 @@ void CFolderDialog::OnEndLabelEditShortcutList(NMHDR* pNMHDR, LRESULT* pResult)
 	CShortcut sc=CShortcut(m_bdData.cvShortcuts.at(pdi->item.iItem));
 	sc.m_strName=pdi->item.pszText;
 
-	m_bdData.cvShortcuts[pdi->item.iItem] = (CString)sc;
+	m_bdData.cvShortcuts[pdi->item.iItem] = sc.ToString();
 	
 	*pResult=1;
 }

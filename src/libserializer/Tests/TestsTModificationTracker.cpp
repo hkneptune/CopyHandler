@@ -12,7 +12,7 @@ TEST(TModificationTrackerTests, DefaultConstructor)
 	TModificationTracker<TString> tracker;
 
 	EXPECT_TRUE(tracker.IsModified());
-	EXPECT_EQ(TString(), tracker);
+	EXPECT_EQ(TString(), (TString)tracker);
 	EXPECT_FALSE(tracker.IsAdded());
 }
 
@@ -20,7 +20,7 @@ TEST(TModificationTrackerTests, ValueConstructor_NotAdded)
 {
 	TModificationTracker<TString> tracker(L"SomeString", false);
 
-	EXPECT_EQ(TString(L"SomeString"), tracker);
+	EXPECT_EQ(TString(L"SomeString"), (TString)tracker);
 	EXPECT_TRUE(tracker.IsModified());
 	EXPECT_FALSE(tracker.IsAdded());
 }
@@ -29,7 +29,7 @@ TEST(TModificationTrackerTests, ValueConstructor_Added)
 {
 	TModificationTracker<TString> tracker(L"SomeString", true);
 
-	EXPECT_EQ(TString(L"SomeString"), tracker);
+	EXPECT_EQ(TString(L"SomeString"), (TString)tracker);
 	EXPECT_TRUE(tracker.IsModified());
 	EXPECT_TRUE(tracker.IsAdded());
 }
@@ -39,7 +39,7 @@ TEST(TModificationTrackerTests, CopyConstructor_NotAdded)
 	TModificationTracker<TString> tracker(L"SomeString", false);
 	TModificationTracker<TString> tracker2(tracker);
 
-	EXPECT_EQ(TString(L"SomeString"), tracker2);
+	EXPECT_EQ(TString(L"SomeString"), (TString)tracker2);
 	EXPECT_TRUE(tracker2.IsModified());
 	EXPECT_FALSE(tracker2.IsAdded());
 }
@@ -49,7 +49,7 @@ TEST(TModificationTrackerTests, CopyConstructor_Added)
 	TModificationTracker<TString> tracker(L"SomeString", true);
 	TModificationTracker<TString> tracker2(tracker);
 
-	EXPECT_EQ(TString(L"SomeString"), tracker2);
+	EXPECT_EQ(TString(L"SomeString"), (TString)tracker2);
 	EXPECT_TRUE(tracker2.IsModified());
 	EXPECT_TRUE(tracker2.IsAdded());
 }
@@ -62,7 +62,7 @@ TEST(TModificationTrackerTests, AssignmentOperator_ModificationTracker_NotAdded)
 	
 	tracker2 = tracker;
 
-	EXPECT_EQ(TString(L"SomeString"), tracker2);
+	EXPECT_EQ(TString(L"SomeString"), (TString)tracker2);
 	EXPECT_TRUE(tracker2.IsModified());
 	EXPECT_FALSE(tracker2.IsAdded());
 }
@@ -74,7 +74,7 @@ TEST(TModificationTrackerTests, AssignmentOperator_ModificationTracker_Added)
 
 	tracker2 = tracker;
 
-	EXPECT_EQ(TString(L"SomeString"), tracker2);
+	EXPECT_EQ(TString(L"SomeString"), (TString)tracker2);
 	EXPECT_TRUE(tracker2.IsModified());
 	EXPECT_TRUE(tracker2.IsAdded());
 }
@@ -86,7 +86,7 @@ TEST(TModificationTrackerTests, AssignmentOperator_ValueModified)
 
 	tracker = L"OtherString";
 
-	EXPECT_EQ(TString(L"OtherString"), tracker);
+	EXPECT_EQ(TString(L"OtherString"), (TString)tracker);
 	EXPECT_TRUE(tracker.IsModified());
 	EXPECT_FALSE(tracker.IsAdded());
 }
@@ -98,7 +98,7 @@ TEST(TModificationTrackerTests, AssignmentOperator_ValueNotModified)
 
 	tracker = L"SomeString";
 
-	EXPECT_EQ(TString(L"SomeString"), tracker);
+	EXPECT_EQ(TString(L"SomeString"), (TString)tracker);
 	EXPECT_FALSE(tracker.IsModified());
 	EXPECT_FALSE(tracker.IsAdded());
 }
@@ -111,7 +111,7 @@ TEST(TModificationTrackerTests, Modify)
 
 	tracker.Modify() = L"SomeString";
 
-	EXPECT_EQ(TString(L"SomeString"), tracker);
+	EXPECT_EQ(TString(L"SomeString"), (TString)tracker);
 	EXPECT_TRUE(tracker.IsModified());
 	EXPECT_FALSE(tracker.IsAdded());
 }

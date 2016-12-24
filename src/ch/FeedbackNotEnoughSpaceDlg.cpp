@@ -72,7 +72,7 @@ void CFeedbackNotEnoughSpaceDlg::UpdateDialog()
 
 	CWnd* pWnd=GetDlgItem(IDC_HEADER_STATIC);
 	if (pWnd)
-		pWnd->SetWindowText(fmt);
+		pWnd->SetWindowText(fmt.ToString());
 
 	// now the sizes
 	pWnd=GetDlgItem(IDC_REQUIRED_STATIC);

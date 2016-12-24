@@ -119,20 +119,20 @@ void CFeedbackReplaceDlg::RefreshFilesInfo()
 	strTemplate = rManager.LoadString(IDS_INFO_PATH_STRING);
 	ictranslate::CFormat fmt(strTemplate);
 	fmt.SetParam(_T("%pathname"), pathSrc.GetParent().ToString());
-	m_ctlSrcPath.SetWindowText(fmt);
+	m_ctlSrcPath.SetWindowText(fmt.ToString());
 
 	// size
 	strTemplate = rManager.LoadString(IDS_INFO_SIZE_STRING);
 	fmt.SetFormat(strTemplate);
 	fmt.SetParam(_T("%size"), m_rSrcFile.GetLength64());
-	m_ctlSrcSize.SetWindowText(fmt);
+	m_ctlSrcSize.SetWindowText(fmt.ToString());
 
 	// modified date
 	strTemplate = rManager.LoadString(IDS_INFO_MODIFIED_STRING);
 	fmt.SetFormat(strTemplate);
 	COleDateTime dtTemp = m_rSrcFile.GetLastWriteTime().GetAsFiletime();
 	fmt.SetParam(_T("%datemod"), dtTemp.Format(LOCALE_NOUSEROVERRIDE, LANG_USER_DEFAULT));
-	m_ctlSrcDate.SetWindowText(fmt);
+	m_ctlSrcDate.SetWindowText(fmt.ToString());
 
 	/////////////////////////////////////////////////////////////
 	// dst file
@@ -145,20 +145,20 @@ void CFeedbackReplaceDlg::RefreshFilesInfo()
 	strTemplate = rManager.LoadString(IDS_INFO_PATH_STRING);
 	fmt.SetFormat(strTemplate);
 	fmt.SetParam(_T("%pathname"), pathDst.GetParent().ToString());
-	m_ctlDstPath.SetWindowText(fmt);
+	m_ctlDstPath.SetWindowText(fmt.ToString());
 
 	// size
 	strTemplate = rManager.LoadString(IDS_INFO_SIZE_STRING);
 	fmt.SetFormat(strTemplate);
 	fmt.SetParam(_T("%size"), m_rDstFile.GetLength64());
-	m_ctlDstSize.SetWindowText(fmt);
+	m_ctlDstSize.SetWindowText(fmt.ToString());
 
 	// modified date
 	strTemplate = rManager.LoadString(IDS_INFO_MODIFIED_STRING);
 	fmt.SetFormat(strTemplate);
 	dtTemp = m_rDstFile.GetLastWriteTime().GetAsFiletime();
 	fmt.SetParam(_T("%datemod"), dtTemp.Format(LOCALE_NOUSEROVERRIDE, LANG_USER_DEFAULT));
-	m_ctlDstDate.SetWindowText(fmt);
+	m_ctlDstDate.SetWindowText(fmt.ToString());
 
 	// button captions
 	CWnd* pAppendButton = GetDlgItem(IDC_COPY_REST_BUTTON);

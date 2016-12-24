@@ -24,7 +24,8 @@ class CShortcut
 public:
 	CShortcut() { }
 	explicit CShortcut(const CString& strText);
-	operator CString();
+	
+	CString ToString() const;
 
 	bool FromString(const CString& strText);
 

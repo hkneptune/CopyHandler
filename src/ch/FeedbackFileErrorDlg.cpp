@@ -74,7 +74,7 @@ BOOL CFeedbackFileErrorDlg::OnInitDialog()
 	fmt.SetParam(_T("%dstfilename"), m_strDstPath);
 	fmt.SetParam(_T("%reason"), strError.c_str());
 
-	m_ctlErrorInfo.SetWindowText(fmt);
+	m_ctlErrorInfo.SetWindowText(fmt.ToString());
 
 	return TRUE;  // return TRUE unless you set the focus to a control
 	// EXCEPTION: OCX Property Pages should return FALSE

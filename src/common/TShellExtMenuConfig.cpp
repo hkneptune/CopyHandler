@@ -26,7 +26,6 @@
 #include <memory>
 #include <boost/assert.hpp>
 #include <boost/lexical_cast.hpp>
-#include "../libchengine/TConfig.h"
 #include "../libchengine/TConfigArray.h"
 
 using namespace chcore;
