@@ -641,8 +641,8 @@ bool config::enum_properties(const wchar_t* pszName, PFNCFGENUMCALLBACK pfn, voi
 		m_pCfgBase->find_close(pFind);
 		return true;
 	}
-	else
-		return false;
+
+	return false;
 }
 
 /** Function sets the property value from string.

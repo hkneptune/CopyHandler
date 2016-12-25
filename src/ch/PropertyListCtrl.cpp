@@ -271,8 +271,8 @@ HBRUSH CPropertyListCtrl::OnCtlColor(CDC* pDC, CWnd* pWnd, UINT nCtlColor)
 
 	if(m_pBkPropertyBrush)
 		return (HBRUSH)(m_pBkPropertyBrush->GetSafeHandle() );
-	else
-		return hbr;
+	
+	return hbr;
 }
 void CPropertyListCtrl::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct) 
 {

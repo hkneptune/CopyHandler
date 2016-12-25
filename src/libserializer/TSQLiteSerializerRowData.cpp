@@ -301,7 +301,8 @@ namespace serializer
 
 			return strQuery;
 		}
-		else if (HasAnyData())
+
+		if (HasAnyData())
 		{
 			// prepare update query
 			TString strQuery = boost::str(boost::wformat(L"UPDATE %1% SET ") % strContainerName).c_str();
@@ -326,8 +327,8 @@ namespace serializer
 
 			return strQuery;
 		}
-		else
-			return TString();
+
+		return TString();
 	}
 
 	unsigned long long TSQLiteSerializerRowData::GetChangeIdentification() const

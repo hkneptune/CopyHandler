@@ -445,8 +445,8 @@ const wchar_t* property::get_string(size_t stIndex) const
 		assert(stIndex < m_paStrings->size());
 		return m_paStrings->at(stIndex).c_str();
 	}
-	else
-		return m_val.pszVal;
+
+	return m_val.pszVal;
 }
 
 /** Sets a signed number property value.
@@ -524,8 +524,8 @@ long long property::get_signed_num(size_t stIndex) const
 		assert(stIndex < m_paSigneds->size());
 		return m_paSigneds->at(stIndex);
 	}
-	else
-		return m_val.llVal;
+
+	return m_val.llVal;
 }
 
 /** Sets an unsigned number property value.
@@ -603,8 +603,8 @@ unsigned long long property::get_unsigned_num(size_t stIndex) const
 		assert(stIndex < m_paUnsigneds->size());
 		return m_paUnsigneds->at(stIndex);
 	}
-	else
-		return m_val.ullVal;
+
+	return m_val.ullVal;
 }
 
 /** Sets a bool property value.
@@ -663,8 +663,8 @@ bool property::get_bool(size_t stIndex) const
 		assert(stIndex < m_paBools->size());
 		return m_paBools->at(stIndex);
 	}
-	else
-		return m_val.bVal;
+
+	return m_val.bVal;
 }
 
 /** Retrieves the property count for this property.
@@ -690,8 +690,8 @@ size_t property::get_count() const
 			return 0;
 		}
 	}
-	else
-		return 1;
+
+	return 1;
 }
 
 /** Removes a property value at a given index.
@@ -887,8 +887,8 @@ wchar_t* property::copy_string(const wchar_t* pszSrc)
 		_tcscpy(psz, pszSrc);
 		return psz;
 	}
-	else
-		return nullptr;
+
+	return nullptr;
 }
 
 /** Converts a string to a boolean value.

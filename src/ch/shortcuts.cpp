@@ -33,8 +33,8 @@ bool CShortcut::FromString(const CString& strText)
 
 		return true;
 	}
-	else
-		return false;
+
+	return false;
 }
 
 CShortcut::CShortcut(const CString& strText)
@@ -46,6 +46,6 @@ CString CShortcut::ToString() const
 {
 	if (m_strPath.IsEmpty())
 		return _T("");
-	else
-		return m_strName+_T("|")+m_strPath;
+
+	return m_strName+_T("|")+m_strPath;
 }

@@ -243,8 +243,8 @@ namespace chcore
 	{
 		if (bCaseSensitive)
 			return m_strPath.Compare(rPath.m_strPath);
-		else
-			return m_strPath.CompareNoCase(rPath.m_strPath);
+
+		return m_strPath.CompareNoCase(rPath.m_strPath);
 	}
 
 	// ============================================================================
@@ -299,8 +299,8 @@ namespace chcore
 	{
 		if (bCaseSensitive)
 			return m_strPath.StartsWith(rPath.m_strPath.c_str());
-		else
-			return m_strPath.StartsWithNoCase(rPath.m_strPath.c_str());
+
+		return m_strPath.StartsWithNoCase(rPath.m_strPath.c_str());
 	}
 
 	// ============================================================================
@@ -325,8 +325,8 @@ namespace chcore
 			m_strPath.Delete(0, rReferenceBasePath.m_strPath.GetLength());
 			return true;
 		}
-		else
-			return false;
+
+		return false;
 	}
 
 	bool TSmartPath::MakeAbsolutePath(const TSmartPath& rReferenceBasePath)
@@ -445,8 +445,8 @@ namespace chcore
 		{
 			if (m_strPath.GetLength() == 2)
 				return *this;
-			else
-				return PathFromWString(m_strPath.Left(2));	// c: for c:\windows\test.cpp
+
+			return PathFromWString(m_strPath.Left(2));	// c: for c:\windows\test.cpp
 		}
 
 		return TSmartPath();
@@ -689,8 +689,8 @@ namespace chcore
 		size_t stIndex = m_strPath.FindLastOf(_T("\\/"));
 		if (stIndex == TString::npos)	// no path separator?
 			return true;
-		else
-			return (stIndex != TString::npos && stIndex != m_strPath.GetLength() - 1);
+
+		return (stIndex != TString::npos && stIndex != m_strPath.GetLength() - 1);
 	}
 
 	// ============================================================================
@@ -705,8 +705,8 @@ namespace chcore
 		size_t stIndex = m_strPath.FindLastOf(_T("\\/"));
 		if (stIndex != TString::npos)
 			return PathFromWString(m_strPath.MidRange(stIndex + 1, m_strPath.GetLength()));	// "test.txt" for "c:\windows\test.txt"
-		else
-			return *this;
+
+		return *this;
 	}
 
 	// ============================================================================

@@ -63,7 +63,8 @@ namespace chengine
 			m_ullZeroIntervalData += ullValue;
 			return;
 		}
-		else if (ullInterval >= m_ullSampleTime * m_stRequiredSamples)	// special case 1: interval is bigger than what we track
+
+		if (ullInterval >= m_ullSampleTime * m_stRequiredSamples)	// special case 1: interval is bigger than what we track
 		{
 			m_stNextSamplePos = 0;
 			m_dPartialSpeedNotInSamples = 0.0;
@@ -74,12 +75,10 @@ namespace chengine
 			std::fill(m_vSamples.begin(), m_vSamples.end(), dSpeed);
 			return;
 		}
-		else
-		{
-			// append the data from previous zero-interval samples
-			ullValue += m_ullZeroIntervalData;
-			m_ullZeroIntervalData = 0;
-		}
+
+		// append the data from previous zero-interval samples
+		ullValue += m_ullZeroIntervalData;
+		m_ullZeroIntervalData = 0;
 
 		// calculate speed
 		double dSpeed = NormalizeValueByTime(ullValue, ullInterval, m_ullSampleTime);

@@ -78,8 +78,8 @@ namespace chengine
 
 		if (ullTotal != 0)
 			return Math::Div64(ullProcessed, ullTotal);
-		else
-			return 0.0;
+
+		return 0.0;
 	}
 
 	unsigned long long TSubTaskStatsSnapshot::GetEstimatedTotalTime() const
@@ -87,8 +87,8 @@ namespace chengine
 		double dProgress = CalculateProgress();
 		if (dProgress == 0.0)
 			return std::numeric_limits<unsigned long long>::max();
-		else
-			return (unsigned long long)(m_timeElapsed * (1.0 / dProgress));
+
+		return (unsigned long long)(m_timeElapsed * (1.0 / dProgress));
 	}
 
 	void TSubTaskStatsSnapshot::SetSizeSpeed(double dSizeSpeed)
@@ -120,8 +120,8 @@ namespace chengine
 	{
 		if (m_timeElapsed)
 			return Math::Div64(m_ullProcessedSize, m_timeElapsed / 1000.0);
-		else
-			return 0.0;
+
+		return 0.0;
 	}
 
 	double TSubTaskStatsSnapshot::GetAvgCountSpeed() const

@@ -78,7 +78,8 @@ namespace chengine
 						wfd.ftLastAccessTime, wfd.ftLastWriteTime, 0);
 					return true;
 				}
-				else if (wfd.cFileName[0] != _T('.') || (wfd.cFileName[1] != _T('\0') && (wfd.cFileName[1] != _T('.') || wfd.cFileName[2] != _T('\0'))))
+
+				if (wfd.cFileName[0] != _T('.') || (wfd.cFileName[1] != _T('\0') && (wfd.cFileName[1] != _T('.') || wfd.cFileName[2] != _T('\0'))))
 				{
 					LOG_TRACE(m_spLog) << "Found file: " << wfd.cFileName <<
 						L", attrs: " << wfd.dwFileAttributes <<

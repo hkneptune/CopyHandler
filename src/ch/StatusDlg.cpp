@@ -111,25 +111,25 @@ BOOL CStatusDlg::OnInitDialog()
 	lvc.mask=LVCF_FMT | LVCF_SUBITEM | LVCF_TEXT | LVCF_WIDTH;
 	lvc.fmt=LVCFMT_LEFT;
 
-	lvc.pszText=(PTSTR)GetResManager().LoadString(IDS_COLUMNSTATUS_STRING); /*_T("Status")*/;
+	lvc.pszText=(PTSTR)GetResManager().LoadString(IDS_COLUMNSTATUS_STRING);
 	lvc.cchTextMax = lstrlen(lvc.pszText); 
 	lvc.cx = static_cast<int>(0.27*iWidth);
 	lvc.iSubItem=-1;
 	m_ctlStatusList.InsertColumn(1, &lvc);
 
-	lvc.pszText=(PTSTR)GetResManager().LoadString(IDS_COLUMNSOURCE_STRING);/*_T("File");*/
+	lvc.pszText=(PTSTR)GetResManager().LoadString(IDS_COLUMNSOURCE_STRING);
 	lvc.cchTextMax = lstrlen(lvc.pszText); 
 	lvc.cx = static_cast<int>(0.3*iWidth);
 	lvc.iSubItem=0;
 	m_ctlStatusList.InsertColumn(2, &lvc);
 
-	lvc.pszText=(PTSTR)GetResManager().LoadString(IDS_COLUMNDESTINATION_STRING);/*_T("To:");*/
+	lvc.pszText=(PTSTR)GetResManager().LoadString(IDS_COLUMNDESTINATION_STRING);
 	lvc.cchTextMax = lstrlen(lvc.pszText);
 	lvc.cx = static_cast<int>(0.27*iWidth);
 	lvc.iSubItem=1;
 	m_ctlStatusList.InsertColumn(3, &lvc);
 
-	lvc.pszText=(PTSTR)GetResManager().LoadString(IDS_COLUMNPROGRESS_STRING);/*_T("Progress");*/
+	lvc.pszText=(PTSTR)GetResManager().LoadString(IDS_COLUMNPROGRESS_STRING);
 	lvc.cchTextMax = lstrlen(lvc.pszText);
 	lvc.cx = static_cast<int>(0.15*iWidth);
 	lvc.iSubItem=2;
@@ -811,25 +811,25 @@ void CStatusDlg::OnLanguageChanged()
 	lvc.mask=LVCF_FMT | LVCF_SUBITEM | LVCF_TEXT | LVCF_WIDTH;
 	lvc.fmt=LVCFMT_LEFT;
 
-	lvc.pszText=(PTSTR)GetResManager().LoadString(IDS_COLUMNSTATUS_STRING); /*_T("Status")*/;
+	lvc.pszText=(PTSTR)GetResManager().LoadString(IDS_COLUMNSTATUS_STRING);
 	lvc.cchTextMax = lstrlen(lvc.pszText); 
 	lvc.cx = static_cast<int>(0.27*iWidth);
 	lvc.iSubItem=-1;
 	m_ctlStatusList.InsertColumn(1, &lvc);
 
-	lvc.pszText=(PTSTR)GetResManager().LoadString(IDS_COLUMNSOURCE_STRING);/*_T("File");*/
+	lvc.pszText=(PTSTR)GetResManager().LoadString(IDS_COLUMNSOURCE_STRING);
 	lvc.cchTextMax = lstrlen(lvc.pszText); 
 	lvc.cx = static_cast<int>(0.3*iWidth);
 	lvc.iSubItem=0;
 	m_ctlStatusList.InsertColumn(2, &lvc);
 
-	lvc.pszText=(PTSTR)GetResManager().LoadString(IDS_COLUMNDESTINATION_STRING);/*_T("To:");*/
+	lvc.pszText=(PTSTR)GetResManager().LoadString(IDS_COLUMNDESTINATION_STRING);
 	lvc.cchTextMax = lstrlen(lvc.pszText);
 	lvc.cx = static_cast<int>(0.27*iWidth);
 	lvc.iSubItem=1;
 	m_ctlStatusList.InsertColumn(3, &lvc);
 
-	lvc.pszText=(PTSTR)GetResManager().LoadString(IDS_COLUMNPROGRESS_STRING);/*_T("Progress");*/
+	lvc.pszText=(PTSTR)GetResManager().LoadString(IDS_COLUMNPROGRESS_STRING);
 	lvc.cchTextMax = lstrlen(lvc.pszText);
 	lvc.cx = static_cast<int>(0.15*iWidth);
 	lvc.iSubItem=2;
@@ -1043,14 +1043,14 @@ CString CStatusDlg::GetSubtaskName(chengine::ESubOperationType eSubtask) const
 {
 	if(eSubtask == chengine::eSubOperation_Deleting)
 		return GetResManager().LoadString(IDS_STATUS_DELETING_STRING);
-	else if(eSubtask == chengine::eSubOperation_Scanning)
+	if(eSubtask == chengine::eSubOperation_Scanning)
 		return GetResManager().LoadString(IDS_STATUS_SEARCHING_STRING);
-	else if(eSubtask == chengine::eSubOperation_FastMove)
+	if(eSubtask == chengine::eSubOperation_FastMove)
 		return GetResManager().LoadString(IDS_STATUS_FASTMOVE_STRING);
-	else if(eSubtask == chengine::eSubOperation_Copying)
+	if(eSubtask == chengine::eSubOperation_Copying)
 		return GetResManager().LoadString(IDS_STATUS_COPYING_STRING);
-	else
-		return GetResManager().LoadString(IDS_STATUS_UNKNOWN_STRING);
+
+	return GetResManager().LoadString(IDS_STATUS_UNKNOWN_STRING);
 }
 
 void CStatusDlg::SetTaskListEntry(size_t stPos, const chengine::TTaskStatsSnapshotPtr& spTaskStats)
@@ -1078,7 +1078,7 @@ void CStatusDlg::SetTaskListEntry(size_t stPos, const chengine::TTaskStatsSnapsh
 	if(strCurrentPath.IsEmpty())
 		strCurrentPath = GetResManager().LoadString(IDS_NONEINPUTFILE_STRING);
 
-	lvi.pszText = (PTSTR)strCurrentPath.c_str();;
+	lvi.pszText = (PTSTR)strCurrentPath.c_str();
 	lvi.cchTextMax = lstrlen(lvi.pszText);
 	m_ctlStatusList.SetItem(&lvi);
 

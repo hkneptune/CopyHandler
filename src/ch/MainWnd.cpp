@@ -539,10 +539,10 @@ BOOL CMainWnd::OnCopyData(CWnd* pWnd, COPYDATASTRUCT* pCopyDataStruct)
 
 				GetPropValue<PP_RECENTPATHS>(rConfig, dlg.m_vRecent);
 
-				INT_PTR iModalResult;
-				if((iModalResult = dlg.DoModal()) == IDCANCEL)
+				INT_PTR iModalResult = dlg.DoModal();
+				if(iModalResult == IDCANCEL)
 					return CWnd::OnCopyData(pWnd, pCopyDataStruct);
-				else if(iModalResult == -1)	// windows has been closed by a parent
+				if(iModalResult == -1)	// windows has been closed by a parent
 					return TRUE;
 
 				TRecentPathsTools::AddNewPath(dlg.m_vRecent, dlg.m_tTaskDefinition.GetDestinationPath().ToString());

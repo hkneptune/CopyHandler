@@ -44,8 +44,8 @@ HTHEME CUxThemeSupport::OpenThemeData(HWND hwnd, LPCWSTR pszClassList)
 
 	if (pfnProc)
 		return (*pfnProc)(hwnd, pszClassList);
-	else
-		return nullptr;
+
+	return nullptr;
 }
 
 HRESULT CUxThemeSupport::CloseThemeData(HTHEME hTheme)
@@ -58,8 +58,8 @@ HRESULT CUxThemeSupport::CloseThemeData(HTHEME hTheme)
 
 	if (pfnProc)
 		return (*pfnProc)(hTheme);
-	else
-		return E_UNEXPECTED;
+
+	return E_UNEXPECTED;
 }
 
 HRESULT CUxThemeSupport::DrawThemeEdge(HTHEME hTheme, HDC hdc, int iPartId, int iStateId, const RECT* pDestRect, UINT uEdge, UINT uFlags, RECT* pContentRect)
@@ -72,8 +72,8 @@ HRESULT CUxThemeSupport::DrawThemeEdge(HTHEME hTheme, HDC hdc, int iPartId, int 
 
 	if (pfnProc)
 		return (*pfnProc)(hTheme, hdc, iPartId, iStateId, pDestRect, uEdge, uFlags, pContentRect);
-	else
-		return E_UNEXPECTED;
+
+	return E_UNEXPECTED;
 }
 
 HRESULT CUxThemeSupport::DrawThemeBackground(HTHEME hTheme, HDC hdc, int iPartId, int iStateId, const RECT *pRect, OPTIONAL const RECT *pClipRect)
@@ -86,8 +86,8 @@ HRESULT CUxThemeSupport::DrawThemeBackground(HTHEME hTheme, HDC hdc, int iPartId
 
 	if (pfnProc)
 		return (*pfnProc)(hTheme, hdc, iPartId, iStateId, pRect, pClipRect);
-	else
-		return E_UNEXPECTED;
+
+	return E_UNEXPECTED;
 }
 
 HRESULT CUxThemeSupport::DrawThemeParentBackground(HWND hwnd, HDC hdc, RECT* prc)
@@ -100,8 +100,8 @@ HRESULT CUxThemeSupport::DrawThemeParentBackground(HWND hwnd, HDC hdc, RECT* prc
 
 	if (pfnProc)
 		return (*pfnProc)(hwnd, hdc, prc);
-	else
-		return E_UNEXPECTED;
+
+	return E_UNEXPECTED;
 }
 
 BOOL CUxThemeSupport::IsAppThemed()
@@ -114,6 +114,6 @@ BOOL CUxThemeSupport::IsAppThemed()
 
 	if (pfnProc)
 		return (*pfnProc)();
-	else
-		return FALSE;
+
+	return FALSE;
 }

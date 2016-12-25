@@ -126,8 +126,8 @@ namespace chengine
 			pathCombined += m_pathFile;
 			return pathCombined;
 		}
-		else
-			return m_pathFile;
+
+		return m_pathFile;
 	}
 
 	object_id_t TFileInfo::GetSrcObjectID() const

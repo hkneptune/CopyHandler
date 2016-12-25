@@ -198,8 +198,8 @@ namespace chengine
 
 		if (m_ullTimeElapsed)
 			return Math::Div64(m_ullProcessedCount, m_ullTimeElapsed / 1000.0);
-		else
-			return 0.0;
+
+		return 0.0;
 	}
 
 	double TTaskStatsSnapshot::GetAvgSizeSpeed() const
@@ -209,8 +209,8 @@ namespace chengine
 
 		if (m_ullTimeElapsed)
 			return Math::Div64(m_ullProcessedSize, m_ullTimeElapsed / 1000.0);
-		else
-			return 0.0;
+
+		return 0.0;
 	}
 
 	unsigned long long TTaskStatsSnapshot::GetEstimatedTotalTime() const
@@ -220,7 +220,7 @@ namespace chengine
 
 		if (m_dCombinedProgress == 0.0)
 			return std::numeric_limits<unsigned long long>::max();
-		else
-			return (unsigned long long)(m_ullTimeElapsed / m_dCombinedProgress);
+
+		return (unsigned long long)(m_ullTimeElapsed / m_dCombinedProgress);
 	}
 }

@@ -103,8 +103,8 @@ namespace chengine
 			rFilter.SetData(rNewFilter);
 			return true;
 		}
-		else
-			return false;
+
+		return false;
 	}
 
 	const TFileFilter* TFileFiltersArray::GetAt(size_t stIndex) const
@@ -112,8 +112,8 @@ namespace chengine
 		BOOST_ASSERT(stIndex < m_vFilters.size());
 		if (stIndex < m_vFilters.size())
 			return &m_vFilters.at(stIndex);
-		else
-			return nullptr;
+
+		return nullptr;
 	}
 
 	bool TFileFiltersArray::RemoveAt(size_t stIndex)
@@ -126,8 +126,8 @@ namespace chengine
 			m_vFilters.erase(m_vFilters.begin() + stIndex);
 			return true;
 		}
-		else
-			return false;
+
+		return false;
 	}
 
 	size_t TFileFiltersArray::GetSize() const

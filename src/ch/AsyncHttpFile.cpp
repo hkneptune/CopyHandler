@@ -100,7 +100,7 @@ HRESULT CAsyncHttpFile::Open(const wchar_t* pszPath, const wchar_t* pszUserAgent
 		ATLTRACE(L"InternetOpen failed with error: %lu\n", dwError);
 		SetErrorCode(dwError);
 
-		::CloseHandle(m_hFinishedEvent);
+		CloseHandle(m_hFinishedEvent);
 		m_hFinishedEvent = nullptr;
 
 		return E_FAIL;
@@ -112,8 +112,8 @@ HRESULT CAsyncHttpFile::Open(const wchar_t* pszPath, const wchar_t* pszUserAgent
 		ATLTRACE(L"InternetSetStatusCallback failed with error: %lu\n", dwError);
 		SetErrorCode(dwError);
 
-		::InternetCloseHandle(m_hInternet);
-		::CloseHandle(m_hFinishedEvent);
+		InternetCloseHandle(m_hInternet);
+		CloseHandle(m_hFinishedEvent);
 
 		m_hFinishedEvent = nullptr;
 		return E_FAIL;
@@ -128,9 +128,9 @@ HRESULT CAsyncHttpFile::Open(const wchar_t* pszPath, const wchar_t* pszUserAgent
 		SetErrorCode(dwError);
 		if(GetErrorCode() != ERROR_IO_PENDING)
 		{
-			::InternetSetStatusCallback(m_hInternet, nullptr);
-			::InternetCloseHandle(m_hInternet);
-			::CloseHandle(m_hFinishedEvent);
+			InternetSetStatusCallback(m_hInternet, nullptr);
+			InternetCloseHandle(m_hInternet);
+			CloseHandle(m_hFinishedEvent);
 
 			m_hInternet = nullptr;
 			m_hFinishedEvent = nullptr;
@@ -141,7 +141,7 @@ HRESULT CAsyncHttpFile::Open(const wchar_t* pszPath, const wchar_t* pszUserAgent
 	else
 	{
 		SetUrlHandle(hOpenUrl);
-		::SetEvent(m_hFinishedEvent);
+		SetEvent(m_hFinishedEvent);
 	}
 
 	return hOpenUrl ? S_OK : S_FALSE;
@@ -199,7 +199,7 @@ HRESULT CAsyncHttpFile::RequestData(void* pBuffer, size_t stSize)
 
 	SetErrorCode(ERROR_SUCCESS);
 
-	if(!::ResetEvent(m_hFinishedEvent))
+	if(!ResetEvent(m_hFinishedEvent))
 	{
 		SetErrorCode(GetLastError());
 		return E_FAIL;
@@ -213,7 +213,7 @@ HRESULT CAsyncHttpFile::RequestData(void* pBuffer, size_t stSize)
 
 	// #WinXP #workaround - in bare WinXP SP3 (i.e. without additional updates), InternetReadFileExW returns
 	// error 120 (not implemented); it was implemented with some later update
-	if(!::InternetReadFileExA(m_hOpenUrl, &m_internetBuffers, IRF_NO_WAIT, (DWORD_PTR)&m_tReadRequest))
+	if(!InternetReadFileExA(m_hOpenUrl, &m_internetBuffers, IRF_NO_WAIT, (DWORD_PTR)&m_tReadRequest))
 	{
 		DWORD dwError = GetLastError();
 		ATLTRACE(L"InternetReadFileExA failed with error: %lu\n", dwError);
@@ -221,11 +221,10 @@ HRESULT CAsyncHttpFile::RequestData(void* pBuffer, size_t stSize)
 		SetErrorCode(dwError);
 		if(GetErrorCode() == ERROR_IO_PENDING)
 			return S_FALSE;
-		else
-			return E_FAIL;
+		return E_FAIL;
 	}
 
-	if(!::SetEvent(m_hFinishedEvent))
+	if(!SetEvent(m_hFinishedEvent))
 	{
 		SetErrorCode(GetLastError());
 		return E_FAIL;
@@ -269,13 +268,13 @@ HRESULT CAsyncHttpFile::Close()
 
 	if(m_hInternet != nullptr)
 	{
-		::InternetCloseHandle(m_hInternet);
+		InternetCloseHandle(m_hInternet);
 		m_hInternet = nullptr;
 	}
 
 	if(m_hFinishedEvent)
 	{
-		::CloseHandle(m_hFinishedEvent);
+		CloseHandle(m_hFinishedEvent);
 		m_hFinishedEvent = nullptr;
 	}
 
@@ -302,9 +301,9 @@ CAsyncHttpFile::EWaitResult CAsyncHttpFile::GetResult()
 	HANDLE hHandles[] = { m_hFinishedEvent };
 	DWORD dwEffect = WaitForMultipleObjects(1, hHandles, FALSE, 0);
 	if(dwEffect == WAIT_OBJECT_0 + 0 || dwEffect == WAIT_ABANDONED_0 + 0)
-		return GetErrorCode() == ERROR_SUCCESS ? CAsyncHttpFile::eFinished : CAsyncHttpFile::eError;
-	else
-		return CAsyncHttpFile::ePending;
+		return GetErrorCode() == ERROR_SUCCESS ? eFinished : eError;
+
+	return ePending;
 }
 
 // ============================================================================
@@ -325,14 +324,14 @@ CAsyncHttpFile::EWaitResult CAsyncHttpFile::WaitForResult(HANDLE hKillEvent)
 		ATLTRACE(L"WaitForMultipleObjects failed with error: %lu\n", dwError);
 
 		SetErrorCode(dwError);
-		return CAsyncHttpFile::eError;
+		return eError;
 	}
-	else if(dwEffect == WAIT_OBJECT_0 + 0 || dwEffect == WAIT_ABANDONED_0 + 0)
-		return CAsyncHttpFile::eKilled;
-	else if(dwEffect == WAIT_OBJECT_0 + 1 || dwEffect == WAIT_ABANDONED_0 + 1)
-		return GetErrorCode() == ERROR_SUCCESS ? CAsyncHttpFile::eFinished : CAsyncHttpFile::eError;
-	else
-		return CAsyncHttpFile::eTimeout;
+	if(dwEffect == WAIT_OBJECT_0 + 0 || dwEffect == WAIT_ABANDONED_0 + 0)
+		return eKilled;
+	if(dwEffect == WAIT_OBJECT_0 + 1 || dwEffect == WAIT_ABANDONED_0 + 1)
+		return GetErrorCode() == ERROR_SUCCESS ? eFinished : eError;
+	
+	return eTimeout;
 }
 
 // ============================================================================
@@ -353,7 +352,7 @@ void CALLBACK CAsyncHttpFile::InternetStatusCallback(HINTERNET hInternet, DWORD_
 	if(!pRequest || !pRequest->pHttpFile)
 		return;
 
-	logger::TLoggerPtr spLog = logger::MakeLogger(GetLogFileData(), L"AsyncHttpFile");
+	logger::TLoggerPtr spLog = MakeLogger(GetLogFileData(), L"AsyncHttpFile");
 	CString strMsg;
 	strMsg.Format(_T("InternetStatusCallback - hInternet: %p, dwContext: %Iu (operation: %lu), dwInternetStatus: %lu, lpvStatusInformation: %p, dwStatusInformationLength: %lu"),
 		hInternet, (size_t)dwContext, pRequest->eOperationType, dwInternetStatus, lpvStatusInformation, dwStatusInformationLength);
@@ -411,7 +410,7 @@ void CALLBACK CAsyncHttpFile::InternetStatusCallback(HINTERNET hInternet, DWORD_
 void CAsyncHttpFile::SetUrlHandle(HANDLE hOpenUrl)
 {
 	if(m_hOpenUrl && m_hOpenUrl != hOpenUrl)
-		::InternetCloseHandle(m_hOpenUrl);
+		InternetCloseHandle(m_hOpenUrl);
 
 	m_hOpenUrl = hOpenUrl;
 }
@@ -444,6 +443,6 @@ HRESULT CAsyncHttpFile::SetCompletionStatus(DWORD dwCurrentState)
 		return E_FAIL;
 
 	if(dwCurrentState == INTERNET_STATUS_REQUEST_COMPLETE)
-		return ::SetEvent(m_hFinishedEvent) ? S_OK : E_FAIL;
+		return SetEvent(m_hFinishedEvent) ? S_OK : E_FAIL;
 	return S_FALSE;
 }

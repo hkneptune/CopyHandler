@@ -32,8 +32,10 @@
 #include "TTaskStatsSnapshot.h"
 #include <boost/numeric/conversion/cast.hpp>
 #include "TTaskConfiguration.h"
+#include "../libchcore/TCoreException.h"
 
 using namespace serializer;
+using namespace chcore;
 
 namespace chengine
 {

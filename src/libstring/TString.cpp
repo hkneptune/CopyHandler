@@ -262,8 +262,8 @@ namespace string
 
 		if (tLen >= stThisLen)
 			return *this;
-		else
-			return TString(m_pszData, tLen);
+
+		return TString(m_pszData, tLen);
 	}
 
 	/** Returns a new TString object with the Right part of this TString object.
@@ -279,8 +279,8 @@ namespace string
 
 		if (tLen >= stThisLen)
 			return *this;
-		else
-			return TString(m_pszData + stThisLen - tLen, tLen);
+
+		return TString(m_pszData + stThisLen - tLen, tLen);
 	}
 
 	/** Returns a new TString object with the middle part of this TString object.
@@ -528,8 +528,8 @@ namespace string
 
 		if (rangeFind.begin() != rangeText.end())
 			return rangeFind.begin() - rangeText.begin() + stStartPos;
-		else
-			return TString::npos;
+
+		return TString::npos;
 	}
 
 	void TString::Replace(const wchar_t* pszWhat, const wchar_t* pszWithWhat)
@@ -599,19 +599,17 @@ namespace string
 			wch = m_pszData[tPos];
 			return true;
 		}
-		else
-		{
-			wch = L'\0';
-			return false;
-		}
+
+		wch = L'\0';
+		return false;
 	}
 
 	wchar_t TString::GetAt(size_t tPos) const
 	{
 		if (tPos < GetLength())
 			return m_pszData[tPos];
-		else
-			return L'\0';
+
+		return L'\0';
 	}
 
 	/** Returns a pointer to the unicode internal buffer. If the buffer is in ansi format

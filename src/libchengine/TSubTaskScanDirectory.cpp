@@ -139,7 +139,7 @@ namespace chengine
 			ESubOperationResult eResult = tFilesystemFBWrapper.GetFileInfoFB(pathCurrent, spFileInfo, spBasePath);
 			if (eResult == TSubTaskBase::eSubResult_SkipFile)
 				continue;
-			else if (eResult != TSubTaskBase::eSubResult_Continue)
+			if (eResult != TSubTaskBase::eSubResult_Continue)
 				return eResult;
 
 			// log

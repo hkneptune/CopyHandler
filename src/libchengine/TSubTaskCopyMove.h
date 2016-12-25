@@ -27,8 +27,6 @@
 #include "TBufferSizes.h"
 #include "../liblogger/TLogger.h"
 #include "TOverlappedMemoryPool.h"
-#include "TOverlappedReaderFB.h"
-#include "TOverlappedWriterFB.h"
 
 namespace chengine
 {

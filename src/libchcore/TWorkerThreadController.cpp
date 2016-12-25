@@ -59,16 +59,16 @@ namespace chcore
 			throw TCoreException(eErr_ThreadAlreadyStarted, L"Thread was already started", LOCATION);
 
 		// just in case reset the kill event to avoid early death of the thread to be created
-		if (!::ResetEvent(m_hKillThread))
+		if (!ResetEvent(m_hKillThread))
 			throw TCoreWin32Exception(eErr_CannotResetEvent, GetLastError(), L"Failed to reset event", LOCATION);
 
 		boost::upgrade_to_unique_lock<boost::shared_mutex> lock_upgraded(lock);
 
-		m_hThread = ::CreateThread(nullptr, 0, pThreadFunction, pThreadParam, CREATE_SUSPENDED, nullptr);
+		m_hThread = CreateThread(nullptr, 0, pThreadFunction, pThreadParam, CREATE_SUSPENDED, nullptr);
 		if (!m_hThread)
 			throw TCoreWin32Exception(eErr_CannotCreateThread, GetLastError(), L"Failed to create thread", LOCATION);
 
-		if (!::SetThreadPriority(m_hThread, iPriority))
+		if (!SetThreadPriority(m_hThread, iPriority))
 		{
 			DWORD dwLastError = GetLastError();
 
@@ -78,7 +78,7 @@ namespace chcore
 			throw TCoreWin32Exception(eErr_CannotChangeThreadPriority, dwLastError, L"Failed to set thread priority", LOCATION);
 		}
 
-		if (::ResumeThread(m_hThread) == (DWORD)-1)
+		if (ResumeThread(m_hThread) == (DWORD)-1)
 		{
 			DWORD dwLastError = GetLastError();
 
@@ -103,7 +103,7 @@ namespace chcore
 		DWORD dwRes = WaitForSingleObject(m_hThread, dwMiliseconds);
 		if (dwRes == WAIT_OBJECT_0)
 		{
-			if (!::ResetEvent(m_hKillThread))
+			if (!ResetEvent(m_hKillThread))
 				throw TCoreWin32Exception(eErr_CannotResetEvent, GetLastError(), L"Failed to reset event", LOCATION);
 
 			boost::upgrade_to_unique_lock<boost::shared_mutex> lock_upgraded(lock);
@@ -135,22 +135,22 @@ namespace chcore
 
 		if (m_hThread != nullptr)
 		{
-			if (::SuspendThread(m_hThread) == (DWORD)-1)
+			if (SuspendThread(m_hThread) == (DWORD)-1)
 				throw TCoreWin32Exception(eErr_CannotSuspendThread, GetLastError(), L"Failed to suspend thread", LOCATION);
 
-			if (!::SetThreadPriority(m_hThread, iPriority))
+			if (!SetThreadPriority(m_hThread, iPriority))
 			{
 				DWORD dwLastError = GetLastError();
 
 				// try to resume thread priority cannot be changed
-				DWORD dwResult = ::ResumeThread(m_hThread);
+				DWORD dwResult = ResumeThread(m_hThread);
 				dwResult;	// to avoid warnings in release builds
 				BOOST_ASSERT(dwResult != (DWORD)-1);
 
 				throw TCoreWin32Exception(eErr_CannotChangeThreadPriority, dwLastError, L"Failed to set thread priority", LOCATION);
 			}
 
-			if (::ResumeThread(m_hThread) == (DWORD)-1)
+			if (ResumeThread(m_hThread) == (DWORD)-1)
 				throw TCoreWin32Exception(eErr_CannotResumeThread, GetLastError(), L"Failed to resume thread", LOCATION);
 		}
 	}
@@ -179,7 +179,7 @@ namespace chcore
 		// thread already stopped?
 		if (WaitForSingleObject(m_hThread, 0) == WAIT_OBJECT_0)
 		{
-			if (!::ResetEvent(m_hKillThread))
+			if (!ResetEvent(m_hKillThread))
 				throw TCoreWin32Exception(eErr_CannotResetEvent, GetLastError(), L"Failed to reset event", LOCATION);
 
 			boost::upgrade_to_unique_lock<boost::shared_mutex> lock_upgraded(rUpgradeLock);
@@ -195,7 +195,7 @@ namespace chcore
 		if (!m_hThread)
 			return;
 
-		if (!::SetEvent(m_hKillThread))
+		if (!SetEvent(m_hKillThread))
 			throw TCoreWin32Exception(eErr_CannotSetEvent, GetLastError(), L"Failed to set event", LOCATION);
 	}
 
@@ -207,7 +207,7 @@ namespace chcore
 		DWORD dwRes = WaitForSingleObject(m_hThread, dwMiliseconds);
 		if (dwRes == WAIT_OBJECT_0)
 		{
-			if (!::ResetEvent(m_hKillThread))
+			if (!ResetEvent(m_hKillThread))
 				throw TCoreWin32Exception(eErr_CannotResetEvent, GetLastError(), L"Failed to reset event", LOCATION);
 
 			boost::upgrade_to_unique_lock<boost::shared_mutex> lock_upgraded(rUpgradeLock);

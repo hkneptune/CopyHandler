@@ -589,8 +589,8 @@ bool CDirTreeCtrl::GetPath(HTREEITEM hItem, LPTSTR pszPath)
 		lpsf->Release();
 		return true;
 	}
-	else
-		return false;
+
+	return false;
 }
 
 ////////////////////////////////////////////////////////////////////////////
@@ -611,14 +611,12 @@ bool CDirTreeCtrl::SetPath(LPCTSTR lpszPath)
 
 	if (!bNetwork)
 		return SetLocalPath(lpszPath);
-	else
-	{
-		// we don't look in net neighborhood for speed reasons
-		EnsureVisible(m_hNetwork);
+
+	// we don't look in net neighborhood for speed reasons
+	EnsureVisible(m_hNetwork);
 //		SelectItem(m_hNetwork);
 //		ExpandItem(m_hNetwork, TVE_EXPAND);
-		return true;
-	}
+	return true;
 }
 
 
@@ -706,8 +704,8 @@ bool CDirTreeCtrl::ComparePaths(LPCTSTR lpszFull, LPCTSTR lpszPartial)
 
 		return strSrc == strFnd;
 	}
-	else
-		return false;
+
+	return false;
 }
 
 ////////////////////////////////////////////////////////////////////////////

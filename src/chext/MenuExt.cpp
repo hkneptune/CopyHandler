@@ -425,7 +425,7 @@ STDMETHODIMP CMenuExt::GetCommandString(UINT_PTR idCmd, UINT uFlags, UINT* /*pwR
 		HRESULT hResult = ShellExtensionVerifier::IsShellExtEnabled(m_piShellExtControl);
 		if(FAILED(hResult))
 			return hResult;
-		else if(hResult == S_FALSE)
+		if(hResult == S_FALSE)
 			return S_OK;
 
 		TShellMenuItemPtr spSelectedItem = m_tContextMenuHandler.GetCommandByMenuItemOffset(LOWORD(idCmd));

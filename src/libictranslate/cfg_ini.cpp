@@ -260,36 +260,34 @@ void* ini_cfg::find(const wchar_t* pszName)
 
 		return pHandle;
 	}
-	else
+
+	// parse the path
+	std::wstring strSection;
+	std::wstring strAttr;
+	if(!parse_property_name(pszName, strSection, strAttr))
+		return nullptr;
+
+	ini_storage::iterator iterSection = m_pMainNode->find(strSection);
+	if(iterSection == m_pMainNode->end())
+		return nullptr;
+
+	std::pair<attr_storage::iterator, attr_storage::iterator> pairRange;
+	if(strAttr == _T("*"))
 	{
-		// parse the path
-		std::wstring strSection;
-		std::wstring strAttr;
-		if(!parse_property_name(pszName, strSection, strAttr))
-			return nullptr;
+		pairRange.first = (*iterSection).second.begin();
+		pairRange.second = (*iterSection).second.end();
+	}
+	else
+		pairRange = (*iterSection).second.equal_range(strAttr);
+	if(pairRange.first != (*iterSection).second.end() && pairRange.first != pairRange.second)
+	{
+		INIFINDHANDLE* pHandle = new INIFINDHANDLE;
+		pHandle->bSection = false;
+		pHandle->bOnlyAttributes = true;
+		pHandle->itAttr = pairRange.first;
+		pHandle->itAttrEnd = pairRange.second;
 
-		ini_storage::iterator iterSection = m_pMainNode->find(strSection);
-		if(iterSection == m_pMainNode->end())
-			return nullptr;
-
-		std::pair<attr_storage::iterator, attr_storage::iterator> pairRange;
-		if(strAttr == _T("*"))
-		{
-			pairRange.first = (*iterSection).second.begin();
-			pairRange.second = (*iterSection).second.end();
-		}
-		else
-			pairRange = (*iterSection).second.equal_range(strAttr);
-		if(pairRange.first != (*iterSection).second.end() && pairRange.first != pairRange.second)
-		{
-			INIFINDHANDLE* pHandle = new INIFINDHANDLE;
-			pHandle->bSection = false;
-			pHandle->bOnlyAttributes = true;
-			pHandle->itAttr = pairRange.first;
-			pHandle->itAttrEnd = pairRange.second;
-
-			return pHandle;
-		}
+		return pHandle;
 	}
 
 	return nullptr;
@@ -318,47 +316,41 @@ bool ini_cfg::find_next(void* pFindHandle, PROPINFO& pi)
 			++pfh->itAttr;
 			return true;
 		}
-		else
-			return false;
+
+		return false;
 	}
-	else
+
+	if(pfh->bSection)
 	{
-		if(pfh->bSection)
-		{
-			if(pfh->itSection == pfh->itSectionEnd)
-				return false;
-			pfh->bSection = false;
-			pfh->itAttr = (*pfh->itSection).second.begin();
-			pfh->itAttrEnd = (*pfh->itSection).second.end();
+		if(pfh->itSection == pfh->itSectionEnd)
+			return false;
+		pfh->bSection = false;
+		pfh->itAttr = (*pfh->itSection).second.begin();
+		pfh->itAttrEnd = (*pfh->itSection).second.end();
 
-			// section name
-			pi.bGroup = true;
-			pi.pszName = (*pfh->itSection++).first.c_str();
-			pi.pszValue = nullptr;
-			return true;
-		}
-		else
-		{
-			if(pfh->itAttr != pfh->itAttrEnd)
-			{
-				pi.bGroup = false;
-				pi.pszName = (*pfh->itAttr).first.c_str();
-				pi.pszValue = (*pfh->itAttr).second.c_str();
-
-				++pfh->itAttr;
-				if(pfh->itAttr == pfh->itAttrEnd)
-					pfh->bSection = true;
-				return true;
-
-			}
-			else
-			{
-				// should not happen
-				assert(false);
-				return false;
-			}
-		}
+		// section name
+		pi.bGroup = true;
+		pi.pszName = (*pfh->itSection++).first.c_str();
+		pi.pszValue = nullptr;
+		return true;
 	}
+
+	if(pfh->itAttr != pfh->itAttrEnd)
+	{
+		pi.bGroup = false;
+		pi.pszName = (*pfh->itAttr).first.c_str();
+		pi.pszValue = (*pfh->itAttr).second.c_str();
+
+		++pfh->itAttr;
+		if(pfh->itAttr == pfh->itAttrEnd)
+			pfh->bSection = true;
+		return true;
+
+	}
+
+	// should not happen
+	assert(false);
+	return false;
 }
 
 /** Closes the find handle.

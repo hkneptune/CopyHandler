@@ -431,11 +431,9 @@ void CCustomCopyDlg::OnRemoveButton()
 		pos = m_ctlFiles.GetFirstSelectedItemPosition();
 		if (pos == nullptr)
 			break;
-		else
-		{
-			iItem=m_ctlFiles.GetNextSelectedItem(pos);
-			m_ctlFiles.DeleteItem(iItem);
-		}
+
+		iItem=m_ctlFiles.GetNextSelectedItem(pos);
+		m_ctlFiles.DeleteItem(iItem);
 	}
 }
 
@@ -709,12 +707,10 @@ void CCustomCopyDlg::OnRemovefilterButton()
 		pos=m_ctlFilters.GetFirstSelectedItemPosition();
 		if (pos == nullptr)
 			break;
-		else
-		{
-			iItem=m_ctlFilters.GetNextSelectedItem(pos);
-			m_ctlFilters.DeleteItem(iItem);
-			afFilters.RemoveAt(iItem);
-		}
+
+		iItem=m_ctlFilters.GetNextSelectedItem(pos);
+		m_ctlFilters.DeleteItem(iItem);
+		afFilters.RemoveAt(iItem);
 	}
 }
 

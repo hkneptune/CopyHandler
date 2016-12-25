@@ -233,19 +233,16 @@ namespace ictranslate
 
 			return pBuffer + 4;
 		}
-		else
-		{
-			*pwData = 0xffff;
-			DWORD dwLen = (DWORD)wcslen((wchar_t*)pBuffer);
-			*ppszStr = new TCHAR[ dwLen + 1 ];
-#ifdef _UNICODE
-			_tcscpy(*ppszStr, (wchar_t*)pBuffer);
-#else
-			WideCharToMultiByte(CP_ACP, 0, (wchar_t*)pBuffer, dwLen + 1, *ppszStr, dwLen + 1, nullptr, nullptr);
-#endif
-			return pBuffer + (dwLen + 1) * sizeof(wchar_t);
-		}
 
+		*pwData = 0xffff;
+		DWORD dwLen = (DWORD)wcslen((wchar_t*)pBuffer);
+		*ppszStr = new TCHAR[ dwLen + 1 ];
+#ifdef _UNICODE
+		_tcscpy(*ppszStr, (wchar_t*)pBuffer);
+#else
+		WideCharToMultiByte(CP_ACP, 0, (wchar_t*)pBuffer, dwLen + 1, *ppszStr, dwLen + 1, nullptr, nullptr);
+#endif
+		return pBuffer + (dwLen + 1) * sizeof(wchar_t);
 	}
 
 	/////////////////////////////////////////////////////////////////////////////
@@ -484,12 +481,10 @@ namespace ictranslate
 
 			return TRUE;
 		}
-		else
-		{
-			m_bLockChanged = false;
-			Cleanup();
-			return FALSE;
-		}
+
+		m_bLockChanged = false;
+		Cleanup();
+		return FALSE;
 	}
 
 	///////////////////////////////////////////////////////////////
@@ -791,8 +786,8 @@ namespace ictranslate
 			AfxGetApp()->HtmlHelp((DWORD_PTR)pHelpInfo, HH_DISPLAY_TEXT_POPUP);
 			return true;
 		}
-		else
-			return false;
+
+		return false;
 	}
 
 	void CLanguageDialog::OnContextMenu(CWnd* pWnd, CPoint point)

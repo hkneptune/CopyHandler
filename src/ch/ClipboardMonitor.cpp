@@ -174,13 +174,11 @@ DWORD WINAPI CClipboardMonitor::ClipboardMonitorProc(LPVOID pParam)
 					BOOL bExit=ExitWindowsEx(EWX_POWEROFF | EWX_SHUTDOWN | (GetPropValue<PP_PFORCESHUTDOWN>(GetConfig()) ? EWX_FORCE : 0), 0);
 					if (bExit)
 						return 1;
-					else
-					{
-						// some kind of error
-						ictranslate::CFormat fmt(GetResManager().LoadString(IDS_SHUTDOWNERROR_STRING));
-						fmt.SetParam(_T("%errno"), GetLastError());
-						AfxMessageBox(fmt.ToString(), MB_ICONERROR | MB_OK | MB_SYSTEMMODAL);
-					}
+
+					// some kind of error
+					ictranslate::CFormat fmt(GetResManager().LoadString(IDS_SHUTDOWNERROR_STRING));
+					fmt.SetParam(_T("%errno"), GetLastError());
+					AfxMessageBox(fmt.ToString(), MB_ICONERROR | MB_OK | MB_SYSTEMMODAL);
 				}
 			}
 		}

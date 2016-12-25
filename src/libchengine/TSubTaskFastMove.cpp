@@ -111,8 +111,8 @@ namespace chengine
 			m_tSubTaskStats.SetTotalCount(0);
 			return eSubResult_Continue;
 		}
-		else
-			m_tSubTaskStats.SetTotalCount(spBasePaths->GetCount());
+
+		m_tSubTaskStats.SetTotalCount(spBasePaths->GetCount());
 
 		TDestinationPathProvider tDstPathProvider(spFilesystem, pathDestination,
 			bIgnoreDirs, bForceDirectories,
@@ -149,7 +149,7 @@ namespace chengine
 				spBasePath->SetSkipFurtherProcessing(true);
 				continue;
 			}
-			else if (eResult != TSubTaskBase::eSubResult_Continue)
+			if (eResult != TSubTaskBase::eSubResult_Continue)
 				return eResult;
 
 			// does it match the input filter?

@@ -130,7 +130,7 @@ chengine::TConfig& CCopyHandlerApp::GetConfig()
 	return tCfg;
 }
 
-int MsgBox(UINT uiID, UINT nType, UINT nIDHelp)
+int CCopyHandlerApp::MsgBox(UINT uiID, UINT nType, UINT nIDHelp)
 {
 	return AfxMessageBox(GetResManager().LoadString(uiID), nType, nIDHelp);
 }
@@ -368,12 +368,10 @@ BOOL CCopyHandlerApp::InitInstance()
 
 			return FALSE;
 		}
-		else
-		{
-			LOG_WARNING(m_spLog) << _T("Other instance of Copy Handler is already running. Exiting.");
-			MsgBox(IDS_ONECOPY_STRING, MB_OK | MB_ICONWARNING);
-			return FALSE;
-		}
+
+		LOG_WARNING(m_spLog) << _T("Other instance of Copy Handler is already running. Exiting.");
+		MsgBox(IDS_ONECOPY_STRING, MB_OK | MB_ICONWARNING);
+		return FALSE;
 	}
 
 	// ================================= Common controls ========================================
@@ -704,8 +702,8 @@ HWND CCopyHandlerApp::HHelp(HWND hwndCaller, LPCTSTR pszFile, UINT uCommand, DWO
 		strAdd += pszFile;
 		return ::HtmlHelp(hwndCaller, strAdd, uCommand, dwData);
 	}
-	else
-		return ::HtmlHelp(hwndCaller, pszPath, uCommand, dwData);
+
+	return ::HtmlHelp(hwndCaller, pszPath, uCommand, dwData);
 }
 
 void CCopyHandlerApp::HtmlHelp(DWORD_PTR dwData, UINT nCmd)

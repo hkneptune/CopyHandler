@@ -6,18 +6,18 @@
 #include <boost/format.hpp>
 #include <boost/algorithm/string/replace.hpp>
 
-class TFailedOutputPrinter : public ::testing::EmptyTestEventListener
+class TFailedOutputPrinter : public testing::EmptyTestEventListener
 {
-	virtual void OnTestStart(const ::testing::TestInfo& test_info)
+	void OnTestStart(const testing::TestInfo& test_info) override
 	{
 		m_strTestName = str(boost::format("%1%.%2%") % test_info.test_case_name() % test_info.name());
 	}
 
-	virtual void OnTestPartResult(const ::testing::TestPartResult& test_part_result)
+	void OnTestPartResult(const testing::TestPartResult& test_part_result) override
 	{
 		if(test_part_result.failed())
 		{
-			char* pszFailureText = NULL;
+			char* pszFailureText = nullptr;
 			if(test_part_result.fatally_failed())
 				pszFailureText = "FATAL";
 			else
@@ -35,7 +35,7 @@ class TFailedOutputPrinter : public ::testing::EmptyTestEventListener
 		}
 	}
 
-	virtual void OnTestProgramEnd(const ::testing::UnitTest& unit_test)
+	void OnTestProgramEnd(const testing::UnitTest& unit_test) override
 	{
 		if(unit_test.Failed())
 		{
@@ -65,8 +65,8 @@ __declspec(dllexport) int __stdcall RunTests(int argc, TCHAR* argv[])
 #endif
 {
 	testing::InitGoogleMock(&argc, argv);
-	::testing::FLAGS_gtest_death_test_style = "fast";
-	::testing::FLAGS_gtest_print_time = 1;
+	testing::FLAGS_gtest_death_test_style = "fast";
+	testing::FLAGS_gtest_print_time = true;
 
 	bool bUseStdFormat = false;
 	for(int iIndex = 1; iIndex < argc; ++iIndex)
@@ -80,7 +80,7 @@ __declspec(dllexport) int __stdcall RunTests(int argc, TCHAR* argv[])
 
 	if(!bUseStdFormat)
 	{
-		::testing::TestEventListeners& listeners = ::testing::UnitTest::GetInstance()->listeners();
+		testing::TestEventListeners& listeners = testing::UnitTest::GetInstance()->listeners();
 		delete listeners.Release(listeners.default_result_printer());
 		listeners.Append(new TFailedOutputPrinter);
 	}

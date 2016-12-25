@@ -41,7 +41,7 @@ public:
 
 	PCTSTR GetHelpPath() const { return m_pszHelpFilePath; }
 
-	friend int MsgBox(UINT uiID, UINT nType=MB_OK, UINT nIDHelp=0);
+	static int MsgBox(UINT uiID, UINT nType=MB_OK, UINT nIDHelp=0);
 
 	friend CCopyHandlerApp& GetApplication();
 	static ictranslate::CResourceManager& GetResManager();
@@ -111,6 +111,11 @@ inline chengine::TConfig& GetConfig()
 inline TShellExtensionConfigPtr GetShellExtensionConfig()
 {
 	return GetApp().GetShellExtensionConfig();
+}
+
+inline int MsgBox(UINT uiID, UINT nType = MB_OK, UINT nIDHelp = 0)
+{
+	return GetApp().MsgBox(uiID, nType, nIDHelp);
 }
 
 #endif

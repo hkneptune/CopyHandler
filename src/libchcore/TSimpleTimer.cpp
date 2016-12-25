@@ -79,8 +79,8 @@ namespace chcore
 
 			return ullCurrentTotal;
 		}
-		else
-			return 0;
+
+		return 0;
 	}
 
 	void TSimpleTimer::Reset()

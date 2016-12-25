@@ -168,7 +168,7 @@ ERegistrationResult TShellExtensionClient::RegisterShellExtDll(long lClientVersi
 		int iTries = 3;
 		do
 		{
-			LOG_DEBUG(GetLogger()) << L"Trying to enable native shell extension";;
+			LOG_DEBUG(GetLogger()) << L"Trying to enable native shell extension";
 			hResult = EnableExtensionIfCompatible(lClientVersion, rlExtensionVersion, rstrExtensionStringVersion);
 			if(hResult == REGDB_E_CLASSNOTREG)
 			{
@@ -180,7 +180,7 @@ ERegistrationResult TShellExtensionClient::RegisterShellExtDll(long lClientVersi
 
 		if(FAILED(hResult))
 		{
-			LOG_INFO(GetLogger()) << L"Shell Extension requires system restart";;
+			LOG_INFO(GetLogger()) << L"Shell Extension requires system restart";
 			eResult = eSuccessNeedRestart;
 		}
 	}

@@ -41,7 +41,7 @@ CUpdateChecker::CUpdateChecker() :
 {
 	m_hKillEvent = ::CreateEvent(nullptr, FALSE, FALSE, nullptr);
 	BOOST_ASSERT(m_hKillEvent);
-	::InitializeCriticalSection(&m_cs);
+	InitializeCriticalSection(&m_cs);
 }
 
 // ============================================================================
@@ -61,9 +61,9 @@ CUpdateChecker::~CUpdateChecker()
 	}
 
 	if(m_hKillEvent)
-		::CloseHandle(m_hKillEvent);
+		CloseHandle(m_hKillEvent);
 
-	::DeleteCriticalSection(&m_cs);
+	DeleteCriticalSection(&m_cs);
 }
 
 bool CUpdateChecker::AsyncCheckForUpdates(const wchar_t* pszSite, const wchar_t* pszLanguage, UpdateVersionInfo::EVersionType eUpdateChannel, bool bOnlyIfConnected, bool bSendHeaders)
@@ -78,7 +78,7 @@ bool CUpdateChecker::AsyncCheckForUpdates(const wchar_t* pszSite, const wchar_t*
 	if(bOnlyIfConnected && !InternetGetConnectedState(&dwConnectionFlags, 0))
 		return false;
 
-	::EnterCriticalSection(&m_cs);
+	EnterCriticalSection(&m_cs);
 
 	m_strSite = pszSite;
 	m_eResult = eResult_Undefined;
@@ -86,9 +86,9 @@ bool CUpdateChecker::AsyncCheckForUpdates(const wchar_t* pszSite, const wchar_t*
 	m_strLanguage = pszLanguage;
 	m_bSendHeaders = bSendHeaders;
 
-	::LeaveCriticalSection(&m_cs);
+	LeaveCriticalSection(&m_cs);
 
-	::ResetEvent(m_hKillEvent);
+	ResetEvent(m_hKillEvent);
 
 	m_hThread = CreateThread(nullptr, 0, (LPTHREAD_START_ROUTINE)&CUpdateChecker::UpdateCheckThread, (void*)this, 0, nullptr);
 	if(!m_hThread)
@@ -111,7 +111,7 @@ void CUpdateChecker::Cleanup()
 	if(m_hThread)
 	{
 		if(m_hKillEvent)
-			::SetEvent(m_hKillEvent);
+			SetEvent(m_hKillEvent);
 		DWORD dwResult = WaitForSingleObject(m_hThread, 5000);
 		if (dwResult == WAIT_TIMEOUT || dwResult == WAIT_FAILED)
 			throw std::exception("Failed to stop update checker thread.");
@@ -119,11 +119,11 @@ void CUpdateChecker::Cleanup()
 		m_hThread = nullptr;
 	}
 
-	::ResetEvent(m_hKillEvent);
+	ResetEvent(m_hKillEvent);
 
 	m_httpFile.Close();
 
-	::EnterCriticalSection(&m_cs);
+	EnterCriticalSection(&m_cs);
 
 	m_strSite.Empty();
 	m_eUpdateChannel = UpdateVersionInfo::eStable;
@@ -134,10 +134,10 @@ void CUpdateChecker::Cleanup()
 	m_strReleaseDate.Empty();
 	m_strDownloadAddress.Empty();
 	m_strReleaseNotes.Empty();
-	m_eResult = CUpdateChecker::eResult_Undefined;
+	m_eResult = eResult_Undefined;
 	m_bSendHeaders = true;
 
-	::LeaveCriticalSection(&m_cs);
+	LeaveCriticalSection(&m_cs);
 }
 
 // ============================================================================
@@ -154,12 +154,12 @@ void CUpdateChecker::SetResult(ECheckResult eCheckResult, DWORD dwError)
 	if(eCheckResult == eResult_Error && dwError != 0)
 		strError = chcore::TWin32ErrorFormatter::FormatWin32ErrorCodeWithFallback(dwError, _T("wininet.dll"), true);
 
-	::EnterCriticalSection(&m_cs);
+	EnterCriticalSection(&m_cs);
 	
 	m_eResult = eCheckResult;
 	m_strLastError = strError.c_str();
 
-	::LeaveCriticalSection(&m_cs);
+	LeaveCriticalSection(&m_cs);
 }
 
 // ============================================================================
@@ -171,9 +171,9 @@ void CUpdateChecker::SetResult(ECheckResult eCheckResult, DWORD dwError)
 // ============================================================================
 void CUpdateChecker::SetLastError(PCTSTR pszError)
 {
-	::EnterCriticalSection(&m_cs);
+	EnterCriticalSection(&m_cs);
 	m_strLastError = pszError;
-	::LeaveCriticalSection(&m_cs);
+	LeaveCriticalSection(&m_cs);
 }
 
 // ============================================================================
@@ -187,27 +187,27 @@ void CUpdateChecker::SetLastError(PCTSTR pszError)
 // ============================================================================
 void CUpdateChecker::SetVersionsAndAddress(PCTSTR pszAddress, PCTSTR pszNumericVersion, PCTSTR pszReadableVersion, PCTSTR pszReleaseDate, PCTSTR pszReleaseNotes)
 {
-	::EnterCriticalSection(&m_cs);
+	EnterCriticalSection(&m_cs);
 	m_strDownloadAddress = pszAddress;
 	m_strNumericVersion = pszNumericVersion;
 	m_strReadableVersion = pszReadableVersion;
 	m_strReleaseDate = pszReleaseDate;
 	m_strReleaseNotes = pszReleaseNotes;
-	::LeaveCriticalSection(&m_cs);
+	LeaveCriticalSection(&m_cs);
 }
 
 void CUpdateChecker::SetSendHeaders(bool bSendHeaders)
 {
-	::EnterCriticalSection(&m_cs);
+	EnterCriticalSection(&m_cs);
 	m_bSendHeaders = bSendHeaders;
-	::LeaveCriticalSection(&m_cs);
+	LeaveCriticalSection(&m_cs);
 }
 
 CString CUpdateChecker::GetSiteAddress() const
 {
-	::EnterCriticalSection(&m_cs);
+	EnterCriticalSection(&m_cs);
 	CString strAddress = m_strSite;
-	::LeaveCriticalSection(&m_cs);
+	LeaveCriticalSection(&m_cs);
 
 	return strAddress;
 }
@@ -221,9 +221,9 @@ CString CUpdateChecker::GetSiteAddress() const
 // ============================================================================
 UpdateVersionInfo::EVersionType CUpdateChecker::GetUpdateChannel()
 {
-	::EnterCriticalSection(&m_cs);
+	EnterCriticalSection(&m_cs);
 	UpdateVersionInfo::EVersionType eUpdateChannel = m_eUpdateChannel;
-	::LeaveCriticalSection(&m_cs);
+	LeaveCriticalSection(&m_cs);
 
 	return eUpdateChannel;
 }
@@ -237,9 +237,9 @@ UpdateVersionInfo::EVersionType CUpdateChecker::GetUpdateChannel()
 // ============================================================================
 CUpdateChecker::ECheckResult CUpdateChecker::GetResult() const
 {
-	::EnterCriticalSection(&m_cs);
+	EnterCriticalSection(&m_cs);
 	ECheckResult eResult = m_eResult;
-	::LeaveCriticalSection(&m_cs);
+	LeaveCriticalSection(&m_cs);
 	return eResult;
 }
 

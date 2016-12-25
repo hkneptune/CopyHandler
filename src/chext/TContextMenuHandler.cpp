@@ -158,6 +158,6 @@ TShellMenuItemPtr TContextMenuHandler::GetCommandByItemID(UINT uiID)
 	std::map<UINT, TShellMenuItemPtr>::iterator iter = m_mapMenuItems.find(uiID);
 	if(iter != m_mapMenuItems.end())
 		return (*iter).second;
-	else
-		return TShellMenuItemPtr();
+
+	return TShellMenuItemPtr();
 }

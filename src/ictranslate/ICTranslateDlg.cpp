@@ -584,10 +584,10 @@ int CALLBACK CICTranslateDlg::ListSortFunc(LPARAM lParam1, LPARAM lParam2, LPARA
 
 	if(uiID1 < uiID2)
 		return -1;
-	else if(uiID1 == uiID2)
+	if(uiID1 == uiID2)
 		return 0;
-	else
-		return 1;
+
+	return 1;
 }
 
 void CICTranslateDlg::OnBnClickedCopyButton()
@@ -789,8 +789,8 @@ bool CICTranslateDlg::WarnModified() const
 		int iRes = AfxMessageBox(_T("You have modified the translation file. If you continue, the changes might be lost. Do you want to continue ?"), MB_YESNO | MB_ICONQUESTION);
 		return iRes == IDYES;
 	}
-	else
-		return true;
+
+	return true;
 }
 
 void CICTranslateDlg::OnCancel()

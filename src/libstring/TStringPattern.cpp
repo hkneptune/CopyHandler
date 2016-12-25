@@ -79,7 +79,8 @@ namespace string
 			}
 			lpszMask++;
 		}
-		while (*lpszMask == _T('*') && bMatch) lpszMask++;
+		while (*lpszMask == _T('*') && bMatch)
+			lpszMask++;
 
 		return bMatch && *lpszString == _T('\0') && *lpszMask == _T('\0');
 	}
@@ -94,28 +95,27 @@ namespace string
 
 		// if lpszString is empty and lpszMask has more characters or,
 		// lpszMask is empty, return 
-		if (*lpszString == _T('\0') && *lpszMask != _T('\0')) return false;
-		if (*lpszString == _T('\0') && *lpszMask == _T('\0')) return true;
+		if (*lpszString == _T('\0') && *lpszMask != _T('\0'))
+			return false;
+		if (*lpszString == _T('\0') && *lpszMask == _T('\0'))
+			return true;
 		// else search substring
-		else
+		LPCTSTR wdsCopy = lpszMask;
+		LPCTSTR lpszStringCopy = lpszString;
+		bool bMatch = true;
+		do
 		{
-			LPCTSTR wdsCopy = lpszMask;
-			LPCTSTR lpszStringCopy = lpszString;
-			bool bMatch = true;
-			do
-			{
-				if (!MatchMask(lpszMask, lpszString)) lpszStringCopy++;
-				lpszMask = wdsCopy;
-				lpszString = lpszStringCopy;
-				while (!(_tcicmp(*lpszMask, *lpszString)) && (*lpszString != '\0')) lpszString++;
-				wdsCopy = lpszMask;
-				lpszStringCopy = lpszString;
-			} while ((*lpszString != _T('\0')) ? !MatchMask(lpszMask, lpszString) : (bMatch = false) != false);
+			if (!MatchMask(lpszMask, lpszString)) lpszStringCopy++;
+			lpszMask = wdsCopy;
+			lpszString = lpszStringCopy;
+			while (!(_tcicmp(*lpszMask, *lpszString)) && (*lpszString != '\0')) lpszString++;
+			wdsCopy = lpszMask;
+			lpszStringCopy = lpszString;
+		} while ((*lpszString != _T('\0')) ? !MatchMask(lpszMask, lpszString) : (bMatch = false) != false);
 
-			if (*lpszString == _T('\0') && *lpszMask == _T('\0')) return true;
+		if (*lpszString == _T('\0') && *lpszMask == _T('\0')) return true;
 
-			return bMatch;
-		}
+		return bMatch;
 	}
 
 	bool TStringPattern::Matches(const TString& strTextToMatch) const

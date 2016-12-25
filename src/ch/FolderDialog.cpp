@@ -574,8 +574,8 @@ INT_PTR CFolderDialog::DoModal()
 {
 	if (!InitModalIndirect((LPCDLGTEMPLATE)__g_DlgTemplate))
 		return -1;
-	else
-		return ictranslate::CLanguageDialog::DoModal();
+
+	return ictranslate::CLanguageDialog::DoModal();
 }
 
 ///////////////////////////////////////////////////////////////////////////

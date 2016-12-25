@@ -704,8 +704,8 @@ namespace ictranslate
 		translation_map::const_iterator it = m_mapTranslation.find((wHiID << 16) | wLoID);
 		if(it != m_mapTranslation.end())
 			return (*it).second.GetText();
-		else
-			return EMPTY_STRING;
+
+		return EMPTY_STRING;
 	}
 
 	void CLangData::EnumStrings(PFNENUMCALLBACK pfnCallback, void* pData)
@@ -721,16 +721,14 @@ namespace ictranslate
 		translation_map::iterator iterTranslation = m_mapTranslation.find(uiTranslationKey);
 		if(iterTranslation != m_mapTranslation.end())
 			return &(*iterTranslation).second;
-		else
+
+		if(bCreate)
 		{
-			if(bCreate)
+			std::pair<translation_map::iterator, bool> pairTranslation = m_mapTranslation.insert(std::make_pair(uiTranslationKey, CTranslationItem()));
+			if(pairTranslation.second)
 			{
-				std::pair<translation_map::iterator, bool> pairTranslation = m_mapTranslation.insert(std::make_pair(uiTranslationKey, CTranslationItem()));
-				if(pairTranslation.second)
-				{
-					m_bModified = true;
-					return &(*pairTranslation.first).second;
-				}
+				m_bModified = true;
+				return &(*pairTranslation.first).second;
 			}
 		}
 
@@ -774,17 +772,15 @@ namespace ictranslate
 	{
 		if(bFullPath)
 			return m_pszFilename;
-		else
-		{
-			if(m_pszFilename)
-			{
-				TCHAR *pszFnd = _tcsrchr(m_pszFilename, _T('\\'));
-				if(pszFnd)
-					return pszFnd + 1;
-			}
 
-			return m_pszFilename;
+		if(m_pszFilename)
+		{
+			TCHAR *pszFnd = _tcsrchr(m_pszFilename, _T('\\'));
+			if(pszFnd)
+				return pszFnd + 1;
 		}
+
+		return m_pszFilename;
 	}
 
 	void CLangData::SetLangName(PCTSTR psz)

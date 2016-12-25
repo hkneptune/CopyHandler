@@ -173,13 +173,11 @@ _PROGRESSITEM_* CProgressListBox::GetItemAddress(int iIndex)
 {
 	if(boost::numeric_cast<int>(m_vItems.size()) > iIndex)
 		return m_vItems.at(iIndex);
-	else
-	{
-		_PROGRESSITEM_* pItem=new _PROGRESSITEM_;
-		pItem->m_uiRange=100;
-		m_vItems.push_back(pItem);
-		return pItem;
-	}
+
+	_PROGRESSITEM_* pItem=new _PROGRESSITEM_;
+	pItem->m_uiRange=100;
+	m_vItems.push_back(pItem);
+	return pItem;
 }
 
 void CProgressListBox::UpdateItems(int nLimit, bool bUpdateSize)

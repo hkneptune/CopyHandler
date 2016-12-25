@@ -184,11 +184,9 @@ namespace chengine
 					m_mic.modify(iterFnd, std::ref(tChange));
 					return tChange.WasModified();
 				}
-				else
-				{
-					m_mic.insert(ConfigNode(++m_oidLastObjectID, pszPropName, 0, boost::lexical_cast<std::wstring>(rValue).c_str()));
-					return true;
-				}
+
+				m_mic.insert(ConfigNode(++m_oidLastObjectID, pszPropName, 0, boost::lexical_cast<std::wstring>(rValue).c_str()));
+				return true;
 			}
 
 			template<>
@@ -203,11 +201,9 @@ namespace chengine
 					m_mic.modify(iterFnd, std::ref(tChange));
 					return tChange.WasModified();
 				}
-				else
-				{
-					m_mic.insert(ConfigNode(++m_oidLastObjectID, pszPropName, 0, bValue ? _T("true") : _T("false")));
-					return true;
-				}
+
+				m_mic.insert(ConfigNode(++m_oidLastObjectID, pszPropName, 0, bValue ? _T("true") : _T("false")));
+				return true;
 			}
 
 			// vector-based values
