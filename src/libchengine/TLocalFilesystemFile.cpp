@@ -372,7 +372,7 @@ namespace chengine
 		uli.HighPart = bhfi.nFileSizeHigh;
 		uli.LowPart = bhfi.nFileSizeLow;
 
-		tFileInfo.SetFilePath(m_pathFile);
+		tFileInfo.SetFilePath(TLocalFilesystem::StripPathExtensionIfNeeded(m_pathFile));
 		tFileInfo.SetAttributes(bhfi.dwFileAttributes);
 		tFileInfo.SetFileTimes(TFileTime(bhfi.ftCreationTime), TFileTime(bhfi.ftLastAccessTime), TFileTime(bhfi.ftLastWriteTime));
 		tFileInfo.SetLength64(uli.QuadPart);
@@ -388,6 +388,6 @@ namespace chengine
 
 	TSmartPath TLocalFilesystemFile::GetFilePath() const
 	{
-		return m_pathFile;
+		return TLocalFilesystem::StripPathExtensionIfNeeded(m_pathFile);
 	}
 }

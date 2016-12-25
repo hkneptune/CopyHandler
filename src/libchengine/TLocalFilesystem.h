@@ -72,6 +72,7 @@ namespace chengine
 
 	private:
 		static chcore::TSmartPath PrependPathExtensionIfNeeded(const chcore::TSmartPath& pathInput);
+		static chcore::TSmartPath StripPathExtensionIfNeeded(const chcore::TSmartPath& pathInput);
 		static UINT GetDriveData(const chcore::TSmartPath& spPath);
 		DWORD GetPhysicalDiskNumber(wchar_t wchDrive);
 

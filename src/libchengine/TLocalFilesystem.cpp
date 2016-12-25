@@ -350,6 +350,16 @@ namespace chengine
 		return pathInput;
 	}
 
+	TSmartPath TLocalFilesystem::StripPathExtensionIfNeeded(const TSmartPath& pathInput)
+	{
+		const TSmartPath pathPrefix = PathFromString(L"\\\\?\\");
+
+		if(pathInput.StartsWith(pathPrefix))
+			return PathFromString(pathInput.ToWString().Mid(pathPrefix.GetLength()).c_str());
+
+		return pathInput;
+	}
+
 	TLocalFilesystem::EPathsRelation TLocalFilesystem::GetPathsRelation(const TSmartPath& pathFirst, const TSmartPath& pathSecond)
 	{
 		if (pathFirst.IsEmpty())
