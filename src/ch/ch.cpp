@@ -265,6 +265,7 @@ BOOL CCopyHandlerApp::InitInstance()
 	m_spEngineLoggerConfig->SetLogLevel(L"Serializer-RowData", (logger::ESeverityLevel)GetPropValue<PP_LOGLEVEL_SERIALIZER>(rCfg));
 	m_spEngineLoggerConfig->SetLogLevel(L"Serializer-Container", (logger::ESeverityLevel)GetPropValue<PP_LOGLEVEL_SERIALIZER>(rCfg));
 	m_spEngineLoggerConfig->SetLogLevel(L"TaskManager", (logger::ESeverityLevel)GetPropValue<PP_LOGLEVEL_ENGINEDEFAULT>(rCfg));
+	// also update CCopyHandlerApp::OnConfigNotify() with new channels
 
 	// initialize the global log file if it is requested by configuration file
 	CString strLogPath = strPath + _T("\\ch.log");
@@ -653,7 +654,10 @@ void CCopyHandlerApp::OnConfigNotify(const string::TStringSet& setPropNames)
 		m_spLog->GetLogFileData()->GetMultiLoggerConfig()->SetLogLevel(L"default", (logger::ESeverityLevel)GetPropValue<PP_LOGLEVEL_APP>(rCfg));
 
 	if(setPropNames.HasValue(PropData<PP_LOGLEVEL_ENGINEDEFAULT>::GetPropertyName()))
+	{
 		m_spEngineLoggerConfig->SetLogLevel(L"default", (logger::ESeverityLevel)GetPropValue<PP_LOGLEVEL_ENGINEDEFAULT>(rCfg));
+		m_spEngineLoggerConfig->SetLogLevel(L"TaskManager", (logger::ESeverityLevel)GetPropValue<PP_LOGLEVEL_ENGINEDEFAULT>(rCfg));
+	}
 	if(setPropNames.HasValue(PropData<PP_LOGLEVEL_FILESYSTEM>::GetPropertyName()))
 	{
 		m_spEngineLoggerConfig->SetLogLevel(L"Filesystem", (logger::ESeverityLevel)GetPropValue<PP_LOGLEVEL_FILESYSTEM>(rCfg));
@@ -670,6 +674,14 @@ void CCopyHandlerApp::OnConfigNotify(const string::TStringSet& setPropNames)
 		m_spEngineLoggerConfig->SetLogLevel(L"ST-Delete", (logger::ESeverityLevel)GetPropValue<PP_LOGLEVEL_SUBTASK_DELETE>(rCfg));
 	if(setPropNames.HasValue(PropData<PP_LOGLEVEL_SUBTASK_SCANDIR>::GetPropertyName()))
 		m_spEngineLoggerConfig->SetLogLevel(L"ST-ScanDirs", (logger::ESeverityLevel)GetPropValue<PP_LOGLEVEL_SUBTASK_SCANDIR>(rCfg));
+
+	if(setPropNames.HasValue(PropData<PP_LOGLEVEL_SERIALIZER>::GetPropertyName()))
+	{
+		m_spEngineLoggerConfig->SetLogLevel(L"Serializer", (logger::ESeverityLevel)GetPropValue<PP_LOGLEVEL_SERIALIZER>(rCfg));
+		m_spEngineLoggerConfig->SetLogLevel(L"Serializer-RowReader", (logger::ESeverityLevel)GetPropValue<PP_LOGLEVEL_SERIALIZER>(rCfg));
+		m_spEngineLoggerConfig->SetLogLevel(L"Serializer-RowData", (logger::ESeverityLevel)GetPropValue<PP_LOGLEVEL_SERIALIZER>(rCfg));
+		m_spEngineLoggerConfig->SetLogLevel(L"Serializer-Container", (logger::ESeverityLevel)GetPropValue<PP_LOGLEVEL_SERIALIZER>(rCfg));
+	}
 }
 
 void CCopyHandlerApp::OnResManNotify(UINT uiType)

@@ -1049,6 +1049,7 @@ BEGIN
     IDS_SHELLEXECUTEERROR_STRING 
                             "Error #%errno calling ShellExecute for file %path"
     IDS_BSDEFAULT_STRING    "Default: "
+	IDS_LOGFILEEMPTY_STRING "Log file is empty"
 END
 
 STRINGTABLE

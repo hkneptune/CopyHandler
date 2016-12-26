@@ -26,6 +26,7 @@
 #include "Structs.h"
 #include "CfgProperties.h"
 #include "../libchengine/TTaskManager.h"
+#include "../libchengine/TLocalFilesystem.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -733,7 +734,15 @@ void CStatusDlg::OnShowLogButton()
 	if(!spTask)
 		return;
 
-	ULONG_PTR hResult = (ULONG_PTR)ShellExecute(this->m_hWnd, _T("open"), _T("notepad.exe"), spTask->GetLogPath().ToString(), nullptr, SW_SHOWNORMAL);
+	chcore::TSmartPath logPath = spTask->GetLogPath();
+	chengine::TLocalFilesystem localFilesystem(GetLogFileData());
+	if(!localFilesystem.PathExist(logPath))
+	{
+		MsgBox(IDS_LOGFILEEMPTY_STRING, MB_OK | MB_ICONINFORMATION);
+		return;
+	}
+
+	ULONG_PTR hResult = (ULONG_PTR)ShellExecute(this->m_hWnd, _T("open"), _T("notepad.exe"), logPath.ToString(), nullptr, SW_SHOWNORMAL);
 	if(hResult < 32)
 	{
 		ictranslate::CFormat fmt(GetResManager().LoadString(IDS_SHELLEXECUTEERROR_STRING));
