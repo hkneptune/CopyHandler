@@ -53,6 +53,7 @@ namespace logger
 		{
 			rLoggerPaths.Add(strPath.c_str());
 		}
+
 		rLoggerPaths.Add(m_spLogFile->GetLogPath().c_str());
 	}
 
@@ -68,9 +69,14 @@ namespace logger
 		return m_spHasEntriesEvent;
 	}
 
+	void TLogFileData::DisableLogging()
+	{
+		m_bLoggingEnabled = false;
+	}
+
 	void TLogFileData::PushLogEntry(std::wstring strLine)
 	{
-		if(m_spLogFile)
+		if(m_spLogFile && m_bLoggingEnabled)
 		{
 			boost::unique_lock<boost::shared_mutex> lock(m_mutex);
 			m_listEntries.push_back(strLine);
@@ -92,6 +98,8 @@ namespace logger
 
 			m_spLogFile->Write(listEntries);
 		}
+		else
+			ResetEvent(m_spHasEntriesEvent.get());
 	}
 
 	void TLogFileData::CloseUnusedFile()

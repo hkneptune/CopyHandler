@@ -61,6 +61,7 @@ namespace logger
 
 		TLoggerRotationInfoPtr m_spGlobalRotationInfo;
 #pragma warning(pop)
+		bool m_bLoggingEnabled = true;
 	};
 }
 

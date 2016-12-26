@@ -43,6 +43,7 @@ namespace logger
 
 	private:
 		void PushLogEntry(std::wstring strLine);
+		void DisableLogging();
 
 		std::shared_ptr<void> GetEntriesEvent() const;
 		void StoreLogEntries();
@@ -60,6 +61,8 @@ namespace logger
 
 		std::unique_ptr<internal::TLogFile> m_spLogFile;
 #pragma warning(pop)
+
+		bool m_bLoggingEnabled = true;
 
 		friend class TLogRecord;
 		friend class TAsyncMultiLogger;

@@ -21,6 +21,7 @@
 #include <thread>
 #include <boost/numeric/conversion/cast.hpp>
 #include <atltrace.h>
+#include <boost/format.hpp>
 
 namespace logger
 {
@@ -64,6 +65,8 @@ namespace logger
 	TLogFileDataPtr TAsyncMultiLogger::CreateLoggerData(PCTSTR pszLogPath, const TMultiLoggerConfigPtr& spLoggerConfig)
 	{
 		TLogFileDataPtr spLogFileData = std::make_shared<TLogFileData>(pszLogPath, spLoggerConfig, m_spGlobalRotationInfo);
+		if(!m_bLoggingEnabled)
+			spLogFileData->DisableLogging();
 
 		boost::unique_lock<boost::shared_mutex> lock(m_mutex);
 		m_setLoggerData.insert(spLogFileData);
@@ -97,14 +100,14 @@ namespace logger
 
 		try
 		{
-			std::vector<HANDLE> vHandles;
-
 			bool bStopProcessing = false;
 			do
 			{
+				std::vector<HANDLE> vHandles;
+				std::wstring strError;
+
 				{
 					boost::unique_lock<boost::shared_mutex> lock(pAsyncLogger->m_mutex);
-					vHandles.clear();
 					vHandles.push_back(pAsyncLogger->m_spStopEvent.get());
 
 					std::transform(pAsyncLogger->m_setLoggerData.begin(), pAsyncLogger->m_setLoggerData.end(), std::back_inserter(vHandles), [](const TLogFileDataPtr& rData) { return rData->GetEntriesEvent().get(); });
@@ -115,6 +118,16 @@ namespace logger
 				{
 					bStopProcessing = true;
 					break;
+				}
+				if(dwWaitResult == WAIT_FAILED)
+				{
+					DWORD dwLastError = GetLastError();
+					_ASSERTE(dwLastError == ERROR_SUCCESS);
+
+					strError = boost::str(boost::wformat(L"Asynchronous logger critical failure: waiting failed with error %1%. Logging will be disabled until the application will be restarted.") % dwLastError);
+					pAsyncLogger->m_bLoggingEnabled = false;
+
+					bStopProcessing = true;
 				}
 
 				std::vector<TLogFileDataPtr> vLogs;
@@ -127,6 +140,13 @@ namespace logger
 				{
 					try
 					{
+						// append emergency message
+						if(!strError.empty())
+						{
+							spLogData->PushLogEntry(strError);
+							spLogData->DisableLogging();
+						}
+
 						spLogData->StoreLogEntries();
 						spLogData->CloseUnusedFile();
 					}
