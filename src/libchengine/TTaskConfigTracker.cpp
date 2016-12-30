@@ -134,12 +134,9 @@ namespace chengine
 
 	void TTaskConfigTracker::AddModified(const TStringSet& setModified)
 	{
-		TStringSet::const_iterator iterBegin = setModified.Begin();
-		TStringSet::const_iterator iterEnd = setModified.End();
-
-		for (; iterBegin != iterEnd; ++iterBegin)
+		for (const TString& strMod : setModified)
 		{
-			AddModified(*iterBegin);
+			AddModified(strMod);
 		}
 	}
 

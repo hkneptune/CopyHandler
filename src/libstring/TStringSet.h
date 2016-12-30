@@ -96,10 +96,12 @@ namespace string
 		size_t GetCount() const;
 		bool IsEmpty() const;
 
-		TStringSetIterator Begin();
-		TStringSetIterator End();
-		TStringSetConstIterator Begin() const;
-		TStringSetConstIterator End() const;
+		iterator begin();
+		iterator end();
+		const_iterator begin() const;
+		const_iterator end() const;
+		const_iterator cbegin() const;
+		const_iterator cend() const;
 
 	private:
 #pragma warning(push)

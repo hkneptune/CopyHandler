@@ -59,6 +59,16 @@ namespace string
 		return TString(strPrefix + m_strPattern);
 	}
 
+	bool TStringPattern::operator!=(const TStringPattern& rSrc) const
+	{
+		return m_ePatternType != rSrc.m_ePatternType || m_strPattern != rSrc.m_strPattern;
+	}
+
+	bool TStringPattern::operator==(const TStringPattern& rSrc) const
+	{
+		return m_ePatternType == rSrc.m_ePatternType && m_strPattern == rSrc.m_strPattern;
+	}
+
 	bool TStringPattern::MatchMask(LPCTSTR lpszMask, LPCTSTR lpszString) const
 	{
 		bool bMatch = true;

@@ -27,6 +27,9 @@
     <Filter Include="Source Files\Tools\IPC">
       <UniqueIdentifier>{6c5d3d2d-292d-45f1-a74d-8b3047a68694}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Shared">
+      <UniqueIdentifier>{1b7aada1-f6a4-45f3-821c-ac3f7e589a05}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="TAutoHandles.h">
@@ -96,6 +99,12 @@
     <ClInclude Include="TSharedMemory.h">
       <Filter>Source Files\Tools\IPC</Filter>
     </ClInclude>
+    <ClInclude Include="..\common\GenericTemplates\RandomAccessIterators.h">
+      <Filter>Source Files\Shared</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\GenericTemplates\RandomAccessContainerWrapper.h">
+      <Filter>Source Files\Shared</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -154,6 +163,9 @@
     </ClCompile>
     <ClCompile Include="TSharedMemory.cpp">
       <Filter>Source Files\Tools\IPC</Filter>
+    </ClCompile>
+    <ClCompile Include="Tests\TestsTPathContainer.cpp">
+      <Filter>Tests</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

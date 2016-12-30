@@ -23,56 +23,9 @@
 
 namespace string
 {
-	void TStringPatternArray::Add(const TStringPattern& strPattern)
-	{
-		m_vPatterns.push_back(strPattern);
-	}
-
-	void TStringPatternArray::InsertAt(size_t stIndex, const TStringPattern& strPattern)
-	{
-		if (stIndex > m_vPatterns.size())
-			throw TStringException("stIndex out of bounds");
-
-		m_vPatterns.insert(m_vPatterns.begin() + stIndex, strPattern);
-	}
-
-	void TStringPatternArray::SetAt(size_t stIndex, const TStringPattern& strPattern)
-	{
-		if (stIndex >= m_vPatterns.size())
-			throw TStringException("stIndex out of bounds");
-
-		m_vPatterns[stIndex] = strPattern;
-	}
-
-	void TStringPatternArray::RemoveAt(size_t stIndex)
-	{
-		if (stIndex >= m_vPatterns.size())
-			throw TStringException("stIndex out of bounds");
-
-		m_vPatterns.erase(m_vPatterns.begin() + stIndex);
-	}
-
-	void TStringPatternArray::Clear()
-	{
-		m_vPatterns.clear();
-	}
-
-	const TStringPattern& TStringPatternArray::GetAt(size_t stIndex) const
-	{
-		if (stIndex >= m_vPatterns.size())
-			throw TStringException("stIndex out of bounds");
-
-		return m_vPatterns[stIndex];
-	}
-
-	size_t TStringPatternArray::GetCount() const
-	{
-		return m_vPatterns.size();
-	}
-
 	bool TStringPatternArray::MatchesAny(const TString& strTextToMatch) const
 	{
-		for (const TStringPattern& pattern : m_vPatterns)
+		for (const TStringPattern& pattern : m_vItems)
 		{
 			if (pattern.Matches(strTextToMatch))
 				return true;
@@ -83,7 +36,7 @@ namespace string
 
 	bool TStringPatternArray::MatchesAll(const TString& strTextToMatch) const
 	{
-		for (const TStringPattern& pattern : m_vPatterns)
+		for (const TStringPattern& pattern : m_vItems)
 		{
 			if (!pattern.Matches(strTextToMatch))
 				return false;
@@ -101,11 +54,11 @@ namespace string
 
 	void TStringPatternArray::FromSerializedStringArray(const TStringArray& arrSerializedPatterns)
 	{
-		m_vPatterns.clear();
+		m_vItems.clear();
 
 		for (size_t stIndex = 0; stIndex < arrSerializedPatterns.GetCount(); ++stIndex)
 		{
-			m_vPatterns.push_back(TStringPattern::CreateFromString(arrSerializedPatterns.GetAt(stIndex)));
+			m_vItems.push_back(TStringPattern::CreateFromString(arrSerializedPatterns.GetAt(stIndex)));
 		}
 	}
 
@@ -136,7 +89,7 @@ namespace string
 	TStringArray TStringPatternArray::ToSerializedStringArray() const
 	{
 		TStringArray arrSerialized;
-		for (const TStringPattern& pattern : m_vPatterns)
+		for (const TStringPattern& pattern : m_vItems)
 		{
 			arrSerialized.Add(pattern.ToString());
 		}

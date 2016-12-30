@@ -21,6 +21,8 @@
 
 #include "TFileFilter.h"
 #include "../libserializer/TRemovedObjects.h"
+#include "../common/GenericTemplates/RandomAccessIterators.h"
+#include "../common/GenericTemplates/RandomAccessContainerWrapper.h"
 
 namespace chengine
 {
@@ -28,12 +30,21 @@ namespace chengine
 	class TFileInfo;
 	typedef std::shared_ptr<TFileInfo> TFileInfoPtr;
 
-	class LIBCHENGINE_API TFileFiltersArray
+	template class LIBCHENGINE_API RandomAccessIteratorWrapper<TFileFilter>;
+	class LIBCHENGINE_API TFileFiltersArrayIterator : public RandomAccessIteratorWrapper<TFileFilter>
+	{
+	};
+
+	template class LIBCHENGINE_API RandomAccessConstIteratorWrapper<TFileFilter>;
+	class LIBCHENGINE_API TFileFiltersArrayConstIterator : public RandomAccessConstIteratorWrapper<TFileFilter>
+	{
+	};
+
+	template class LIBCHENGINE_API RandomAccessContainerWrapper<TFileFilter>;
+
+	class LIBCHENGINE_API TFileFiltersArray : public RandomAccessContainerWrapper<TFileFilter>
 	{
 	public:
-		TFileFiltersArray();
-		~TFileFiltersArray();
-
 		bool Match(const TFileInfoPtr& spInfo) const;
 
 		void StoreInConfig(TConfig& rConfig, PCTSTR pszNodeName) const;
@@ -44,21 +55,7 @@ namespace chengine
 
 		void InitColumns(const serializer::ISerializerContainerPtr& spContainer) const;
 
-		bool IsEmpty() const;
-
-		void Add(const TFileFilter& rFilter);
-		bool SetAt(size_t stIndex, const TFileFilter& rNewFilter);
-		const TFileFilter* GetAt(size_t stIndex) const;
-		bool RemoveAt(size_t stIndex);
-		size_t GetSize() const;
-
-		void Clear();
-
 	private:
-#pragma warning(push)
-#pragma warning(disable: 4251)
-		std::vector<TFileFilter> m_vFilters;
-#pragma warning(pop)
 		mutable serializer::TRemovedObjects m_setRemovedObjects;
 	};
 }

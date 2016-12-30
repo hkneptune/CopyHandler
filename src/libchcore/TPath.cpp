@@ -28,40 +28,12 @@
 #include "TPathContainer.h"
 #include "../libstring/TStringArray.h"
 
+#define DEFAULT_PATH_SEPARATOR _T("\\")
+
 using namespace string;
 
 namespace chcore
 {
-#define DEFAULT_PATH_SEPARATOR _T("\\")
-
-	// ============================================================================
-	/// TSmartPath::TSmartPath
-	/// @date 2009/11/29
-	///
-	/// @brief     Constructs an empty path.
-	// ============================================================================
-	TSmartPath::TSmartPath() :
-		m_strPath()
-	{
-	}
-
-	// ============================================================================
-	/// TSmartPath::~TSmartPath
-	/// @date 2009/11/29
-	///
-	/// @brief     
-	/// @return    
-	// ============================================================================
-	TSmartPath::~TSmartPath()
-	{
-	}
-
-	// ============================================================================
-	/// TSmartPath::Clear
-	/// @date 2009/11/29
-	///
-	/// @brief     Clears this object.
-	// ============================================================================
 	void TSmartPath::Clear() throw()
 	{
 		m_strPath.Clear();

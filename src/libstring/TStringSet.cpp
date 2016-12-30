@@ -157,22 +157,32 @@ namespace string
 		return m_setItems.empty();
 	}
 
-	TStringSetIterator TStringSet::Begin()
+	TStringSet::iterator TStringSet::begin()
 	{
 		return TStringSetIterator(m_setItems.begin());
 	}
 
-	TStringSetIterator TStringSet::End()
+	TStringSet::iterator TStringSet::end()
 	{
 		return TStringSetIterator(m_setItems.end());
 	}
 
-	TStringSetConstIterator TStringSet::Begin() const
+	TStringSet::const_iterator TStringSet::begin() const
 	{
 		return TStringSetConstIterator(m_setItems.begin());
 	}
 
-	TStringSetConstIterator TStringSet::End() const
+	TStringSet::const_iterator TStringSet::end() const
+	{
+		return TStringSetConstIterator(m_setItems.end());
+	}
+
+	TStringSet::const_iterator TStringSet::cbegin() const
+	{
+		return TStringSetConstIterator(m_setItems.begin());
+	}
+
+	TStringSet::const_iterator TStringSet::cend() const
 	{
 		return TStringSetConstIterator(m_setItems.end());
 	}

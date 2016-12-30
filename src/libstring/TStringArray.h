@@ -26,92 +26,24 @@
 #include "TString.h"
 #include "libstring.h"
 #include <vector>
+#include "../common/GenericTemplates/RandomAccessIterators.h"
+#include "../common/GenericTemplates/RandomAccessContainerWrapper.h"
 
 namespace string
 {
-	class LIBSTRING_API TStringArrayIterator
+	template class LIBSTRING_API RandomAccessIteratorWrapper<TString>;
+	class LIBSTRING_API TStringArrayIterator : public RandomAccessIteratorWrapper<TString>
 	{
-	protected:
-		explicit TStringArrayIterator(std::vector<TString>::iterator iterArray);
-
-	public:
-		TStringArrayIterator();
-		~TStringArrayIterator();
-
-		TStringArrayIterator operator++(int);
-		TStringArrayIterator& operator++();
-
-		bool operator==(const TStringArrayIterator& rSrc) const;
-		bool operator!=(const TStringArrayIterator& rSrc) const;
-
-		TString& operator*();
-		const TString& operator*() const;
-
-	private:
-#pragma warning(push)
-#pragma warning(disable: 4251)
-		std::vector<TString>::iterator m_iterArray;
-#pragma warning(pop)
-
-		friend class TStringArray;
 	};
 
-	class LIBSTRING_API TStringArrayConstIterator
+	template class LIBSTRING_API RandomAccessConstIteratorWrapper<TString>;
+	class LIBSTRING_API TStringArrayConstIterator : public RandomAccessConstIteratorWrapper<TString>
 	{
-	protected:
-		explicit TStringArrayConstIterator(std::vector<TString>::const_iterator iterArray);
-
-	public:
-		TStringArrayConstIterator();
-		~TStringArrayConstIterator();
-
-		TStringArrayConstIterator operator++(int);
-		TStringArrayConstIterator& operator++();
-
-		bool operator==(const TStringArrayConstIterator& rSrc) const;
-		bool operator!=(const TStringArrayConstIterator& rSrc) const;
-
-		const TString& operator*();
-		const TString& operator*() const;
-
-	private:
-#pragma warning(push)
-#pragma warning(disable: 4251)
-		std::vector<TString>::const_iterator m_iterArray;
-#pragma warning(pop)
-
-		friend class TStringArray;
 	};
 
-	class LIBSTRING_API TStringArray
+	template class LIBSTRING_API RandomAccessContainerWrapper<TString>;
+	class LIBSTRING_API TStringArray : public RandomAccessContainerWrapper<TString>
 	{
-	public:
-		typedef TStringArrayIterator iterator;
-		typedef TStringArrayConstIterator const_iterator;
-
-	public:
-		bool operator==(const TStringArray& rSrc) const;
-		bool operator!=(const TStringArray& rSrc) const;
-
-		void Add(const TString& str);
-		void InsertAt(size_t stIndex, const TString& str);
-		void SetAt(size_t stIndex, const TString& str);
-		void RemoveAt(size_t stIndex);
-		void Clear();
-
-		const TString& GetAt(size_t stIndex) const;
-		size_t GetCount() const;
-
-		TStringArrayIterator Begin();
-		TStringArrayIterator End();
-		TStringArrayConstIterator Begin() const;
-		TStringArrayConstIterator End() const;
-
-	private:
-#pragma warning(push)
-#pragma warning(disable: 4251)
-		std::vector<TString> m_vItems;
-#pragma warning(pop)
 	};
 }
 

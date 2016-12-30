@@ -20,22 +20,26 @@
 #define __TSTRINGPATTERNARRAY_H__
 
 #include "TStringPattern.h"
+#include "../common/GenericTemplates/RandomAccessIterators.h"
+#include "../common/GenericTemplates/RandomAccessContainerWrapper.h"
 
 namespace string
 {
-	class LIBSTRING_API TStringPatternArray
+	template class LIBSTRING_API RandomAccessIteratorWrapper<TStringPattern>;
+	class LIBSTRING_API TStringPatternArrayIterator : public RandomAccessIteratorWrapper<TStringPattern>
+	{
+	};
+
+	template class LIBSTRING_API RandomAccessConstIteratorWrapper<TStringPattern>;
+	class LIBSTRING_API TStringPatternArrayConstIterator : public RandomAccessConstIteratorWrapper<TStringPattern>
+	{
+	};
+
+	template class LIBSTRING_API RandomAccessContainerWrapper<TStringPattern>;
+
+	class LIBSTRING_API TStringPatternArray : public RandomAccessContainerWrapper<TStringPattern>
 	{
 	public:
-		// general api
-		void Add(const TStringPattern& strPattern);
-		void InsertAt(size_t stIndex, const TStringPattern& strPattern);
-		void SetAt(size_t stIndex, const TStringPattern& strPattern);
-		void RemoveAt(size_t stIndex);
-		void Clear();
-
-		const TStringPattern& GetAt(size_t stIndex) const;
-		size_t GetCount() const;
-
 		// pattern api
 		bool MatchesAny(const TString& strTextToMatch) const;
 		bool MatchesAll(const TString& strTextToMatch) const;
@@ -48,12 +52,6 @@ namespace string
 		// serialization
 		void FromSerializedStringArray(const TStringArray& arrSerializedPatterns);
 		TStringArray ToSerializedStringArray() const;
-
-	private:
-#pragma warning(push)
-#pragma warning(disable: 4251)
-		std::vector<TStringPattern> m_vPatterns;
-#pragma warning(pop)
 	};
 }
 

@@ -471,6 +471,8 @@ goto end
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="..\common\GenericTemplates\RandomAccessContainerWrapper.h" />
+    <ClInclude Include="..\common\GenericTemplates\RandomAccessIterators.h" />
     <ClInclude Include="GTestMacros.h" />
     <ClInclude Include="ITimestampProvider.h" />
     <ClInclude Include="MathFunctions.h" />
@@ -513,6 +515,7 @@ goto end
     <ClCompile Include="MathFunctions.cpp" />
     <ClCompile Include="TBaseException.cpp" />
     <ClCompile Include="TCoreWin32Exception.cpp" />
+    <ClCompile Include="Tests\TestsTPathContainer.cpp" />
     <ClCompile Include="Tests\TestsTSimpleTimer.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>

@@ -98,6 +98,85 @@ namespace chengine
 	{
 	}
 
+	bool TFileFilter::operator==(const TFileFilter& rSrc) const
+	{
+		// files mask
+		if (m_bUseMask.Get() != rSrc.m_bUseMask.Get())
+			return false;
+		if (m_astrMask.Get() != rSrc.m_astrMask.Get())
+			return false;
+
+		// files mask-
+		if (m_bUseExcludeMask.Get() != m_bUseExcludeMask.Get())
+			return false;
+		if (m_astrExcludeMask.Get() != m_astrExcludeMask.Get())
+			return false;
+
+		// size filtering
+		if (m_bUseSize1.Get() != m_bUseSize1.Get())
+			return false;
+		if (m_eSizeCmpType1.Get() != m_eSizeCmpType1.Get())
+			return false;
+		if (m_ullSize1.Get() != m_ullSize1.Get())
+			return false;
+
+		if (m_bUseSize2.Get() != m_bUseSize2.Get())
+			return false;
+		if (m_eSizeCmpType2.Get() != m_eSizeCmpType2.Get())
+			return false;
+		if (m_ullSize2.Get() != m_ullSize2.Get())
+			return false;
+
+		// date filtering
+		if (m_eDateType.Get() != m_eDateType.Get())
+			return false;
+
+		if (m_bUseDateTime1.Get() != m_bUseDateTime1.Get())
+			return false;
+
+		if (m_eDateCmpType1.Get() != m_eDateCmpType1.Get())
+			return false;
+		if (m_bUseDate1.Get() != m_bUseDate1.Get())
+			return false;
+		if (m_bUseTime1.Get() != m_bUseTime1.Get())
+			return false;
+		if (m_tDateTime1.Get() != m_tDateTime1.Get())
+			return false;
+
+		if (m_bUseDateTime2.Get() != m_bUseDateTime2.Get())
+			return false;
+
+		if (m_eDateCmpType2.Get() != m_eDateCmpType2.Get())
+			return false;
+		if (m_bUseDate2.Get() != m_bUseDate2.Get())
+			return false;
+		if (m_bUseTime2.Get() != m_bUseTime2.Get())
+			return false;
+		if (m_tDateTime2.Get() != m_tDateTime2.Get())
+			return false;
+
+		// attribute filtering
+		if (m_bUseAttributes.Get() != m_bUseAttributes.Get())
+			return false;
+		if (m_iArchive.Get() != m_iArchive.Get())
+			return false;
+		if (m_iReadOnly.Get() != m_iReadOnly.Get())
+			return false;
+		if (m_iHidden.Get() != m_iHidden.Get())
+			return false;
+		if (m_iSystem.Get() != m_iSystem.Get())
+			return false;
+		if (m_iDirectory.Get() != m_iDirectory.Get())
+			return false;
+
+		return true;
+	}
+
+	bool TFileFilter::operator!=(const TFileFilter& rSrc) const
+	{
+		return !operator==(rSrc);
+	}
+
 	TFileFilter& TFileFilter::operator=(const TFileFilter& rFilter)
 	{
 		if (this == &rFilter)

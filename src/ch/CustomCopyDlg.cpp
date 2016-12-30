@@ -371,11 +371,10 @@ void CCustomCopyDlg::OnLanguageChanged()
 	// refresh the entries in filters' list
 	const chengine::TFileFiltersArray& afFilters = m_tTaskDefinition.GetFilters();
 	m_ctlFilters.DeleteAllItems();
-	for(size_t stIndex = 0; stIndex < afFilters.GetSize(); ++stIndex)
+	for(size_t stIndex = 0; stIndex < afFilters.GetCount(); ++stIndex)
 	{
-		const chengine::TFileFilter* pFilter = afFilters.GetAt(stIndex);
-		if(pFilter)
-			AddFilter(*pFilter, boost::numeric_cast<int>(stIndex));
+		const chengine::TFileFilter& rFilter = afFilters.GetAt(stIndex);
+		AddFilter(rFilter, boost::numeric_cast<int>(stIndex));
 	}
 }
 
@@ -539,17 +538,13 @@ void CCustomCopyDlg::OnAddfilterButton()
 	CFilterDlg dlg;
 
 	chengine::TFileFiltersArray& afFilters = m_tTaskDefinition.GetFilters();
-	for (size_t i = 0; i < afFilters.GetSize(); i++)
+	for (size_t i = 0; i < afFilters.GetCount(); i++)
 	{
-		const chengine::TFileFilter* pFilter = afFilters.GetAt(i);
-		BOOST_ASSERT(pFilter);
-		if(pFilter)
-		{
-			if(pFilter->GetUseMask())
-				dlg.m_astrAddMask.Add(pFilter->GetCombinedMask().c_str());
-			if(pFilter->GetUseExcludeMask())
-				dlg.m_astrAddExcludeMask.Add(pFilter->GetCombinedExcludeMask().c_str());
-		}
+		const chengine::TFileFilter& rFilter = afFilters.GetAt(i);
+		if(rFilter.GetUseMask())
+			dlg.m_astrAddMask.Add(rFilter.GetCombinedMask().c_str());
+		if(rFilter.GetUseExcludeMask())
+			dlg.m_astrAddExcludeMask.Add(rFilter.GetCombinedExcludeMask().c_str());
 	}
 	
 	if(dlg.DoModal() == IDOK)
@@ -759,22 +754,16 @@ void CCustomCopyDlg::OnDblclkFiltersList(NMHDR* /*pNMHDR*/, LRESULT* pResult)
 
 		int iItem = m_ctlFilters.GetNextSelectedItem(pos);
 		CFilterDlg dlg;
-		const chengine::TFileFilter* pFilter = afFilters.GetAt(iItem);
-		BOOST_ASSERT(pFilter);
-		if(pFilter)
-			dlg.m_ffFilter = *pFilter;
+		const chengine::TFileFilter& rFilter = afFilters.GetAt(iItem);
+		dlg.m_ffFilter = rFilter;
 		
-		for(size_t stIndex = 0; stIndex < afFilters.GetSize(); ++stIndex)
+		for(size_t stIndex = 0; stIndex < afFilters.GetCount(); ++stIndex)
 		{
-			pFilter = afFilters.GetAt(stIndex);
-			BOOST_ASSERT(pFilter);
-			if(pFilter)
-			{
-				if(pFilter->GetUseMask() && boost::numeric_cast<int>(stIndex) != iItem)
-					dlg.m_astrAddMask.Add(pFilter->GetCombinedMask().c_str());
-				if (pFilter->GetUseExcludeMask() && boost::numeric_cast<int>(stIndex) != iItem)
-					dlg.m_astrAddExcludeMask.Add(pFilter->GetCombinedExcludeMask().c_str());
-			}
+			const chengine::TFileFilter& rFilter = afFilters.GetAt(stIndex);
+			if(rFilter.GetUseMask() && boost::numeric_cast<int>(stIndex) != iItem)
+				dlg.m_astrAddMask.Add(rFilter.GetCombinedMask().c_str());
+			if (rFilter.GetUseExcludeMask() && boost::numeric_cast<int>(stIndex) != iItem)
+				dlg.m_astrAddExcludeMask.Add(rFilter.GetCombinedExcludeMask().c_str());
 		}
 
 		if (dlg.DoModal() == IDOK)

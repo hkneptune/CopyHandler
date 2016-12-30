@@ -20,34 +20,24 @@
 #define __TPATHCONTAINER_H__
 
 #include "TPath.h"
+#include "../common/GenericTemplates/RandomAccessIterators.h"
+#include "../common/GenericTemplates/RandomAccessContainerWrapper.h"
 
 namespace chcore
 {
-	class LIBCHCORE_API TPathContainer
+	template class LIBCHCORE_API RandomAccessIteratorWrapper<TSmartPath>;
+	class LIBCHCORE_API TPathArrayIterator : public RandomAccessIteratorWrapper<TSmartPath>
 	{
-	public:
-		TPathContainer();
-		~TPathContainer();
+	};
 
-		void Add(const TSmartPath& spPath);
-		void Append(const TPathContainer& vPaths);
+	template class LIBCHCORE_API RandomAccessConstIteratorWrapper<TSmartPath>;
+	class LIBCHCORE_API TPathArrayConstIterator : public RandomAccessConstIteratorWrapper<TSmartPath>
+	{
+	};
 
-		const TSmartPath& GetAt(size_t stIndex) const;
-		TSmartPath& GetAt(size_t stIndex);
-
-		void SetAt(size_t stIndex, const TSmartPath& spPath);
-
-		void DeleteAt(size_t stIndex);
-		void Clear();
-
-		size_t GetCount() const;
-		bool IsEmpty() const;
-
-	private:
-#pragma warning(push)
-#pragma warning(disable: 4251)
-		std::vector<TSmartPath> m_vPaths;
-#pragma warning(pop)
+	template class LIBCHCORE_API RandomAccessContainerWrapper<TSmartPath>;
+	class LIBCHCORE_API TPathContainer : public RandomAccessContainerWrapper<TSmartPath>
+	{
 	};
 }
 

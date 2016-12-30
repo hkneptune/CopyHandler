@@ -64,6 +64,9 @@ namespace chengine
 		TFileFilter(const TFileFilter& rFilter);
 		TFileFilter& operator=(const TFileFilter& rFilter);
 
+		bool operator==(const TFileFilter& rSrc) const;
+		bool operator!=(const TFileFilter& rSrc) const;
+
 		void SetData(const TFileFilter& rSrc);
 
 		// matching

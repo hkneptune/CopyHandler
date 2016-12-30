@@ -425,7 +425,7 @@ TEST(TStringTests, Split_NormalStringSingleSeparator)
 	EXPECT_EQ(arrSplitted.GetAt(6), _T(""));
 	EXPECT_EQ(arrSplitted.GetAt(7), _T(""));
 	EXPECT_EQ(arrSplitted.GetAt(8), _T(""));
-	EXPECT_THROW(arrSplitted.GetAt(9), TStringException);
+	EXPECT_THROW(arrSplitted.GetAt(9), std::out_of_range);
 }
 
 TEST(TStringTests, Split_NormalStringMultipleSeparators)
@@ -442,7 +442,7 @@ TEST(TStringTests, Split_NormalStringMultipleSeparators)
 	EXPECT_EQ(arrSplitted.GetAt(6), _T(""));
 	EXPECT_EQ(arrSplitted.GetAt(7), _T(""));
 	EXPECT_EQ(arrSplitted.GetAt(8), _T(""));
-	EXPECT_THROW(arrSplitted.GetAt(9), TStringException);
+	EXPECT_THROW(arrSplitted.GetAt(9), std::out_of_range);
 }
 
 TEST(TStringTests, CompareCaseSensitive_WithPtrToString)

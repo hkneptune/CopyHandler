@@ -47,6 +47,9 @@ namespace string
 		void FromString(const TString& strPattern, EPatternType eDefaultPatternType = EPatternType::eType_Wildcard);
 		TString ToString() const;
 
+		bool operator==(const TStringPattern& rSrc) const;
+		bool operator!=(const TStringPattern& rSrc) const;
+
 	private:
 		bool MatchMask(LPCTSTR lpszMask, LPCTSTR lpszString) const;
 		bool Scan(LPCTSTR& lpszMask, LPCTSTR& lpszString) const;

@@ -32,10 +32,6 @@ namespace chcore
 		static const bool DefaultCaseSensitivity = false;
 
 	public:
-		// Construction/destruction
-		TSmartPath();
-		~TSmartPath();
-
 		bool operator==(const TSmartPath& rPath) const;
 		bool operator!=(const TSmartPath& rPath) const;
 		bool operator<(const TSmartPath& rPath) const;
