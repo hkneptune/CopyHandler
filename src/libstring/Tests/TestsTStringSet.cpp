@@ -172,7 +172,7 @@ TEST(TestsTStringSet, NewFor_Full)
 	{
 		if (iCount == 0)
 			EXPECT_EQ(TString(L"SomeString1"), strData);
-		else if (iCount == 0)
+		else if (iCount == 1)
 			EXPECT_EQ(TString(L"SomeString2"), strData);
 		++iCount;
 	}

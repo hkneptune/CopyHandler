@@ -69,7 +69,7 @@ protected:
 
 public:
 	RandomAccessConstIteratorWrapper();
-	RandomAccessConstIteratorWrapper(const RandomAccessIteratorWrapper<T>& rIterator);
+	explicit RandomAccessConstIteratorWrapper(const RandomAccessIteratorWrapper<T>& rIterator);
 	~RandomAccessConstIteratorWrapper();
 
 	RandomAccessConstIteratorWrapper& operator=(const RandomAccessIteratorWrapper<T>& rIterator);

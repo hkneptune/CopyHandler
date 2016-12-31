@@ -236,7 +236,7 @@ TEST(TestsTPathContainer, NewFor_Full)
 	{
 		if (iCount == 0)
 			EXPECT_EQ(PathFromString(L"SomeString1"), strData);
-		else if (iCount == 0)
+		else if (iCount == 1)
 			EXPECT_EQ(PathFromString(L"SomeString2"), strData);
 		++iCount;
 	}

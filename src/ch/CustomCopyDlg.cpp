@@ -423,15 +423,13 @@ void CCustomCopyDlg::OnAddFilesButton()
 
 void CCustomCopyDlg::OnRemoveButton() 
 {
-	POSITION pos;
-	int iItem;
 	while (true)
 	{
-		pos = m_ctlFiles.GetFirstSelectedItemPosition();
+		POSITION pos = m_ctlFiles.GetFirstSelectedItemPosition();
 		if (pos == nullptr)
 			break;
 
-		iItem=m_ctlFiles.GetNextSelectedItem(pos);
+		int iItem = m_ctlFiles.GetNextSelectedItem(pos);
 		m_ctlFiles.DeleteItem(iItem);
 	}
 }
@@ -695,15 +693,13 @@ void CCustomCopyDlg::OnRemovefilterButton()
 {
 	chengine::TFileFiltersArray& afFilters = m_tTaskDefinition.GetFilters();
 
-	POSITION pos;
-	int iItem;
 	while(true)
 	{
-		pos=m_ctlFilters.GetFirstSelectedItemPosition();
+		POSITION pos = m_ctlFilters.GetFirstSelectedItemPosition();
 		if (pos == nullptr)
 			break;
 
-		iItem=m_ctlFilters.GetNextSelectedItem(pos);
+		int iItem = m_ctlFilters.GetNextSelectedItem(pos);
 		m_ctlFilters.DeleteItem(iItem);
 		afFilters.RemoveAt(iItem);
 	}
