@@ -23,31 +23,19 @@
 
 namespace chengine
 {
-	class LIBCHENGINE_API TConfigArray
+	template class LIBCHENGINE_API RandomAccessIteratorWrapper<TConfig>;
+	class LIBCHENGINE_API TConfigArrayIterator : public RandomAccessIteratorWrapper<TConfig>
 	{
-	public:
-		TConfigArray();
-		TConfigArray(const TConfigArray& rSrc);
-		~TConfigArray();
+	};
 
-		TConfigArray& operator=(const TConfigArray& rSrc);
+	template class LIBCHENGINE_API RandomAccessConstIteratorWrapper<TConfig>;
+	class LIBCHENGINE_API TConfigArrayConstIterator : public RandomAccessConstIteratorWrapper<TConfig>
+	{
+	};
 
-		size_t GetCount() const;
-		bool IsEmpty() const;
-
-		const TConfig& GetAt(size_t stIndex) const;
-		TConfig& GetAt(size_t stIndex);
-
-		void Add(const TConfig& rSrc);
-
-		void RemoveAt(size_t stIndex);
-		void Clear();
-
-	private:
-#pragma warning(push)
-#pragma warning(disable: 4251)
-		std::vector<TConfig> m_vConfigs;
-#pragma warning(pop)
+	template class LIBCHENGINE_API RandomAccessContainerWrapper<TConfig>;
+	class LIBCHENGINE_API TConfigArray : public RandomAccessContainerWrapper<TConfig>
+	{
 	};
 }
 

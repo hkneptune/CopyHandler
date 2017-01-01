@@ -24,6 +24,7 @@
 
 #include "TBasePathData.h"
 #include "CommonDataTypes.h"
+#include "TBasePathDataContainer.h"
 
 namespace chengine
 {
@@ -37,10 +38,10 @@ namespace chengine
 		~TFileInfoArray();
 
 		// Adds a new object info to this container
-		void AddFileInfo(const TFileInfoPtr& spFileInfo);
+		void Add(const TFileInfoPtr& spFileInfo);
 
 		/// Retrieves count of elements in this object
-		file_count_t GetSize() const;
+		file_count_t GetCount() const;
 
 		/// Retrieves an element at the specified index
 		TFileInfoPtr GetAt(file_count_t stIndex) const;

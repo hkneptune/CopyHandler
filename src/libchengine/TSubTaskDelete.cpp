@@ -60,7 +60,7 @@ namespace chengine
 	{
 		TFileInfoArray& rFilesCache = GetContext().GetFilesCache();
 
-		file_count_t fcCount = rFilesCache.GetSize();
+		file_count_t fcCount = rFilesCache.GetCount();
 		if(fcCount == 0)
 		{
 			m_tSubTaskStats.SetCurrentPath(TString());
@@ -92,7 +92,7 @@ namespace chengine
 
 		// new stats
 		m_tSubTaskStats.SetCurrentBufferIndex(TBufferSizes::eBuffer_Default);
-		m_tSubTaskStats.SetTotalCount(rFilesCache.GetSize());
+		m_tSubTaskStats.SetTotalCount(rFilesCache.GetCount());
 		m_tSubTaskStats.SetProcessedCount(0);
 		m_tSubTaskStats.SetTotalSize(0);
 		m_tSubTaskStats.SetProcessedSize(0);
@@ -104,9 +104,9 @@ namespace chengine
 
 		// index points to 0 or next item to process
 		file_count_t fcIndex = m_tSubTaskStats.GetCurrentIndex();
-		while (fcIndex < rFilesCache.GetSize())
+		while (fcIndex < rFilesCache.GetCount())
 		{
-			spFileInfo = rFilesCache.GetAt(rFilesCache.GetSize() - fcIndex - 1);
+			spFileInfo = rFilesCache.GetAt(rFilesCache.GetCount() - fcIndex - 1);
 
 			m_tSubTaskStats.SetCurrentIndex(fcIndex);
 
@@ -156,7 +156,7 @@ namespace chengine
 		// if this subtask is not started yet, try to get the most fresh information for processing
 		if (!spStats->IsRunning() && spStats->GetTotalCount() == 0 && spStats->GetTotalSize() == 0)
 		{
-			spStats->SetTotalCount(GetContext().GetFilesCache().GetSize());
+			spStats->SetTotalCount(GetContext().GetFilesCache().GetCount());
 			spStats->SetTotalSize(0);
 		}
 	}

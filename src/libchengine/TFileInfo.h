@@ -26,6 +26,7 @@
 #include "TBasePathData.h"
 #include <bitset>
 #include "../libchcore/TFileTime.h"
+#include "TBasePathDataContainer.h"
 
 namespace chengine
 {

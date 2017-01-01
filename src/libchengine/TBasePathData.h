@@ -94,56 +94,7 @@ namespace chengine
 	typedef std::shared_ptr<TBasePathData> TBasePathDataPtr;
 
 	//////////////////////////////////////////////////////////////////////////
-	// TBasePathDataContainer
 
-	class LIBCHENGINE_API TBasePathDataContainer
-	{
-	public:
-		// constructors/destructor
-		TBasePathDataContainer();
-		TBasePathDataContainer(const TBasePathDataContainer& rSrc) = delete;
-		~TBasePathDataContainer();
-
-		TBasePathDataContainer& operator=(const TBasePathDataContainer& rSrc) = delete;
-
-		TBasePathDataContainer& operator=(const chcore::TPathContainer& tPaths);
-
-		// standard access to data
-		void Add(const TBasePathDataPtr& spEntry);
-		void RemoveAt(file_count_t fcIndex);
-		TBasePathDataPtr GetAt(file_count_t fcIndex) const;
-		TBasePathDataPtr FindByID(size_t fcObjectID) const;
-
-		void Clear();
-
-		bool IsEmpty() const;
-		file_count_t GetCount() const;
-
-		// processing flags
-		bool AllMarkedAsSkipFurtherProcessing() const;
-		void ResetProcessingFlags();
-
-		void Store(const serializer::ISerializerContainerPtr& spContainer) const;
-		void Load(const serializer::ISerializerContainerPtr& spContainer);
-
-		void InitColumns(const serializer::ISerializerContainerPtr& spContainer) const;
-
-	private:
-		void ClearNL();
-
-	protected:
-#pragma warning(push)
-#pragma warning(disable: 4251)
-		typedef std::vector<TBasePathDataPtr> VecEntries;
-		VecEntries m_vEntries;
-		mutable serializer::TRemovedObjects m_setRemovedObjects;
-
-		mutable boost::shared_mutex m_lock;
-#pragma warning(pop)
-		serializer::object_id_t m_oidLastObjectID;
-	};
-
-	typedef std::shared_ptr<TBasePathDataContainer> TBasePathDataContainerPtr;
 }
 
 #endif // __TBASEPATHDATA_H__

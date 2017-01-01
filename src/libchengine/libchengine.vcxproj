@@ -490,6 +490,7 @@ goto end
     <ClInclude Include="OverlappedCallbacks.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="TaskID.h" />
+    <ClInclude Include="TBasePathDataContainer.h" />
     <ClInclude Include="TBasePathDataFwd.h" />
     <ClInclude Include="TConfigArray.h" />
     <ClInclude Include="TConfigNotifier.h" />
@@ -595,6 +596,7 @@ goto end
     <ClCompile Include="IFilesystemFind.cpp" />
     <ClCompile Include="IRunningTimeControl.cpp" />
     <ClCompile Include="OverlappedCallbacks.cpp" />
+    <ClCompile Include="TBasePathDataContainer.cpp" />
     <ClCompile Include="TConfigArray.cpp" />
     <ClCompile Include="TConfigNotifier.cpp" />
     <ClCompile Include="TCoreEngine.cpp" />

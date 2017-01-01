@@ -25,7 +25,6 @@
 
 #include "TString.h"
 #include "libstring.h"
-#include <vector>
 #include "../common/GenericTemplates/RandomAccessIterators.h"
 #include "../common/GenericTemplates/RandomAccessContainerWrapper.h"
 

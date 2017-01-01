@@ -154,7 +154,7 @@ namespace chengine
 				if (!bIgnoreDirs && !bForceDirectories)
 				{
 					// add directory info; it is not to be filtered with afFilters
-					rFilesCache.AddFileInfo(spFileInfo);
+					rFilesCache.Add(spFileInfo);
 
 					// log
 					strFormat = _T("Added folder %path");
@@ -183,7 +183,7 @@ namespace chengine
 			{
 				// add file info if passes filters
 				if (rafFilters.Match(spFileInfo))
-					rFilesCache.AddFileInfo(spFileInfo);
+					rFilesCache.Add(spFileInfo);
 
 				// log
 				strFormat = _T("Added file %path");
@@ -231,7 +231,7 @@ namespace chengine
 				if (afFilters.Match(spFileInfo))
 				{
 					spFileInfo->SetParentObject(spBasePathData);
-					rFilesCache.AddFileInfo(spFileInfo);
+					rFilesCache.Add(spFileInfo);
 					spFileInfo = std::make_shared<TFileInfo>();
 				}
 			}
@@ -241,7 +241,7 @@ namespace chengine
 				if (bIncludeDirs)
 				{
 					spFileInfo->SetParentObject(spBasePathData);
-					rFilesCache.AddFileInfo(spFileInfo);
+					rFilesCache.Add(spFileInfo);
 					spFileInfo = std::make_shared<TFileInfo>();
 				}
 

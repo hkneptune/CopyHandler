@@ -20,6 +20,7 @@
 #define __RANDOMACCESSCONTAINERWRAPPER_H__
 
 #include "RandomAccessIterators.h"
+#include <boost/type_traits/has_operator.hpp>
 
 template<class T>
 class RandomAccessContainerWrapper
@@ -31,8 +32,37 @@ public:
 public:
 	virtual ~RandomAccessContainerWrapper();
 
-	bool operator==(const RandomAccessContainerWrapper& rSrc) const;
-	bool operator!=(const RandomAccessContainerWrapper& rSrc) const;
+	template <typename U = T>
+	typename std::enable_if<boost::has_equal_to<U>::value, bool>::type operator==(const RandomAccessContainerWrapper& rSrc) const
+	{
+		if(rSrc.GetCount() != GetCount())
+			return false;
+
+		size_t stCount = GetCount();
+		while(stCount-- > 0)
+		{
+			if(m_vItems[ stCount ] != rSrc.m_vItems[ stCount ])
+				return false;
+		}
+
+		return true;
+	}
+
+	template <typename U = T>
+	typename std::enable_if<boost::has_not_equal_to<U>::value, bool>::type operator!=(const RandomAccessContainerWrapper& rSrc) const
+	{
+		if(rSrc.GetCount() != GetCount())
+			return true;
+
+		size_t stCount = GetCount();
+		while(stCount-- > 0)
+		{
+			if(m_vItems[ stCount ] != rSrc.m_vItems[ stCount ])
+				return true;
+		}
+
+		return false;
+	}
 
 	void Add(const T& str);
 	void InsertAt(size_t stIndex, const T& str);
@@ -41,6 +71,7 @@ public:
 	void Clear();
 
 	const T& GetAt(size_t stIndex) const;
+	T& GetAt(size_t stIndex);
 
 	bool IsEmpty() const;
 	size_t GetCount() const;
@@ -115,6 +146,15 @@ const T& RandomAccessContainerWrapper<T>::GetAt(size_t stIndex) const
 }
 
 template<class T>
+T& RandomAccessContainerWrapper<T>::GetAt(size_t stIndex)
+{
+	if (stIndex >= m_vItems.size())
+		throw std::out_of_range("stIndex out of bounds");
+
+	return m_vItems.at(stIndex);
+}
+
+template<class T>
 bool RandomAccessContainerWrapper<T>::IsEmpty() const
 {
 	return m_vItems.empty();
@@ -166,38 +206,6 @@ template<class T>
 typename RandomAccessContainerWrapper<T>::const_iterator RandomAccessContainerWrapper<T>::cend() const
 {
 	return const_iterator(m_vItems.cend());
-}
-
-template<class T>
-bool RandomAccessContainerWrapper<T>::operator==(const RandomAccessContainerWrapper& rSrc) const
-{
-	if (rSrc.GetCount() != GetCount())
-		return false;
-
-	size_t stCount = GetCount();
-	while (stCount-- > 0)
-	{
-		if (m_vItems[stCount] != rSrc.m_vItems[stCount])
-			return false;
-	}
-
-	return true;
-}
-
-template<class T>
-bool RandomAccessContainerWrapper<T>::operator!=(const RandomAccessContainerWrapper& rSrc) const
-{
-	if (rSrc.GetCount() != GetCount())
-		return true;
-
-	size_t stCount = GetCount();
-	while (stCount-- > 0)
-	{
-		if (m_vItems[stCount] != rSrc.m_vItems[stCount])
-			return true;
-	}
-
-	return false;
 }
 
 #endif

@@ -83,7 +83,7 @@ namespace chengine
 	{
 		TFileInfoArray& rFilesCache = GetContext().GetFilesCache();
 
-		file_count_t fcCount = rFilesCache.GetSize();
+		file_count_t fcCount = rFilesCache.GetCount();
 		if(fcCount == 0)
 		{
 			m_spSubTaskStats->SetCurrentPath(TString());
@@ -119,11 +119,11 @@ namespace chengine
 		// initialize stats if not resuming (when resuming we have already initialized
 		// the stats once - it is being restored in Load() too).
 		if (!m_spSubTaskStats->IsInitialized())
-			m_spSubTaskStats->Init(TBufferSizes::eBuffer_Default, rFilesCache.GetSize(), 0, rFilesCache.CalculateTotalSize(), rFilesCache.CalculatePartialSize(m_spSubTaskStats->GetCurrentIndex()), TString());
+			m_spSubTaskStats->Init(TBufferSizes::eBuffer_Default, rFilesCache.GetCount(), 0, rFilesCache.CalculateTotalSize(), rFilesCache.CalculatePartialSize(m_spSubTaskStats->GetCurrentIndex()), TString());
 		else
 		{
-			_ASSERTE(rFilesCache.GetSize() == m_spSubTaskStats->GetTotalCount());
-			if (rFilesCache.GetSize() != m_spSubTaskStats->GetTotalCount())
+			_ASSERTE(rFilesCache.GetCount() == m_spSubTaskStats->GetTotalCount());
+			if (rFilesCache.GetCount() != m_spSubTaskStats->GetTotalCount())
 				throw TCoreException(eErr_InternalProblem, L"Size of files' cache differs from stats information", LOCATION);
 		}
 
@@ -135,7 +135,7 @@ namespace chengine
 			return eResult;
 
 		// begin at index which wasn't processed previously
-		file_count_t fcSize = rFilesCache.GetSize();
+		file_count_t fcSize = rFilesCache.GetCount();
 		file_count_t fcIndex = m_spSubTaskStats->GetCurrentIndex();
 		unsigned long long ullCurrentItemProcessedSize = m_spSubTaskStats->GetCurrentItemProcessedSize();
 		bool bCurrentFileSilentResume = m_spSubTaskStats->CanCurrentItemSilentResume();
@@ -301,7 +301,7 @@ namespace chengine
 		if(!spStats->IsRunning() && spStats->GetTotalCount() == 0 && spStats->GetTotalSize() == 0)
 		{
 			const auto& rCache = GetContext().GetFilesCache();
-			spStats->SetTotalCount(rCache.GetSize());
+			spStats->SetTotalCount(rCache.GetCount());
 			spStats->SetTotalSize(rCache.CalculateTotalSize());
 		}
 	}

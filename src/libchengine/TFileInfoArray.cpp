@@ -43,14 +43,14 @@ namespace chengine
 	{
 	}
 
-	void TFileInfoArray::AddFileInfo(const TFileInfoPtr& spFileInfo)
+	void TFileInfoArray::Add(const TFileInfoPtr& spFileInfo)
 	{
 		boost::unique_lock<boost::shared_mutex> lock(m_lock);
 		spFileInfo->SetObjectID(++m_oidLastObjectID);
 		m_vFiles.push_back(spFileInfo);
 	}
 
-	file_count_t TFileInfoArray::GetSize() const
+	file_count_t TFileInfoArray::GetCount() const
 	{
 		boost::shared_lock<boost::shared_mutex> lock(m_lock);
 		return boost::numeric_cast<file_count_t>(m_vFiles.size());
