@@ -32,29 +32,6 @@ namespace chcore
 		ATLTRACE(_T("*** Base Exception is being thrown:\n\tMsg: %s\n\tError code: %d\n\tFile: %s\n\tLine number: %ld\n\tFunction: %s\n"), pszMsg, eErrorCode, pszFile, stLineNumber, pszFunction);
 	}
 
-	TBaseException::TBaseException(const TBaseException& rSrc) :
-		m_eErrorCode(rSrc.m_eErrorCode),
-		m_pszMsg(rSrc.m_pszMsg),
-		m_pszFile(rSrc.m_pszFile),
-		m_pszFunction(rSrc.m_pszFunction),
-		m_stLineNumber(rSrc.m_stLineNumber)
-	{
-	}
-
-	TBaseException& TBaseException::operator=(const TBaseException& rSrc)
-	{
-		if(this != &rSrc)
-		{
-			m_eErrorCode = rSrc.m_eErrorCode;
-			m_pszMsg = rSrc.m_pszMsg;
-			m_pszFile = rSrc.m_pszFile;
-			m_pszFunction = rSrc.m_pszFunction;
-			m_stLineNumber = rSrc.m_stLineNumber;
-		}
-
-		return *this;
-	}
-
 	TBaseException::~TBaseException()
 	{
 	}

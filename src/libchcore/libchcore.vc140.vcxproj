@@ -515,6 +515,10 @@ goto end
     <ClCompile Include="MathFunctions.cpp" />
     <ClCompile Include="TBaseException.cpp" />
     <ClCompile Include="TCoreWin32Exception.cpp" />
+    <ClCompile Include="Tests\TestsMathFunctions.cpp" />
+    <ClCompile Include="Tests\TestsTFileTime.cpp" />
+    <ClCompile Include="Tests\TestsTIpcMutex.cpp" />
+    <ClCompile Include="Tests\TestsTIpcMutexLock.cpp" />
     <ClCompile Include="Tests\TestsTPathContainer.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>

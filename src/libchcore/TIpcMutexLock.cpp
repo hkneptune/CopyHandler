@@ -18,13 +18,16 @@
 // ============================================================================
 #include "stdafx.h"
 #include "TIpcMutexLock.h"
+#include "TCoreException.h"
 
 namespace chcore
 {
-	TIpcMutexLock::TIpcMutexLock(TIpcMutex& rMutex) :
+	TIpcMutexLock::TIpcMutexLock(TIpcMutex& rMutex, DWORD dwTimeout) :
 		m_rMutex(rMutex)
 	{
-		m_rMutex.Lock();
+		if (rMutex.IsLocked())
+			throw TCoreException(eErr_MutexAlreadyLocked, L"Mutex already locked", LOCATION);
+		m_rMutex.Lock(dwTimeout);
 	}
 
 	TIpcMutexLock::~TIpcMutexLock()

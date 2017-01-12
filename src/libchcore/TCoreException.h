@@ -27,7 +27,6 @@ namespace chcore
 	class LIBCHCORE_API TCoreException : public TBaseException
 	{
 	public:
-		TCoreException(TCoreException&& rSrc);
 		TCoreException(EGeneralErrors eErrorCode, const wchar_t* pszMsg, const wchar_t* pszFile, size_t stLineNumber, const wchar_t* pszFunction);
 	};
 }

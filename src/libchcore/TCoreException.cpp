@@ -25,8 +25,4 @@ namespace chcore
 		TBaseException(eErrorCode, pszMsg, pszFile, stLineNumber, pszFunction)
 	{
 	}
-
-	TCoreException::TCoreException(TCoreException&& rSrc) : TBaseException(std::forward<TBaseException>(rSrc))
-	{
-	}
 }

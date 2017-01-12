@@ -15,6 +15,9 @@ namespace chcore
 
 		LIBCHCORE_API double Div64(unsigned long long ullNumber, double dDenominator)
 		{
+			if (dDenominator == 0.0)
+				return 0.0;
+
 			return ullNumber / dDenominator;
 		}
 	}

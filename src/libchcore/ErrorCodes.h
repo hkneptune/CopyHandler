@@ -51,6 +51,7 @@ namespace chcore
 		eErr_CannotSuspendThread = 1008,
 		eErr_CannotSetEvent = 1009,
 		eErr_CannotCreateMutex = 1010,
+		eErr_MutexAlreadyLocked = 1011,
 
 		// string errors (1500+)
 

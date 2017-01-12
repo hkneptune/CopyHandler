@@ -75,6 +75,11 @@ namespace chcore
 		m_bLocked = false;
 	}
 
+	bool TIpcMutex::IsLocked() const
+	{
+		return m_bLocked;
+	}
+
 	void TIpcMutex::Close()
 	{
 		if (m_bLocked)

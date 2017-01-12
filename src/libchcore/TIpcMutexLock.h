@@ -26,7 +26,7 @@ namespace chcore
 	class LIBCHCORE_API TIpcMutexLock
 	{
 	public:
-		explicit TIpcMutexLock(TIpcMutex& rMutex);
+		TIpcMutexLock(TIpcMutex& rMutex, DWORD dwTimeout = INFINITE);
 		TIpcMutexLock(const TIpcMutexLock&) = delete;
 		~TIpcMutexLock();
 

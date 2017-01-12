@@ -38,6 +38,7 @@ namespace chcore
 		void Lock(DWORD dwTimeout = INFINITE);
 		void Unlock();
 
+		bool IsLocked() const;
 	private:
 		void Close();
 
