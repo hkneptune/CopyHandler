@@ -115,13 +115,13 @@ namespace chcore
 			throw TCoreWin32Exception(eErr_WaitingFailed, GetLastError(), L"Waiting failed", LOCATION);
 	}
 
-	void TWorkerThreadController::StopThread()
+	void TWorkerThreadController::StopThread(DWORD dwMiliseconds)
 	{
 		boost::upgrade_lock<boost::shared_mutex> lock(m_lock);
 
 		SignalThreadToStop(lock);
 
-		WaitForThreadToExit(lock);
+		WaitForThreadToExit(lock, dwMiliseconds);
 	}
 
 	void TWorkerThreadController::ChangePriority(int iPriority)

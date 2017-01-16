@@ -47,7 +47,7 @@ namespace chcore
 		void SignalThreadToStop();
 		void WaitForThreadToExit(DWORD dwMiliseconds = INFINITE);
 
-		void StopThread();
+		void StopThread(DWORD dwMiliseconds = INFINITE);
 		void ChangePriority(int iPriority);
 
 		// methods to be used only inside the thread being controlled

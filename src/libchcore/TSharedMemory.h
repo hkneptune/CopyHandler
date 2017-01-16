@@ -54,6 +54,7 @@ namespace chcore
 		// below are the unsafe functions (i.e. not protected with mutex)
 		const BYTE* GetData() const;
 		BYTE* GetData();
+		const BYTE* GetFullData() const;
 
 		shm_size_t GetSharedMemorySize() const;
 		shm_size_t GetDataSize() const;

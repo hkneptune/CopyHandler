@@ -95,6 +95,9 @@ namespace chcore
 
 	void TSharedMemory::Create(const wchar_t* pszName, const BYTE* pbyData, shm_size_t stSize)
 	{
+		if (!pbyData)
+			throw TCoreException(eErr_InvalidArgument, L"pbyData is NULL", LOCATION);
+
 		Create(pszName, stSize);
 
 		TIpcMutexLock lock(m_mutex);
@@ -201,6 +204,14 @@ namespace chcore
 			return nullptr;
 
 		return (BYTE*)m_pMappedMemory + sizeof(shm_size_t);
+	}
+
+	const BYTE* TSharedMemory::GetFullData() const
+	{
+		if (!m_hFileMapping || !m_pMappedMemory || m_stSize <= sizeof(shm_size_t))
+			return nullptr;
+
+		return (BYTE*)m_pMappedMemory;
 	}
 
 	TSharedMemory::shm_size_t TSharedMemory::GetSharedMemorySize() const
