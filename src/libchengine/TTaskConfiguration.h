@@ -112,14 +112,14 @@ namespace chengine
 
 	// Buffer settings
 	TASK_PROPERTY(eTO_UseOnlyDefaultBuffer, bool, _T("Buffer.UseOnlyDefaultBuffer"), false);
-	TASK_PROPERTY_MIN(eTO_DefaultBufferSize, unsigned int, _T("Buffer.DefaultBufferSize"), 131072, 1);
+	TASK_PROPERTY_MIN(eTO_DefaultBufferSize, unsigned int, _T("Buffer.DefaultBufferSize"), 1048576, 1);
 	TASK_PROPERTY_MIN(eTO_OneDiskBufferSize, unsigned int, _T("Buffer.OnePhysicalDiskSize"), 2097152, 1);
-	TASK_PROPERTY_MIN(eTO_TwoDisksBufferSize, unsigned int, _T("Buffer.TwoPhysicalDisksSize"), 131072, 1);
-	TASK_PROPERTY_MIN(eTO_CDBufferSize, unsigned int, _T("Buffer.CDSize"), 131072, 1);
-	TASK_PROPERTY_MIN(eTO_LANBufferSize, unsigned int, _T("Buffer.LANSize"), 131072, 1);
-	TASK_PROPERTY_MINMAX(eTO_BufferQueueDepth, unsigned int, _T("Buffer.QueueDepth"), 8, 1, 1000);
+	TASK_PROPERTY_MIN(eTO_TwoDisksBufferSize, unsigned int, _T("Buffer.TwoPhysicalDisksSize"), 1048576, 1);
+	TASK_PROPERTY_MIN(eTO_CDBufferSize, unsigned int, _T("Buffer.CDSize"), 1048576, 1);
+	TASK_PROPERTY_MIN(eTO_LANBufferSize, unsigned int, _T("Buffer.LANSize"), 1048576, 1);
+	TASK_PROPERTY_MINMAX(eTO_BufferQueueDepth, unsigned int, _T("Buffer.QueueDepth"), 10, 1, 1000);
 	TASK_PROPERTY_MINMAX(eTO_MaxReadAheadBuffers, unsigned int, _T("Buffer.MaxReadAhead"), 10, 1, 1000);
-	TASK_PROPERTY_MINMAX(eTO_MaxConcurrentReads, unsigned int, _T("Buffer.MaxConcurrentReads"), 2, 1, 1000);
+	TASK_PROPERTY_MINMAX(eTO_MaxConcurrentReads, unsigned int, _T("Buffer.MaxConcurrentReads"), 3, 1, 1000);
 	TASK_PROPERTY_MINMAX(eTO_MaxConcurrentWrites, unsigned int, _T("Buffer.MaxConcurrentWrites"), 2, 1, 1000);
 
 	TASK_PROPERTY(eTO_DisableBuffering, bool, _T("Operation.Buffering.DisableBufferingForLargeFiles"), true);
