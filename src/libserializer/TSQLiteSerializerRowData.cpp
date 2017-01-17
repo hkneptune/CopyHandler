@@ -399,7 +399,7 @@ namespace serializer
 				case IColumnsDefinition::eType_bool:
 				{
 					bool bValue = GetDataForColumn(stColumn) != 0 ? true : false;
-					LOG_TRACE(m_spLog) << L"BindValue - column: " << stColumn << L", value(bool): " << (bValue ? 1l : 0l);
+					LOG_TRACE(m_spLog) << L"BindValue - column: " << stColumn << L" (" << iSQLiteColumnNumber << L"), value(bool): " << (bValue ? 1l : 0l);
 					tStatement.BindValue(iSQLiteColumnNumber++, bValue);
 					break;
 				}
@@ -407,7 +407,7 @@ namespace serializer
 				case IColumnsDefinition::eType_short:
 				{
 					short siValue = *(short*)(unsigned short*)&GetDataForColumn(stColumn);
-					LOG_TRACE(m_spLog) << L"BindValue - column: " << stColumn << L", value(short): " << siValue;
+					LOG_TRACE(m_spLog) << L"BindValue - column: " << stColumn << L" (" << iSQLiteColumnNumber << L"), value(short): " << siValue;
 					tStatement.BindValue(iSQLiteColumnNumber++, siValue);
 					break;
 				}
@@ -415,7 +415,7 @@ namespace serializer
 				case IColumnsDefinition::eType_ushort:
 				{
 					unsigned short usiValue = (unsigned short)GetDataForColumn(stColumn);
-					LOG_TRACE(m_spLog) << L"BindValue - column: " << stColumn << L", value(ushort): " << usiValue;
+					LOG_TRACE(m_spLog) << L"BindValue - column: " << stColumn << L" (" << iSQLiteColumnNumber << L"), value(ushort): " << usiValue;
 					tStatement.BindValue(iSQLiteColumnNumber++, usiValue);
 					break;
 				}
@@ -423,7 +423,7 @@ namespace serializer
 				case IColumnsDefinition::eType_int:
 				{
 					int iValue = *(int*)(unsigned int*)&GetDataForColumn(stColumn);
-					LOG_TRACE(m_spLog) << L"BindValue - column: " << stColumn << L", value(int): " << iValue;
+					LOG_TRACE(m_spLog) << L"BindValue - column: " << stColumn << L" (" << iSQLiteColumnNumber << L"), value(int): " << iValue;
 					tStatement.BindValue(iSQLiteColumnNumber++, iValue);
 					break;
 				}
@@ -431,7 +431,7 @@ namespace serializer
 				case IColumnsDefinition::eType_uint:
 				{
 					unsigned int uiValue = (unsigned int)GetDataForColumn(stColumn);
-					LOG_TRACE(m_spLog) << L"BindValue - column: " << stColumn << L", value(uint): " << uiValue;
+					LOG_TRACE(m_spLog) << L"BindValue - column: " << stColumn << L" (" << iSQLiteColumnNumber << L"), value(uint): " << uiValue;
 					tStatement.BindValue(iSQLiteColumnNumber++, uiValue);
 					break;
 				}
@@ -439,7 +439,7 @@ namespace serializer
 				case IColumnsDefinition::eType_long:
 				{
 					long lValue = *(long*)(unsigned long*)&GetDataForColumn(stColumn);
-					LOG_TRACE(m_spLog) << L"BindValue - column: " << stColumn << L", value(long): " << lValue;
+					LOG_TRACE(m_spLog) << L"BindValue - column: " << stColumn << L" (" << iSQLiteColumnNumber << L"), value(long): " << lValue;
 					tStatement.BindValue(iSQLiteColumnNumber++, lValue);
 					break;
 				}
@@ -447,7 +447,7 @@ namespace serializer
 				case IColumnsDefinition::eType_ulong:
 				{
 					unsigned long ulValue = (unsigned long)GetDataForColumn(stColumn);
-					LOG_TRACE(m_spLog) << L"BindValue - column: " << stColumn << L", value(ulong): " << ulValue;
+					LOG_TRACE(m_spLog) << L"BindValue - column: " << stColumn << L" (" << iSQLiteColumnNumber << L"), value(ulong): " << ulValue;
 					tStatement.BindValue(iSQLiteColumnNumber++, ulValue);
 					break;
 				}
@@ -455,7 +455,7 @@ namespace serializer
 				case IColumnsDefinition::eType_longlong:
 				{
 					long long llValue = *(long long*)(unsigned long long*)&GetDataForColumn(stColumn);
-					LOG_TRACE(m_spLog) << L"BindValue - column: " << stColumn << L", value(llong): " << llValue;
+					LOG_TRACE(m_spLog) << L"BindValue - column: " << stColumn << L" (" << iSQLiteColumnNumber << L"), value(llong): " << llValue;
 					tStatement.BindValue(iSQLiteColumnNumber++, llValue);
 					break;
 				}
@@ -463,7 +463,7 @@ namespace serializer
 				case IColumnsDefinition::eType_ulonglong:
 				{
 					unsigned long long ullValue = GetDataForColumn(stColumn);
-					LOG_TRACE(m_spLog) << L"BindValue - column: " << stColumn << L", value(ullong): " << ullValue;
+					LOG_TRACE(m_spLog) << L"BindValue - column: " << stColumn << L" (" << iSQLiteColumnNumber << L"), value(ullong): " << ullValue;
 					tStatement.BindValue(iSQLiteColumnNumber++, ullValue);
 					break;
 				}
@@ -472,7 +472,7 @@ namespace serializer
 				{
 					// cppcheck-suppress invalidPointerCast
 					double dValue = *(double*)(unsigned long long*)&GetDataForColumn(stColumn);
-					LOG_TRACE(m_spLog) << L"BindValue - column: " << stColumn << L", value(double): " << dValue;
+					LOG_TRACE(m_spLog) << L"BindValue - column: " << stColumn << L" (" << iSQLiteColumnNumber << L"), value(double): " << dValue;
 					tStatement.BindValue(iSQLiteColumnNumber++, dValue);
 					break;
 				}
@@ -480,7 +480,7 @@ namespace serializer
 				case IColumnsDefinition::eType_string:
 				{
 					const wchar_t* pszValue = (const wchar_t*)(unsigned long long*)GetDataForColumn(stColumn);
-					LOG_TRACE(m_spLog) << L"BindValue - column: " << stColumn << L", value(string): " << (pszValue ? pszValue : _T(""));
+					LOG_TRACE(m_spLog) << L"BindValue - column: " << stColumn << L" (" << iSQLiteColumnNumber << L"), value(string): " << (pszValue ? pszValue : _T(""));
 					tStatement.BindValue(iSQLiteColumnNumber++, pszValue ? pszValue : _T(""));
 					break;
 				}
@@ -488,7 +488,7 @@ namespace serializer
 				case IColumnsDefinition::eType_path:
 				{
 					const wchar_t* pszValue = (const wchar_t*)(unsigned long long*)GetDataForColumn(stColumn);
-					LOG_TRACE(m_spLog) << L"BindValue - column: " << stColumn << L", value(path): " << (pszValue ? pszValue : _T(""));
+					LOG_TRACE(m_spLog) << L"BindValue - column: " << stColumn << L" (" << iSQLiteColumnNumber << L"), value(path): " << (pszValue ? pszValue : _T(""));
 					tStatement.BindValue(iSQLiteColumnNumber++, pszValue ? PathFromString(pszValue) : TSmartPath());
 					break;
 				}
