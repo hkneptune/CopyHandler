@@ -168,7 +168,7 @@ namespace chengine
 
 		LOG_INFO(m_spLog) << strFormat.c_str();
 
-		TOverlappedThreadPool threadPool(rThreadController.GetKillThreadHandle());
+		TOverlappedThreadPool threadPool;
 
 		for(; fcIndex < fcSize; fcIndex++)
 		{

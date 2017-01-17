@@ -77,9 +77,6 @@
     <ClInclude Include="StreamingHelpers.h">
       <Filter>Source Files\Tools</Filter>
     </ClInclude>
-    <ClInclude Include="GTestMacros.h">
-      <Filter>Tests</Filter>
-    </ClInclude>
     <ClInclude Include="resource.h" />
     <ClInclude Include="ITimestampProvider.h">
       <Filter>Source Files\Tools\Timers</Filter>
@@ -104,6 +101,9 @@
     </ClInclude>
     <ClInclude Include="..\common\GenericTemplates\RandomAccessContainerWrapper.h">
       <Filter>Source Files\Shared</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\GTestMacros.h">
+      <Filter>Tests</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

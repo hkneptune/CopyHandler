@@ -3,7 +3,7 @@
 #include "gmock/gmock.h"
 #include "../TReadBufferQueueWrapper.h"
 #include <memory>
-#include "../GTestMacros.h"
+#include "../../common/GTestMacros.h"
 
 using namespace chengine;
 using namespace chcore;

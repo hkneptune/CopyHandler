@@ -3,7 +3,7 @@
 #include "gmock/gmock.h"
 #include "../TOverlappedDataBuffer.h"
 #include "../../liblogger/TLogFileData.h"
-#include "../GTestMacros.h"
+#include "../../common/GTestMacros.h"
 #include "../TOverlappedMemoryPool.h"
 #include "../TOverlappedReader.h"
 

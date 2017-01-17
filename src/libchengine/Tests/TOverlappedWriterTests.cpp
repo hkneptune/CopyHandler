@@ -2,7 +2,7 @@
 #include "gtest/gtest.h"
 #include "gmock/gmock.h"
 #include "../TOverlappedWriter.h"
-#include "../GTestMacros.h"
+#include "../../common/GTestMacros.h"
 
 using namespace chengine;
 

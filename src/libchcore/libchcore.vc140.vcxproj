@@ -473,7 +473,7 @@ goto end
   <ItemGroup>
     <ClInclude Include="..\common\GenericTemplates\RandomAccessContainerWrapper.h" />
     <ClInclude Include="..\common\GenericTemplates\RandomAccessIterators.h" />
-    <ClInclude Include="GTestMacros.h" />
+    <ClInclude Include="..\common\GTestMacros.h" />
     <ClInclude Include="ITimestampProvider.h" />
     <ClInclude Include="MathFunctions.h" />
     <ClInclude Include="resource.h" />

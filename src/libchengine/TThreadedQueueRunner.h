@@ -30,8 +30,7 @@ namespace chengine
 	class TThreadedQueueRunner
 	{
 	public:
-		explicit TThreadedQueueRunner(HANDLE hKill) :
-			m_hKill(hKill),
+		explicit TThreadedQueueRunner() :
 			m_eventLocalKill(true, false)
 		{
 		}
@@ -107,7 +106,6 @@ namespace chengine
 	private:
 		WaitableQueue<T> m_queue;
 		std::thread m_thread;
-		HANDLE m_hKill = nullptr;
 		TEvent m_eventLocalKill;
 	};
 }

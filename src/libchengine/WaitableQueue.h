@@ -23,6 +23,8 @@
 #include <mutex>
 #include <deque>
 #include "TEvent.h"
+#include "..\libchcore\ErrorCodes.h"
+#include "..\libchcore\TCoreException.h"
 
 namespace chengine
 {
@@ -45,6 +47,9 @@ namespace chengine
 		T PopFront()
 		{
 			std::lock_guard<std::mutex> lock(m_lock);
+
+			if (m_queue.empty())
+				throw chcore::TCoreException(chcore::eErr_BoundsExceeded, L"Tried to pop from empty container", LOCATION);
 
 			T value = std::move(m_queue.front());
 			m_queue.pop_front();

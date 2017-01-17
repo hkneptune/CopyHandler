@@ -110,16 +110,12 @@
     <ClInclude Include="TPlainStringPool.h">
       <Filter>Source Files\Tools</Filter>
     </ClInclude>
-    <ClInclude Include="TObsoleteFiles.h">
-      <Filter>Source Files\Tools</Filter>
-    </ClInclude>
     <ClInclude Include="TFakeFileSerializer.h">
       <Filter>Source Files\Serialization\Fake</Filter>
     </ClInclude>
     <ClInclude Include="SerializerDataTypes.h">
       <Filter>Source Files\Tools</Filter>
     </ClInclude>
-    <ClInclude Include="resource.h" />
     <ClInclude Include="TRemovedObjects.h">
       <Filter>Source Files\Tools</Filter>
     </ClInclude>
@@ -128,6 +124,9 @@
     </ClInclude>
     <ClInclude Include="TSharedModificationTracker.h">
       <Filter>Source Files\Tools\ModificationTrackers</Filter>
+    </ClInclude>
+    <ClInclude Include="resource.h">
+      <Filter>Resource Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -213,9 +212,6 @@
       <Filter>Tests</Filter>
     </ClCompile>
     <ClCompile Include="TPlainStringPool.cpp">
-      <Filter>Source Files\Tools</Filter>
-    </ClCompile>
-    <ClCompile Include="TObsoleteFiles.cpp">
       <Filter>Source Files\Tools</Filter>
     </ClCompile>
     <ClCompile Include="TFakeFileSerializer.cpp">

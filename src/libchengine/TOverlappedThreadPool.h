@@ -32,8 +32,6 @@ namespace chengine
 	class TOverlappedThreadPool
 	{
 	public:
-		explicit TOverlappedThreadPool(HANDLE hKill);
-
 		TReaderThread& ReaderThread();
 		TWriterThread& WriterThread();
 

@@ -21,12 +21,6 @@
 
 namespace chengine
 {
-	TOverlappedThreadPool::TOverlappedThreadPool(HANDLE hKill) :
-		m_threadReader(hKill),
-		m_threadWriter(hKill)
-	{
-	}
-
 	TReaderThread& TOverlappedThreadPool::ReaderThread()
 	{
 		return m_threadReader;

@@ -2,7 +2,7 @@
 #include "gtest/gtest.h"
 #include "gmock/gmock.h"
 #include "../TOrderedBufferQueue.h"
-#include "../GTestMacros.h"
+#include "../../common/GTestMacros.h"
 
 class FallbackCollection : public std::vector<chengine::TOverlappedDataBuffer*>
 {

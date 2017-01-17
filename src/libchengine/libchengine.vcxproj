@@ -471,6 +471,7 @@ goto end
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="..\common\GTestMacros.h" />
     <ClInclude Include="CommonDataTypes.h" />
     <ClInclude Include="ConfigNode.h" />
     <ClInclude Include="ConfigNodeContainer.h" />
@@ -480,7 +481,6 @@ goto end
     <ClInclude Include="EOperationTypes.h" />
     <ClInclude Include="ESubTaskTypes.h" />
     <ClInclude Include="ETaskCurrentState.h" />
-    <ClInclude Include="GTestMacros.h" />
     <ClInclude Include="IFeedbackHandler.h" />
     <ClInclude Include="IFeedbackHandlerFactory.h" />
     <ClInclude Include="IFilesystem.h" />
@@ -506,13 +506,13 @@ goto end
     <ClInclude Include="TFileInfoFwd.h" />
     <ClInclude Include="TFilesystemFileFeedbackWrapper.h" />
     <ClInclude Include="TFileException.h" />
+    <ClInclude Include="TObsoleteFiles.h" />
     <ClInclude Include="TOverlappedThreadPool.h" />
     <ClInclude Include="TSharedCount.h" />
     <ClInclude Include="TSharedCountMT.h" />
     <ClInclude Include="TThreadedQueueRunner.h" />
     <ClInclude Include="TLocalFilesystemFile.h" />
     <ClInclude Include="TLocalFilesystemFind.h" />
-    <ClInclude Include="TObsoleteFiles.h" />
     <ClInclude Include="TOrderedBufferQueue.h" />
     <ClInclude Include="TOverlappedMemoryPool.h" />
     <ClInclude Include="TOverlappedProcessorRange.h" />
@@ -521,16 +521,11 @@ goto end
     <ClInclude Include="TOverlappedReaderWriterFB.h" />
     <ClInclude Include="TOverlappedWriter.h" />
     <ClInclude Include="TOverlappedWriterFB.h" />
-    <ClInclude Include="TPlainStringPool.h" />
     <ClInclude Include="TScopedRunningTimeTracker.h" />
     <ClInclude Include="TScopedRunningTimeTrackerPause.h" />
     <ClInclude Include="TSimpleOrderedBufferQueue.h" />
     <ClInclude Include="TSizeFormatter.h" />
     <ClInclude Include="TSpeedTracker.h" />
-    <ClInclude Include="TSQLiteDatabase.h" />
-    <ClInclude Include="TSQLiteException.h" />
-    <ClInclude Include="TSQLiteStatement.h" />
-    <ClInclude Include="TSQLiteTransaction.h" />
     <ClInclude Include="TSubTaskArray.h" />
     <ClInclude Include="TSubTaskArrayStatsSnapshot.h" />
     <ClInclude Include="TSubTaskBase.h" />
@@ -643,6 +638,18 @@ goto end
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
+    <ClCompile Include="Tests\TestsTThreadedQueueRunner.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="Tests\TestsWaitableQueue.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
     <ClCompile Include="Tests\TOrderedBufferQueueTests.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
@@ -711,15 +718,10 @@ goto end
     <ClCompile Include="TOverlappedThreadPool.cpp" />
     <ClCompile Include="TOverlappedWriter.cpp" />
     <ClCompile Include="TOverlappedWriterFB.cpp" />
-    <ClCompile Include="TPlainStringPool.cpp" />
     <ClCompile Include="TScopedRunningTimeTracker.cpp" />
     <ClCompile Include="TScopedRunningTimeTrackerPause.cpp" />
     <ClCompile Include="TSizeFormatter.cpp" />
     <ClCompile Include="TSpeedTracker.cpp" />
-    <ClCompile Include="TSQLiteDatabase.cpp" />
-    <ClCompile Include="TSQLiteException.cpp" />
-    <ClCompile Include="TSQLiteStatement.cpp" />
-    <ClCompile Include="TSQLiteTransaction.cpp" />
     <ClCompile Include="TSubTaskArray.cpp" />
     <ClCompile Include="TSubTaskArrayStatsSnapshot.cpp" />
     <ClCompile Include="TSubTaskBase.cpp" />

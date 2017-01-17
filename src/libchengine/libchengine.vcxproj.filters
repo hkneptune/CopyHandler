@@ -27,9 +27,6 @@
     <Filter Include="Source Files\Tools">
       <UniqueIdentifier>{1fddd996-c723-4b09-9c98-868df98fe204}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\Tools\SQLite">
-      <UniqueIdentifier>{e6da867d-b0bd-42d5-a0c8-43542984582f}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Source Files\Tools\Config">
       <UniqueIdentifier>{e4894f9f-1e1d-451a-9a02-60b9d682b60f}</UniqueIdentifier>
     </Filter>
@@ -194,18 +191,6 @@
     <ClInclude Include="TTaskInfo.h">
       <Filter>Source Files\Task Manager</Filter>
     </ClInclude>
-    <ClInclude Include="TSQLiteDatabase.h">
-      <Filter>Source Files\Tools\SQLite</Filter>
-    </ClInclude>
-    <ClInclude Include="TSQLiteException.h">
-      <Filter>Source Files\Tools\SQLite</Filter>
-    </ClInclude>
-    <ClInclude Include="TSQLiteStatement.h">
-      <Filter>Source Files\Tools\SQLite</Filter>
-    </ClInclude>
-    <ClInclude Include="TSQLiteTransaction.h">
-      <Filter>Source Files\Tools\SQLite</Filter>
-    </ClInclude>
     <ClInclude Include="TSpeedTracker.h">
       <Filter>Source Files\Tools</Filter>
     </ClInclude>
@@ -226,12 +211,6 @@
     </ClInclude>
     <ClInclude Include="TTaskBaseData.h">
       <Filter>Source Files\Task</Filter>
-    </ClInclude>
-    <ClInclude Include="TPlainStringPool.h">
-      <Filter>Source Files\Tools</Filter>
-    </ClInclude>
-    <ClInclude Include="TObsoleteFiles.h">
-      <Filter>Source Files\Tools</Filter>
     </ClInclude>
     <ClInclude Include="TFeedbackHandlerWrapper.h">
       <Filter>Source Files\Feedback</Filter>
@@ -310,9 +289,6 @@
     </ClInclude>
     <ClInclude Include="TCoreEngine.h">
       <Filter>Source Files\Library files</Filter>
-    </ClInclude>
-    <ClInclude Include="GTestMacros.h">
-      <Filter>Tests</Filter>
     </ClInclude>
     <ClInclude Include="TOverlappedWriter.h">
       <Filter>Source Files\Filesystems\OverlappedIO\ReaderWriter</Filter>
@@ -397,6 +373,12 @@
       <Filter>Source Files\Tools\Threading</Filter>
     </ClInclude>
     <ClInclude Include="TBasePathDataContainer.h">
+      <Filter>Source Files\Tools</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\GTestMacros.h">
+      <Filter>Tests</Filter>
+    </ClInclude>
+    <ClInclude Include="TObsoleteFiles.h">
       <Filter>Source Files\Tools</Filter>
     </ClInclude>
   </ItemGroup>
@@ -485,18 +467,6 @@
     <ClCompile Include="TTaskInfo.cpp">
       <Filter>Source Files\Task Manager</Filter>
     </ClCompile>
-    <ClCompile Include="TSQLiteDatabase.cpp">
-      <Filter>Source Files\Tools\SQLite</Filter>
-    </ClCompile>
-    <ClCompile Include="TSQLiteException.cpp">
-      <Filter>Source Files\Tools\SQLite</Filter>
-    </ClCompile>
-    <ClCompile Include="TSQLiteStatement.cpp">
-      <Filter>Source Files\Tools\SQLite</Filter>
-    </ClCompile>
-    <ClCompile Include="TSQLiteTransaction.cpp">
-      <Filter>Source Files\Tools\SQLite</Filter>
-    </ClCompile>
     <ClCompile Include="TSpeedTracker.cpp">
       <Filter>Source Files\Tools</Filter>
     </ClCompile>
@@ -524,14 +494,8 @@
     <ClCompile Include="..\..\tests\tests_shared\TestsExports.cpp">
       <Filter>Tests</Filter>
     </ClCompile>
-    <ClCompile Include="TPlainStringPool.cpp">
-      <Filter>Source Files\Tools</Filter>
-    </ClCompile>
     <ClCompile Include="Tests\TestsTConfig.cpp">
       <Filter>Tests</Filter>
-    </ClCompile>
-    <ClCompile Include="TObsoleteFiles.cpp">
-      <Filter>Source Files\Tools</Filter>
     </ClCompile>
     <ClCompile Include="TFeedbackHandlerWrapper.cpp">
       <Filter>Source Files\Feedback</Filter>
@@ -684,6 +648,15 @@
       <Filter>Source Files\Tools\Threading</Filter>
     </ClCompile>
     <ClCompile Include="TBasePathDataContainer.cpp">
+      <Filter>Source Files\Tools</Filter>
+    </ClCompile>
+    <ClCompile Include="Tests\TestsWaitableQueue.cpp">
+      <Filter>Tests</Filter>
+    </ClCompile>
+    <ClCompile Include="Tests\TestsTThreadedQueueRunner.cpp">
+      <Filter>Tests</Filter>
+    </ClCompile>
+    <ClCompile Include="TObsoleteFiles.cpp">
       <Filter>Source Files\Tools</Filter>
     </ClCompile>
   </ItemGroup>
