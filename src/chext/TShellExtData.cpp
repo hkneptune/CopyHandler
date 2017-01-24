@@ -58,12 +58,20 @@ HRESULT TShellExtData::GatherDataFromInitialize(LPCITEMIDLIST pidlFolder, IDataO
 		if(hResult != S_OK)
 			hResult = E_FAIL;
 		if(SUCCEEDED(hResult))
+		{
 			hResult = ReadPreferredDropEffectFromIDataObject(piDataObject);
+			if(hResult == S_FALSE)
+				hResult = S_OK;
+		}
 	}
 
 	// Read clipboard paths with preferred drop effects
 	if(SUCCEEDED(hResult))
+	{
 		hResult = ReadClipboard();
+		if(hResult == S_FALSE)
+			hResult = S_OK;
+	}
 
 	if(SUCCEEDED(hResult))
 	{
@@ -523,10 +531,10 @@ HRESULT TShellExtData::ReadPreferredDropEffectFromIDataObject(IDataObject* piDat
 
 HRESULT TShellExtData::ReadClipboard()
 {
-	HRESULT hResult = S_FALSE;
-
 	if(IsClipboardFormatAvailable(CF_HDROP))
 	{
+		HRESULT hResult = S_OK;
+
 		// read paths from clipboard
 		if(!OpenClipboard(nullptr))
 			return E_FAIL;
