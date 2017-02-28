@@ -46,6 +46,8 @@ public:
 	bool HasCHItems(HMENU hMenu) const;
 	void Clear();
 
+	int FindMenuInsertLocation(HMENU hMenu);
+
 	UINT GetLastCommandID() const { return m_uiNextMenuID; }
 	TShellMenuItemPtr GetCommandByMenuItemOffset(UINT uiOffset);
 	TShellMenuItemPtr GetCommandByItemID(UINT uiOffset);

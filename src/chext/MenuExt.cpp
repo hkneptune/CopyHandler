@@ -30,22 +30,6 @@
 #include "Logger.h"
 #include "../libchengine/TTaskDefinition.h"
 
-// globals
-static void CutAmpersands(LPTSTR lpszString)
-{
-	int iOffset=0;
-	size_t iLength=_tcslen(lpszString);
-	for (size_t j=0;j<iLength;j++)
-	{
-		if (lpszString[j] == _T('&'))
-			iOffset++;
-		else
-			if (iOffset != 0)
-				lpszString[j-iOffset]=lpszString[j];
-	}
-	lpszString[iLength-iOffset]=_T('\0');
-}
-
 /////////////////////////////////////////////////////////////////////////////
 // CMenuExt
 CMenuExt::CMenuExt() :
@@ -128,49 +112,9 @@ STDMETHODIMP CMenuExt::QueryContextMenu(HMENU hMenu, UINT indexMenu, UINT idCmdF
 		if (m_tContextMenuHandler.HasCHItems(hMenu))
 			return S_OK;
 
-		// current commands count in menu
-		TCHAR szText[ _MAX_PATH ];
-		int iCount = ::GetMenuItemCount(hMenu);
-
-		// find a place where the commands should be inserted
-		for(int iMenuIndex = 0; iMenuIndex < iCount; iMenuIndex++)
-		{
-			MENUITEMINFO mii = { 0 };
-			mii.cbSize = sizeof(mii);
-			mii.fMask = MIIM_STRING;
-			mii.dwTypeData = szText;
-			mii.cch = _MAX_PATH;
-
-			if(!::GetMenuItemInfo(hMenu, iMenuIndex, TRUE, &mii))
-				continue;
-
-			// get rid of &
-			CutAmpersands(szText);
-			_tcslwr(szText);
-
-			// check for texts Wytnij/Wklej/Kopiuj/Cut/Paste/Copy
-			if(_tcscmp(szText, _T("wytnij")) == 0 || _tcscmp(szText, _T("wklej")) == 0 ||
-				_tcscmp(szText, _T("kopiuj")) == 0 || _tcscmp(szText, _T("cut")) == 0 ||
-				_tcscmp(szText, _T("paste")) == 0 || _tcscmp(szText, _T("copy")) == 0)
-			{
-				// found - find the nearest bar and insert above
-				for(int j = iMenuIndex + 1; j < iCount; j++)
-				{
-					MENUITEMINFO miiInner = { 0 };
-					miiInner.cbSize = sizeof(miiInner);
-					miiInner.fMask = MIIM_FTYPE;
-
-					// find bar
-					if(::GetMenuItemInfo(hMenu, j, TRUE, &miiInner) && miiInner.fType == MFT_SEPARATOR)
-					{
-						indexMenu = j;
-						iMenuIndex = iCount;
-
-						break;
-					}
-				}
-			}
-		}
+		int iMenuInsertLocation = m_tContextMenuHandler.FindMenuInsertLocation(hMenu);
+		if (iMenuInsertLocation != -1)
+			indexMenu = iMenuInsertLocation;
 
 		// main command adding
 		TShellMenuItemPtr spRootMenuItem = m_tShellExtMenuConfig.GetNormalRoot();
