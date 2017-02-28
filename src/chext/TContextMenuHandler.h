@@ -33,6 +33,9 @@ typedef std::shared_ptr<TShellMenuItem> TShellMenuItemPtr;
 
 class TContextMenuHandler
 {
+private:
+	const unsigned long CHItemMarker = L'C' << 16 | L'H';
+
 public:
 	TContextMenuHandler();
 	~TContextMenuHandler();
@@ -40,6 +43,7 @@ public:
 	void Init(const TShellMenuItemPtr& spRootMenuItem, HMENU hMenu, UINT uiFirstItemID, UINT uiFirstItemPosition, const TShellExtData& rShellExtData,
 		const chengine::TSizeFormatterPtr& spFormatter, bool bShowFreeSpace,
 		bool bEnableOwnerDrawnPaths, bool bOverrideDefaultItem);
+	bool HasCHItems(HMENU hMenu) const;
 	void Clear();
 
 	UINT GetLastCommandID() const { return m_uiNextMenuID; }

@@ -105,8 +105,11 @@ STDMETHODIMP CMenuExt::Initialize(LPCITEMIDLIST pidlFolder, IDataObject* piDataO
 	}
 }
 
-STDMETHODIMP CMenuExt::QueryContextMenu(HMENU hMenu, UINT indexMenu, UINT idCmdFirst, UINT /*idCmdLast*/, UINT /*uFlags*/)
+STDMETHODIMP CMenuExt::QueryContextMenu(HMENU hMenu, UINT indexMenu, UINT idCmdFirst, UINT idCmdLast, UINT uFlags)
 {
+	idCmdLast;
+	uFlags;
+
 	try
 	{
 		LOG_DEBUG(m_spLog) << L"Querying context menu";
@@ -120,6 +123,9 @@ STDMETHODIMP CMenuExt::QueryContextMenu(HMENU hMenu, UINT indexMenu, UINT idCmdF
 		// check options
 		HWND hWnd = ShellExtensionVerifier::VerifyShellExt(m_piShellExtControl);
 		if(!hWnd)
+			return S_OK;
+
+		if (m_tContextMenuHandler.HasCHItems(hMenu))
 			return S_OK;
 
 		// current commands count in menu

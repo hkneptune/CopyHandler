@@ -50,6 +50,31 @@ void TContextMenuHandler::Init(const TShellMenuItemPtr& spRootMenuItem, HMENU hM
 	UpdateMenuRecursive(spRootMenuItem, hMenu, uiFirstItemPosition, rShellExtData, spFormatter, bShowFreeSpace, bOverrideDefaultItem);
 }
 
+bool TContextMenuHandler::HasCHItems(HMENU hMenu) const
+{
+	// current commands count in menu
+	TCHAR szText[_MAX_PATH];
+	int iCount = ::GetMenuItemCount(hMenu);
+
+	// find a place where the commands should be inserted
+	for (int iMenuIndex = 0; iMenuIndex < iCount; iMenuIndex++)
+	{
+		MENUITEMINFO mii = { 0 };
+		mii.cbSize = sizeof(mii);
+		mii.fMask = MIIM_STRING | MIIM_DATA;
+		mii.dwTypeData = szText;
+		mii.cch = _MAX_PATH;
+
+		if (!::GetMenuItemInfo(hMenu, iMenuIndex, TRUE, &mii))
+			continue;
+
+		if (mii.dwItemData == CHItemMarker)
+			return true;
+	}
+
+	return false;
+}
+
 void TContextMenuHandler::UpdateMenuRecursive(const TShellMenuItemPtr& spRootMenuItem, HMENU hMenu, UINT uiFirstItemPosition,
 	const TShellExtData& rShellExtData, const chengine::TSizeFormatterPtr& spFormatter, bool bShowFreeSpace, bool bOverrideDefaultItem)
 {
@@ -64,14 +89,15 @@ void TContextMenuHandler::UpdateMenuRecursive(const TShellMenuItemPtr& spRootMen
 				HMENU hSubMenu = CreatePopupMenu();
 				UpdateMenuRecursive(spMenuItem, hSubMenu, 0, rShellExtData, spFormatter, bShowFreeSpace, bOverrideDefaultItem);
 
-				MENUITEMINFO mii;
+				MENUITEMINFO mii = {0};
 				mii.cbSize = sizeof(MENUITEMINFO);
-				mii.fMask = MIIM_ID | MIIM_STATE | MIIM_SUBMENU | MIIM_STRING;
+				mii.fMask = MIIM_ID | MIIM_STATE | MIIM_SUBMENU | MIIM_STRING | MIIM_DATA;
 				mii.fType = MFT_STRING;
 				mii.fState = (spRootMenuItem->GetChildrenCount() > 0) ? MFS_ENABLED : MFS_GRAYED;
 				mii.wID = m_uiNextMenuID++;
 				mii.hSubMenu = hSubMenu;
 				mii.dwTypeData = (PTSTR)spMenuItem->GetLocalName().c_str();
+				mii.dwItemData = CHItemMarker;
 				mii.cch = 0;
 
 				::InsertMenuItem(hMenu, uiFirstItemPosition++, TRUE, &mii);
@@ -89,8 +115,16 @@ void TContextMenuHandler::UpdateMenuRecursive(const TShellMenuItemPtr& spRootMen
 
 				std::wstring wstrItemName = GetDisplayText(spMenuItem, spFormatter, bShowFreeSpace);
 
-				::InsertMenu(hMenu, uiFirstItemPosition++, MF_BYPOSITION | MF_STRING | (bEnableItem ? MF_ENABLED : MF_GRAYED) | (bEnableOwnerDrawnItem ? MF_OWNERDRAW : 0),
-					m_uiNextMenuID, wstrItemName.c_str());
+				MENUITEMINFO mii = {0};
+				mii.cbSize = sizeof(MENUITEMINFO);
+				mii.fMask = MIIM_ID | MIIM_STATE | MIIM_STRING | MIIM_DATA;
+				mii.fType = MFT_STRING | (bEnableOwnerDrawnItem ? MFT_OWNERDRAW : 0);
+				mii.fState = bEnableItem ? MFS_ENABLED : MFS_GRAYED;
+				mii.wID = m_uiNextMenuID;
+				mii.dwTypeData = (PTSTR)wstrItemName.c_str();
+				mii.dwItemData = CHItemMarker;
+				mii.cch = 0;
+				::InsertMenuItem(hMenu, uiFirstItemPosition++, TRUE, &mii);
 
 				if(bOverrideDefaultItem && rShellExtData.IsDefaultItem(spMenuItem))
 					::SetMenuDefaultItem(hMenu, m_uiNextMenuID, FALSE);
