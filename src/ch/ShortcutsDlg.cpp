@@ -314,7 +314,7 @@ void CShortcutsDlg::OnUpButton()
 		// swap data in m_ascShortcuts
 		std::vector<CString>::iterator iterOne = m_cvShortcuts.begin() + iPos - 1;
 		std::vector<CString>::iterator iterTwo = m_cvShortcuts.begin()+iPos;
-		std::swap(iterOne, iterTwo);
+		std::iter_swap(iterOne, iterTwo);
 		//m_cvShortcuts.swap();
 
 		// do the same with list
@@ -353,7 +353,7 @@ void CShortcutsDlg::OnDownButton()
 		std::vector<CString>::iterator iterOne = m_cvShortcuts.begin() + iPos;
 		std::vector<CString>::iterator iterTwo = m_cvShortcuts.begin() + iPos + 1;
 
-		std::swap(iterOne, iterTwo);
+		std::iter_swap(iterOne, iterTwo);
 
 		// do the same with list
 		SHFILEINFO sfi;
