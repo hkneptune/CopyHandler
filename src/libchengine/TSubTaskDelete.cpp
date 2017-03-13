@@ -102,9 +102,11 @@ namespace chengine
 		TFileInfoPtr spFileInfo;
 		TString strFormat;
 
+		ESubOperationResult eResult = eSubResult_Continue;
+
 		// index points to 0 or next item to process
 		file_count_t fcIndex = m_tSubTaskStats.GetCurrentIndex();
-		while (fcIndex < rFilesCache.GetCount())
+		while (fcIndex < rFilesCache.GetCount() && eResult == eSubResult_Continue)
 		{
 			spFileInfo = rFilesCache.GetAt(rFilesCache.GetCount() - fcIndex - 1);
 
@@ -133,11 +135,14 @@ namespace chengine
 			// delete data
 			bool bProtectReadOnlyFiles = GetTaskPropValue<eTO_ProtectReadOnlyFiles>(GetContext().GetConfig());
 			if (spFileInfo->IsDirectory())
-				tFilesystemFBWrapper.RemoveDirectoryFB(spFileInfo, bProtectReadOnlyFiles);
+				eResult = tFilesystemFBWrapper.RemoveDirectoryFB(spFileInfo, bProtectReadOnlyFiles);
 			else
-				tFilesystemFBWrapper.DeleteFileFB(spFileInfo, bProtectReadOnlyFiles);
+				eResult = tFilesystemFBWrapper.DeleteFileFB(spFileInfo, bProtectReadOnlyFiles);
 
-			++fcIndex;
+			if (eResult == eSubResult_SkipFile || eResult == eSubResult_Continue)
+				++fcIndex;
+			else
+				break;
 		}
 
 		m_tSubTaskStats.SetCurrentIndex(fcIndex);
@@ -147,7 +152,7 @@ namespace chengine
 		// log
 		LOG_INFO(m_spLog) << _T("Deleting files finished");
 
-		return TSubTaskBase::eSubResult_Continue;
+		return eResult;
 	}
 
 	void TSubTaskDelete::GetStatsSnapshot(TSubTaskStatsSnapshotPtr& spStats) const
