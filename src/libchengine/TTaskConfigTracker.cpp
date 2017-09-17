@@ -216,6 +216,22 @@ namespace chengine
 		if (strOption == TaskPropData<eTO_BufferQueueDepth>::GetPropertyName())
 			return eTO_BufferQueueDepth;
 
+		if (strOption == TaskPropData<eTO_MaxReadAheadBuffers>::GetPropertyName())
+			return eTO_MaxReadAheadBuffers;
+		if (strOption == TaskPropData<eTO_MaxConcurrentReads>::GetPropertyName())
+			return eTO_MaxConcurrentReads;
+
+		if (strOption == TaskPropData<eTO_MaxConcurrentWrites>::GetPropertyName())
+			return eTO_MaxConcurrentWrites;
+/*
+		if (strOption == TaskPropData<eTO_FeedbackGeneralFileError>::GetPropertyName())
+			return eTO_FeedbackGeneralFileError;
+		if (strOption == TaskPropData<eTO_FeedbackFileAlreadyExists>::GetPropertyName())
+			return eTO_FeedbackFileAlreadyExists;
+		if (strOption == TaskPropData<eTO_FeedbackNotEnoughSpace>::GetPropertyName())
+			return eTO_FeedbackNotEnoughSpace;
+*/
+
 		if (strOption == TaskPropData<eTO_SetDestinationAttributes>::GetPropertyName())
 			return eTO_SetDestinationAttributes;
 		if (strOption == TaskPropData<eTO_ProtectReadOnlyFiles>::GetPropertyName())
@@ -246,6 +262,6 @@ namespace chengine
 		throw TCoreException(eErr_UnhandledCase, L"Option name not supported", LOCATION);
 
 		// add new elements before this one
-		BOOST_STATIC_ASSERT(eTO_Last == eTO_AlternateFilenameFormatString_AfterFirst + 1);
+		static_assert(eTO_Last == 27, "Function not updated to accommodate new enum options");
 	}
 }
