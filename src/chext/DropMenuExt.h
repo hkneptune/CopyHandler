@@ -24,12 +24,11 @@
 #include "../common/TShellExtMenuConfig.h"
 #include "TShellExtData.h"
 #include "../liblogger/TLogger.h"
+#include "ShellExtControl.h"
 
 /////////////////////////////////////////////////////////////////////////////
 // CDropMenuExt
-class ATL_NO_VTABLE CDropMenuExt : 
-	public CComObjectRootEx<CComSingleThreadModel>,
-	public CComCoClass<CDropMenuExt, &CLSID_DropMenuExt>,
+class CDropMenuExt :
 	public IShellExtInit,
 	public IContextMenu3
 {
@@ -37,17 +36,11 @@ public:
 	CDropMenuExt();
 	~CDropMenuExt();
 
-DECLARE_REGISTRY_RESOURCEID(IDR_DROPMENUEXT)
-DECLARE_NOT_AGGREGATABLE(CDropMenuExt)
-
-DECLARE_PROTECT_FINAL_CONSTRUCT()
-
-BEGIN_COM_MAP(CDropMenuExt)
-	COM_INTERFACE_ENTRY(IShellExtInit)
-	COM_INTERFACE_ENTRY(IContextMenu)
-END_COM_MAP()
-
 public:
+	STDMETHODIMP QueryInterface(REFIID, LPVOID FAR *) override;
+	STDMETHODIMP_(ULONG) AddRef() override;
+	STDMETHODIMP_(ULONG) Release() override;
+
 	STDMETHOD(InvokeCommand) (LPCMINVOKECOMMANDINFO lpici);
 	STDMETHOD(Initialize)(LPCITEMIDLIST pidlFolder, IDataObject* piDataObject, HKEY /*hkeyProgID*/);
 	STDMETHOD(GetCommandString)(UINT_PTR idCmd, UINT uFlags, UINT* /*pwReserved*/, LPSTR pszName, UINT cchMax);
@@ -57,6 +50,8 @@ public:
 	STDMETHOD(HandleMenuMsg2)(UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT* plResult);
 
 protected:
+	volatile ULONG m_ulRefCnt = 0;
+
 	IShellExtControl* m_piShellExtControl;
 
 	TShellExtData m_tShellExtData;

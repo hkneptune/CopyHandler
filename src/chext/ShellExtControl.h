@@ -20,47 +20,40 @@
 #define __SHELLEXTCONTROL_H_
 
 #include "resource.h"       // main symbols
+#include "guids.h"
 #include "../liblogger/TLogger.h"
 #include "../libchcore/TIpcMutex.h"
 #include "../libchcore/TSharedMemory.h"
+#include "IShellExtControl.h"
 
-/////////////////////////////////////////////////////////////////////////////
-// CDropMenuExt
-class ATL_NO_VTABLE CShellExtControl : 
-	public CComObjectRootEx<CComMultiThreadModel>,
-	public CComCoClass<CShellExtControl, &CLSID_CShellExtControl>,
-	public IDispatchImpl<IShellExtControl, &IID_IShellExtControl, &LIBID_CHEXTLib>
+class CShellExtControl : public IShellExtControl
 {
 public:
 	CShellExtControl();
 	~CShellExtControl();
 
+	STDMETHODIMP QueryInterface(REFIID, LPVOID FAR *) override;
+	STDMETHODIMP_(ULONG) AddRef() override;
+	STDMETHODIMP_(ULONG) Release() override;
+
 	STDMETHOD(GetVersion)(LONG* plVersion, BSTR* pbstrVersion);
 	STDMETHOD(SetFlags)(LONG lFlags, LONG lMask);
 	STDMETHOD(GetFlags)(LONG* plFlags);
-
-DECLARE_REGISTRY_RESOURCEID(IDR_SHELLEXTCONTROL)
-
-DECLARE_PROTECT_FINAL_CONSTRUCT()
-
-BEGIN_COM_MAP(CShellExtControl)
-	COM_INTERFACE_ENTRY(IUnknown)
-	COM_INTERFACE_ENTRY(IShellExtControl)
-END_COM_MAP()
 
 private:
 	HRESULT Initialize();
 
 private:
+	volatile ULONG m_ulRefCnt = 0;
+
 	HANDLE m_hMemory = nullptr;
 	chcore::TIpcMutex m_mutex;
 
 	struct SHELLEXT_DATA
 	{
 		long m_lFlags = 0;
-	} *m_pShellExtData;
+	} *m_pShellExtData = nullptr;
 
-	CComAutoCriticalSection m_lock;
 	logger::TLoggerPtr m_spLog;
 	chcore::TSharedMemory m_shmConfiguration;
 	bool m_bInitialized = false;

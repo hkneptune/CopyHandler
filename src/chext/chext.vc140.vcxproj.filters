@@ -27,6 +27,9 @@
     <Filter Include="Tests">
       <UniqueIdentifier>{65a70a57-2fd2-49a6-90f2-e0597f13adfe}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Interfaces\ClassFactories">
+      <UniqueIdentifier>{4c68be3a-4d21-48ce-b3f0-e166072c66d3}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="DropMenuExt.cpp">
@@ -59,9 +62,6 @@
     <ClCompile Include="StdAfx.cpp">
       <Filter>Source Files\Main</Filter>
     </ClCompile>
-    <ClCompile Include="chext_i.c">
-      <Filter>Generated Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\tests\tests_shared\TestsExports.cpp">
       <Filter>Tests</Filter>
     </ClCompile>
@@ -79,6 +79,24 @@
     </ClCompile>
     <ClCompile Include="..\common\TShellExtIpcConfigDataConsumer.cpp">
       <Filter>Source Files\Common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\TRegistry.cpp">
+      <Filter>Source Files\Common</Filter>
+    </ClCompile>
+    <ClCompile Include="DllRegistration.cpp">
+      <Filter>Source Files\Tools</Filter>
+    </ClCompile>
+    <ClCompile Include="ClassFactory.cpp">
+      <Filter>Source Files\Interfaces\ClassFactories</Filter>
+    </ClCompile>
+    <ClCompile Include="DropMenuExtClassFactory.cpp">
+      <Filter>Source Files\Interfaces\ClassFactories</Filter>
+    </ClCompile>
+    <ClCompile Include="MenuExtClassFactory.cpp">
+      <Filter>Source Files\Interfaces\ClassFactories</Filter>
+    </ClCompile>
+    <ClCompile Include="ShellExtControlClassFactory.cpp">
+      <Filter>Source Files\Interfaces\ClassFactories</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -106,9 +124,6 @@
     <ClInclude Include="..\common\TShellExtMenuConfig.h">
       <Filter>Source Files\Common</Filter>
     </ClInclude>
-    <ClInclude Include="dllmain.h">
-      <Filter>Source Files\Main</Filter>
-    </ClInclude>
     <ClInclude Include="StdAfx.h">
       <Filter>Source Files\Main</Filter>
     </ClInclude>
@@ -133,6 +148,30 @@
     <ClInclude Include="..\common\TShellExtIpcConfigDataConsumer.h">
       <Filter>Source Files\Common</Filter>
     </ClInclude>
+    <ClInclude Include="guids.h">
+      <Filter>Source Files\Interfaces</Filter>
+    </ClInclude>
+    <ClInclude Include="IShellExtControl.h">
+      <Filter>Source Files\Interfaces</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\TRegistry.h">
+      <Filter>Source Files\Common</Filter>
+    </ClInclude>
+    <ClInclude Include="DllRegistration.h">
+      <Filter>Source Files\Tools</Filter>
+    </ClInclude>
+    <ClInclude Include="ClassFactory.h">
+      <Filter>Source Files\Interfaces\ClassFactories</Filter>
+    </ClInclude>
+    <ClInclude Include="DropMenuExtClassFactory.h">
+      <Filter>Source Files\Interfaces\ClassFactories</Filter>
+    </ClInclude>
+    <ClInclude Include="MenuExtClassFactory.h">
+      <Filter>Source Files\Interfaces\ClassFactories</Filter>
+    </ClInclude>
+    <ClInclude Include="ShellExtControlClassFactory.h">
+      <Filter>Source Files\Interfaces\ClassFactories</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="chext.def">
@@ -147,11 +186,6 @@
     <None Include="ShellExtControl.rgs">
       <Filter>Resource Files</Filter>
     </None>
-  </ItemGroup>
-  <ItemGroup>
-    <Midl Include="chext.idl">
-      <Filter>Source Files\Main</Filter>
-    </Midl>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="chext.rc">

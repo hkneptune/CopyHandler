@@ -19,9 +19,9 @@
 #ifndef __TSHELLEXTENSIONCLIENT_H__
 #define __TSHELLEXTENSIONCLIENT_H__
 
-#include "../chext/chext.h"
 #include "../liblogger/TLogger.h"
 #include "../common/ERegistrationResult.h"
+#include "../chext/IShellExtControl.h"
 
 class TShellExtensionClient
 {

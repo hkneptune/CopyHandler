@@ -18,7 +18,7 @@
 // ============================================================================
 #include "stdafx.h"
 #include "WindowsVersion.h"
-#include "TRegistry.h"
+#include "../common/TRegistry.h"
 #include <boost/lexical_cast.hpp>
 #include <boost/algorithm/string/replace.hpp>
 

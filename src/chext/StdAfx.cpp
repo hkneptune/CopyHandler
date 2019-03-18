@@ -17,10 +17,3 @@
 *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
 ***************************************************************************/
 #include "stdafx.h"
-
-#ifdef _ATL_STATIC_REGISTRY
-#include <statreg.h>
-//#include <statreg.cpp>
-#endif
-
-//#include <atlimpl.cpp>

@@ -20,6 +20,7 @@
 #include "TShellExtensionClient.h"
 #include "objbase.h"
 #include "../chext/Logger.h"
+#include "../chext/guids.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW

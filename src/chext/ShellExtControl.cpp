@@ -17,7 +17,6 @@
 *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
 ***************************************************************************/
 #include "stdafx.h"
-#include "chext.h"
 #include <comutil.h>
 #include "ShellExtControl.h"
 #include "../common/version.h"
@@ -25,9 +24,7 @@
 #include "../libchcore/TIpcMutexLock.h"
 
 CShellExtControl::CShellExtControl() :
-	m_hMemory(nullptr),
 	m_mutex(L"CHShellExtControlDataMutex"),
-	m_pShellExtData(nullptr),
 	m_spLog(GetLogger(L"ShellExtControl"))
 {
 	LOG_DEBUG(m_spLog) << L"Constructing CShellExtControl";
@@ -42,6 +39,40 @@ CShellExtControl::~CShellExtControl()
 		// Close the process's handle to the file-mapping object.
 		CloseHandle(m_hMemory); 
 	}
+}
+
+STDMETHODIMP CShellExtControl::QueryInterface(REFIID riid, LPVOID FAR *ppvObject)
+{
+	if (!ppvObject)
+		return E_POINTER;
+
+	*ppvObject = nullptr;
+
+	if (IsEqualIID(riid, IID_IUnknown))
+		*ppvObject = static_cast<IUnknown*>(this);
+	else if (IsEqualIID(riid, IID_IShellExtControl))
+		*ppvObject = static_cast<IShellExtControl*>(this);
+	else
+		return E_NOINTERFACE;
+
+	AddRef();
+	return S_OK;
+}
+
+STDMETHODIMP_(ULONG) CShellExtControl::AddRef()
+{
+	return InterlockedIncrement(&m_ulRefCnt);
+}
+
+STDMETHODIMP_(ULONG) CShellExtControl::Release()
+{
+	ULONG ulNewValue = InterlockedDecrement(&m_ulRefCnt);
+	if (ulNewValue)
+		return ulNewValue;
+
+	delete this;
+
+	return 0UL;
 }
 
 STDMETHODIMP CShellExtControl::GetVersion(LONG* plVersion, BSTR* pbstrVersion)

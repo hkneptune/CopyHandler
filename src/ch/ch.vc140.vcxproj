@@ -518,6 +518,7 @@
   <ItemGroup>
     <ClInclude Include="..\Common\ipcstructs.h" />
     <ClInclude Include="..\common\targetver.h" />
+    <ClInclude Include="..\common\TRegistry.h" />
     <ClInclude Include="..\common\TShellExtIpcConfigDataProvider.h" />
     <ClInclude Include="..\common\TShellExtMenuConfig.h" />
     <ClInclude Include="..\common\version.h" />
@@ -538,7 +539,6 @@
     <ClInclude Include="TPathProcessor.h" />
     <ClInclude Include="TProgressCtrlEx.h" />
     <ClInclude Include="TRecentPathsTools.h" />
-    <ClInclude Include="TRegistry.h" />
     <ClInclude Include="TShellExtensionConfig.h" />
     <ClInclude Include="TTaskManagerWrapper.h" />
     <ClInclude Include="TWindowMessageFilterHelper.h" />
@@ -773,6 +773,7 @@ makehm /h IDC_,IDH_,0x00000 "%(Filename)%(Extension)" &gt;&gt; "help\HTMLDefines
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Testing Debug|x64'">NotUsing</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="..\common\TRegistry.cpp" />
     <ClCompile Include="..\common\TShellExtIpcConfigDataProvider.cpp" />
     <ClCompile Include="..\common\TShellExtMenuConfig.cpp" />
     <ClCompile Include="AsyncHttpFile.cpp" />
@@ -791,7 +792,6 @@ makehm /h IDC_,IDH_,0x00000 "%(Filename)%(Extension)" &gt;&gt; "help\HTMLDefines
     <ClCompile Include="TPathProcessor.cpp" />
     <ClCompile Include="TProgressCtrlEx.cpp" />
     <ClCompile Include="TRecentPathsTools.cpp" />
-    <ClCompile Include="TRegistry.cpp" />
     <ClCompile Include="TShellExtensionConfig.cpp" />
     <ClCompile Include="TTaskManagerWrapper.cpp" />
     <ClCompile Include="TWindowMessageFilterHelper.cpp" />
@@ -837,24 +837,6 @@ makehm /h IDC_,IDH_,0x00000 "%(Filename)%(Extension)" &gt;&gt; "help\HTMLDefines
     <ClCompile Include="UpdateMultipleVersionInfo.cpp" />
     <ClCompile Include="UpdaterDlg.cpp" />
     <ClCompile Include="TShellExtensionClient.cpp" />
-    <ClCompile Include="..\chext\chext_i.c">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-      </PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Testing Debug|Win32'">
-      </PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-      </PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Testing Debug|x64'">
-      </PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-      </PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Testing Release|Win32'">
-      </PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-      </PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Testing Release|x64'">
-      </PrecompiledHeader>
-    </ClCompile>
     <ClCompile Include="UpdateResponse.cpp" />
     <ClCompile Include="UpdateVersionInfo.cpp" />
     <ClCompile Include="WindowsVersion.cpp" />

@@ -1,5 +1,5 @@
 // ============================================================================
-//  Copyright (C) 2001-2015 by Jozef Starosczyk
+//  Copyright (C) 2001-2019 by Jozef Starosczyk
 //  ixen@copyhandler.com
 //
 //  This program is free software; you can redistribute it and/or modify
@@ -16,19 +16,31 @@
 //  Free Software Foundation, Inc.,
 //  59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // ============================================================================
-#ifndef __SHELLEXTENSIONVERIFIER_H__
-#define __SHELLEXTENSIONVERIFIER_H__
 
-#include "IShellExtControl.h"
+#pragma once
 
-class TShellExtMenuConfig;
-
-class ShellExtensionVerifier
+class DllRegistration
 {
 public:
-	static HWND VerifyShellExt(IShellExtControl* piShellExtControl);
-	static HRESULT IsShellExtEnabled(IShellExtControl* piShellExtControl);
-	static HRESULT ReadShellConfig(IShellExtControl* piShellExtControl, TShellExtMenuConfig& tShellExtConfig);
-};
+	DllRegistration(HMODULE hModule);
 
-#endif
+	void RegisterAll();
+	void UnregisterAll();
+
+	void RegisterMenuExt();
+	void RegisterDropMenuExt();
+	void RegisterShellExtensionControl();
+
+	void UnregisterMenuExt();
+	void UnregisterDropMenuExt();
+	void UnregisterShellExtensionControl();
+
+	void RemoveLegacyEntries();
+
+private:
+	void RegisterClass(std::wstring strClsId, std::wstring strClassDescription, std::wstring strThreadingModel);
+	void UnregisterClass(std::wstring strClsId);
+
+private:
+	std::wstring m_strModulePath;
+};

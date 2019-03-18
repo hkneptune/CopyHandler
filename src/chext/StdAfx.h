@@ -24,25 +24,14 @@
 
 #include "../common/targetver.h"
 
-#define _ATL_APARTMENT_THREADED
-
-#include <comsvcs.h>
+#include <tchar.h>
 
 #include "resource.h"
-#include <atlbase.h>
-#include <atlcom.h>
-#include <atlctl.h>
 #include <ShlObj.h>
-#include <comdef.h>
 
 #include <vector>
 #include <set>
 
-#pragma warning(push)
-#pragma warning(disable: 4985)
-
 #include <boost/thread/shared_mutex.hpp>
-
-#pragma warning(pop)
 
 #endif

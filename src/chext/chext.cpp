@@ -16,23 +16,41 @@
 *   Free Software Foundation, Inc.,                                       *
 *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
 ***************************************************************************/
-// Note: Proxy/Stub Information
-//      To build a separate proxy/stub DLL, 
-//      run nmake -f CopyHandlerShellExtps.mk in the project directory.
-
 #include "stdafx.h"
-#include "chext.h"
-#include "dllmain.h"
 #include "Logger.h"
+#include "guids.h"
+#include "MenuExtClassFactory.h"
+#include "DropMenuExtClassFactory.h"
+#include "ShellExtControlClassFactory.h"
+#include "../common/TRegistry.h"
+#include "DllRegistration.h"
+
+LONG g_DllRefCount = 0; // Reference count of this DLL.
+extern HINSTANCE g_hInstance;
+
+namespace
+{
+	template<class T>
+	HRESULT CreateFactory(REFIID riid, LPVOID* ppv)
+	{
+		auto classFactory = new (std::nothrow) T;
+		if (!classFactory)
+			return E_OUTOFMEMORY;
+
+		HRESULT hResult = classFactory->QueryInterface(riid, ppv);
+		if (hResult != S_OK)
+			delete classFactory;
+
+		return hResult;
+	}
+}
 
 /////////////////////////////////////////////////////////////////////////////
 // Used to determine whether the DLL can be unloaded by OLE
 
 STDAPI DllCanUnloadNow()
 {
-	HRESULT hResult = _AtlModule.DllCanUnloadNow();
-
-	return hResult;
+	return (g_DllRefCount == 0 ? S_OK : S_FALSE);
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -40,9 +58,27 @@ STDAPI DllCanUnloadNow()
 
 STDAPI DllGetClassObject(REFCLSID rclsid, REFIID riid, LPVOID* ppv)
 {
-	HRESULT hResult = _AtlModule.DllGetClassObject(rclsid, riid, ppv);
+	if (!ppv)
+		return E_POINTER;
 
-	return hResult;
+	*ppv = nullptr;
+
+	try
+	{
+		if (IsEqualIID(rclsid, CLSID_MenuExt))
+			return CreateFactory<MenuExtClassFactory>(riid, ppv);
+		else if (IsEqualIID(rclsid, CLSID_DropMenuExt))
+			return CreateFactory<DropMenuExtClassFactory>(riid, ppv);
+		else if (IsEqualIID(rclsid, CLSID_CShellExtControl))
+			return CreateFactory<ShellExtControlClassFactory>(riid, ppv);
+	}
+	catch (const std::exception& e)
+	{
+		OutputDebugStringA(e.what());
+		return E_FAIL;
+	}
+
+	return CLASS_E_CLASSNOTAVAILABLE;
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -50,10 +86,19 @@ STDAPI DllGetClassObject(REFCLSID rclsid, REFIID riid, LPVOID* ppv)
 
 STDAPI DllRegisterServer()
 {
-	// registers object, typelib and all interfaces in typelib
-	HRESULT hResult = _AtlModule.DllRegisterServer();
+	try
+	{
+		DllRegistration regDll(g_hInstance);
 
-	return hResult;
+		regDll.RegisterAll();
+	}
+	catch (const std::exception& e)
+	{
+		OutputDebugStringA(e.what());
+		return E_FAIL;
+	}
+
+	return S_OK;
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -61,32 +106,16 @@ STDAPI DllRegisterServer()
 
 STDAPI DllUnregisterServer()
 {
-	HRESULT hResult = _AtlModule.DllUnregisterServer();
-
-	return hResult;
-}
-
-// DllInstall - Adds/Removes entries to the system registry per user
-//              per machine.	
-STDAPI DllInstall(BOOL bInstall, LPCWSTR pszCmdLine)
-{
-	static const wchar_t szUserSwitch[] = _T("user");
-
-	if (pszCmdLine != nullptr)
+	try
 	{
-		if (_wcsnicmp(pszCmdLine, szUserSwitch, _countof(szUserSwitch)) == 0)
-			AtlSetPerUserRegistration(true);
+		DllRegistration regDll(g_hInstance);
+		regDll.UnregisterAll();
+	}
+	catch (const std::exception& e)
+	{
+		OutputDebugStringA(e.what());
+		return E_FAIL;
 	}
 
-	HRESULT hResult = E_FAIL;
-	if (bInstall)
-	{
-		hResult = DllRegisterServer();
-		if (FAILED(hResult))
-			DllUnregisterServer();
-	}
-	else
-		hResult = DllUnregisterServer();
-
-	return hResult;
+	return S_OK;
 }

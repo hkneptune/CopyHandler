@@ -1,5 +1,5 @@
 // ============================================================================
-//  Copyright (C) 2001-2015 by Jozef Starosczyk
+//  Copyright (C) 2001-2019 by Jozef Starosczyk
 //  ixen@copyhandler.com
 //
 //  This program is free software; you can redistribute it and/or modify
@@ -16,19 +16,12 @@
 //  Free Software Foundation, Inc.,
 //  59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // ============================================================================
-#ifndef __SHELLEXTENSIONVERIFIER_H__
-#define __SHELLEXTENSIONVERIFIER_H__
+#pragma once
 
-#include "IShellExtControl.h"
+#include "ClassFactory.h"
 
-class TShellExtMenuConfig;
-
-class ShellExtensionVerifier
+class MenuExtClassFactory : public ClassFactory
 {
 public:
-	static HWND VerifyShellExt(IShellExtControl* piShellExtControl);
-	static HRESULT IsShellExtEnabled(IShellExtControl* piShellExtControl);
-	static HRESULT ReadShellConfig(IShellExtControl* piShellExtControl, TShellExtMenuConfig& tShellExtConfig);
+	STDMETHODIMP CreateInstance(LPUNKNOWN, REFIID, LPVOID*) override;
 };
-
-#endif

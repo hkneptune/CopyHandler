@@ -214,7 +214,7 @@
     <Link>
       <RegisterOutput>false</RegisterOutput>
       <AdditionalDependencies>comctl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <ModuleDefinitionFile>chext32.def</ModuleDefinitionFile>
+      <ModuleDefinitionFile>chext.def</ModuleDefinitionFile>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>
       <TargetMachine>MachineX86</TargetMachine>
@@ -250,7 +250,7 @@
     <Link>
       <RegisterOutput>false</RegisterOutput>
       <AdditionalDependencies>comctl32.lib;gmock32d.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <ModuleDefinitionFile>chext32.def</ModuleDefinitionFile>
+      <ModuleDefinitionFile>chext.def</ModuleDefinitionFile>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>
       <TargetMachine>MachineX86</TargetMachine>
@@ -301,7 +301,7 @@ goto end
     <Link>
       <RegisterOutput>false</RegisterOutput>
       <AdditionalDependencies>comctl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <ModuleDefinitionFile>chext64.def</ModuleDefinitionFile>
+      <ModuleDefinitionFile>chext.def</ModuleDefinitionFile>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>
       <TargetMachine>MachineX64</TargetMachine>
@@ -338,7 +338,7 @@ goto end
     <Link>
       <RegisterOutput>false</RegisterOutput>
       <AdditionalDependencies>comctl32.lib;gmock64d.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <ModuleDefinitionFile>chext64.def</ModuleDefinitionFile>
+      <ModuleDefinitionFile>chext.def</ModuleDefinitionFile>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>
       <TargetMachine>MachineX64</TargetMachine>
@@ -389,7 +389,7 @@ goto end
     <Link>
       <RegisterOutput>false</RegisterOutput>
       <AdditionalDependencies>comctl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <ModuleDefinitionFile>chext32.def</ModuleDefinitionFile>
+      <ModuleDefinitionFile>chext.def</ModuleDefinitionFile>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>
       <TargetMachine>MachineX86</TargetMachine>
@@ -426,7 +426,7 @@ goto end
     <Link>
       <RegisterOutput>false</RegisterOutput>
       <AdditionalDependencies>comctl32.lib;gmock32.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <ModuleDefinitionFile>chext32.def</ModuleDefinitionFile>
+      <ModuleDefinitionFile>chext.def</ModuleDefinitionFile>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>
       <TargetMachine>MachineX86</TargetMachine>
@@ -477,7 +477,7 @@ goto end
     <Link>
       <RegisterOutput>false</RegisterOutput>
       <AdditionalDependencies>comctl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <ModuleDefinitionFile>chext64.def</ModuleDefinitionFile>
+      <ModuleDefinitionFile>chext.def</ModuleDefinitionFile>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>
       <TargetMachine>MachineX64</TargetMachine>
@@ -514,7 +514,7 @@ goto end
     <Link>
       <RegisterOutput>false</RegisterOutput>
       <AdditionalDependencies>comctl32.lib;gmock64.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <ModuleDefinitionFile>chext64.def</ModuleDefinitionFile>
+      <ModuleDefinitionFile>chext.def</ModuleDefinitionFile>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>
       <TargetMachine>MachineX64</TargetMachine>
@@ -553,12 +553,18 @@ goto end
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Testing Debug|x64'">NotUsing</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="..\common\TRegistry.cpp" />
     <ClCompile Include="..\common\TShellExtIpcConfigDataConsumer.cpp" />
+    <ClCompile Include="ClassFactory.cpp" />
+    <ClCompile Include="DllRegistration.cpp" />
+    <ClCompile Include="DropMenuExtClassFactory.cpp" />
+    <ClCompile Include="MenuExtClassFactory.cpp" />
     <ClCompile Include="DropMenuExt.cpp" />
     <ClCompile Include="GuidFormatter.cpp" />
     <ClCompile Include="HResultFormatter.cpp" />
     <ClCompile Include="MenuExt.cpp" />
     <ClCompile Include="ShellExtControl.cpp" />
+    <ClCompile Include="ShellExtControlClassFactory.cpp" />
     <ClCompile Include="ShellExtensionVerifier.cpp" />
     <ClCompile Include="ShellPathsHelpers.cpp" />
     <ClCompile Include="TContextMenuHandler.cpp" />
@@ -577,32 +583,22 @@ goto end
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Testing Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="chext_i.c">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-      </PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Testing Debug|Win32'">
-      </PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-      </PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Testing Debug|x64'">
-      </PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-      </PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Testing Release|Win32'">
-      </PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-      </PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Testing Release|x64'">
-      </PrecompiledHeader>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\common\TRegistry.h" />
     <ClInclude Include="..\common\TShellExtIpcConfigDataConsumer.h" />
+    <ClInclude Include="ClassFactory.h" />
+    <ClInclude Include="DllRegistration.h" />
+    <ClInclude Include="DropMenuExtClassFactory.h" />
+    <ClInclude Include="guids.h" />
+    <ClInclude Include="IShellExtControl.h" />
+    <ClInclude Include="MenuExtClassFactory.h" />
     <ClInclude Include="DropMenuExt.h" />
     <ClInclude Include="GuidFormatter.h" />
     <ClInclude Include="HResultFormatter.h" />
     <ClInclude Include="MenuExt.h" />
     <ClInclude Include="ShellExtControl.h" />
+    <ClInclude Include="ShellExtControlClassFactory.h" />
     <ClInclude Include="ShellExtensionVerifier.h" />
     <ClInclude Include="ShellPathsHelpers.h" />
     <ClInclude Include="TContextMenuHandler.h" />
@@ -610,7 +606,6 @@ goto end
     <ClInclude Include="TShellExtData.h" />
     <ClInclude Include="..\common\ipcstructs.h" />
     <ClInclude Include="..\common\TShellExtMenuConfig.h" />
-    <ClInclude Include="dllmain.h" />
     <ClInclude Include="StdAfx.h" />
     <ClInclude Include="..\common\targetver.h" />
     <ClInclude Include="resource.h" />
@@ -620,42 +615,6 @@ goto end
     <None Include="DropMenuExt.rgs" />
     <None Include="MenuExt.rgs" />
     <None Include="ShellExtControl.rgs" />
-  </ItemGroup>
-  <ItemGroup>
-    <Midl Include="chext.idl">
-      <GenerateStublessProxies Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</GenerateStublessProxies>
-      <GenerateStublessProxies Condition="'$(Configuration)|$(Platform)'=='Testing Debug|Win32'">true</GenerateStublessProxies>
-      <TypeLibraryName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">.\chext.tlb</TypeLibraryName>
-      <TypeLibraryName Condition="'$(Configuration)|$(Platform)'=='Testing Debug|Win32'">.\chext.tlb</TypeLibraryName>
-      <HeaderFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">chext.h</HeaderFileName>
-      <HeaderFileName Condition="'$(Configuration)|$(Platform)'=='Testing Debug|Win32'">chext.h</HeaderFileName>
-      <InterfaceIdentifierFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">chext_i.c</InterfaceIdentifierFileName>
-      <InterfaceIdentifierFileName Condition="'$(Configuration)|$(Platform)'=='Testing Debug|Win32'">chext_i.c</InterfaceIdentifierFileName>
-      <GenerateStublessProxies Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</GenerateStublessProxies>
-      <GenerateStublessProxies Condition="'$(Configuration)|$(Platform)'=='Testing Debug|x64'">true</GenerateStublessProxies>
-      <TypeLibraryName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\chext.tlb</TypeLibraryName>
-      <TypeLibraryName Condition="'$(Configuration)|$(Platform)'=='Testing Debug|x64'">.\chext.tlb</TypeLibraryName>
-      <HeaderFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">chext.h</HeaderFileName>
-      <HeaderFileName Condition="'$(Configuration)|$(Platform)'=='Testing Debug|x64'">chext.h</HeaderFileName>
-      <InterfaceIdentifierFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">chext_i.c</InterfaceIdentifierFileName>
-      <InterfaceIdentifierFileName Condition="'$(Configuration)|$(Platform)'=='Testing Debug|x64'">chext_i.c</InterfaceIdentifierFileName>
-      <GenerateStublessProxies Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</GenerateStublessProxies>
-      <GenerateStublessProxies Condition="'$(Configuration)|$(Platform)'=='Testing Release|Win32'">true</GenerateStublessProxies>
-      <TypeLibraryName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">.\chext.tlb</TypeLibraryName>
-      <TypeLibraryName Condition="'$(Configuration)|$(Platform)'=='Testing Release|Win32'">.\chext.tlb</TypeLibraryName>
-      <HeaderFileName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">chext.h</HeaderFileName>
-      <HeaderFileName Condition="'$(Configuration)|$(Platform)'=='Testing Release|Win32'">chext.h</HeaderFileName>
-      <InterfaceIdentifierFileName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">chext_i.c</InterfaceIdentifierFileName>
-      <InterfaceIdentifierFileName Condition="'$(Configuration)|$(Platform)'=='Testing Release|Win32'">chext_i.c</InterfaceIdentifierFileName>
-      <GenerateStublessProxies Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</GenerateStublessProxies>
-      <GenerateStublessProxies Condition="'$(Configuration)|$(Platform)'=='Testing Release|x64'">true</GenerateStublessProxies>
-      <TypeLibraryName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\chext.tlb</TypeLibraryName>
-      <TypeLibraryName Condition="'$(Configuration)|$(Platform)'=='Testing Release|x64'">.\chext.tlb</TypeLibraryName>
-      <HeaderFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">chext.h</HeaderFileName>
-      <HeaderFileName Condition="'$(Configuration)|$(Platform)'=='Testing Release|x64'">chext.h</HeaderFileName>
-      <InterfaceIdentifierFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">chext_i.c</InterfaceIdentifierFileName>
-      <InterfaceIdentifierFileName Condition="'$(Configuration)|$(Platform)'=='Testing Release|x64'">chext_i.c</InterfaceIdentifierFileName>
-    </Midl>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="chext.rc" />

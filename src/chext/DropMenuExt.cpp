@@ -17,7 +17,6 @@
 *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
 ***************************************************************************/
 #include "stdafx.h"
-#include "chext.h"
 #include "DropMenuExt.h"
 #include "../Common/ipcstructs.h"
 #include "../libchengine/TTaskDefinition.h"
@@ -46,6 +45,44 @@ CDropMenuExt::~CDropMenuExt()
 		m_piShellExtControl->Release();
 		m_piShellExtControl = nullptr;
 	}
+}
+
+STDMETHODIMP CDropMenuExt::QueryInterface(REFIID riid, LPVOID FAR *ppvObject)
+{
+	if (!ppvObject)
+		return E_POINTER;
+
+	*ppvObject = nullptr;
+
+	if (IsEqualIID(riid, IID_IShellExtInit) || IsEqualIID(riid, IID_IUnknown))
+		*ppvObject = static_cast<IShellExtInit*>(this);
+	else if (IsEqualIID(riid, IID_IContextMenu))
+		*ppvObject = static_cast<IContextMenu*>(this);
+	else if (IsEqualIID(riid, IID_IContextMenu2))
+		*ppvObject = static_cast<IContextMenu2*>(this);
+	else if (IsEqualIID(riid, IID_IContextMenu3))
+		*ppvObject = static_cast<IContextMenu3*>(this);
+	else
+		return E_NOINTERFACE;
+
+	AddRef();
+	return S_OK;
+}
+
+STDMETHODIMP_(ULONG) CDropMenuExt::AddRef()
+{
+	return InterlockedIncrement(&m_ulRefCnt);
+}
+
+STDMETHODIMP_(ULONG) CDropMenuExt::Release()
+{
+	ULONG ulNewValue = InterlockedDecrement(&m_ulRefCnt);
+	if (ulNewValue)
+		return ulNewValue;
+
+	delete this;
+
+	return 0UL;
 }
 
 STDMETHODIMP CDropMenuExt::Initialize(LPCITEMIDLIST pidlFolder, IDataObject* piDataObject, HKEY /*hkeyProgID*/)

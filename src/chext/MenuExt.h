@@ -24,14 +24,13 @@
 #include "../common/TShellExtMenuConfig.h"
 #include "TShellExtData.h"
 #include "../liblogger/TLogger.h"
+#include "ShellExtControl.h"
 
 class TShellMenuItem;
 
 /////////////////////////////////////////////////////////////////////////////
 // CMenuExt
-class ATL_NO_VTABLE CMenuExt : 
-	public CComObjectRootEx<CComSingleThreadModel>,
-	public CComCoClass<CMenuExt, &CLSID_MenuExt>,
+class CMenuExt :
 	public IShellExtInit,
 	public IContextMenu3
 {
@@ -39,20 +38,12 @@ public:
 	CMenuExt();
 	~CMenuExt();
 
-DECLARE_REGISTRY_RESOURCEID(IDR_MENUEXT)
-DECLARE_NOT_AGGREGATABLE(CMenuExt)
-
-DECLARE_PROTECT_FINAL_CONSTRUCT()
-
-BEGIN_COM_MAP(CMenuExt)
-	COM_INTERFACE_ENTRY(IShellExtInit)
-	COM_INTERFACE_ENTRY(IContextMenu)
-	COM_INTERFACE_ENTRY(IContextMenu2)
-	COM_INTERFACE_ENTRY(IContextMenu3)
-END_COM_MAP()
-
 // IMenuExt
 public:
+	STDMETHODIMP QueryInterface(REFIID, LPVOID FAR *) override;
+	STDMETHODIMP_(ULONG) AddRef() override;
+	STDMETHODIMP_(ULONG) Release() override;
+
 	STDMETHOD(Initialize)(LPCITEMIDLIST pidlFolder, IDataObject* piDataObject, HKEY /*hkeyProgID*/);
 	STDMETHOD(InvokeCommand)(LPCMINVOKECOMMANDINFO lpici);
 	STDMETHOD(GetCommandString)(UINT_PTR idCmd, UINT uFlags, UINT* /*pwReserved*/, LPSTR pszName, UINT cchMax);
@@ -64,6 +55,7 @@ protected:
 	HRESULT DrawMenuItem(LPDRAWITEMSTRUCT lpdis);
 
 private:
+	volatile ULONG m_ulRefCnt = 0;
 	TShellExtData m_tShellExtData;
 
 	TShellExtMenuConfig m_tShellExtMenuConfig;

@@ -203,9 +203,6 @@
     <ClInclude Include="WindowsVersion.h">
       <Filter>Source Files\Tools</Filter>
     </ClInclude>
-    <ClInclude Include="TRegistry.h">
-      <Filter>Source Files\Tools</Filter>
-    </ClInclude>
     <ClInclude Include="AsyncHttpFile.h">
       <Filter>Source Files\Tools</Filter>
     </ClInclude>
@@ -256,6 +253,9 @@
     </ClInclude>
     <ClInclude Include="FeedbackReplaceDlg.h">
       <Filter>Source Files\GUI\Dialogs\Feedback</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\TRegistry.h">
+      <Filter>Source Files\Shared</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -361,9 +361,6 @@
     <ClCompile Include="TShellExtensionClient.cpp">
       <Filter>Source Files\Shell Extension</Filter>
     </ClCompile>
-    <ClCompile Include="..\chext\chext_i.c">
-      <Filter>Generated Files</Filter>
-    </ClCompile>
     <ClCompile Include="TProgressCtrlEx.cpp">
       <Filter>Source Files\GUI\Controls</Filter>
     </ClCompile>
@@ -383,9 +380,6 @@
       <Filter>Source Files\Core</Filter>
     </ClCompile>
     <ClCompile Include="WindowsVersion.cpp">
-      <Filter>Source Files\Tools</Filter>
-    </ClCompile>
-    <ClCompile Include="TRegistry.cpp">
       <Filter>Source Files\Tools</Filter>
     </ClCompile>
     <ClCompile Include="AsyncHttpFile.cpp">
@@ -438,6 +432,9 @@
     </ClCompile>
     <ClCompile Include="FeedbackReplaceDlg.cpp">
       <Filter>Source Files\GUI\Dialogs\Feedback</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\TRegistry.cpp">
+      <Filter>Source Files\Shared</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

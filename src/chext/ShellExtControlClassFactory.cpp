@@ -1,5 +1,5 @@
 // ============================================================================
-//  Copyright (C) 2001-2015 by Jozef Starosczyk
+//  Copyright (C) 2001-2019 by Jozef Starosczyk
 //  ixen@copyhandler.com
 //
 //  This program is free software; you can redistribute it and/or modify
@@ -16,19 +16,26 @@
 //  Free Software Foundation, Inc.,
 //  59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // ============================================================================
-#ifndef __SHELLEXTENSIONVERIFIER_H__
-#define __SHELLEXTENSIONVERIFIER_H__
+#include "stdafx.h"
+#include "ShellExtControlClassFactory.h"
+#include "ShellExtControl.h"
+#include <new.h>
 
-#include "IShellExtControl.h"
-
-class TShellExtMenuConfig;
-
-class ShellExtensionVerifier
+STDMETHODIMP ShellExtControlClassFactory::CreateInstance(LPUNKNOWN pUnknown, REFIID riid, LPVOID *ppObject)
 {
-public:
-	static HWND VerifyShellExt(IShellExtControl* piShellExtControl);
-	static HRESULT IsShellExtEnabled(IShellExtControl* piShellExtControl);
-	static HRESULT ReadShellConfig(IShellExtControl* piShellExtControl, TShellExtMenuConfig& tShellExtConfig);
-};
+	if (!ppObject)
+		return E_POINTER;
 
-#endif
+	*ppObject = nullptr;
+	if (pUnknown != nullptr)
+		return CLASS_E_NOAGGREGATION;
+
+	auto pShellExtControl = new (std::nothrow) CShellExtControl();
+	if (!pShellExtControl)
+		return E_OUTOFMEMORY;
+
+	const HRESULT hr = pShellExtControl->QueryInterface(riid, ppObject);
+	if (FAILED(hr))
+		delete pShellExtControl;
+	return hr;
+}
