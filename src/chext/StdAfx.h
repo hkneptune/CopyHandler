@@ -28,6 +28,7 @@
 
 #include "resource.h"
 #include <ShlObj.h>
+#include <comdef.h>
 
 #include <vector>
 #include <set>
