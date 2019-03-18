@@ -19,6 +19,7 @@
 #include "stdafx.h"
 #include "TRegistry.h"
 #include <Shlwapi.h>
+#include <boost/numeric/conversion/cast.hpp>
 
 TRegistry::TRegistry(HKEY key, const wchar_t* pszKey, bool bReadOnly)
 {
