@@ -17,12 +17,12 @@ public:
 	MOCK_METHOD5(SetFileDirBasicInfo, void(const TSmartPath& pathFileDir, DWORD dwAttributes, const TFileTime& ftCreationTime, const TFileTime& ftLastAccessTime, const TFileTime& ftLastWriteTime));
 	MOCK_METHOD2(SetAttributes, void(const TSmartPath& pathFileDir, DWORD dwAttributes));
 
-	MOCK_METHOD2(CreateDirectory, void(const TSmartPath& pathDirectory, bool bCreateFullPath));
+	MOCK_METHOD2(CreateDirectory, void(const TSmartPath&, bool));
 	MOCK_METHOD1(RemoveDirectory, void(const TSmartPath& pathFile));
 	MOCK_METHOD1(DeleteFile, void(const TSmartPath& pathFile));
 
 	MOCK_METHOD3(GetFileInfo, void(const TSmartPath& pathFile, TFileInfoPtr& rFileInfo, const TBasePathDataPtr& spBasePathData));
-	MOCK_METHOD2(FastMove, void(const TSmartPath& pathSource, const TSmartPath& pathDestination));
+	MOCK_METHOD2(FastMove, void(const TSmartPath&, const TSmartPath&));
 
 	MOCK_METHOD2(CreateFinderObject, IFilesystemFindPtr(const TSmartPath& pathDir, const TSmartPath& pathMask));
 	MOCK_METHOD4(CreateFileObject, IFilesystemFilePtr(IFilesystemFile::EOpenMode eMode, const TSmartPath& pathFile, bool bNoBuffering, bool bProtectReadOnlyFiles));

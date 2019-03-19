@@ -48,13 +48,13 @@ namespace string
 		TString(const wchar_t* pszStart, size_t stCount);
 
 		TString(const TString& str);
-		TString(TString&& str);
+		TString(TString&& str) noexcept;
 
 		~TString();
 
 		// assignment
 		TString& operator=(const TString& src);
-		TString& operator=(TString&& src);
+		TString& operator=(TString&& src) noexcept;
 
 		const TString& operator=(const wchar_t* pszSrc);
 

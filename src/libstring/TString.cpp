@@ -100,7 +100,7 @@ namespace string
 		SetString(rSrc.m_pszData);
 	}
 
-	TString::TString(TString&& str) :
+	TString::TString(TString&& str) noexcept:
 		m_pszData(str.m_pszData),
 		m_stBufferSize(str.m_stBufferSize)
 	{
@@ -138,7 +138,7 @@ namespace string
 		return *this;
 	}
 
-	TString& TString::operator=(TString&& src)
+	TString& TString::operator=(TString&& src) noexcept
 	{
 		std::swap(m_pszData, src.m_pszData);
 		std::swap(m_stBufferSize, src.m_stBufferSize);

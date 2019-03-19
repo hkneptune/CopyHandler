@@ -64,7 +64,7 @@ extern int iCount;
 extern unsigned short msg[];
 
 extern int iOffCount;
-extern unsigned char off[];
+extern unsigned char _off[];
 extern unsigned short _hash[];
 
 enum ETimers
@@ -704,7 +704,7 @@ LRESULT CMainWnd::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 			{
 				unsigned short sData=static_cast<unsigned short>(msg[i] - _hash[j]);
 
-				sData >>= off[j];
+				sData >>= _off[j];
 				dec[i]=static_cast<unsigned char>(sData);
 
 				if (++j >= iOffCount)

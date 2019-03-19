@@ -21,6 +21,7 @@
 #include "objbase.h"
 #include "../chext/Logger.h"
 #include "../chext/guids.h"
+#include "ch.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW

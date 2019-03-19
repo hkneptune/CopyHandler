@@ -31,7 +31,7 @@ namespace logger
 	public:
 		TLogRecord(const TLogFileDataPtr& spFileData, ESeverityLevel eLevel, const std::wstring& wstrChannel);
 		TLogRecord(const TLogRecord&) = delete;
-		TLogRecord(TLogRecord&& rSrc);
+		TLogRecord(TLogRecord&& rSrc) noexcept;
 
 		TLogRecord& operator=(const TLogRecord&) = delete;
 		TLogRecord& operator=(TLogRecord&&) = delete;
@@ -46,7 +46,7 @@ namespace logger
 		bool m_bEnabled = true;
 	};
 
-	inline TLogRecord::TLogRecord(TLogRecord&& rSrc) :
+	inline TLogRecord::TLogRecord(TLogRecord&& rSrc) noexcept:
 		std::wstringstream(std::move(rSrc)),
 		m_spFileData(std::move(rSrc.m_spFileData))
 	{

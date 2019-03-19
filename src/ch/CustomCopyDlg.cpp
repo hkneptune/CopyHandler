@@ -755,11 +755,11 @@ void CCustomCopyDlg::OnDblclkFiltersList(NMHDR* /*pNMHDR*/, LRESULT* pResult)
 		
 		for(size_t stIndex = 0; stIndex < afFilters.GetCount(); ++stIndex)
 		{
-			const chengine::TFileFilter& rFilter = afFilters.GetAt(stIndex);
-			if(rFilter.GetUseMask() && boost::numeric_cast<int>(stIndex) != iItem)
-				dlg.m_astrAddMask.Add(rFilter.GetCombinedMask().c_str());
-			if (rFilter.GetUseExcludeMask() && boost::numeric_cast<int>(stIndex) != iItem)
-				dlg.m_astrAddExcludeMask.Add(rFilter.GetCombinedExcludeMask().c_str());
+			const chengine::TFileFilter& rLoopFilter = afFilters.GetAt(stIndex);
+			if(rLoopFilter.GetUseMask() && boost::numeric_cast<int>(stIndex) != iItem)
+				dlg.m_astrAddMask.Add(rLoopFilter.GetCombinedMask().c_str());
+			if (rLoopFilter.GetUseExcludeMask() && boost::numeric_cast<int>(stIndex) != iItem)
+				dlg.m_astrAddExcludeMask.Add(rLoopFilter.GetCombinedExcludeMask().c_str());
 		}
 
 		if (dlg.DoModal() == IDOK)

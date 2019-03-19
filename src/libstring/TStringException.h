@@ -23,11 +23,14 @@
 
 namespace string
 {
+#pragma warning(push)
+#pragma warning(disable: 4275)
 	class LIBSTRING_API TStringException : public std::exception
 	{
 	public:
 		explicit TStringException(const char* pszMsg);
 	};
+#pragma warning(pop)
 }
 
 #endif

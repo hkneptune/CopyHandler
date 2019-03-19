@@ -39,53 +39,54 @@
     <ProjectGuid>{4B215B9A-58CA-4987-AC95-7DFC3043E100}</ProjectGuid>
     <RootNamespace>ch</RootNamespace>
     <Keyword>MFCProj</Keyword>
+    <WindowsTargetPlatformVersion>7.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
-    <PlatformToolset>v120_xp</PlatformToolset>
+    <PlatformToolset>v141_xp</PlatformToolset>
     <UseOfMfc>Dynamic</UseOfMfc>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Testing Release|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
-    <PlatformToolset>v120_xp</PlatformToolset>
+    <PlatformToolset>v141_xp</PlatformToolset>
     <UseOfMfc>Dynamic</UseOfMfc>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
-    <PlatformToolset>v120_xp</PlatformToolset>
+    <PlatformToolset>v141_xp</PlatformToolset>
     <UseOfMfc>Dynamic</UseOfMfc>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Testing Debug|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
-    <PlatformToolset>v120_xp</PlatformToolset>
+    <PlatformToolset>v141_xp</PlatformToolset>
     <UseOfMfc>Dynamic</UseOfMfc>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
-    <PlatformToolset>v120_xp</PlatformToolset>
+    <PlatformToolset>v141_xp</PlatformToolset>
     <UseOfMfc>Dynamic</UseOfMfc>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Testing Release|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
-    <PlatformToolset>v120_xp</PlatformToolset>
+    <PlatformToolset>v141_xp</PlatformToolset>
     <UseOfMfc>Dynamic</UseOfMfc>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
-    <PlatformToolset>v120_xp</PlatformToolset>
+    <PlatformToolset>v141_xp</PlatformToolset>
     <UseOfMfc>Dynamic</UseOfMfc>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Testing Debug|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
-    <PlatformToolset>v120_xp</PlatformToolset>
+    <PlatformToolset>v141_xp</PlatformToolset>
     <UseOfMfc>Dynamic</UseOfMfc>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
@@ -176,6 +177,9 @@
     <LinkIncremental>false</LinkIncremental>
     <TargetName>$(ProjectName)64</TargetName>
   </PropertyGroup>
+  <PropertyGroup>
+    <XPDeprecationWarning>false</XPDeprecationWarning>
+  </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <Midl>
       <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -186,7 +190,7 @@
       <HeaderFileName />
     </Midl>
     <ClCompile>
-      <AdditionalOptions>/Zm150 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>/Zm150 /Zc:threadSafeInit- %(AdditionalOptions)</AdditionalOptions>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_CRT_SECURE_NO_DEPRECATE;_BIND_TO_CURRENT_VCLIBS_VERSION=1;_SCL_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
@@ -211,7 +215,6 @@
       <SubSystem>Windows</SubSystem>
       <TargetMachine>MachineX86</TargetMachine>
       <AdditionalLibraryDirectories>"$(OutDir)"</AdditionalLibraryDirectories>
-      <ImageHasSafeExceptionHandlers>true</ImageHasSafeExceptionHandlers>
     </Link>
     <PostBuildEvent />
   </ItemDefinitionGroup>
@@ -226,7 +229,7 @@
       </HeaderFileName>
     </Midl>
     <ClCompile>
-      <AdditionalOptions>/Zm150 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>/Zm150 /Zc:threadSafeInit- %(AdditionalOptions)</AdditionalOptions>
       <Optimization>Disabled</Optimization>
       <AdditionalIncludeDirectories>..\..\ext\googletest\googletest\include;..\..\ext\googletest\googlemock\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_CRT_SECURE_NO_DEPRECATE;_BIND_TO_CURRENT_VCLIBS_VERSION=1;_SCL_SECURE_NO_WARNINGS;TESTING;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -252,7 +255,6 @@
       <SubSystem>Console</SubSystem>
       <TargetMachine>MachineX86</TargetMachine>
       <AdditionalLibraryDirectories>"$(OutDir)"</AdditionalLibraryDirectories>
-      <ImageHasSafeExceptionHandlers>true</ImageHasSafeExceptionHandlers>
     </Link>
     <PostBuildEvent>
       <Command>cd "$(TargetDir)"
@@ -270,7 +272,7 @@
       <HeaderFileName />
     </Midl>
     <ClCompile>
-      <AdditionalOptions>/Zm150 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>/Zm150 /Zc:threadSafeInit- %(AdditionalOptions)</AdditionalOptions>
       <Optimization>Disabled</Optimization>
       <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_CRT_SECURE_NO_DEPRECATE;_BIND_TO_CURRENT_VCLIBS_VERSION=1;_SCL_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -296,7 +298,6 @@
       <SubSystem>Windows</SubSystem>
       <TargetMachine>MachineX64</TargetMachine>
       <AdditionalLibraryDirectories>"$(OutDir)"</AdditionalLibraryDirectories>
-      <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
     </Link>
     <PostBuildEvent />
   </ItemDefinitionGroup>
@@ -311,7 +312,7 @@
       </HeaderFileName>
     </Midl>
     <ClCompile>
-      <AdditionalOptions>/Zm150 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>/Zm150 /Zc:threadSafeInit- %(AdditionalOptions)</AdditionalOptions>
       <Optimization>Disabled</Optimization>
       <AdditionalIncludeDirectories>..\..\ext\googletest\googletest\include;..\..\ext\googletest\googlemock\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_CRT_SECURE_NO_DEPRECATE;_BIND_TO_CURRENT_VCLIBS_VERSION=1;_SCL_SECURE_NO_WARNINGS;TESTING;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -337,7 +338,6 @@
       <SubSystem>Console</SubSystem>
       <TargetMachine>MachineX64</TargetMachine>
       <AdditionalLibraryDirectories>"$(OutDir)"</AdditionalLibraryDirectories>
-      <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
     </Link>
     <PostBuildEvent>
       <Command>cd "$(TargetDir)"
@@ -355,7 +355,7 @@
       <HeaderFileName />
     </Midl>
     <ClCompile>
-      <AdditionalOptions>/Zm150 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>/Zm150 /Zc:threadSafeInit- %(AdditionalOptions)</AdditionalOptions>
       <Optimization>MaxSpeed</Optimization>
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_CRT_SECURE_NO_DEPRECATE;_BIND_TO_CURRENT_VCLIBS_VERSION=1;_SCL_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -367,9 +367,9 @@
       <TreatWarningAsError>true</TreatWarningAsError>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <SDLCheck>true</SDLCheck>
-      <EnableEnhancedInstructionSet>NoExtensions</EnableEnhancedInstructionSet>
       <DisableSpecificWarnings>4714</DisableSpecificWarnings>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <EnableEnhancedInstructionSet>NoExtensions</EnableEnhancedInstructionSet>
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -381,7 +381,6 @@
       <SubSystem>Windows</SubSystem>
       <TargetMachine>MachineX86</TargetMachine>
       <AdditionalLibraryDirectories>"$(OutDir)"</AdditionalLibraryDirectories>
-      <ImageHasSafeExceptionHandlers>true</ImageHasSafeExceptionHandlers>
     </Link>
     <PostBuildEvent />
   </ItemDefinitionGroup>
@@ -396,7 +395,7 @@
       </HeaderFileName>
     </Midl>
     <ClCompile>
-      <AdditionalOptions>/Zm150 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>/Zm150 /Zc:threadSafeInit- %(AdditionalOptions)</AdditionalOptions>
       <Optimization>MaxSpeed</Optimization>
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
       <AdditionalIncludeDirectories>..\..\ext\googletest\googletest\include;..\..\ext\googletest\googlemock\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
@@ -423,7 +422,6 @@
       <SubSystem>Console</SubSystem>
       <TargetMachine>MachineX86</TargetMachine>
       <AdditionalLibraryDirectories>"$(OutDir)"</AdditionalLibraryDirectories>
-      <ImageHasSafeExceptionHandlers>true</ImageHasSafeExceptionHandlers>
     </Link>
     <PostBuildEvent>
       <Command>cd "$(TargetDir)"
@@ -441,7 +439,7 @@
       <HeaderFileName />
     </Midl>
     <ClCompile>
-      <AdditionalOptions>/Zm150 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>/Zm150 /Zc:threadSafeInit- %(AdditionalOptions)</AdditionalOptions>
       <Optimization>Disabled</Optimization>
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_CRT_SECURE_NO_DEPRECATE;_BIND_TO_CURRENT_VCLIBS_VERSION=1;_SCL_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -466,7 +464,6 @@
       <SubSystem>Windows</SubSystem>
       <TargetMachine>MachineX64</TargetMachine>
       <AdditionalLibraryDirectories>"$(OutDir)"</AdditionalLibraryDirectories>
-      <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
     </Link>
     <PostBuildEvent />
   </ItemDefinitionGroup>
@@ -481,7 +478,7 @@
       </HeaderFileName>
     </Midl>
     <ClCompile>
-      <AdditionalOptions>/Zm150 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>/Zm150 /Zc:threadSafeInit- %(AdditionalOptions)</AdditionalOptions>
       <Optimization>Disabled</Optimization>
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
       <AdditionalIncludeDirectories>..\..\ext\googletest\googletest\include;..\..\ext\googletest\googlemock\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
@@ -507,7 +504,6 @@
       <SubSystem>Console</SubSystem>
       <TargetMachine>MachineX64</TargetMachine>
       <AdditionalLibraryDirectories>"$(OutDir)"</AdditionalLibraryDirectories>
-      <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
     </Link>
     <PostBuildEvent>
       <Command>cd "$(TargetDir)"
@@ -845,11 +841,11 @@ makehm /h IDC_,IDH_,0x00000 "%(Filename)%(Extension)" &gt;&gt; "help\HTMLDefines
     <CustomBuild Include="ch.rc">
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Compiling resources %(FullPath)</Message>
       <Message Condition="'$(Configuration)|$(Platform)'=='Testing Debug|Win32'">Compiling resources %(FullPath)</Message>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">"$(SolutionDir)\tools\rc2lng.exe" "%(FullPath)" "$(InputDir)scripts\header.lng" "$(IntDir)\chtmp.rc" "$(OutDir)langs\english.lng" "$(InputDir)resource.h" "$(VCInstallDir)atlmfc\include\afxres.h"
-rc.exe /l 0x409 /d "NDEBUG" /d "_AFXDLL" /fo"$(OutDir)\%(Filename).res" "$(IntDir)\chtmp.rc"
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">"$(SolutionDir)tools\rc2lng.exe" "%(FullPath)" "$(InputDir)scripts\header.lng" "$(IntDir)chtmp.rc" "$(OutDir)langs\english.lng" "$(InputDir)resource.h" "$(VCToolsInstallDir)atlmfc\include\afxres.h"
+rc.exe /l 0x409 /d "NDEBUG" /d "_AFXDLL" /fo"$(OutDir)%(Filename).res" "$(IntDir)chtmp.rc"
 </Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Testing Debug|Win32'">"$(SolutionDir)\tools\rc2lng.exe" "%(FullPath)" "$(InputDir)scripts\header.lng" "$(IntDir)\chtmp.rc" "$(OutDir)langs\english.lng" "$(InputDir)resource.h" "$(VCInstallDir)atlmfc\include\afxres.h"
-rc.exe /l 0x409 /d "NDEBUG" /d "_AFXDLL" /fo"$(OutDir)\%(Filename).res" "$(IntDir)\chtmp.rc"
+      <Command Condition="'$(Configuration)|$(Platform)'=='Testing Debug|Win32'">"$(SolutionDir)tools\rc2lng.exe" "%(FullPath)" "$(InputDir)scripts\header.lng" "$(IntDir)chtmp.rc" "$(OutDir)langs\english.lng" "$(InputDir)resource.h" "$(VCToolsInstallDir)atlmfc\include\afxres.h"
+rc.exe /l 0x409 /d "NDEBUG" /d "_AFXDLL" /fo"$(OutDir)%(Filename).res" "$(IntDir)chtmp.rc"
 </Command>
       <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">res/ch.rc2;version.h</AdditionalInputs>
       <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Testing Debug|Win32'">res/ch.rc2;version.h</AdditionalInputs>
@@ -857,11 +853,11 @@ rc.exe /l 0x409 /d "NDEBUG" /d "_AFXDLL" /fo"$(OutDir)\%(Filename).res" "$(IntDi
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Testing Debug|Win32'">$(OutDir)%(Filename).res;%(Outputs)</Outputs>
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Compiling resources %(FullPath)</Message>
       <Message Condition="'$(Configuration)|$(Platform)'=='Testing Debug|x64'">Compiling resources %(FullPath)</Message>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">"$(SolutionDir)\tools\rc2lng.exe" "%(FullPath)" "$(InputDir)scripts\header.lng" "$(IntDir)\chtmp.rc" "$(OutDir)langs\english.lng" "$(InputDir)resource.h" "$(VCInstallDir)atlmfc\include\afxres.h"
-rc.exe /l 0x409 /d "NDEBUG" /d "_AFXDLL" /fo"$(OutDir)\%(Filename).res" "$(IntDir)\chtmp.rc"
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">"$(SolutionDir)tools\rc2lng.exe" "%(FullPath)" "$(InputDir)scripts\header.lng" "$(IntDir)chtmp.rc" "$(OutDir)langs\english.lng" "$(InputDir)resource.h" "$(VCToolsInstallDir)atlmfc\include\afxres.h"
+rc.exe /l 0x409 /d "NDEBUG" /d "_AFXDLL" /fo"$(OutDir)%(Filename).res" "$(IntDir)chtmp.rc"
 </Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Testing Debug|x64'">"$(SolutionDir)\tools\rc2lng.exe" "%(FullPath)" "$(InputDir)scripts\header.lng" "$(IntDir)\chtmp.rc" "$(OutDir)langs\english.lng" "$(InputDir)resource.h" "$(VCInstallDir)atlmfc\include\afxres.h"
-rc.exe /l 0x409 /d "NDEBUG" /d "_AFXDLL" /fo"$(OutDir)\%(Filename).res" "$(IntDir)\chtmp.rc"
+      <Command Condition="'$(Configuration)|$(Platform)'=='Testing Debug|x64'">"$(SolutionDir)tools\rc2lng.exe" "%(FullPath)" "$(InputDir)scripts\header.lng" "$(IntDir)chtmp.rc" "$(OutDir)langs\english.lng" "$(InputDir)resource.h" "$(VCToolsInstallDir)atlmfc\include\afxres.h"
+rc.exe /l 0x409 /d "NDEBUG" /d "_AFXDLL" /fo"$(OutDir)%(Filename).res" "$(IntDir)chtmp.rc"
 </Command>
       <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">res/ch.rc2;version.h</AdditionalInputs>
       <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Testing Debug|x64'">res/ch.rc2;version.h</AdditionalInputs>
@@ -869,11 +865,11 @@ rc.exe /l 0x409 /d "NDEBUG" /d "_AFXDLL" /fo"$(OutDir)\%(Filename).res" "$(IntDi
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Testing Debug|x64'">$(OutDir)%(Filename).res;%(Outputs)</Outputs>
       <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Compiling resources %(FullPath)</Message>
       <Message Condition="'$(Configuration)|$(Platform)'=='Testing Release|Win32'">Compiling resources %(FullPath)</Message>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">"$(SolutionDir)\tools\rc2lng.exe" "%(FullPath)" "$(InputDir)scripts\header.lng" "$(IntDir)\chtmp.rc" "$(OutDir)langs\english.lng" "$(InputDir)resource.h" "$(VCInstallDir)atlmfc\include\afxres.h"
-rc.exe /l 0x409 /d "NDEBUG" /d "_AFXDLL" /fo"$(OutDir)\%(Filename).res" "$(IntDir)\chtmp.rc"
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">"$(SolutionDir)tools\rc2lng.exe" "%(FullPath)" "$(InputDir)scripts\header.lng" "$(IntDir)chtmp.rc" "$(OutDir)langs\english.lng" "$(InputDir)resource.h" "$(VCToolsInstallDir)atlmfc\include\afxres.h"
+rc.exe /l 0x409 /d "NDEBUG" /d "_AFXDLL" /fo"$(OutDir)%(Filename).res" "$(IntDir)chtmp.rc"
 </Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Testing Release|Win32'">"$(SolutionDir)\tools\rc2lng.exe" "%(FullPath)" "$(InputDir)scripts\header.lng" "$(IntDir)\chtmp.rc" "$(OutDir)langs\english.lng" "$(InputDir)resource.h" "$(VCInstallDir)atlmfc\include\afxres.h"
-rc.exe /l 0x409 /d "NDEBUG" /d "_AFXDLL" /fo"$(OutDir)\%(Filename).res" "$(IntDir)\chtmp.rc"
+      <Command Condition="'$(Configuration)|$(Platform)'=='Testing Release|Win32'">"$(SolutionDir)tools\rc2lng.exe" "%(FullPath)" "$(InputDir)scripts\header.lng" "$(IntDir)chtmp.rc" "$(OutDir)langs\english.lng" "$(InputDir)resource.h" "$(VCToolsInstallDir)atlmfc\include\afxres.h"
+rc.exe /l 0x409 /d "NDEBUG" /d "_AFXDLL" /fo"$(OutDir)%(Filename).res" "$(IntDir)chtmp.rc"
 </Command>
       <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">res/ch.rc2;version.h</AdditionalInputs>
       <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Testing Release|Win32'">res/ch.rc2;version.h</AdditionalInputs>
@@ -881,11 +877,11 @@ rc.exe /l 0x409 /d "NDEBUG" /d "_AFXDLL" /fo"$(OutDir)\%(Filename).res" "$(IntDi
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Testing Release|Win32'">$(OutDir)%(Filename).res;%(Outputs)</Outputs>
       <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Compiling resources %(FullPath)</Message>
       <Message Condition="'$(Configuration)|$(Platform)'=='Testing Release|x64'">Compiling resources %(FullPath)</Message>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">"$(SolutionDir)\tools\rc2lng.exe" "%(FullPath)" "$(InputDir)scripts\header.lng" "$(IntDir)\chtmp.rc" "$(OutDir)langs\english.lng" "$(InputDir)resource.h" "$(VCInstallDir)atlmfc\include\afxres.h"
-rc.exe /l 0x409 /d "NDEBUG" /d "_AFXDLL" /fo"$(OutDir)\%(Filename).res" "$(IntDir)\chtmp.rc"
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">"$(SolutionDir)tools\rc2lng.exe" "%(FullPath)" "$(InputDir)scripts\header.lng" "$(IntDir)chtmp.rc" "$(OutDir)langs\english.lng" "$(InputDir)resource.h" "$(VCToolsInstallDir)atlmfc\include\afxres.h"
+rc.exe /l 0x409 /d "NDEBUG" /d "_AFXDLL" /fo"$(OutDir)%(Filename).res" "$(IntDir)chtmp.rc"
 </Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Testing Release|x64'">"$(SolutionDir)\tools\rc2lng.exe" "%(FullPath)" "$(InputDir)scripts\header.lng" "$(IntDir)\chtmp.rc" "$(OutDir)langs\english.lng" "$(InputDir)resource.h" "$(VCInstallDir)atlmfc\include\afxres.h"
-rc.exe /l 0x409 /d "NDEBUG" /d "_AFXDLL" /fo"$(OutDir)\%(Filename).res" "$(IntDir)\chtmp.rc"
+      <Command Condition="'$(Configuration)|$(Platform)'=='Testing Release|x64'">"$(SolutionDir)tools\rc2lng.exe" "%(FullPath)" "$(InputDir)scripts\header.lng" "$(IntDir)chtmp.rc" "$(OutDir)langs\english.lng" "$(InputDir)resource.h" "$(VCToolsInstallDir)atlmfc\include\afxres.h"
+rc.exe /l 0x409 /d "NDEBUG" /d "_AFXDLL" /fo"$(OutDir)%(Filename).res" "$(IntDir)chtmp.rc"
 </Command>
       <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">res/ch.rc2;version.h</AdditionalInputs>
       <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Testing Release|x64'">res/ch.rc2;version.h</AdditionalInputs>

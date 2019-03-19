@@ -69,7 +69,7 @@ unsigned short msg[]={	0x40d1, 0x4dcd, 0x8327, 0x6cdf, 0xb912, 0x017b, 0xac78, 0
 						0xac6e, 0x1e4c, 0x5667, 0x1942, 0x0a47, 0x1f80, 0x4191, 0x4f8d };
 
 int iOffCount=12;
-unsigned char off[]={ 2, 6, 3, 4, 8, 0, 1, 3, 2, 4, 1, 6 };
+unsigned char _off[]={ 2, 6, 3, 4, 8, 0, 1, 3, 2, 4, 1, 6 };
 unsigned short _hash[]={ 0x3fad, 0x34cd, 0x7fff, 0x65ff, 0x4512, 0x0112, 0xabac, 0x1abc, 0x54ab, 0x1212, 0x0981, 0x0100 };
 
 /////////////////////////////////////////////////////////////////////////////
@@ -308,7 +308,7 @@ BOOL CCopyHandlerApp::InitInstance()
 	rResManager.Init(AfxGetInstanceHandle());
 	rResManager.SetCallback(ResManCallback);
 	GetPropValue<PP_PLANGUAGE>(rCfg, strPath);
-	TRACE(_T("Help path=%s\n"), strPath);
+	TRACE(_T("Help path=%s\n"), (PCTSTR)strPath);
 	if(!rResManager.SetLanguage(m_pathProcessor.ExpandPath(strPath)))
 	{
 		TCHAR szData[2048];

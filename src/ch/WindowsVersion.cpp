@@ -67,8 +67,11 @@ bool WindowsVersion::IsWindowsXP()
 	OSVERSIONINFOEX ovi = { 0 };
 	ovi.dwOSVersionInfoSize = sizeof(OSVERSIONINFOEX);
 
+#pragma warning(push)
+#pragma warning(disable: 4996)
 	if(!GetVersionEx((OSVERSIONINFO*)&ovi))
 		return false;
+#pragma warning(pop)
 
 	if(ovi.dwMajorVersion != 5)
 		return false;
@@ -89,8 +92,11 @@ bool WindowsVersion::IsWindows7Or2008R2OrGreater()
 	OSVERSIONINFOEX ovi = { 0 };
 	ovi.dwOSVersionInfoSize = sizeof(OSVERSIONINFOEX);
 
+#pragma warning(push)
+#pragma warning(disable: 4996)
 	if(!GetVersionEx((OSVERSIONINFO*)&ovi))
 		return false;
+#pragma warning(pop)
 
 	if(ovi.dwMajorVersion != 6)
 		return ovi.dwMajorVersion > 6;
