@@ -164,15 +164,14 @@ Source: "{#DbgHelp32}\dbghelp.dll"; DestDir: "{app}\ShellExt32"; Flags: ignoreve
 Name: {group}\{#MyAppName}; Filename: {app}\{code:ExpandArch|ExeFilename}; WorkingDir: {app}
 Name: {group}\{cm:TranslateCopyHandler}; Filename: {app}\{code:ExpandArch|ICTranslateFilename}; Parameters: """{app}\langs\english.lng"""; WorkingDir: {app}\lang
 Name: {group}\{cm:UninstallCopyHandler}; Filename: {uninstallexe}; WorkingDir: {app}
-Name: {userdesktop}\{#MyAppName}; Filename: {app}\{code:ExpandArch|ExeFilename}; Tasks: desktopicon; WorkingDir: {app}
-Name: {userappdata}\Microsoft\Internet Explorer\Quick Launch\{#MyAppName}; Filename: {app}\{code:ExpandArch|ExeFilename}; Tasks: quicklaunchicon; WorkingDir: {app}
+Name: {commondesktop}\{#MyAppName}; Filename: {app}\{code:ExpandArch|ExeFilename}; Tasks: desktopicon; WorkingDir: {app}
+Name: {commonappdata}\Microsoft\Internet Explorer\Quick Launch\{#MyAppName}; Filename: {app}\{code:ExpandArch|ExeFilename}; Tasks: quicklaunchicon; WorkingDir: {app}
 
 [Run]
 Filename: "{app}\{code:ExpandArch|ExeFilename}"; Flags: nowait postinstall skipifsilent; Description: "{cm:LaunchProgram,{#MyAppName}}"
 
 [Registry]
 Root: "HKLM"; Subkey: "SOFTWARE\Microsoft\Windows\CurrentVersion\Run"; ValueType: none; ValueName: "Copy Handler"; Flags: deletevalue uninsdeletevalue
-Root: "HKCU"; Subkey: "SOFTWARE\Microsoft\Windows\CurrentVersion\Run"; ValueType: none; ValueName: "Copy Handler"; Flags: uninsdeletevalue
 
 [Dirs]
 Name: {app}\help; Flags: uninsalwaysuninstall

@@ -5,8 +5,6 @@ call "%WORKSPACE%\scripts\jenkins\_get-output-dir.bat" || exit /b 1
 
 SET TmpDir=%WORKSPACE%\temp\chzip-%BUILD_NUMBER%
 
-SET VSInstallDirX86=C:\Program Files (x86)\Microsoft Visual Studio 14.0
-
 mkdir "%TmpDir%"
 
 rem Prepare 32bit build
