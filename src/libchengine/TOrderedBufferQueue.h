@@ -24,6 +24,8 @@
 #include "TOverlappedDataBuffer.h"
 #include "TBufferList.h"
 #include <boost/thread/recursive_mutex.hpp>
+#include "../libchcore/ErrorCodes.h"
+#include "../libchcore/TCoreException.h"
 
 namespace chengine
 {
@@ -91,9 +93,9 @@ namespace chengine
 	void TOrderedBufferQueue::PushError(TOverlappedDataBuffer* pBuffer, T& rRetryQueue)
 	{
 		if(!pBuffer)
-			throw TCoreException(eErr_InvalidArgument, L"pBuffer is NULL", LOCATION);
+			throw chcore::TCoreException(chcore::eErr_InvalidArgument, L"pBuffer is NULL", LOCATION);
 		if(!pBuffer->HasError())
-			throw TCoreException(eErr_InvalidArgument, L"Cannot push successful buffer to failed queue", LOCATION);
+			throw chcore::TCoreException(chcore::eErr_InvalidArgument, L"Cannot push successful buffer to failed queue", LOCATION);
 
 		boost::unique_lock<boost::recursive_mutex> lock(m_mutex);
 

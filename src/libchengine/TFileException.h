@@ -28,7 +28,7 @@ namespace chengine
 	class LIBCHENGINE_API TFileException : public chcore::TCoreException
 	{
 	public:
-		TFileException(chcore::EGeneralErrors eErrorCode, DWORD dwNativeErrorCode, const chcore::TSmartPath& path, wchar_t* pszMsg,
+		TFileException(chcore::EGeneralErrors eErrorCode, DWORD dwNativeErrorCode, const chcore::TSmartPath& path, const wchar_t* pszMsg,
 			const wchar_t* pszFile, size_t stLineNumber, const wchar_t* pszFunction);
 
 		void GetErrorInfo(wchar_t* pszBuffer, size_t stMaxBuffer) const override;

@@ -178,13 +178,13 @@ BOOL CICTranslateDlg::OnInitDialog()
 	lvc.mask = LVCF_FMT | LVCF_WIDTH | LVCF_TEXT;
 	lvc.fmt = LVCFMT_LEFT;
 	lvc.cx = uiWidth / 5;
-	lvc.pszText = _T("ID");
+	lvc.pszText = (LPWSTR)_T("ID");
 
 	m_ctlBaseLanguageList.InsertColumn(0, &lvc);
 	m_ctlCustomLanguageList.InsertColumn(0, &lvc);
 
 	lvc.cx = 4 * uiWidth / 5;
-	lvc.pszText = _T("Text");
+	lvc.pszText = (LPWSTR)_T("Text");
 
 	m_ctlBaseLanguageList.InsertColumn(1, &lvc);
 	m_ctlCustomLanguageList.InsertColumn(1, &lvc);
@@ -500,7 +500,7 @@ void CICTranslateDlg::UpdateCustomLanguageList()
 			m_ctlCustomLanguageList.InsertItem(&lvi);
 
 			lvi.mask = LVIF_TEXT;
-			lvi.pszText = _T("");
+			lvi.pszText = (LPWSTR)_T("");
 			lvi.iItem = 0;
 			lvi.iSubItem = 1;
 
@@ -571,7 +571,7 @@ void CICTranslateDlg::UpdateCustomListImage(int iItem, bool bUpdateText)
 		if(pCustomItem)
 			lvi.pszText = (PTSTR)pCustomItem->GetText();
 		else
-			lvi.pszText = _T("");
+			lvi.pszText = (LPWSTR)_T("");
 
 		m_ctlCustomLanguageList.SetItem(&lvi);
 	}

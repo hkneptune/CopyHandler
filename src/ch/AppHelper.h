@@ -57,9 +57,9 @@ protected:
 	TPathProcessor m_pathProcessor;
 	TCHAR* m_pszProgramName;	// name of this program (ie. CH.exe)
 
-	TCHAR* m_pszAppName;		// app-name string of this app
-	TCHAR* m_pszAppNameVer;		// extended app-name-with small version
-	TCHAR* m_pszAppVersion;		// app-version string of this app (VERSION based)
+	const TCHAR* m_pszAppName;		// app-name string of this app
+	const TCHAR* m_pszAppNameVer;		// extended app-name-with small version
+	const TCHAR* m_pszAppVersion;		// app-version string of this app (VERSION based)
 
 	boost::optional<bool> m_optPortableMode;
 };

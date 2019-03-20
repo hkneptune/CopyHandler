@@ -88,6 +88,8 @@ private:
 	void InitLoggers();
 };
 
+CCopyHandlerApp& GetApplication();
+
 inline CCopyHandlerApp& GetApp()
 {
 	return GetApplication();

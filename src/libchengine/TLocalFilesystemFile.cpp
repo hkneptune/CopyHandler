@@ -86,7 +86,7 @@ namespace chengine
 			DWORD dwLastError = GetLastError();
 			LOG_ERROR(m_spLog) << "Opening file for reading failed with error: " << dwLastError << GetFileInfoForLog(m_bNoBuffering);
 
-			throw TFileException(eErr_CannotOpenFile, dwLastError, m_pathFile, L"Cannot open for reading", LOCATION);
+			throw TFileException(chcore::eErr_CannotOpenFile, dwLastError, m_pathFile, L"Cannot open for reading", LOCATION);
 		}
 
 		LOG_DEBUG(m_spLog) << "Opening file for reading succeeded. New handle: " << m_hFile << GetFileInfoForLog(m_bNoBuffering);

@@ -24,7 +24,7 @@
 struct __dbg_msg__
 {
 	UINT uiMsg;
-	TCHAR *pszText;
+	const TCHAR *pszText;
 };
 
 //////////////////////////////////////

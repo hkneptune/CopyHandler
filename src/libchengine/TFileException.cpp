@@ -21,7 +21,7 @@
 
 namespace chengine
 {
-	TFileException::TFileException(chcore::EGeneralErrors eErrorCode, DWORD dwNativeErrorCode, const chcore::TSmartPath& path, wchar_t* pszMsg, const wchar_t* pszFile, size_t stLineNumber, const wchar_t* pszFunction) :
+	TFileException::TFileException(chcore::EGeneralErrors eErrorCode, DWORD dwNativeErrorCode, const chcore::TSmartPath& path, const wchar_t* pszMsg, const wchar_t* pszFile, size_t stLineNumber, const wchar_t* pszFunction) :
 		TCoreException(eErrorCode, pszMsg, pszFile, stLineNumber, pszFunction),
 		m_dwNativeErrorCode(dwNativeErrorCode),
 		m_path(path)

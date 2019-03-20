@@ -63,7 +63,7 @@ namespace chengine
 
 		void InternalClose();
 
-		std::wstring TLocalFilesystemFile::GetFileInfoForLog(bool bNoBuffering) const;
+		std::wstring GetFileInfoForLog(bool bNoBuffering) const;
 
 	private:
 		chcore::TSmartPath m_pathFile;

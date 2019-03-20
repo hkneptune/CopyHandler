@@ -46,7 +46,7 @@ INT_PTR ChooseDirectory(chengine::EOperationType eOperation, const chcore::TPath
 	dlg.m_bdData.iView=GetPropValue<PP_FDSHORTCUTLISTSTYLE>(rConfig);
 	dlg.m_bdData.bIgnoreDialogs=GetPropValue<PP_FDIGNORESHELLDIALOGS>(rConfig);
 
-	dlg.m_bdData.strInitialDir=(dlg.m_bdData.cvRecent.size() > 0) ? dlg.m_bdData.cvRecent.at(0) : _T("");
+	dlg.m_bdData.strInitialDir=(dlg.m_bdData.cvRecent.size() > 0) ? dlg.m_bdData.cvRecent.at(0) : CString(L"");
 
 	if(eOperation == chengine::eOperation_Copy)
 		dlg.m_bdData.strCaption = GetResManager().LoadString(IDS_TITLECOPY_STRING);
