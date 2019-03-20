@@ -47,7 +47,7 @@ xcopy "%WORKSPACE%\scripts\portable_config\ch.xml" "%TmpDir%\64bit\" || exit /B 
 xcopy "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\redist\x64\Microsoft.VC140.CRT\*" "%TmpDir%\64bit\" || exit /B 1
 xcopy "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\redist\x64\Microsoft.VC140.MFC\*" "%TmpDir%\64bit\" || exit /B 1
 xcopy "C:\Program Files (x86)\Windows Kits\8.1\Debuggers\x64\dbghelp.dll" "%TmpDir%\64bit\" || exit /B 1
-xcopy "C:\Program Files (x86)\Windows Kits\10\Redist\ucrt\DLLs\x64\*" "%TmpDir%\32bit\" || exit /B 1
+xcopy "C:\Program Files (x86)\Windows Kits\10\Redist\ucrt\DLLs\x64\*" "%TmpDir%\64bit\" || exit /B 1
 xcopy /E /I "%WORKSPACE%\bin\release\help" "%TmpDir%\64bit\help" || exit /B 1
 xcopy /E /I "%WORKSPACE%\bin\release\langs" "%TmpDir%\64bit\langs" || exit /B 1
 
