@@ -512,8 +512,8 @@ TEST(TStringTests, EndsWithCaseInsensitive_WithPtrToString)
 TEST(TStringTests, FindFirstOf_WithPtrToString)
 {
 	TString strValue(_T("Some string"));
-	EXPECT_EQ(strValue.FindFirstOf(_T("er"), 3), 3);
-	EXPECT_EQ(strValue.FindFirstOf(_T("er"), 4), 7);
+	EXPECT_EQ(strValue.FindFirstOf(_T("er"), 3), 3UL);
+	EXPECT_EQ(strValue.FindFirstOf(_T("er"), 4), 7UL);
 	EXPECT_EQ(strValue.FindFirstOf(_T(""), 0), TString::npos);
 	EXPECT_EQ(strValue.FindFirstOf(nullptr, 0), TString::npos);
 }
@@ -521,7 +521,7 @@ TEST(TStringTests, FindFirstOf_WithPtrToString)
 TEST(TStringTests, FindLastOf_WithPtrToString)
 {
 	TString strValue(_T("Some string"));
-	EXPECT_EQ(strValue.FindLastOf(_T("er")), 7);
+	EXPECT_EQ(strValue.FindLastOf(_T("er")), 7UL);
 	EXPECT_EQ(strValue.FindLastOf(_T("")), TString::npos);
 	EXPECT_EQ(strValue.FindLastOf(nullptr), TString::npos);
 }
@@ -530,7 +530,7 @@ TEST(TStringTests, FindLastOf_WithPtrToString)
 TEST(TStringTests, Find_WithPtrToString)
 {
 	TString strValue(_T("Some string"));
-	EXPECT_EQ(strValue.Find(_T("tri"), 6), 6);
+	EXPECT_EQ(strValue.Find(_T("tri"), 6), 6UL);
 	EXPECT_EQ(strValue.Find(_T("tri"), 7), TString::npos);
 	EXPECT_EQ(strValue.Find(_T(""), 0), TString::npos);
 	EXPECT_EQ(strValue.Find(nullptr, 0), TString::npos);
@@ -592,7 +592,7 @@ TEST(TStringTests, GetAndReleaseBuffer)
 	pszBuffer[4] = _T('\0');
 	strValue.ReleaseBuffer();
 	
-	EXPECT_EQ(strValue.GetLength(), 4);
+	EXPECT_EQ(strValue.GetLength(), 4UL);
 }
 
 TEST(TStringTests, GetAndReleaseBufferSetLength)
@@ -602,7 +602,7 @@ TEST(TStringTests, GetAndReleaseBufferSetLength)
 	pszBuffer[4] = _T('t');
 	strValue.ReleaseBufferSetLength(1);
 
-	EXPECT_EQ(strValue.GetLength(), 1);
+	EXPECT_EQ(strValue.GetLength(), 1UL);
 	EXPECT_EQ(strValue, _T("S"));
 }
 
@@ -621,7 +621,7 @@ TEST(TStringTests, GetLength)
 {
 	TString strValue(_T("Some string"));
 
-	EXPECT_EQ(strValue.GetLength(), 11);
+	EXPECT_EQ(strValue.GetLength(), 11UL);
 }
 
 // corner cases and detected bugs

@@ -12,7 +12,7 @@ TEST(TSimpleOrderedBufferQueueTests, ConstructionSanityTest)
 {
 	TSimpleOrderedBufferQueue queue;
 
-	EXPECT_EQ(0, queue.GetCount());
+	EXPECT_EQ(0UL, queue.GetCount());
 	EXPECT_EQ(true, queue.IsEmpty());
 	EXPECT_EQ(nullptr, queue.Peek());
 }
@@ -24,7 +24,7 @@ TEST(TSimpleOrderedBufferQueueTests, Push)
 
 	queue.Push(&buffer);
 
-	EXPECT_EQ(1, queue.GetCount());
+	EXPECT_EQ(1UL, queue.GetCount());
 	EXPECT_EQ(false, queue.IsEmpty());
 	EXPECT_EQ(&buffer, queue.Peek());
 }
@@ -46,7 +46,7 @@ TEST(TSimpleOrderedBufferQueueTests, Pop)
 	queue.Push(&buffer);
 	EXPECT_EQ(&buffer, queue.Pop());
 
-	EXPECT_EQ(0, queue.GetCount());
+	EXPECT_EQ(0UL, queue.GetCount());
 	EXPECT_EQ(true, queue.IsEmpty());
 	EXPECT_EQ(nullptr, queue.Peek());
 }
@@ -60,7 +60,7 @@ TEST(TSimpleOrderedBufferQueueTests, Clear)
 	queue.Push(&buffer);
 	queue.ClearBuffers(spEmptyBuffers);
 
-	EXPECT_EQ(0, queue.GetCount());
+	EXPECT_EQ(0UL, queue.GetCount());
 	EXPECT_EQ(true, queue.IsEmpty());
 	EXPECT_EQ(nullptr, queue.Peek());
 }
@@ -74,5 +74,5 @@ TEST(TSimpleOrderedBufferQueueTests, ReleaseBuffers)
 	queue.Push(&buffer);
 	queue.ClearBuffers(spReleaseList);
 
-	EXPECT_EQ(1, spReleaseList->GetCount());
+	EXPECT_EQ(1UL, spReleaseList->GetCount());
 }

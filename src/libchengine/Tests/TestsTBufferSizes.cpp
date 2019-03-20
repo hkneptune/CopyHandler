@@ -23,16 +23,16 @@ TEST(TestsTBufferSizes, ParametrizedConstructor_RoundedValues)
 {
 	TBufferSizes tSizes(true, 2, 4096, 8192, 16384, 32768, 65536, 10, 2, 1);
 
-	EXPECT_EQ(2, tSizes.GetBufferCount());
-	EXPECT_EQ(4096, tSizes.GetDefaultSize());
-	EXPECT_EQ(8192, tSizes.GetOneDiskSize());
-	EXPECT_EQ(16384, tSizes.GetTwoDisksSize());
-	EXPECT_EQ(32768, tSizes.GetCDSize());
-	EXPECT_EQ(65536, tSizes.GetLANSize());
+	EXPECT_EQ(2UL, tSizes.GetBufferCount());
+	EXPECT_EQ(4096UL, tSizes.GetDefaultSize());
+	EXPECT_EQ(8192UL, tSizes.GetOneDiskSize());
+	EXPECT_EQ(16384UL, tSizes.GetTwoDisksSize());
+	EXPECT_EQ(32768UL, tSizes.GetCDSize());
+	EXPECT_EQ(65536UL, tSizes.GetLANSize());
 	EXPECT_EQ(true, tSizes.IsOnlyDefault());
-	EXPECT_EQ(10, tSizes.GetMaxReadAheadBuffers());
-	EXPECT_EQ(2, tSizes.GetMaxConcurrentReads());
-	EXPECT_EQ(1, tSizes.GetMaxConcurrentWrites());
+	EXPECT_EQ(10UL, tSizes.GetMaxReadAheadBuffers());
+	EXPECT_EQ(2UL, tSizes.GetMaxConcurrentReads());
+	EXPECT_EQ(1UL, tSizes.GetMaxConcurrentWrites());
 }
 
 TEST(TestsTBufferSizes, ParametrizedConstructor_MinimumCheck)
@@ -46,25 +46,25 @@ TEST(TestsTBufferSizes, ParametrizedConstructor_MinimumCheck)
 	EXPECT_EQ(TBufferSizes::BufferGranularity, tSizes.GetCDSize());
 	EXPECT_EQ(TBufferSizes::BufferGranularity, tSizes.GetLANSize());
 	EXPECT_EQ(true, tSizes.IsOnlyDefault());
-	EXPECT_EQ(1, tSizes.GetMaxReadAheadBuffers());
-	EXPECT_EQ(1, tSizes.GetMaxConcurrentReads());
-	EXPECT_EQ(1, tSizes.GetMaxConcurrentWrites());
+	EXPECT_EQ(1UL, tSizes.GetMaxReadAheadBuffers());
+	EXPECT_EQ(1UL, tSizes.GetMaxConcurrentReads());
+	EXPECT_EQ(1UL, tSizes.GetMaxConcurrentWrites());
 }
 
 TEST(TestsTBufferSizes, ParametrizedConstructor_RoundingCheck)
 {
 	TBufferSizes tSizes(true, 2, 6543, 9891, 17123, 37012, 72089, 10, 2, 1);
 
-	EXPECT_EQ(2, tSizes.GetBufferCount());
-	EXPECT_EQ(8192, tSizes.GetDefaultSize());
-	EXPECT_EQ(12288, tSizes.GetOneDiskSize());
-	EXPECT_EQ(20480, tSizes.GetTwoDisksSize());
-	EXPECT_EQ(40960, tSizes.GetCDSize());
-	EXPECT_EQ(73728, tSizes.GetLANSize());
+	EXPECT_EQ(2UL, tSizes.GetBufferCount());
+	EXPECT_EQ(8192UL, tSizes.GetDefaultSize());
+	EXPECT_EQ(12288UL, tSizes.GetOneDiskSize());
+	EXPECT_EQ(20480UL, tSizes.GetTwoDisksSize());
+	EXPECT_EQ(40960UL, tSizes.GetCDSize());
+	EXPECT_EQ(73728UL, tSizes.GetLANSize());
 	EXPECT_EQ(true, tSizes.IsOnlyDefault());
-	EXPECT_EQ(10, tSizes.GetMaxReadAheadBuffers());
-	EXPECT_EQ(2, tSizes.GetMaxConcurrentReads());
-	EXPECT_EQ(1, tSizes.GetMaxConcurrentWrites());
+	EXPECT_EQ(10UL, tSizes.GetMaxReadAheadBuffers());
+	EXPECT_EQ(2UL, tSizes.GetMaxConcurrentReads());
+	EXPECT_EQ(1UL, tSizes.GetMaxConcurrentWrites());
 }
 
 TEST(TestsTBufferSizes, Clear)
@@ -80,9 +80,9 @@ TEST(TestsTBufferSizes, Clear)
 	EXPECT_EQ(TBufferSizes::BufferGranularity, tSizes.GetCDSize());
 	EXPECT_EQ(TBufferSizes::BufferGranularity, tSizes.GetLANSize());
 	EXPECT_EQ(false, tSizes.IsOnlyDefault());
-	EXPECT_EQ(1, tSizes.GetMaxReadAheadBuffers());
-	EXPECT_EQ(1, tSizes.GetMaxConcurrentReads());
-	EXPECT_EQ(1, tSizes.GetMaxConcurrentWrites());
+	EXPECT_EQ(1UL, tSizes.GetMaxReadAheadBuffers());
+	EXPECT_EQ(1UL, tSizes.GetMaxConcurrentReads());
+	EXPECT_EQ(1UL, tSizes.GetMaxConcurrentWrites());
 }
 
 TEST(TestsTBufferSizes, SetOnlyDefault_IsOnlyDefault)
@@ -101,7 +101,7 @@ TEST(TestsTBufferSizes, SetDefaultSize_GetDefaultSize_Rounded)
 
 	tSizes.SetDefaultSize(8192);
 
-	EXPECT_EQ(8192, tSizes.GetDefaultSize());
+	EXPECT_EQ(8192UL, tSizes.GetDefaultSize());
 }
 
 TEST(TestsTBufferSizes, SetDefaultSize_GetDefaultSize_MinCheck)
@@ -110,7 +110,7 @@ TEST(TestsTBufferSizes, SetDefaultSize_GetDefaultSize_MinCheck)
 
 	tSizes.SetDefaultSize(1);
 
-	EXPECT_EQ(4096, tSizes.GetDefaultSize());
+	EXPECT_EQ(4096UL, tSizes.GetDefaultSize());
 }
 
 TEST(TestsTBufferSizes, SetDefaultSize_GetDefaultSize_RoundCheck)
@@ -119,7 +119,7 @@ TEST(TestsTBufferSizes, SetDefaultSize_GetDefaultSize_RoundCheck)
 
 	tSizes.SetDefaultSize(8193);
 
-	EXPECT_EQ(12288, tSizes.GetDefaultSize());
+	EXPECT_EQ(12288UL, tSizes.GetDefaultSize());
 }
 
 /////////////////////////////////////////////////////////////////////////
@@ -129,7 +129,7 @@ TEST(TestsTBufferSizes, SetOneDiskSize_GetOneDiskSize_Rounded)
 
 	tSizes.SetOneDiskSize(8192);
 
-	EXPECT_EQ(8192, tSizes.GetOneDiskSize());
+	EXPECT_EQ(8192UL, tSizes.GetOneDiskSize());
 }
 
 TEST(TestsTBufferSizes, SetOneDiskSize_GetOneDiskSize_MinCheck)
@@ -138,7 +138,7 @@ TEST(TestsTBufferSizes, SetOneDiskSize_GetOneDiskSize_MinCheck)
 
 	tSizes.SetOneDiskSize(1);
 
-	EXPECT_EQ(4096, tSizes.GetOneDiskSize());
+	EXPECT_EQ(4096UL, tSizes.GetOneDiskSize());
 }
 
 TEST(TestsTBufferSizes, SetOneDiskSize_GetOneDiskSize_RoundCheck)
@@ -147,7 +147,7 @@ TEST(TestsTBufferSizes, SetOneDiskSize_GetOneDiskSize_RoundCheck)
 
 	tSizes.SetOneDiskSize(8193);
 
-	EXPECT_EQ(12288, tSizes.GetOneDiskSize());
+	EXPECT_EQ(12288UL, tSizes.GetOneDiskSize());
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -157,7 +157,7 @@ TEST(TestsTBufferSizes, SetTwoDisksSize_GetTwoDisksSize_Rounded)
 
 	tSizes.SetTwoDisksSize(8192);
 
-	EXPECT_EQ(8192, tSizes.GetTwoDisksSize());
+	EXPECT_EQ(8192UL, tSizes.GetTwoDisksSize());
 }
 
 TEST(TestsTBufferSizes, SetTwoDisksSize_GetTwoDisksSize_MinCheck)
@@ -166,7 +166,7 @@ TEST(TestsTBufferSizes, SetTwoDisksSize_GetTwoDisksSize_MinCheck)
 
 	tSizes.SetTwoDisksSize(1);
 
-	EXPECT_EQ(4096, tSizes.GetTwoDisksSize());
+	EXPECT_EQ(4096UL, tSizes.GetTwoDisksSize());
 }
 
 TEST(TestsTBufferSizes, SetTwoDisksSize_GetTwoDisksSize_RoundCheck)
@@ -175,7 +175,7 @@ TEST(TestsTBufferSizes, SetTwoDisksSize_GetTwoDisksSize_RoundCheck)
 
 	tSizes.SetTwoDisksSize(8193);
 
-	EXPECT_EQ(12288, tSizes.GetTwoDisksSize());
+	EXPECT_EQ(12288UL, tSizes.GetTwoDisksSize());
 }
 ////////////////////////////////////////////////////////////////////////
 TEST(TestsTBufferSizes, SetCDSize_GetCDSize_Rounded)
@@ -184,7 +184,7 @@ TEST(TestsTBufferSizes, SetCDSize_GetCDSize_Rounded)
 
 	tSizes.SetCDSize(8192);
 
-	EXPECT_EQ(8192, tSizes.GetCDSize());
+	EXPECT_EQ(8192UL, tSizes.GetCDSize());
 }
 
 TEST(TestsTBufferSizes, SetCDSize_GetCDSize_MinCheck)
@@ -193,7 +193,7 @@ TEST(TestsTBufferSizes, SetCDSize_GetCDSize_MinCheck)
 
 	tSizes.SetCDSize(1);
 
-	EXPECT_EQ(4096, tSizes.GetCDSize());
+	EXPECT_EQ(4096UL, tSizes.GetCDSize());
 }
 
 TEST(TestsTBufferSizes, SetCDSize_GetCDSize_RoundCheck)
@@ -202,7 +202,7 @@ TEST(TestsTBufferSizes, SetCDSize_GetCDSize_RoundCheck)
 
 	tSizes.SetCDSize(8193);
 
-	EXPECT_EQ(12288, tSizes.GetCDSize());
+	EXPECT_EQ(12288UL, tSizes.GetCDSize());
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -212,7 +212,7 @@ TEST(TestsTBufferSizes, SetLANSize_GetLANSize_Rounded)
 
 	tSizes.SetLANSize(8192);
 
-	EXPECT_EQ(8192, tSizes.GetLANSize());
+	EXPECT_EQ(8192UL, tSizes.GetLANSize());
 }
 
 TEST(TestsTBufferSizes, SetLANSize_GetLANSize_MinCheck)
@@ -221,7 +221,7 @@ TEST(TestsTBufferSizes, SetLANSize_GetLANSize_MinCheck)
 
 	tSizes.SetLANSize(1);
 
-	EXPECT_EQ(4096, tSizes.GetLANSize());
+	EXPECT_EQ(4096UL, tSizes.GetLANSize());
 }
 
 TEST(TestsTBufferSizes, SetLANSize_GetLANSize_RoundCheck)
@@ -230,7 +230,7 @@ TEST(TestsTBufferSizes, SetLANSize_GetLANSize_RoundCheck)
 
 	tSizes.SetLANSize(8193);
 
-	EXPECT_EQ(12288, tSizes.GetLANSize());
+	EXPECT_EQ(12288UL, tSizes.GetLANSize());
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -240,7 +240,7 @@ TEST(TestsTBufferSizes, SetBufferCount_GetBufferCount)
 
 	tSizes.SetBufferCount(5);
 
-	EXPECT_EQ(5, tSizes.GetBufferCount());
+	EXPECT_EQ(5UL, tSizes.GetBufferCount());
 }
 
 TEST(TestsTBufferSizes, SetBufferCount_GetBufferCount_MinSize)
@@ -249,7 +249,7 @@ TEST(TestsTBufferSizes, SetBufferCount_GetBufferCount_MinSize)
 
 	tSizes.SetBufferCount(0);
 
-	EXPECT_EQ(1, tSizes.GetBufferCount());
+	EXPECT_EQ(1UL, tSizes.GetBufferCount());
 }
 
 ////////////////////////////////////////////////////////////////////
@@ -263,11 +263,11 @@ TEST(TestsTBufferSizes, SetSizeByType_GetSizeByType_RoundedSize)
 	tSizes.SetSizeByType(TBufferSizes::eBuffer_CD, 65536);
 	tSizes.SetSizeByType(TBufferSizes::eBuffer_LAN, 131072);
 
-	EXPECT_EQ(8192, tSizes.GetSizeByType(TBufferSizes::eBuffer_Default));
-	EXPECT_EQ(16384, tSizes.GetSizeByType(TBufferSizes::eBuffer_OneDisk));
-	EXPECT_EQ(32768, tSizes.GetSizeByType(TBufferSizes::eBuffer_TwoDisks));
-	EXPECT_EQ(65536, tSizes.GetSizeByType(TBufferSizes::eBuffer_CD));
-	EXPECT_EQ(131072, tSizes.GetSizeByType(TBufferSizes::eBuffer_LAN));
+	EXPECT_EQ(8192UL, tSizes.GetSizeByType(TBufferSizes::eBuffer_Default));
+	EXPECT_EQ(16384UL, tSizes.GetSizeByType(TBufferSizes::eBuffer_OneDisk));
+	EXPECT_EQ(32768UL, tSizes.GetSizeByType(TBufferSizes::eBuffer_TwoDisks));
+	EXPECT_EQ(65536UL, tSizes.GetSizeByType(TBufferSizes::eBuffer_CD));
+	EXPECT_EQ(131072UL, tSizes.GetSizeByType(TBufferSizes::eBuffer_LAN));
 }
 
 TEST(TestsTBufferSizes, SetSizeByType_GetSizeByType_RoundCheck)
@@ -280,11 +280,11 @@ TEST(TestsTBufferSizes, SetSizeByType_GetSizeByType_RoundCheck)
 	tSizes.SetSizeByType(TBufferSizes::eBuffer_CD, 65530);
 	tSizes.SetSizeByType(TBufferSizes::eBuffer_LAN, 131070);
 
-	EXPECT_EQ(8192, tSizes.GetSizeByType(TBufferSizes::eBuffer_Default));
-	EXPECT_EQ(16384, tSizes.GetSizeByType(TBufferSizes::eBuffer_OneDisk));
-	EXPECT_EQ(32768, tSizes.GetSizeByType(TBufferSizes::eBuffer_TwoDisks));
-	EXPECT_EQ(65536, tSizes.GetSizeByType(TBufferSizes::eBuffer_CD));
-	EXPECT_EQ(131072, tSizes.GetSizeByType(TBufferSizes::eBuffer_LAN));
+	EXPECT_EQ(8192UL, tSizes.GetSizeByType(TBufferSizes::eBuffer_Default));
+	EXPECT_EQ(16384UL, tSizes.GetSizeByType(TBufferSizes::eBuffer_OneDisk));
+	EXPECT_EQ(32768UL, tSizes.GetSizeByType(TBufferSizes::eBuffer_TwoDisks));
+	EXPECT_EQ(65536UL, tSizes.GetSizeByType(TBufferSizes::eBuffer_CD));
+	EXPECT_EQ(131072UL, tSizes.GetSizeByType(TBufferSizes::eBuffer_LAN));
 }
 
 TEST(TestsTBufferSizes, SetSizeByType_GetSizeByType_MinSize)
@@ -297,11 +297,11 @@ TEST(TestsTBufferSizes, SetSizeByType_GetSizeByType_MinSize)
 	tSizes.SetSizeByType(TBufferSizes::eBuffer_CD, 0);
 	tSizes.SetSizeByType(TBufferSizes::eBuffer_LAN, 0);
 
-	EXPECT_EQ(4096, tSizes.GetSizeByType(TBufferSizes::eBuffer_Default));
-	EXPECT_EQ(4096, tSizes.GetSizeByType(TBufferSizes::eBuffer_OneDisk));
-	EXPECT_EQ(4096, tSizes.GetSizeByType(TBufferSizes::eBuffer_TwoDisks));
-	EXPECT_EQ(4096, tSizes.GetSizeByType(TBufferSizes::eBuffer_CD));
-	EXPECT_EQ(4096, tSizes.GetSizeByType(TBufferSizes::eBuffer_LAN));
+	EXPECT_EQ(4096UL, tSizes.GetSizeByType(TBufferSizes::eBuffer_Default));
+	EXPECT_EQ(4096UL, tSizes.GetSizeByType(TBufferSizes::eBuffer_OneDisk));
+	EXPECT_EQ(4096UL, tSizes.GetSizeByType(TBufferSizes::eBuffer_TwoDisks));
+	EXPECT_EQ(4096UL, tSizes.GetSizeByType(TBufferSizes::eBuffer_CD));
+	EXPECT_EQ(4096UL, tSizes.GetSizeByType(TBufferSizes::eBuffer_LAN));
 }
 
 TEST(TestsTBufferSizes, SetSizeByType_GetSizeByType_OutOfRange)
@@ -317,40 +317,40 @@ TEST(TestsTBufferSizes, GetMaxSize_Default)
 {
 	TBufferSizes tSizes(false, 1, 16384, 0, 0, 0, 0, 0, 0, 0);
 
-	EXPECT_EQ(16384, tSizes.GetMaxSize());
+	EXPECT_EQ(16384UL, tSizes.GetMaxSize());
 }
 
 TEST(TestsTBufferSizes, GetMaxSize_OneDisk)
 {
 	TBufferSizes tSizes(false, 1, 0, 16384, 0, 0, 0, 0, 0, 0);
 
-	EXPECT_EQ(16384, tSizes.GetMaxSize());
+	EXPECT_EQ(16384UL, tSizes.GetMaxSize());
 }
 
 TEST(TestsTBufferSizes, GetMaxSize_TwoDisks)
 {
 	TBufferSizes tSizes(false, 1, 0, 0, 16384, 0, 0, 0, 0, 0);
 
-	EXPECT_EQ(16384, tSizes.GetMaxSize());
+	EXPECT_EQ(16384UL, tSizes.GetMaxSize());
 }
 
 TEST(TestsTBufferSizes, GetMaxSize_CD)
 {
 	TBufferSizes tSizes(false, 1, 0, 0, 0, 16384, 0, 0, 0, 0);
 
-	EXPECT_EQ(16384, tSizes.GetMaxSize());
+	EXPECT_EQ(16384UL, tSizes.GetMaxSize());
 }
 
 TEST(TestsTBufferSizes, GetMaxSize_LAN)
 {
 	TBufferSizes tSizes(false, 1, 0, 0, 0, 0, 16384, 0, 0, 0);
 
-	EXPECT_EQ(16384, tSizes.GetMaxSize());
+	EXPECT_EQ(16384UL, tSizes.GetMaxSize());
 }
 
 TEST(TestsTBufferSizes, GetMaxSize_OnlyDefault)
 {
 	TBufferSizes tSizes(true, 1, 16384, 0, 0, 0, 32768, 0, 0, 0);
 
-	EXPECT_EQ(16384, tSizes.GetMaxSize());
+	EXPECT_EQ(16384UL, tSizes.GetMaxSize());
 }

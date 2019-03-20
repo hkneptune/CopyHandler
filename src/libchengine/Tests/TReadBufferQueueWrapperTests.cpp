@@ -58,19 +58,19 @@ TEST(TReadBufferQueueWrapperTests, Pop_FromBufferList)
 
 	EXPECT_EQ(&buffer4, queue.Pop());
 	EXPECT_EQ(0, buffer4.GetFilePosition());
-	EXPECT_EQ(1024, buffer4.GetRequestedDataSize());
+	EXPECT_EQ(1024UL, buffer4.GetRequestedDataSize());
 
 	EXPECT_EQ(&buffer3, queue.Pop());
 	EXPECT_EQ(1024, buffer3.GetFilePosition());
-	EXPECT_EQ(1024, buffer3.GetRequestedDataSize());
+	EXPECT_EQ(1024UL, buffer3.GetRequestedDataSize());
 
 	EXPECT_EQ(&buffer2, queue.Pop());
 	EXPECT_EQ(2048, buffer2.GetFilePosition());
-	EXPECT_EQ(1024, buffer2.GetRequestedDataSize());
+	EXPECT_EQ(1024UL, buffer2.GetRequestedDataSize());
 
 	EXPECT_EQ(&buffer1, queue.Pop());
 	EXPECT_EQ(3072, buffer1.GetFilePosition());
-	EXPECT_EQ(1024, buffer1.GetRequestedDataSize());
+	EXPECT_EQ(1024UL, buffer1.GetRequestedDataSize());
 
 	EXPECT_EQ(nullptr, queue.Pop());
 }
@@ -95,22 +95,22 @@ TEST(TReadBufferQueueWrapperTests, PushPop_ClaimedBuffers)
 	EXPECT_SIGNALED(queue.GetHasBuffersEvent());
 	EXPECT_EQ(&buffer4, queue.Pop());
 	EXPECT_EQ(0, buffer4.GetFilePosition());
-	EXPECT_EQ(1024, buffer4.GetRequestedDataSize());
+	EXPECT_EQ(1024UL, buffer4.GetRequestedDataSize());
 
 	EXPECT_SIGNALED(queue.GetHasBuffersEvent());
 	EXPECT_EQ(&buffer3, queue.Pop());
 	EXPECT_EQ(1024, buffer3.GetFilePosition());
-	EXPECT_EQ(1024, buffer3.GetRequestedDataSize());
+	EXPECT_EQ(1024UL, buffer3.GetRequestedDataSize());
 
 	EXPECT_SIGNALED(queue.GetHasBuffersEvent());
 	EXPECT_EQ(&buffer2, queue.Pop());
 	EXPECT_EQ(2048, buffer2.GetFilePosition());
-	EXPECT_EQ(1024, buffer2.GetRequestedDataSize());
+	EXPECT_EQ(1024UL, buffer2.GetRequestedDataSize());
 
 	EXPECT_SIGNALED(queue.GetHasBuffersEvent());
 	EXPECT_EQ(&buffer1, queue.Pop());
 	EXPECT_EQ(3072, buffer1.GetFilePosition());
-	EXPECT_EQ(1024, buffer1.GetRequestedDataSize());
+	EXPECT_EQ(1024UL, buffer1.GetRequestedDataSize());
 
 	EXPECT_SIGNALED(queue.GetHasBuffersEvent());
 	EXPECT_EQ(nullptr, queue.Pop());
@@ -138,22 +138,22 @@ TEST(TReadBufferQueueWrapperTests, PushPop_MixedBuffers)
 	EXPECT_SIGNALED(queue.GetHasBuffersEvent());
 	EXPECT_EQ(&buffer4, queue.Pop());
 	EXPECT_EQ(0, buffer4.GetFilePosition());
-	EXPECT_EQ(1024, buffer4.GetRequestedDataSize());
+	EXPECT_EQ(1024UL, buffer4.GetRequestedDataSize());
 
 	EXPECT_SIGNALED(queue.GetHasBuffersEvent());
 	EXPECT_EQ(&buffer3, queue.Pop());
 	EXPECT_EQ(1024, buffer3.GetFilePosition());
-	EXPECT_EQ(1024, buffer3.GetRequestedDataSize());
+	EXPECT_EQ(1024UL, buffer3.GetRequestedDataSize());
 
 	EXPECT_SIGNALED(queue.GetHasBuffersEvent());
 	EXPECT_EQ(&buffer2, queue.Pop());
 	EXPECT_EQ(2048, buffer2.GetFilePosition());
-	EXPECT_EQ(1024, buffer2.GetRequestedDataSize());
+	EXPECT_EQ(1024UL, buffer2.GetRequestedDataSize());
 
 	EXPECT_SIGNALED(queue.GetHasBuffersEvent());
 	EXPECT_EQ(&buffer1, queue.Pop());
 	EXPECT_EQ(3072, buffer1.GetFilePosition());
-	EXPECT_EQ(1024, buffer1.GetRequestedDataSize());
+	EXPECT_EQ(1024UL, buffer1.GetRequestedDataSize());
 
 	EXPECT_SIGNALED(queue.GetHasBuffersEvent());
 	EXPECT_EQ(nullptr, queue.Pop());
@@ -218,7 +218,7 @@ TEST(TReadBufferQueueWrapperTests, PushPop_DataSourceFinished_CheckBufferMainten
 
 	EXPECT_EQ(&buffer1, queue.Pop());
 
-	EXPECT_EQ(0, spList->GetCount());
+	EXPECT_EQ(0UL, spList->GetCount());
 	EXPECT_EQ(nullptr, spList->Pop());
 }
 
@@ -236,14 +236,14 @@ TEST(TReadBufferQueueWrapperTests, PushPop_DataSourceFinished_ValidPushAfterFini
 
 	queue.SetDataSourceFinished(&buffer1);
 
-	EXPECT_EQ(0, spList->GetCount());
+	EXPECT_EQ(0UL, spList->GetCount());
 
 	TOverlappedDataBuffer buffer2(1024, nullptr);
 	buffer2.SetLastPart(true);
 	queue.Push(&buffer2);
 
 	EXPECT_EQ(&buffer1, queue.Pop());
-	EXPECT_EQ(1, spList->GetCount());
+	EXPECT_EQ(1UL, spList->GetCount());
 	EXPECT_EQ(&buffer2, spList->Pop());
 }
 
@@ -263,7 +263,7 @@ TEST(TReadBufferQueueWrapperTests, PushPop_DataSourceFinished_InvalidPushAfterFi
 	queue.SetDataSourceFinished(&buffer1);
 
 	EXPECT_EQ(&buffer1, queue.Pop());
-	EXPECT_EQ(0, spList->GetCount());
+	EXPECT_EQ(0UL, spList->GetCount());
 
 	TOverlappedDataBuffer buffer2(1024, nullptr);
 	buffer2.SetFilePosition(1000);

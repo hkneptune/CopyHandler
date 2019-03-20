@@ -10,7 +10,7 @@ TEST(TestsTPathContainer, DefaultConstruction)
 {
 	TPathContainer arrStrings;
 
-	EXPECT_EQ(0, arrStrings.GetCount());
+	EXPECT_EQ(0UL, arrStrings.GetCount());
 }
 
 TEST(TestsTPathContainer, AddElements)
@@ -20,7 +20,7 @@ TEST(TestsTPathContainer, AddElements)
 	arrStrings.Add(PathFromString(L"SomeString1"));
 	arrStrings.Add(PathFromString(L"SomeString2"));
 
-	EXPECT_EQ(2, arrStrings.GetCount());
+	EXPECT_EQ(2UL, arrStrings.GetCount());
 	EXPECT_STREQ(L"SomeString1", arrStrings.GetAt(0).ToWString().c_str());
 	EXPECT_STREQ(L"SomeString2", arrStrings.GetAt(1).ToWString().c_str());
 }
@@ -34,7 +34,7 @@ TEST(TestsTPathContainer, SetAt)
 
 	arrStrings.SetAt(0, PathFromString(L"SomeString3"));
 
-	EXPECT_EQ(2, arrStrings.GetCount());
+	EXPECT_EQ(2UL, arrStrings.GetCount());
 	EXPECT_STREQ(L"SomeString3", arrStrings.GetAt(0).ToWString().c_str());
 	EXPECT_STREQ(L"SomeString2", arrStrings.GetAt(1).ToWString().c_str());
 }
@@ -55,7 +55,7 @@ TEST(TestsTPathContainer, RemoveAt)
 
 	arrStrings.RemoveAt(0);
 
-	EXPECT_EQ(1, arrStrings.GetCount());
+	EXPECT_EQ(1UL, arrStrings.GetCount());
 	EXPECT_STREQ(L"SomeString2", arrStrings.GetAt(0).ToWString().c_str());
 }
 
@@ -75,7 +75,7 @@ TEST(TestsTPathContainer, Clear)
 
 	arrStrings.Clear();
 
-	EXPECT_EQ(0, arrStrings.GetCount());
+	EXPECT_EQ(0UL, arrStrings.GetCount());
 }
 
 TEST(TestsTPathContainer, Compare_Empty)

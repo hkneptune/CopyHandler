@@ -4,7 +4,7 @@
 #define EXPECT_TIMEOUT(handle)\
 	{\
 		DWORD dwResult = WaitForSingleObject(handle, 0); \
-		EXPECT_EQ(WAIT_TIMEOUT, dwResult); \
+		EXPECT_EQ((DWORD)WAIT_TIMEOUT, dwResult); \
 	}
 
 #define EXPECT_SIGNALED(handle)\

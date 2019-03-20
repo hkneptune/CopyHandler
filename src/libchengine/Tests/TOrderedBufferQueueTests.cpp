@@ -23,7 +23,7 @@ TEST(TOrderedBufferQueueTests, ExpectedPos_ConstructionSanityTest)
 	TBufferListPtr spEmptyBuffers(std::make_shared<TBufferList>());
 	TOrderedBufferQueue queue(spEmptyBuffers, 0);
 
-	EXPECT_EQ(0, queue.GetCount());
+	EXPECT_EQ(0UL, queue.GetCount());
 	EXPECT_EQ(true, queue.IsEmpty());
 	EXPECT_TIMEOUT(queue.GetHasBuffersEvent());
 	EXPECT_EQ(nullptr, queue.Peek());
@@ -38,7 +38,7 @@ TEST(TOrderedBufferQueueTests, ExpectedPos_PushAtExpectedPosition)
 
 	queue.Push(&buffer);
 
-	EXPECT_EQ(1, queue.GetCount());
+	EXPECT_EQ(1UL, queue.GetCount());
 	EXPECT_EQ(false, queue.IsEmpty());
 	EXPECT_SIGNALED(queue.GetHasBuffersEvent());
 	EXPECT_EQ(&buffer, queue.Peek());
@@ -53,7 +53,7 @@ TEST(TOrderedBufferQueueTests, ExpectedPos_PushAtOtherPosition)
 
 	queue.Push(&buffer);
 
-	EXPECT_EQ(1, queue.GetCount());
+	EXPECT_EQ(1UL, queue.GetCount());
 	EXPECT_EQ(false, queue.IsEmpty());
 	EXPECT_TIMEOUT(queue.GetHasBuffersEvent());
 	EXPECT_EQ(&buffer, queue.Peek());
@@ -74,7 +74,7 @@ TEST(TOrderedBufferQueueTests, ExpectedPos_PushOutOfOrder)
 	queue.Push(&buffer1);
 	queue.Push(&buffer2);
 
-	EXPECT_EQ(2, queue.GetCount());
+	EXPECT_EQ(2UL, queue.GetCount());
 	EXPECT_EQ(false, queue.IsEmpty());
 	EXPECT_SIGNALED(queue.GetHasBuffersEvent());
 	EXPECT_EQ(&buffer2, queue.Peek());
@@ -91,7 +91,7 @@ TEST(TOrderedBufferQueueTests, ExpectedPos_Pop)
 	queue.Push(&buffer);
 	EXPECT_EQ(&buffer, queue.Pop());
 
-	EXPECT_EQ(0, queue.GetCount());
+	EXPECT_EQ(0UL, queue.GetCount());
 	EXPECT_EQ(true, queue.IsEmpty());
 	EXPECT_TIMEOUT(queue.GetHasBuffersEvent());
 	EXPECT_EQ(nullptr, queue.Peek());
@@ -106,7 +106,7 @@ TEST(TOrderedBufferQueueTests, ExpectedPos_ReleaseBuffers)
 	queue.Push(&buffer);
 	queue.ClearBuffers();
 
-	EXPECT_EQ(1, spEmptyBuffers->GetCount());
+	EXPECT_EQ(1UL, spEmptyBuffers->GetCount());
 }
 
 TEST(TOrderedBufferQueueTests, ExpectedPos_ReleaseBuffersUnordered)
@@ -119,7 +119,7 @@ TEST(TOrderedBufferQueueTests, ExpectedPos_ReleaseBuffersUnordered)
 	queue.Push(&buffer);
 	queue.ClearBuffers();
 
-	EXPECT_EQ(1, spEmptyBuffers->GetCount());
+	EXPECT_EQ(1UL, spEmptyBuffers->GetCount());
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////
@@ -133,7 +133,7 @@ TEST(TOrderedBufferQueueTests, ConstructionSanityTest)
 	TBufferListPtr spEmptyBuffers(std::make_shared<TBufferList>());
 	TOrderedBufferQueue queue(spEmptyBuffers, 0);
 
-	EXPECT_EQ(0, queue.GetCount());
+	EXPECT_EQ(0UL, queue.GetCount());
 	EXPECT_TIMEOUT(queue.GetHasErrorEvent());
 	EXPECT_EQ(true, queue.IsEmpty());
 }
@@ -151,7 +151,7 @@ TEST(TOrderedBufferQueueTests, PushBuffer_FirstFailure)
 	FallbackCollection collection;
 
 	queue.PushError(&buffer, collection);
-	EXPECT_EQ(1, queue.GetCount());
+	EXPECT_EQ(1UL, queue.GetCount());
 	EXPECT_SIGNALED(queue.GetHasErrorEvent());
 	EXPECT_EQ(true, collection.empty());
 }
@@ -172,12 +172,12 @@ TEST(TOrderedBufferQueueTests, PushBuffer_TwoSubsequentFailures)
 	queue.PushError(&buffer1, collection);
 	queue.PushError(&buffer2, collection);
 
-	EXPECT_EQ(1, queue.GetCount());
+	EXPECT_EQ(1UL, queue.GetCount());
 	EXPECT_SIGNALED(queue.GetHasErrorEvent());
-	EXPECT_EQ(1, collection.size());
+	EXPECT_EQ(1UL, collection.size());
 	EXPECT_EQ(&buffer2, collection.front());
 	EXPECT_EQ(1000, collection.front()->GetFilePosition());
-	EXPECT_EQ(0, collection.front()->GetErrorCode());
+	EXPECT_EQ(0UL, collection.front()->GetErrorCode());
 }
 
 TEST(TOrderedBufferQueueTests, PushBuffer_TwoFailuresOutOfOrder)
@@ -196,12 +196,12 @@ TEST(TOrderedBufferQueueTests, PushBuffer_TwoFailuresOutOfOrder)
 	queue.PushError(&buffer2, collection);
 	queue.PushError(&buffer1, collection);
 
-	EXPECT_EQ(1, queue.GetCount());
+	EXPECT_EQ(1UL, queue.GetCount());
 	EXPECT_SIGNALED(queue.GetHasErrorEvent());
-	EXPECT_EQ(1, collection.size());
+	EXPECT_EQ(1UL, collection.size());
 	EXPECT_EQ(&buffer2, collection.front());
 	EXPECT_EQ(1000, collection.front()->GetFilePosition());
-	EXPECT_EQ(0, collection.front()->GetErrorCode());
+	EXPECT_EQ(0UL, collection.front()->GetErrorCode());
 }
 
 TEST(TOrderedBufferQueueTests, PushBuffer_ThrowOnNonErrorBuffer)
@@ -244,10 +244,10 @@ TEST(TOrderedBufferQueueTests, PopBuffer_WithSamePosition)
 	queue.PushError(&buffer1, collection);
 	queue.PopError();
 
-	EXPECT_EQ(0, collection.size());
+	EXPECT_EQ(0UL, collection.size());
 	EXPECT_TIMEOUT(queue.GetHasErrorEvent());
 
 	queue.PushError(&buffer2, collection);
-	EXPECT_EQ(0, queue.GetCount());
-	EXPECT_EQ(1, collection.size());
+	EXPECT_EQ(0UL, queue.GetCount());
+	EXPECT_EQ(1UL, collection.size());
 }

@@ -10,7 +10,7 @@ TEST(TestsTStringPatternArray, DefaultConstruction)
 {
 	TStringPatternArray arrPatterns;
 
-	EXPECT_EQ(0, arrPatterns.GetCount());
+	EXPECT_EQ(0UL, arrPatterns.GetCount());
 }
 
 TEST(TestsTStringPatternArray, AddElements)
@@ -20,7 +20,7 @@ TEST(TestsTStringPatternArray, AddElements)
 	arrPatterns.Add(TStringPattern(L"*.bat", TStringPattern::EPatternType::eType_Wildcard));
 	arrPatterns.Add(TStringPattern(L"*.exe", TStringPattern::EPatternType::eType_Wildcard));
 
-	EXPECT_EQ(2, arrPatterns.GetCount());
+	EXPECT_EQ(2UL, arrPatterns.GetCount());
 	EXPECT_STREQ(L"*.bat", arrPatterns.GetAt(0).ToString().c_str());
 	EXPECT_STREQ(L"*.exe", arrPatterns.GetAt(1).ToString().c_str());
 }
@@ -32,7 +32,7 @@ TEST(TestsTStringPatternArray, InsertAt)
 	arrPatterns.InsertAt(0, TStringPattern(L"*.bat", TStringPattern::EPatternType::eType_Wildcard));
 	arrPatterns.InsertAt(0, TStringPattern(L"*.exe", TStringPattern::EPatternType::eType_Wildcard));
 
-	EXPECT_EQ(2, arrPatterns.GetCount());
+	EXPECT_EQ(2UL, arrPatterns.GetCount());
 	EXPECT_STREQ(L"*.bat", arrPatterns.GetAt(1).ToString().c_str());
 	EXPECT_STREQ(L"*.exe", arrPatterns.GetAt(0).ToString().c_str());
 }
@@ -46,7 +46,7 @@ TEST(TestsTStringPatternArray, SetAt)
 
 	arrPatterns.SetAt(0, TStringPattern(L"*.com", TStringPattern::EPatternType::eType_Wildcard));
 
-	EXPECT_EQ(2, arrPatterns.GetCount());
+	EXPECT_EQ(2UL, arrPatterns.GetCount());
 	EXPECT_STREQ(L"*.com", arrPatterns.GetAt(0).ToString().c_str());
 	EXPECT_STREQ(L"*.exe", arrPatterns.GetAt(1).ToString().c_str());
 }
@@ -60,7 +60,7 @@ TEST(TestsTStringPatternArray, RemoveAt)
 
 	arrPatterns.RemoveAt(0);
 
-	EXPECT_EQ(1, arrPatterns.GetCount());
+	EXPECT_EQ(1UL, arrPatterns.GetCount());
 	EXPECT_STREQ(L"*.exe", arrPatterns.GetAt(0).ToString().c_str());
 }
 
@@ -73,7 +73,7 @@ TEST(TestsTStringPatternArray, Clear)
 
 	arrPatterns.Clear();
 
-	EXPECT_EQ(0, arrPatterns.GetCount());
+	EXPECT_EQ(0UL, arrPatterns.GetCount());
 }
 
 /////////////////////////////////////////////////
@@ -130,7 +130,7 @@ TEST(TestsTStringPatternArray, ToStringArray)
 	arrPatterns.Add(TStringPattern(L"autostart.*", TStringPattern::EPatternType::eType_Wildcard));
 
 	TStringArray arrElements = arrPatterns.ToSerializedStringArray();
-	EXPECT_EQ(2, arrElements.GetCount());
+	EXPECT_EQ(2UL, arrElements.GetCount());
 	EXPECT_STREQ(L"*.bat", arrElements.GetAt(0).c_str());
 	EXPECT_STREQ(L"autostart.*", arrElements.GetAt(1).c_str());
 }

@@ -10,7 +10,7 @@ TEST(TestsTFileFilter, DefaultConstruction)
 	TFileFilter filter;
 
 	// other
-	EXPECT_EQ(0, filter.GetObjectID());
+	EXPECT_EQ(0UL, filter.GetObjectID());
 	
 	EXPECT_EQ(false, filter.GetUseMask());
 	EXPECT_STREQ(L"", filter.GetCombinedMask().c_str());

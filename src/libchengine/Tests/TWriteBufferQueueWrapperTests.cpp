@@ -20,7 +20,7 @@ TEST(TWriteBufferQueueWrapperTests, Constructor)
 
 	TSharedCountPtr<size_t> spOtfBufferCount(std::make_shared<TSharedCount<size_t>>());
 	TWriteBufferQueueWrapper queue(spQueue, 1, spOtfBufferCount);
-	EXPECT_EQ(0, queue.GetCount());
+	EXPECT_EQ(0UL, queue.GetCount());
 	EXPECT_SIGNALED(queue.GetHasBuffersEvent());
 }
 
@@ -63,19 +63,19 @@ TEST(TWriteBufferQueueWrapperTests, Pop_FromBufferList)
 
 	EXPECT_EQ(&buffer1, queue.Pop());
 	EXPECT_EQ(0, buffer1.GetFilePosition());
-	EXPECT_EQ(1000, buffer1.GetRequestedDataSize());
+	EXPECT_EQ(1000UL, buffer1.GetRequestedDataSize());
 
 	EXPECT_EQ(&buffer2, queue.Pop());
 	EXPECT_EQ(1000, buffer2.GetFilePosition());
-	EXPECT_EQ(1000, buffer2.GetRequestedDataSize());
+	EXPECT_EQ(1000UL, buffer2.GetRequestedDataSize());
 
 	EXPECT_EQ(&buffer3, queue.Pop());
 	EXPECT_EQ(2000, buffer3.GetFilePosition());
-	EXPECT_EQ(1000, buffer3.GetRequestedDataSize());
+	EXPECT_EQ(1000UL, buffer3.GetRequestedDataSize());
 
 	EXPECT_EQ(&buffer4, queue.Pop());
 	EXPECT_EQ(3000, buffer4.GetFilePosition());
-	EXPECT_EQ(1000, buffer4.GetRequestedDataSize());
+	EXPECT_EQ(1000UL, buffer4.GetRequestedDataSize());
 
 	EXPECT_EQ(nullptr, queue.Pop());
 }
@@ -109,22 +109,22 @@ TEST(TWriteBufferQueueWrapperTests, PushPop_ClaimedBuffers)
 	EXPECT_SIGNALED(queue.GetHasBuffersEvent());
 	EXPECT_EQ(&buffer1, queue.Pop());
 	EXPECT_EQ(0, buffer1.GetFilePosition());
-	EXPECT_EQ(1000, buffer1.GetRequestedDataSize());
+	EXPECT_EQ(1000UL, buffer1.GetRequestedDataSize());
 
 	EXPECT_SIGNALED(queue.GetHasBuffersEvent());
 	EXPECT_EQ(&buffer2, queue.Pop());
 	EXPECT_EQ(1000, buffer2.GetFilePosition());
-	EXPECT_EQ(1000, buffer2.GetRequestedDataSize());
+	EXPECT_EQ(1000UL, buffer2.GetRequestedDataSize());
 
 	EXPECT_SIGNALED(queue.GetHasBuffersEvent());
 	EXPECT_EQ(&buffer3, queue.Pop());
 	EXPECT_EQ(2000, buffer3.GetFilePosition());
-	EXPECT_EQ(1000, buffer3.GetRequestedDataSize());
+	EXPECT_EQ(1000UL, buffer3.GetRequestedDataSize());
 
 	EXPECT_SIGNALED(queue.GetHasBuffersEvent());
 	EXPECT_EQ(&buffer4, queue.Pop());
 	EXPECT_EQ(3000, buffer4.GetFilePosition());
-	EXPECT_EQ(1000, buffer4.GetRequestedDataSize());
+	EXPECT_EQ(1000UL, buffer4.GetRequestedDataSize());
 
 	EXPECT_SIGNALED(queue.GetHasBuffersEvent());
 	EXPECT_EQ(nullptr, queue.Pop());
@@ -161,22 +161,22 @@ TEST(TWriteBufferQueueWrapperTests, PushPop_MixedBuffers)
 	EXPECT_SIGNALED(queue.GetHasBuffersEvent());
 	EXPECT_EQ(&buffer3, queue.Pop());
 	EXPECT_EQ(2000, buffer3.GetFilePosition());
-	EXPECT_EQ(1000, buffer3.GetRequestedDataSize());
+	EXPECT_EQ(1000UL, buffer3.GetRequestedDataSize());
 
 	EXPECT_SIGNALED(queue.GetHasBuffersEvent());
 	EXPECT_EQ(&buffer4, queue.Pop());
 	EXPECT_EQ(3000, buffer4.GetFilePosition());
-	EXPECT_EQ(1000, buffer4.GetRequestedDataSize());
+	EXPECT_EQ(1000UL, buffer4.GetRequestedDataSize());
 
 	EXPECT_SIGNALED(queue.GetHasBuffersEvent());
 	EXPECT_EQ(&buffer1, queue.Pop());
 	EXPECT_EQ(0, buffer1.GetFilePosition());
-	EXPECT_EQ(1000, buffer1.GetRequestedDataSize());
+	EXPECT_EQ(1000UL, buffer1.GetRequestedDataSize());
 
 	EXPECT_SIGNALED(queue.GetHasBuffersEvent());
 	EXPECT_EQ(&buffer2, queue.Pop());
 	EXPECT_EQ(1000, buffer2.GetFilePosition());
-	EXPECT_EQ(1000, buffer2.GetRequestedDataSize());
+	EXPECT_EQ(1000UL, buffer2.GetRequestedDataSize());
 
 	EXPECT_SIGNALED(queue.GetHasBuffersEvent());
 	EXPECT_EQ(nullptr, queue.Pop());

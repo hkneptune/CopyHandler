@@ -11,7 +11,7 @@ TEST(TBufferListTests, DefaultConstructionSanityTest)
 {
 	TBufferList bufferList;
 
-	EXPECT_EQ(0, bufferList.GetCount());
+	EXPECT_EQ(0UL, bufferList.GetCount());
 	EXPECT_EQ(true, bufferList.IsEmpty());
 	EXPECT_EQ(nullptr, bufferList.Pop());
 }
@@ -31,7 +31,7 @@ TEST(TBufferListTests, PushBuffer)
 
 	bufferList.Push(&rBuffer);
 
-	EXPECT_EQ(1, bufferList.GetCount());
+	EXPECT_EQ(1UL, bufferList.GetCount());
 	EXPECT_EQ(false, bufferList.IsEmpty());
 	EXPECT_EQ(&rBuffer, bufferList.Pop());
 }
@@ -45,7 +45,7 @@ TEST(TBufferListTests, Clear)
 	bufferList.Push(&rBuffer);
 	bufferList.Clear();
 
-	EXPECT_EQ(0, bufferList.GetCount());
+	EXPECT_EQ(0UL, bufferList.GetCount());
 	EXPECT_EQ(true, bufferList.IsEmpty());
 	EXPECT_EQ(nullptr, bufferList.Pop());
 }

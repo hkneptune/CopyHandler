@@ -13,8 +13,8 @@ TEST(TestsTSharedMemory, DefaultConstruction)
 	TSharedMemory memory;
 	EXPECT_EQ(nullptr, memory.GetData());
 	EXPECT_EQ(nullptr, memory.GetFullData());
-	EXPECT_EQ(0, memory.GetDataSize());
-	EXPECT_EQ(0, memory.GetSharedMemorySize());
+	EXPECT_EQ(0UL, memory.GetDataSize());
+	EXPECT_EQ(0UL, memory.GetSharedMemorySize());
 }
 
 TEST(TestsTSharedMemory, Create_ZeroSize)
@@ -29,11 +29,11 @@ TEST(TestsTSharedMemory, Create_NonZeroSize)
 	memory.Create(L"UnitTestsSharedMemoryName", 320);
 
 	EXPECT_TRUE(memory.GetData() != nullptr);
-	EXPECT_EQ(0, *(unsigned int*)memory.GetData());
+	EXPECT_EQ(0UL, *(unsigned int*)memory.GetData());
 	EXPECT_TRUE(memory.GetFullData() != nullptr);
-	EXPECT_EQ(4, *(unsigned int*)memory.GetFullData());
-	EXPECT_EQ(4, memory.GetDataSize());
-	EXPECT_EQ(324, memory.GetSharedMemorySize());
+	EXPECT_EQ(4UL, *(unsigned int*)memory.GetFullData());
+	EXPECT_EQ(4UL, memory.GetDataSize());
+	EXPECT_EQ(324UL, memory.GetSharedMemorySize());
 }
 
 TEST(TestsTSharedMemory, Create_FromEmptyString)
@@ -42,11 +42,11 @@ TEST(TestsTSharedMemory, Create_FromEmptyString)
 	TSharedMemory memory;
 	memory.Create(L"UnitTestsSharedMemoryName", strData);
 	EXPECT_TRUE(memory.GetData() != nullptr);
-	EXPECT_EQ(0, *(unsigned int*)memory.GetData());
+	EXPECT_EQ(0UL, *(unsigned int*)memory.GetData());
 	EXPECT_TRUE(memory.GetFullData() != nullptr);
-	EXPECT_EQ(2, *(unsigned int*)memory.GetFullData());
-	EXPECT_EQ(2, memory.GetDataSize());
-	EXPECT_EQ(6, memory.GetSharedMemorySize());
+	EXPECT_EQ(2UL, *(unsigned int*)memory.GetFullData());
+	EXPECT_EQ(2UL, memory.GetDataSize());
+	EXPECT_EQ(6UL, memory.GetSharedMemorySize());
 }
 
 TEST(TestsTSharedMemory, Create_FromFullString)
@@ -58,8 +58,8 @@ TEST(TestsTSharedMemory, Create_FromFullString)
 	EXPECT_EQ(L'S', *memory.GetData());
 	EXPECT_TRUE(memory.GetFullData() != nullptr);
 	EXPECT_EQ(22, *memory.GetFullData());
-	EXPECT_EQ(22, memory.GetDataSize());
-	EXPECT_EQ(26, memory.GetSharedMemorySize());
+	EXPECT_EQ(22UL, memory.GetDataSize());
+	EXPECT_EQ(26UL, memory.GetSharedMemorySize());
 }
 
 TEST(TestsTSharedMemory, Create_FromBufferZeroSize)
@@ -87,11 +87,11 @@ TEST(TestsTSharedMemory, Create_FromEmptyBuffer)
 	TSharedMemory memory;
 	memory.Create(L"UnitTestsSharedMemoryName", (BYTE*)pszData, 1);
 	EXPECT_TRUE(memory.GetData() != nullptr);
-	EXPECT_EQ(0, *(unsigned int*)memory.GetData());
+	EXPECT_EQ(0UL, *(unsigned int*)memory.GetData());
 	EXPECT_TRUE(memory.GetFullData() != nullptr);
-	EXPECT_EQ(1, *(unsigned int*)memory.GetFullData());
-	EXPECT_EQ(1, memory.GetDataSize());
-	EXPECT_EQ(5, memory.GetSharedMemorySize());
+	EXPECT_EQ(1UL, *(unsigned int*)memory.GetFullData());
+	EXPECT_EQ(1UL, memory.GetDataSize());
+	EXPECT_EQ(5UL, memory.GetSharedMemorySize());
 }
 
 TEST(TestsTSharedMemory, Create_FromFullBuffer)
@@ -103,8 +103,8 @@ TEST(TestsTSharedMemory, Create_FromFullBuffer)
 	EXPECT_EQ(L'S', *memory.GetData());
 	EXPECT_TRUE(memory.GetFullData() != nullptr);
 	EXPECT_EQ(4, *memory.GetFullData());
-	EXPECT_EQ(4, memory.GetDataSize());
-	EXPECT_EQ(8, memory.GetSharedMemorySize());
+	EXPECT_EQ(4UL, memory.GetDataSize());
+	EXPECT_EQ(8UL, memory.GetSharedMemorySize());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -123,8 +123,8 @@ TEST(TestsTSharedMemory, Open)
 	EXPECT_EQ(L'S', *dstMemory.GetData());
 	EXPECT_TRUE(dstMemory.GetFullData() != nullptr);
 	EXPECT_EQ(4, *dstMemory.GetFullData());
-	EXPECT_EQ(4, dstMemory.GetDataSize());
-	EXPECT_EQ(8, dstMemory.GetSharedMemorySize());
+	EXPECT_EQ(4UL, dstMemory.GetDataSize());
+	EXPECT_EQ(8UL, dstMemory.GetSharedMemorySize());
 }
 
 TEST(TestsTSharedMemory, OpenNonExistentMemory)
@@ -147,8 +147,8 @@ TEST(TestsTSharedMemory, WriteStringReadString)
 	EXPECT_EQ(L'S', *memory.GetData());
 	EXPECT_TRUE(memory.GetFullData() != nullptr);
 	EXPECT_EQ(22, *memory.GetFullData());
-	EXPECT_EQ(22, memory.GetDataSize());
-	EXPECT_EQ(260, memory.GetSharedMemorySize());
+	EXPECT_EQ(22UL, memory.GetDataSize());
+	EXPECT_EQ(260UL, memory.GetSharedMemorySize());
 
 	TString strReadData;
 	memory.Read(strReadData);
@@ -166,8 +166,8 @@ TEST(TestsTSharedMemory, WriteBufferReadString)
 	EXPECT_EQ(L'S', *memory.GetData());
 	EXPECT_TRUE(memory.GetFullData() != nullptr);
 	EXPECT_EQ(22, *memory.GetFullData());
-	EXPECT_EQ(22, memory.GetDataSize());
-	EXPECT_EQ(260, memory.GetSharedMemorySize());
+	EXPECT_EQ(22UL, memory.GetDataSize());
+	EXPECT_EQ(260UL, memory.GetSharedMemorySize());
 
 	TString strReadData;
 	memory.Read(strReadData);
@@ -188,8 +188,8 @@ TEST(TestsTSharedMemory, WriteStringReadString_ReceiverSide)
 	EXPECT_EQ(L'S', *memory.GetData());
 	EXPECT_TRUE(memory.GetFullData() != nullptr);
 	EXPECT_EQ(22, *memory.GetFullData());
-	EXPECT_EQ(22, memory.GetDataSize());
-	EXPECT_EQ(26, memory.GetSharedMemorySize());
+	EXPECT_EQ(22UL, memory.GetDataSize());
+	EXPECT_EQ(26UL, memory.GetSharedMemorySize());
 
 	TString strReadData;
 	memory.Read(strReadData);
@@ -210,8 +210,8 @@ TEST(TestsTSharedMemory, WriteBufferReadString_ReceiverSide)
 	EXPECT_EQ(L'S', *memory.GetData());
 	EXPECT_TRUE(memory.GetFullData() != nullptr);
 	EXPECT_EQ(22, *memory.GetFullData());
-	EXPECT_EQ(22, memory.GetDataSize());
-	EXPECT_EQ(26, memory.GetSharedMemorySize());
+	EXPECT_EQ(22UL, memory.GetDataSize());
+	EXPECT_EQ(26UL, memory.GetSharedMemorySize());
 
 	TString strReadData;
 	memory.Read(strReadData);

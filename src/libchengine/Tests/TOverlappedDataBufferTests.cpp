@@ -34,13 +34,13 @@ TEST(TOverlappedDataBufferTests, Constructor_SanityTest)
 	TOverlappedDataBuffer buffer(32768, &iParam);
 
 	EXPECT_NE(nullptr, buffer.GetBufferPtr());
-	EXPECT_EQ(32768, buffer.GetBufferSize());
-	EXPECT_EQ(0, buffer.GetBytesTransferred());
-	EXPECT_EQ(0, buffer.GetErrorCode());
+	EXPECT_EQ(32768UL, buffer.GetBufferSize());
+	EXPECT_EQ(0UL, buffer.GetBytesTransferred());
+	EXPECT_EQ(0UL, buffer.GetErrorCode());
 	EXPECT_EQ(0, buffer.GetFilePosition());
-	EXPECT_EQ(0, buffer.GetRealDataSize());
-	EXPECT_EQ(0, buffer.GetRequestedDataSize());
-	EXPECT_EQ(0, buffer.GetStatusCode());
+	EXPECT_EQ(0UL, buffer.GetRealDataSize());
+	EXPECT_EQ(0UL, buffer.GetRequestedDataSize());
+	EXPECT_EQ(0UL, buffer.GetStatusCode());
 	EXPECT_FALSE(buffer.IsLastPart());
 }
 
@@ -83,7 +83,7 @@ TEST(TOverlappedDataBufferTests, ReinitializeBuffer_ReduceSize)
 	buffer.ReinitializeBuffer(16384);
 
 	EXPECT_NE(nullptr, buffer.GetBufferPtr());
-	EXPECT_EQ(16384, buffer.GetBufferSize());
+	EXPECT_EQ(16384UL, buffer.GetBufferSize());
 }
 
 TEST(TOverlappedDataBufferTests, ReinitializeBuffer_IncreaseSize)
@@ -93,7 +93,7 @@ TEST(TOverlappedDataBufferTests, ReinitializeBuffer_IncreaseSize)
 	buffer.ReinitializeBuffer(32768);
 
 	EXPECT_NE(nullptr, buffer.GetBufferPtr());
-	EXPECT_EQ(32768, buffer.GetBufferSize());
+	EXPECT_EQ(32768UL, buffer.GetBufferSize());
 }
 
 TEST(TOverlappedDataBufferTests, ReinitializeBuffer_SameSize)
@@ -116,7 +116,7 @@ TEST(TOverlappedDataBufferTests, SetRequestedDataSize_GetRequestedDataSize)
 
 	buffer.SetRequestedDataSize(123);
 
-	EXPECT_EQ(123, buffer.GetRequestedDataSize());
+	EXPECT_EQ(123UL, buffer.GetRequestedDataSize());
 }
 
 TEST(TOverlappedDataBufferTests, SetRealDataSize_GetRealDataSize)
@@ -125,7 +125,7 @@ TEST(TOverlappedDataBufferTests, SetRealDataSize_GetRealDataSize)
 
 	buffer.SetRealDataSize(123);
 
-	EXPECT_EQ(123, buffer.GetRealDataSize());
+	EXPECT_EQ(123UL, buffer.GetRealDataSize());
 }
 
 TEST(TOverlappedDataBufferTests, SetLastPart_IsLastPart)
@@ -143,7 +143,7 @@ TEST(TOverlappedDataBufferTests, SetErrorCode_GetErrorCode)
 
 	buffer.SetErrorCode(123);
 
-	EXPECT_EQ(123, buffer.GetErrorCode());
+	EXPECT_EQ(123UL, buffer.GetErrorCode());
 }
 
 TEST(TOverlappedDataBufferTests, SetStatusCode_GetStatusCode)
@@ -152,7 +152,7 @@ TEST(TOverlappedDataBufferTests, SetStatusCode_GetStatusCode)
 
 	buffer.SetStatusCode(123);
 
-	EXPECT_EQ(123, buffer.GetStatusCode());
+	EXPECT_EQ(123UL, buffer.GetStatusCode());
 }
 
 TEST(TOverlappedDataBufferTests, SetBytesTransferred_GetBytesTransferred)
@@ -161,7 +161,7 @@ TEST(TOverlappedDataBufferTests, SetBytesTransferred_GetBytesTransferred)
 
 	buffer.SetBytesTransferred(123);
 
-	EXPECT_EQ(123, buffer.GetBytesTransferred());
+	EXPECT_EQ(123UL, buffer.GetBytesTransferred());
 }
 
 TEST(TOverlappedDataBufferTests, GetFilePosition_SetFilePosition)
@@ -189,13 +189,13 @@ TEST(TOverlappedDataBufferTests, InitForRead)
 
 	buffer.InitForRead(320, 600);
 
-	EXPECT_EQ(600, buffer.GetRequestedDataSize());
+	EXPECT_EQ(600UL, buffer.GetRequestedDataSize());
 	EXPECT_EQ(320, buffer.GetFilePosition());
-	EXPECT_EQ(0, buffer.GetRealDataSize());
+	EXPECT_EQ(0UL, buffer.GetRealDataSize());
 	EXPECT_EQ(false, buffer.IsLastPart());
-	EXPECT_EQ(0, buffer.GetErrorCode());
-	EXPECT_EQ(0, buffer.GetStatusCode());
-	EXPECT_EQ(0, buffer.GetBytesTransferred());
+	EXPECT_EQ(0UL, buffer.GetErrorCode());
+	EXPECT_EQ(0UL, buffer.GetStatusCode());
+	EXPECT_EQ(0UL, buffer.GetBytesTransferred());
 }
 
 TEST(TOverlappedDataBufferTests, InitForWrite)
@@ -212,9 +212,9 @@ TEST(TOverlappedDataBufferTests, InitForWrite)
 
 	buffer.InitForWrite();
 
-	EXPECT_EQ(0, buffer.GetErrorCode());
-	EXPECT_EQ(0, buffer.GetStatusCode());
-	EXPECT_EQ(0, buffer.GetBytesTransferred());
+	EXPECT_EQ(0UL, buffer.GetErrorCode());
+	EXPECT_EQ(0UL, buffer.GetStatusCode());
+	EXPECT_EQ(0UL, buffer.GetBytesTransferred());
 }
 
 TEST(TOverlappedDataBufferTests, Reset)
@@ -232,13 +232,13 @@ TEST(TOverlappedDataBufferTests, Reset)
 
 	buffer.Reset();
 
-	EXPECT_EQ(0, buffer.GetRequestedDataSize());
+	EXPECT_EQ(0UL, buffer.GetRequestedDataSize());
 	EXPECT_EQ(0, buffer.GetFilePosition());
-	EXPECT_EQ(0, buffer.GetRealDataSize());
+	EXPECT_EQ(0UL, buffer.GetRealDataSize());
 	EXPECT_EQ(false, buffer.IsLastPart());
-	EXPECT_EQ(0, buffer.GetErrorCode());
-	EXPECT_EQ(0, buffer.GetStatusCode());
-	EXPECT_EQ(0, buffer.GetBytesTransferred());
+	EXPECT_EQ(0UL, buffer.GetErrorCode());
+	EXPECT_EQ(0UL, buffer.GetStatusCode());
+	EXPECT_EQ(0UL, buffer.GetBytesTransferred());
 	EXPECT_EQ(nullptr, buffer.GetParam());
 }
 

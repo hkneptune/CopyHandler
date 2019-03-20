@@ -15,11 +15,11 @@ TEST(TOverlappedReaderTests, AllocatingConstructor_CheckBufferSizes)
 	TOverlappedMemoryPoolPtr spBuffers(std::make_shared<TOverlappedMemoryPool>(3, 32768));
 	TBufferListPtr spBufferList = spBuffers->GetBufferList();
 
-	EXPECT_EQ(3, spBufferList->GetCount());
+	EXPECT_EQ(3UL, spBufferList->GetCount());
 
-	EXPECT_EQ(32768, spBufferList->Pop()->GetBufferSize());
-	EXPECT_EQ(32768, spBufferList->Pop()->GetBufferSize());
-	EXPECT_EQ(32768, spBufferList->Pop()->GetBufferSize());
+	EXPECT_EQ(32768UL, spBufferList->Pop()->GetBufferSize());
+	EXPECT_EQ(32768UL, spBufferList->Pop()->GetBufferSize());
+	EXPECT_EQ(32768UL, spBufferList->Pop()->GetBufferSize());
 	EXPECT_EQ(nullptr, spBufferList->Pop());
 }
 
@@ -49,12 +49,12 @@ TEST(TOverlappedReaderTests, ReinitializeBuffer_SameSizeSameCount)
 	TOverlappedMemoryPoolPtr spBuffers(std::make_shared<TOverlappedMemoryPool>(3, 32768));
 	spBuffers->ReinitializeBuffers(3, 32768);
 
-	EXPECT_EQ(3, spBuffers->GetTotalBufferCount());
-	EXPECT_EQ(32768, spBuffers->GetSingleBufferSize());
+	EXPECT_EQ(3UL, spBuffers->GetTotalBufferCount());
+	EXPECT_EQ(32768UL, spBuffers->GetSingleBufferSize());
 
-	EXPECT_EQ(32768, spBuffers->GetBufferList()->Pop()->GetBufferSize());
-	EXPECT_EQ(32768, spBuffers->GetBufferList()->Pop()->GetBufferSize());
-	EXPECT_EQ(32768, spBuffers->GetBufferList()->Pop()->GetBufferSize());
+	EXPECT_EQ(32768UL, spBuffers->GetBufferList()->Pop()->GetBufferSize());
+	EXPECT_EQ(32768UL, spBuffers->GetBufferList()->Pop()->GetBufferSize());
+	EXPECT_EQ(32768UL, spBuffers->GetBufferList()->Pop()->GetBufferSize());
 	EXPECT_EQ(nullptr, spBuffers->GetBufferList()->Pop());
 }
 
@@ -65,12 +65,12 @@ TEST(TOverlappedReaderTests, ReinitializeBuffer_IncreaseSize)
 	TOverlappedMemoryPoolPtr spBuffers(std::make_shared<TOverlappedMemoryPool>(3, 32768));
 	spBuffers->ReinitializeBuffers(3, 65536);
 
-	EXPECT_EQ(3, spBuffers->GetTotalBufferCount());
-	EXPECT_EQ(65536, spBuffers->GetSingleBufferSize());
+	EXPECT_EQ(3UL, spBuffers->GetTotalBufferCount());
+	EXPECT_EQ(65536UL, spBuffers->GetSingleBufferSize());
 
-	EXPECT_EQ(65536, spBuffers->GetBufferList()->Pop()->GetBufferSize());
-	EXPECT_EQ(65536, spBuffers->GetBufferList()->Pop()->GetBufferSize());
-	EXPECT_EQ(65536, spBuffers->GetBufferList()->Pop()->GetBufferSize());
+	EXPECT_EQ(65536UL, spBuffers->GetBufferList()->Pop()->GetBufferSize());
+	EXPECT_EQ(65536UL, spBuffers->GetBufferList()->Pop()->GetBufferSize());
+	EXPECT_EQ(65536UL, spBuffers->GetBufferList()->Pop()->GetBufferSize());
 	EXPECT_EQ(nullptr, spBuffers->GetBufferList()->Pop());
 }
 
@@ -81,12 +81,12 @@ TEST(TOverlappedReaderTests, ReinitializeBuffer_DecreaseSize)
 	TOverlappedMemoryPoolPtr spBuffers(std::make_shared<TOverlappedMemoryPool>(3, 65536));
 	spBuffers->ReinitializeBuffers(3, 32768);
 
-	EXPECT_EQ(3, spBuffers->GetTotalBufferCount());
-	EXPECT_EQ(32768, spBuffers->GetSingleBufferSize());
+	EXPECT_EQ(3UL, spBuffers->GetTotalBufferCount());
+	EXPECT_EQ(32768UL, spBuffers->GetSingleBufferSize());
 
-	EXPECT_EQ(32768, spBuffers->GetBufferList()->Pop()->GetBufferSize());
-	EXPECT_EQ(32768, spBuffers->GetBufferList()->Pop()->GetBufferSize());
-	EXPECT_EQ(32768, spBuffers->GetBufferList()->Pop()->GetBufferSize());
+	EXPECT_EQ(32768UL, spBuffers->GetBufferList()->Pop()->GetBufferSize());
+	EXPECT_EQ(32768UL, spBuffers->GetBufferList()->Pop()->GetBufferSize());
+	EXPECT_EQ(32768UL, spBuffers->GetBufferList()->Pop()->GetBufferSize());
 	EXPECT_EQ(nullptr, spBuffers->GetBufferList()->Pop());
 }
 
@@ -97,14 +97,14 @@ TEST(TOverlappedReaderTests, ReinitializeBuffer_IncreaseCount)
 	TOverlappedMemoryPoolPtr spBuffers(std::make_shared<TOverlappedMemoryPool>(3, 32768));
 	spBuffers->ReinitializeBuffers(5, 32768);
 
-	EXPECT_EQ(5, spBuffers->GetTotalBufferCount());
-	EXPECT_EQ(32768, spBuffers->GetSingleBufferSize());
+	EXPECT_EQ(5UL, spBuffers->GetTotalBufferCount());
+	EXPECT_EQ(32768UL, spBuffers->GetSingleBufferSize());
 
-	EXPECT_EQ(32768, spBuffers->GetBufferList()->Pop()->GetBufferSize());
-	EXPECT_EQ(32768, spBuffers->GetBufferList()->Pop()->GetBufferSize());
-	EXPECT_EQ(32768, spBuffers->GetBufferList()->Pop()->GetBufferSize());
-	EXPECT_EQ(32768, spBuffers->GetBufferList()->Pop()->GetBufferSize());
-	EXPECT_EQ(32768, spBuffers->GetBufferList()->Pop()->GetBufferSize());
+	EXPECT_EQ(32768UL, spBuffers->GetBufferList()->Pop()->GetBufferSize());
+	EXPECT_EQ(32768UL, spBuffers->GetBufferList()->Pop()->GetBufferSize());
+	EXPECT_EQ(32768UL, spBuffers->GetBufferList()->Pop()->GetBufferSize());
+	EXPECT_EQ(32768UL, spBuffers->GetBufferList()->Pop()->GetBufferSize());
+	EXPECT_EQ(32768UL, spBuffers->GetBufferList()->Pop()->GetBufferSize());
 	EXPECT_EQ(nullptr, spBuffers->GetBufferList()->Pop());
 }
 
@@ -115,11 +115,11 @@ TEST(TOverlappedReaderTests, ReinitializeBuffer_DecreaseCount)
 	TOverlappedMemoryPoolPtr spBuffers(std::make_shared<TOverlappedMemoryPool>(5, 32768));
 	spBuffers->ReinitializeBuffers(3, 32768);
 
-	EXPECT_EQ(3, spBuffers->GetTotalBufferCount());
-	EXPECT_EQ(32768, spBuffers->GetSingleBufferSize());
+	EXPECT_EQ(3UL, spBuffers->GetTotalBufferCount());
+	EXPECT_EQ(32768UL, spBuffers->GetSingleBufferSize());
 
-	EXPECT_EQ(32768, spBuffers->GetBufferList()->Pop()->GetBufferSize());
-	EXPECT_EQ(32768, spBuffers->GetBufferList()->Pop()->GetBufferSize());
-	EXPECT_EQ(32768, spBuffers->GetBufferList()->Pop()->GetBufferSize());
+	EXPECT_EQ(32768UL, spBuffers->GetBufferList()->Pop()->GetBufferSize());
+	EXPECT_EQ(32768UL, spBuffers->GetBufferList()->Pop()->GetBufferSize());
+	EXPECT_EQ(32768UL, spBuffers->GetBufferList()->Pop()->GetBufferSize());
 	EXPECT_EQ(nullptr, spBuffers->GetBufferList()->Pop());
 }

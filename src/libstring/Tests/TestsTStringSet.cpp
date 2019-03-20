@@ -9,7 +9,7 @@ TEST(TestsTStringSet, DefaultConstruction)
 {
 	TStringSet setStrings;
 
-	EXPECT_EQ(0, setStrings.GetCount());
+	EXPECT_EQ(0UL, setStrings.GetCount());
 }
 
 TEST(TestsTStringSet, InsertElements)
@@ -19,7 +19,7 @@ TEST(TestsTStringSet, InsertElements)
 	setStrings.Insert(TString(L"SomeString1"));
 	setStrings.Insert(TString(L"SomeString2"));
 
-	EXPECT_EQ(2, setStrings.GetCount());
+	EXPECT_EQ(2UL, setStrings.GetCount());
 	EXPECT_TRUE(setStrings.HasValue(L"SomeString1"));
 	EXPECT_TRUE(setStrings.HasValue(L"SomeString2"));
 	EXPECT_FALSE(setStrings.HasValue(TString()));
@@ -38,7 +38,7 @@ TEST(TestsTStringSet, InsertCollection)
 
 	setStrings.Insert(arrPatterns2);
 
-	EXPECT_EQ(3, setStrings.GetCount());
+	EXPECT_EQ(3UL, setStrings.GetCount());
 	EXPECT_TRUE(setStrings.HasValue(L"SomeString1"));
 	EXPECT_TRUE(setStrings.HasValue(L"SomeString2"));
 	EXPECT_TRUE(setStrings.HasValue(L"SomeString3"));
@@ -53,7 +53,7 @@ TEST(TestsTStringSet, Remove)
 
 	setStrings.Remove(L"SomeString1");
 
-	EXPECT_EQ(1, setStrings.GetCount());
+	EXPECT_EQ(1UL, setStrings.GetCount());
 	EXPECT_FALSE(setStrings.HasValue(L"SomeString1"));
 	EXPECT_TRUE(setStrings.HasValue(L"SomeString2"));
 	EXPECT_FALSE(setStrings.HasValue(TString()));
@@ -68,7 +68,7 @@ TEST(TestsTStringSet, Clear)
 
 	setStrings.Clear();
 
-	EXPECT_EQ(0, setStrings.GetCount());
+	EXPECT_EQ(0UL, setStrings.GetCount());
 }
 
 TEST(TestsTStringSet, IsEmpty_Empty)

@@ -288,13 +288,13 @@ TEST(TConfigTests, GetSetUInt)
 	cfg.SetValue(_T("Root.Node.Value2"), (unsigned int)4294967295);
 
 	// check if stored successfully (typed get)
-	EXPECT_EQ(1489, cfg.GetUInt(_T("Root.Node.Value1")));
+	EXPECT_EQ(1489UL, cfg.GetUInt(_T("Root.Node.Value1")));
 	EXPECT_EQ(4294967295, cfg.GetUInt(_T("Root.Node.Value2")));
 
 	// check if stored successfully (GetValue)
 	unsigned int value = 0;
 	cfg.GetValue(_T("Root.Node.Value1"), value);
-	EXPECT_EQ(1489, value);
+	EXPECT_EQ(1489UL, value);
 	cfg.GetValue(_T("Root.Node.Value2"), value);
 	EXPECT_EQ(4294967295, value);
 }
@@ -309,7 +309,7 @@ TEST(TConfigTests, GetSetUIntExport)
 	// store in string
 	cfg.ReadFromString(strXmlData);
 
-	EXPECT_EQ(1489, cfg.GetUInt(_T("Root.Node.Value1")));
+	EXPECT_EQ(1489UL, cfg.GetUInt(_T("Root.Node.Value1")));
 	EXPECT_EQ(4294967295, cfg.GetUInt(_T("Root.Node.Value2")));
 
 	TString strWriteXmlData;
@@ -548,7 +548,7 @@ TEST_F(InitializedConfigFixture, GetSetStringArrayImport)
 	TStringArray arrRead;
 	m_cfg.GetValue(_T("CHConfig.Core.Notifications.PathList.Path"), arrRead);
 
-	EXPECT_EQ(arrRead.GetCount(), 4);
+	EXPECT_EQ(arrRead.GetCount(), 4UL);
 	EXPECT_EQ(TString(_T("c:\\Windows\\System32")), arrRead.GetAt(0));
 	EXPECT_EQ(TString(_T("d:\\Movies")), arrRead.GetAt(1));
 	EXPECT_EQ(TString(_T("x:\\Music")), arrRead.GetAt(2));
@@ -620,7 +620,7 @@ TEST_F(InitializedConfigFixture, ExtractMultipleConfigs)
 
 	m_cfg.ExtractMultiSubConfigs(_T("CHConfig.Core.CompositeObjects.Object"), cfgSubArray);
 
-	EXPECT_EQ(2, cfgSubArray.GetCount());
+	EXPECT_EQ(2UL, cfgSubArray.GetCount());
 
 	EXPECT_EQ(TString(_T("FirstName")), cfgSubArray.GetAt(0).GetString(_T("Name")));
 	EXPECT_EQ(TString(_T("<WINDOWS>\\FirstPath")), cfgSubArray.GetAt(0).GetString(_T("Path")));

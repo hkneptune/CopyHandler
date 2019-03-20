@@ -132,7 +132,7 @@ TEST(TSmartPathTests, SplitPath)
 	path.FromString(_T("c:\\First path\\some directory\\file.txt"));
 	path.SplitPath(vPaths);
 
-	EXPECT_EQ(4, vPaths.GetCount());
+	EXPECT_EQ(4UL, vPaths.GetCount());
 	EXPECT_STREQ(_T("c:"), vPaths.GetAt(0).ToString());
 	EXPECT_STREQ(_T("First path"), vPaths.GetAt(1).ToString());
 	EXPECT_STREQ(_T("some directory"), vPaths.GetAt(2).ToString());
@@ -147,7 +147,7 @@ TEST(TSmartPathTests, SplitEmptyPath)
 	path.FromString(_T(""));
 	path.SplitPath(vPaths);
 
-	EXPECT_EQ(0, vPaths.GetCount());
+	EXPECT_EQ(0UL, vPaths.GetCount());
 }
 
 TEST(TSmartPathTests, CompareLTGTCaseInsensitive)
@@ -1092,20 +1092,20 @@ TEST(TSmartPathTests, GetLength_Empty)
 {
 	TSmartPath path;
 	path.FromString(_T(""));
-	EXPECT_EQ(0, path.GetLength());
+	EXPECT_EQ(0UL, path.GetLength());
 }
 
 TEST(TSmartPathTests, GetLength_NotInitializedEmpty)
 {
 	TSmartPath path;
-	EXPECT_EQ(0, path.GetLength());
+	EXPECT_EQ(0UL, path.GetLength());
 }
 
 TEST(TSmartPathTests, GetLength_NotEmpty)
 {
 	TSmartPath path;
 	path.FromString(_T("some path"));
-	EXPECT_EQ(9, path.GetLength());
+	EXPECT_EQ(9UL, path.GetLength());
 }
 
 ///////////////////////////////////////////////////////////////////////////////

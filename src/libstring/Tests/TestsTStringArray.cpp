@@ -10,7 +10,7 @@ TEST(TestsTStringArray, DefaultConstruction)
 {
 	TStringArray arrStrings;
 
-	EXPECT_EQ(0, arrStrings.GetCount());
+	EXPECT_EQ(0UL, arrStrings.GetCount());
 }
 
 TEST(TestsTStringArray, AddElements)
@@ -20,7 +20,7 @@ TEST(TestsTStringArray, AddElements)
 	arrStrings.Add(TString(L"SomeString1"));
 	arrStrings.Add(TString(L"SomeString2"));
 
-	EXPECT_EQ(2, arrStrings.GetCount());
+	EXPECT_EQ(2UL, arrStrings.GetCount());
 	EXPECT_STREQ(L"SomeString1", arrStrings.GetAt(0).c_str());
 	EXPECT_STREQ(L"SomeString2", arrStrings.GetAt(1).c_str());
 }
@@ -32,7 +32,7 @@ TEST(TestsTStringArray, InsertAt)
 	arrStrings.InsertAt(0, TString(L"SomeString1"));
 	arrStrings.InsertAt(0, TString(L"SomeString2"));
 
-	EXPECT_EQ(2, arrStrings.GetCount());
+	EXPECT_EQ(2UL, arrStrings.GetCount());
 	EXPECT_STREQ(L"SomeString1", arrStrings.GetAt(1).c_str());
 	EXPECT_STREQ(L"SomeString2", arrStrings.GetAt(0).c_str());
 }
@@ -53,7 +53,7 @@ TEST(TestsTStringArray, SetAt)
 
 	arrStrings.SetAt(0, TString(L"SomeString3"));
 
-	EXPECT_EQ(2, arrStrings.GetCount());
+	EXPECT_EQ(2UL, arrStrings.GetCount());
 	EXPECT_STREQ(L"SomeString3", arrStrings.GetAt(0).c_str());
 	EXPECT_STREQ(L"SomeString2", arrStrings.GetAt(1).c_str());
 }
@@ -74,7 +74,7 @@ TEST(TestsTStringArray, RemoveAt)
 
 	arrStrings.RemoveAt(0);
 
-	EXPECT_EQ(1, arrStrings.GetCount());
+	EXPECT_EQ(1UL, arrStrings.GetCount());
 	EXPECT_STREQ(L"SomeString2", arrStrings.GetAt(0).c_str());
 }
 
@@ -94,7 +94,7 @@ TEST(TestsTStringArray, Clear)
 
 	arrStrings.Clear();
 
-	EXPECT_EQ(0, arrStrings.GetCount());
+	EXPECT_EQ(0UL, arrStrings.GetCount());
 }
 
 TEST(TestsTStringArray, Compare_Empty)

@@ -9,8 +9,8 @@ TEST(TestsTFileTime, DefaultConstruction)
 {
 	TFileTime fTime;
 	EXPECT_EQ(0, fTime.ToUInt64());
-	EXPECT_EQ(0, fTime.GetAsFiletime().dwLowDateTime);
-	EXPECT_EQ(0, fTime.GetAsFiletime().dwHighDateTime);
+	EXPECT_EQ(0UL, fTime.GetAsFiletime().dwLowDateTime);
+	EXPECT_EQ(0UL, fTime.GetAsFiletime().dwHighDateTime);
 }
 
 TEST(TestsTFileTime, ConstructionFromFILETIME)
@@ -18,9 +18,9 @@ TEST(TestsTFileTime, ConstructionFromFILETIME)
 	FILETIME filetime = { 0x00000034, 0x00000045 };
 
 	TFileTime fTime(filetime);
-	EXPECT_EQ(0x0000004500000034, fTime.ToUInt64());
-	EXPECT_EQ(0x00000034, fTime.GetAsFiletime().dwLowDateTime);
-	EXPECT_EQ(0x00000045, fTime.GetAsFiletime().dwHighDateTime);
+	EXPECT_EQ(0x0000004500000034ULL, fTime.ToUInt64());
+	EXPECT_EQ(0x00000034UL, fTime.GetAsFiletime().dwLowDateTime);
+	EXPECT_EQ(0x00000045UL, fTime.GetAsFiletime().dwHighDateTime);
 }
 
 TEST(TestsTFileTime, AssignmentOperator)
@@ -30,9 +30,9 @@ TEST(TestsTFileTime, AssignmentOperator)
 
 	TFileTime fTime(filetime1);
 	fTime = filetime2;
-	EXPECT_EQ(0x0000008500000074, fTime.ToUInt64());
-	EXPECT_EQ(0x00000074, fTime.GetAsFiletime().dwLowDateTime);
-	EXPECT_EQ(0x00000085, fTime.GetAsFiletime().dwHighDateTime);
+	EXPECT_EQ(0x0000008500000074ULL, fTime.ToUInt64());
+	EXPECT_EQ(0x00000074UL, fTime.GetAsFiletime().dwLowDateTime);
+	EXPECT_EQ(0x00000085UL, fTime.GetAsFiletime().dwHighDateTime);
 }
 
 TEST(TestsTFileTime, CompareOperator_Default)
