@@ -17,7 +17,7 @@ struct SampleThreadOwner
 
 		++pThis->m_alCounter;
 
-		while (!pThis->m_controller.KillRequested(10))
+		while (!pThis->m_controller.KillRequested(100))
 		{
 			++pThis->m_alCounter;
 		}
