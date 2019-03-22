@@ -26,6 +26,8 @@
 #include "ShellExtensionVerifier.h"
 #include "HResultFormatter.h"
 
+extern std::atomic<long> g_DllRefCount;
+
 /////////////////////////////////////////////////////////////////////////////
 // CDropMenuExt
 
@@ -33,6 +35,8 @@ CDropMenuExt::CDropMenuExt() :
 	m_piShellExtControl(nullptr),
 	m_spLog(GetLogger(L"CDropMenuExt"))
 {
+	++g_DllRefCount;
+
 	HRESULT hResult = CoCreateInstance(CLSID_CShellExtControl, nullptr, CLSCTX_ALL, IID_IShellExtControl, (void**)&m_piShellExtControl);
 
 	LOG_HRESULT(m_spLog, hResult) << L"Create instance of ShellExtControl";
@@ -45,6 +49,8 @@ CDropMenuExt::~CDropMenuExt()
 		m_piShellExtControl->Release();
 		m_piShellExtControl = nullptr;
 	}
+
+	--g_DllRefCount;
 }
 
 STDMETHODIMP CDropMenuExt::QueryInterface(REFIID riid, LPVOID FAR *ppvObject)

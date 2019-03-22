@@ -29,12 +29,16 @@
 #include "Logger.h"
 #include "../libchengine/TTaskDefinition.h"
 
+extern std::atomic<long> g_DllRefCount;
+
 /////////////////////////////////////////////////////////////////////////////
 // CMenuExt
 CMenuExt::CMenuExt() :
 	m_piShellExtControl(nullptr),
 	m_spLog(GetLogger(L"CMenuExt"))
 {
+	++g_DllRefCount;
+
 	HRESULT hResult = CoCreateInstance(CLSID_CShellExtControl, nullptr, CLSCTX_ALL, IID_IShellExtControl, (void**)&m_piShellExtControl);
 	LOG_HRESULT(m_spLog, hResult) << L"Creation of ShellExtControl " << LOG_PARAM(m_piShellExtControl);
 }
@@ -46,6 +50,8 @@ CMenuExt::~CMenuExt()
 		m_piShellExtControl->Release();
 		m_piShellExtControl = nullptr;
 	}
+
+	--g_DllRefCount;
 }
 
 STDMETHODIMP CMenuExt::QueryInterface(REFIID riid, LPVOID FAR *ppvObject)

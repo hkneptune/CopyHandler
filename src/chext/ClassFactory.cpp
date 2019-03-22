@@ -20,18 +20,18 @@
 #include "ClassFactory.h"
 #include "Logger.h"
 
-extern LONG g_DllRefCount;
+extern std::atomic<long> g_DllRefCount;
 
 ClassFactory::ClassFactory() :
 	m_spLog(GetLogger(L"ClassFactory"))
 {
-	InterlockedIncrement(&g_DllRefCount);
+	++g_DllRefCount;
 	LOG_DEBUG(m_spLog) << L"Constructing ClassFactory";
 }
 
 ClassFactory::~ClassFactory()
 {
-	InterlockedDecrement(&g_DllRefCount);
+	--g_DllRefCount;
 }
 
 STDMETHODIMP ClassFactory::QueryInterface(REFIID riid, LPVOID *ppReturn)

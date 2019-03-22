@@ -25,7 +25,8 @@
 #include "../common/TRegistry.h"
 #include "DllRegistration.h"
 
-LONG g_DllRefCount = 0; // Reference count of this DLL.
+std::atomic<long> g_DllRefCount = 0;
+
 extern HINSTANCE g_hInstance;
 
 namespace

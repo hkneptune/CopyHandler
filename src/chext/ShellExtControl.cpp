@@ -23,10 +23,13 @@
 #include "Logger.h"
 #include "../libchcore/TIpcMutexLock.h"
 
+extern std::atomic<long> g_DllRefCount;
+
 CShellExtControl::CShellExtControl() :
 	m_mutex(L"CHShellExtControlDataMutex"),
 	m_spLog(GetLogger(L"ShellExtControl"))
 {
+	++g_DllRefCount;
 	LOG_DEBUG(m_spLog) << L"Constructing CShellExtControl";
 }
 
@@ -37,8 +40,10 @@ CShellExtControl::~CShellExtControl()
 		UnmapViewOfFile((LPVOID)m_pShellExtData); 
 
 		// Close the process's handle to the file-mapping object.
-		CloseHandle(m_hMemory); 
+		CloseHandle(m_hMemory);
 	}
+
+	--g_DllRefCount;
 }
 
 STDMETHODIMP CShellExtControl::QueryInterface(REFIID riid, LPVOID FAR *ppvObject)
