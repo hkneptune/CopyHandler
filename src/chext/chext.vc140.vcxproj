@@ -254,7 +254,7 @@
     </ResourceCompile>
     <Link>
       <RegisterOutput>false</RegisterOutput>
-      <AdditionalDependencies>comctl32.lib;gmock32d.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>comctl32.lib;gmock-static-crt32d.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <ModuleDefinitionFile>chext.def</ModuleDefinitionFile>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>
@@ -344,7 +344,7 @@ goto end
     </ResourceCompile>
     <Link>
       <RegisterOutput>false</RegisterOutput>
-      <AdditionalDependencies>comctl32.lib;gmock64d.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>comctl32.lib;gmock-static-crt64d.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <ModuleDefinitionFile>chext.def</ModuleDefinitionFile>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>
@@ -432,7 +432,7 @@ goto end
     </ResourceCompile>
     <Link>
       <RegisterOutput>false</RegisterOutput>
-      <AdditionalDependencies>comctl32.lib;gmock32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>comctl32.lib;gmock-static-crt32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <ModuleDefinitionFile>chext.def</ModuleDefinitionFile>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>
@@ -522,7 +522,7 @@ goto end
     </ResourceCompile>
     <Link>
       <RegisterOutput>false</RegisterOutput>
-      <AdditionalDependencies>comctl32.lib;gmock64.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>comctl32.lib;gmock-static-crt64.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <ModuleDefinitionFile>chext.def</ModuleDefinitionFile>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>

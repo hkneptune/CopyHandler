@@ -244,7 +244,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Console</SubSystem>
       <TargetMachine>MachineX86</TargetMachine>
-      <AdditionalDependencies>gmock32d.lib</AdditionalDependencies>
+      <AdditionalDependencies>gmock-dynamic-crt32d.lib</AdditionalDependencies>
       <AdditionalLibraryDirectories>"$(OutDir)"</AdditionalLibraryDirectories>
     </Link>
     <PostBuildEvent>
@@ -317,7 +317,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Console</SubSystem>
       <TargetMachine>MachineX64</TargetMachine>
-      <AdditionalDependencies>gmock64d.lib</AdditionalDependencies>
+      <AdditionalDependencies>gmock-dynamic-crt64d.lib</AdditionalDependencies>
       <AdditionalLibraryDirectories>"$(OutDir)"</AdditionalLibraryDirectories>
     </Link>
     <PostBuildEvent>
@@ -396,7 +396,7 @@
       <OptimizeReferences>true</OptimizeReferences>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <TargetMachine>MachineX86</TargetMachine>
-      <AdditionalDependencies>gmock32.lib</AdditionalDependencies>
+      <AdditionalDependencies>gmock-dynamic-crt32.lib</AdditionalDependencies>
       <AdditionalLibraryDirectories>"$(OutDir)"</AdditionalLibraryDirectories>
     </Link>
     <PostBuildEvent>
@@ -475,7 +475,7 @@
       <OptimizeReferences>true</OptimizeReferences>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <TargetMachine>MachineX64</TargetMachine>
-      <AdditionalDependencies>gmock64.lib</AdditionalDependencies>
+      <AdditionalDependencies>gmock-dynamic-crt64.lib</AdditionalDependencies>
       <AdditionalLibraryDirectories>"$(OutDir)"</AdditionalLibraryDirectories>
     </Link>
     <PostBuildEvent>

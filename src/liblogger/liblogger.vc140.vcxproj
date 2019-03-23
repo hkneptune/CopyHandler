@@ -227,7 +227,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>
       <TargetMachine>MachineX86</TargetMachine>
-      <AdditionalDependencies>gmock32d.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>gmock-static-crt32d.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>"$(OutDir)"</AdditionalLibraryDirectories>
     </Link>
     <PostBuildEvent>
@@ -302,7 +302,7 @@ goto end
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>
       <TargetMachine>MachineX64</TargetMachine>
-      <AdditionalDependencies>gmock64d.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>gmock-static-crt64d.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>"$(OutDir)"</AdditionalLibraryDirectories>
     </Link>
     <PostBuildEvent>
@@ -373,7 +373,7 @@ goto end
       <OptimizeReferences>true</OptimizeReferences>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <TargetMachine>MachineX86</TargetMachine>
-      <AdditionalDependencies>gmock32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>gmock-static-crt32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>"$(OutDir)"</AdditionalLibraryDirectories>
     </Link>
     <PostBuildEvent>
@@ -450,7 +450,7 @@ goto end
       <OptimizeReferences>true</OptimizeReferences>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <TargetMachine>MachineX64</TargetMachine>
-      <AdditionalDependencies>gmock64.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>gmock-static-crt64.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>"$(OutDir)"</AdditionalLibraryDirectories>
     </Link>
     <PostBuildEvent>

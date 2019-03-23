@@ -247,7 +247,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>
       <TargetMachine>MachineX86</TargetMachine>
-      <AdditionalDependencies>gmock32d.lib</AdditionalDependencies>
+      <AdditionalDependencies>gmock-dynamic-crt32d.lib</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
       <Command>cd "$(TargetDir)"
@@ -331,7 +331,7 @@ goto end
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>
       <TargetMachine>MachineX64</TargetMachine>
-      <AdditionalDependencies>gmock64d.lib</AdditionalDependencies>
+      <AdditionalDependencies>gmock-dynamic-crt64d.lib</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
       <Command>cd "$(TargetDir)"
@@ -417,7 +417,7 @@ goto end
       <OptimizeReferences>true</OptimizeReferences>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <TargetMachine>MachineX86</TargetMachine>
-      <AdditionalDependencies>gmock32.lib</AdditionalDependencies>
+      <AdditionalDependencies>gmock-dynamic-crt32.lib</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
       <Command>cd "$(TargetDir)"
@@ -505,7 +505,7 @@ goto end
       <OptimizeReferences>true</OptimizeReferences>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <TargetMachine>MachineX64</TargetMachine>
-      <AdditionalDependencies>gmock64.lib</AdditionalDependencies>
+      <AdditionalDependencies>gmock-dynamic-crt64.lib</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
       <Command>cd "$(TargetDir)"

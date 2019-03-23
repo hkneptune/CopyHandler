@@ -40,9 +40,9 @@
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{D98F2D98-2352-4303-93EE-A5430C4E98AB}</ProjectGuid>
-    <RootNamespace>gmock</RootNamespace>
+    <RootNamespace>gmock-static-crt</RootNamespace>
     <Keyword>Win32Proj</Keyword>
-    <ProjectName>gmock</ProjectName>
+    <ProjectName>gmock-static-crt</ProjectName>
     <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
