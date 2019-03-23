@@ -67,7 +67,7 @@ namespace logger
 	inline TLogRecord::~TLogRecord()
 	{
 		*this << L"\r\n";
-		m_spFileData->PushLogEntry(str());
+		m_spFileData->PushLogEntry(str().c_str());
 	}
 
 	inline bool TLogRecord::IsEnabled() const

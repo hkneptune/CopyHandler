@@ -74,12 +74,12 @@ namespace logger
 		m_bLoggingEnabled = false;
 	}
 
-	void TLogFileData::PushLogEntry(std::wstring strLine)
+	void TLogFileData::PushLogEntry(const wchar_t* pszLine)
 	{
 		if(m_spLogFile && m_bLoggingEnabled)
 		{
 			boost::unique_lock<boost::shared_mutex> lock(m_mutex);
-			m_listEntries.push_back(strLine);
+			m_listEntries.push_back(pszLine ? pszLine : L"");
 			SetEvent(m_spHasEntriesEvent.get());
 		}
 	}

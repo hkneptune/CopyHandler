@@ -143,7 +143,7 @@ namespace logger
 						// append emergency message
 						if(!strError.empty())
 						{
-							spLogData->PushLogEntry(strError);
+							spLogData->PushLogEntry(strError.c_str());
 							spLogData->DisableLogging();
 						}
 

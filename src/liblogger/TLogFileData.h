@@ -42,7 +42,7 @@ namespace logger
 		TLoggerPaths GetMainLogPath() const;
 
 	private:
-		void PushLogEntry(std::wstring strLine);
+		void PushLogEntry(const wchar_t* pszLine);
 		void DisableLogging();
 
 		std::shared_ptr<void> GetEntriesEvent() const;
