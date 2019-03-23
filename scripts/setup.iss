@@ -38,8 +38,8 @@
 #define RegCHExtFilename32 "regchext.exe"
 #define RegCHExtFilename64 "regchext64.exe"
 
-#define MSRedistDir32 "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\redist\x86"
-#define MSRedistDir64 "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\redist\x64"
+#define MSRedistDir32 "C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Redist\MSVC\14.16.27012\x86"
+#define MSRedistDir64 "C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Redist\MSVC\14.16.27012\x64"
 #define DbgHelp32 "C:\Program Files (x86)\Windows Kits\8.1\Debuggers\x86"
 #define DbgHelp64 "C:\Program Files (x86)\Windows Kits\8.1\Debuggers\x64"
 #define UCrtDir32 "C:\Program Files (x86)\Windows Kits\10\Redist\ucrt\DLLs\x86"
@@ -122,8 +122,8 @@ Source: "..\bin\release\{#LibictranslateFilename32}"; DestDir: "{app}"; Flags: i
 Source: "..\bin\release\{#ICTranslateFilename32}"; DestDir: "{app}"; Flags: ignoreversion restartreplace uninsrestartdelete; Check: not Is64BitInstallMode
 Source: "..\bin\release\{#SQLite32}"; DestDir: "{app}"; Flags: ignoreversion restartreplace uninsrestartdelete; Check: not Is64BitInstallMode
 
-Source: "{#MSRedistDir32}\Microsoft.VC140.CRT\*"; DestDir: "{app}"; Flags: ignoreversion restartreplace uninsrestartdelete; Check: not Is64BitInstallMode
-Source: "{#MSRedistDir32}\Microsoft.VC140.MFC\*"; DestDir: "{app}"; Flags: ignoreversion restartreplace uninsrestartdelete; Check: not Is64BitInstallMode
+Source: "{#MSRedistDir32}\Microsoft.VC141.CRT\*"; DestDir: "{app}"; Flags: ignoreversion restartreplace uninsrestartdelete; Check: not Is64BitInstallMode
+Source: "{#MSRedistDir32}\Microsoft.VC141.MFC\*"; DestDir: "{app}"; Flags: ignoreversion restartreplace uninsrestartdelete; Check: not Is64BitInstallMode
 Source: "{#UCrtDir32}\*"; DestDir: "{app}"; Flags: ignoreversion restartreplace uninsrestartdelete; Check: not Is64BitInstallMode
 Source: "{#DbgHelp32}\dbghelp.dll"; DestDir: "{app}"; Flags: ignoreversion restartreplace uninsrestartdelete; Check: not Is64BitInstallMode
 
@@ -140,8 +140,8 @@ Source: "..\bin\release\{#LibictranslateFilename64}"; DestDir: "{app}"; Flags: i
 Source: "..\bin\release\{#ICTranslateFilename64}"; DestDir: "{app}"; Flags: ignoreversion restartreplace uninsrestartdelete; Check: Is64BitInstallMode
 Source: "..\bin\release\{#SQLite64}"; DestDir: "{app}"; Flags: ignoreversion restartreplace uninsrestartdelete; Check: Is64BitInstallMode
 
-Source: "{#MSRedistDir64}\Microsoft.VC140.CRT\*"; DestDir: "{app}"; Flags: ignoreversion restartreplace uninsrestartdelete; Check: Is64BitInstallMode
-Source: "{#MSRedistDir64}\Microsoft.VC140.MFC\*"; DestDir: "{app}"; Flags: ignoreversion restartreplace uninsrestartdelete; Check: Is64BitInstallMode
+Source: "{#MSRedistDir64}\Microsoft.VC141.CRT\*"; DestDir: "{app}"; Flags: ignoreversion restartreplace uninsrestartdelete; Check: Is64BitInstallMode
+Source: "{#MSRedistDir64}\Microsoft.VC141.MFC\*"; DestDir: "{app}"; Flags: ignoreversion restartreplace uninsrestartdelete; Check: Is64BitInstallMode
 Source: "{#UCrtDir64}\*"; DestDir: "{app}"; Flags: ignoreversion restartreplace uninsrestartdelete; Check: Is64BitInstallMode
 Source: "{#DbgHelp64}\dbghelp.dll"; DestDir: "{app}"; Flags: ignoreversion restartreplace uninsrestartdelete; Check: Is64BitInstallMode
 
@@ -153,8 +153,8 @@ Source: "..\bin\release\{#LibSerializerFilename32}"; DestDir: "{app}\ShellExt32"
 Source: "..\bin\release\{#LibStringFilename32}"; DestDir: "{app}\ShellExt32"; Flags: ignoreversion restartreplace uninsrestartdelete; Check: Is64BitInstallMode
 Source: "..\bin\release\{#LibLoggerFilename32}"; DestDir: "{app}\ShellExt32"; Flags: ignoreversion restartreplace uninsrestartdelete; Check: Is64BitInstallMode
 Source: "..\bin\release\{#SQLite32}"; DestDir: "{app}\ShellExt32"; Flags: ignoreversion restartreplace uninsrestartdelete; Check: Is64BitInstallMode
-Source: "{#MSRedistDir32}\Microsoft.VC140.CRT\*"; DestDir: "{app}\ShellExt32"; Flags: ignoreversion restartreplace uninsrestartdelete; Check: Is64BitInstallMode
-Source: "{#MSRedistDir32}\Microsoft.VC140.MFC\*"; DestDir: "{app}\ShellExt32"; Flags: ignoreversion restartreplace uninsrestartdelete; Check: Is64BitInstallMode
+Source: "{#MSRedistDir32}\Microsoft.VC141.CRT\*"; DestDir: "{app}\ShellExt32"; Flags: ignoreversion restartreplace uninsrestartdelete; Check: Is64BitInstallMode
+Source: "{#MSRedistDir32}\Microsoft.VC141.MFC\*"; DestDir: "{app}\ShellExt32"; Flags: ignoreversion restartreplace uninsrestartdelete; Check: Is64BitInstallMode
 Source: "{#UCrtDir32}\*"; DestDir: "{app}\ShellExt32"; Flags: ignoreversion restartreplace uninsrestartdelete; Check: Is64BitInstallMode
 Source: "{#DbgHelp32}\dbghelp.dll"; DestDir: "{app}\ShellExt32"; Flags: ignoreversion restartreplace uninsrestartdelete; Check: Is64BitInstallMode
 
