@@ -42,8 +42,8 @@
 #define MSRedistDir64 "C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Redist\MSVC\14.16.27012\x64"
 #define DbgHelp32 "C:\Program Files (x86)\Windows Kits\8.1\Debuggers\x86"
 #define DbgHelp64 "C:\Program Files (x86)\Windows Kits\8.1\Debuggers\x64"
-#define UCrtDir32 "C:\Program Files (x86)\Windows Kits\10\Redist\ucrt\DLLs\x86"
-#define UCrtDir64 "C:\Program Files (x86)\Windows Kits\10\Redist\ucrt\DLLs\x64"
+#define UCrtDir32 "C:\Program Files (x86)\Windows Kits\10\Redist\10.0.17763.0\ucrt\DLLs\x86"
+#define UCrtDir64 "C:\Program Files (x86)\Windows Kits\10\Redist\10.0.17763.0\ucrt\DLLs\x64"
 
 [Setup]
 AppName={#MyAppName}
