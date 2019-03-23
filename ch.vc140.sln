@@ -4,7 +4,7 @@ VisualStudioVersion = 15.0.28307.489
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ch", "src\ch\ch.vc140.vcxproj", "{4B215B9A-58CA-4987-AC95-7DFC3043E100}"
 	ProjectSection(ProjectDependencies) = postProject
-		{D98F2D98-2352-4303-93EE-A5430C4E98AB} = {D98F2D98-2352-4303-93EE-A5430C4E98AB}
+		{F20DCBBB-9681-467D-B3DB-F006C4D7AB62} = {F20DCBBB-9681-467D-B3DB-F006C4D7AB62}
 		{7CE8B0C5-8CD4-4551-ACBF-EC4749E15E69} = {7CE8B0C5-8CD4-4551-ACBF-EC4749E15E69}
 	EndProjectSection
 EndProject
@@ -15,12 +15,12 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "chext", "src\chext\chext.vc
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libictranslate", "src\libictranslate\libictranslate.vc140.vcxproj", "{DD1F3242-7EE4-4F41-8B8D-D833300C445F}"
 	ProjectSection(ProjectDependencies) = postProject
-		{D98F2D98-2352-4303-93EE-A5430C4E98AB} = {D98F2D98-2352-4303-93EE-A5430C4E98AB}
+		{F20DCBBB-9681-467D-B3DB-F006C4D7AB62} = {F20DCBBB-9681-467D-B3DB-F006C4D7AB62}
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ictranslate", "src\ictranslate\ictranslate.vc140.vcxproj", "{B0292250-B70C-4395-9859-F181FB113DA8}"
 	ProjectSection(ProjectDependencies) = postProject
-		{D98F2D98-2352-4303-93EE-A5430C4E98AB} = {D98F2D98-2352-4303-93EE-A5430C4E98AB}
+		{F20DCBBB-9681-467D-B3DB-F006C4D7AB62} = {F20DCBBB-9681-467D-B3DB-F006C4D7AB62}
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libchcore", "src\libchcore\libchcore.vc140.vcxproj", "{CBBF380B-7B16-4A1E-8194-758DAD7D8011}"
@@ -31,16 +31,31 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "sqlite3", "ext\sqlite3\sqlite3.vc140.vcxproj", "{D41831F5-B2A5-4C92-9F15-1D9AB04722CC}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "liblogger", "src\liblogger\liblogger.vc140.vcxproj", "{DF9957D4-3D95-4AC3-AD3F-DCBEA058F79D}"
+	ProjectSection(ProjectDependencies) = postProject
+		{D98F2D98-2352-4303-93EE-A5430C4E98AB} = {D98F2D98-2352-4303-93EE-A5430C4E98AB}
+	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ext", "ext", "{0E7F04BC-F111-4174-A665-F58CDF142934}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "regchext", "src\regchext\regchext.vcxproj", "{767D21BE-A123-46CD-B5D6-E01714E2A981}"
+	ProjectSection(ProjectDependencies) = postProject
+		{D98F2D98-2352-4303-93EE-A5430C4E98AB} = {D98F2D98-2352-4303-93EE-A5430C4E98AB}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libchengine", "src\libchengine\libchengine.vcxproj", "{6840F785-917F-46EE-BD56-C296C7A5B9E9}"
+	ProjectSection(ProjectDependencies) = postProject
+		{D98F2D98-2352-4303-93EE-A5430C4E98AB} = {D98F2D98-2352-4303-93EE-A5430C4E98AB}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libstring", "src\libstring\libstring.vcxproj", "{5BD38175-9F48-417D-8E5B-7093B1873CE5}"
+	ProjectSection(ProjectDependencies) = postProject
+		{D98F2D98-2352-4303-93EE-A5430C4E98AB} = {D98F2D98-2352-4303-93EE-A5430C4E98AB}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libserializer", "src\libserializer\libserializer.vcxproj", "{9490EC08-9CAB-4F99-99D8-0297E5BF6EA7}"
+	ProjectSection(ProjectDependencies) = postProject
+		{D98F2D98-2352-4303-93EE-A5430C4E98AB} = {D98F2D98-2352-4303-93EE-A5430C4E98AB}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "gmock-dynamic-crt", "ext\googletest\gmock-dynamic-crt.vcxproj", "{F20DCBBB-9681-467D-B3DB-F006C4D7AB62}"
 EndProject
