@@ -116,6 +116,12 @@ protected:
 				<Name>SecondName</Name>\
 			</Object>\
 		</CompositeObjects>\
+		<SingleObject>\
+			<Object>\
+				<Path>&lt;WINDOWS&gt;\\FirstPath</Path>\
+				<Name>FirstName</Name>\
+			</Object>\
+		</SingleObject>\
 	</Core>\
 </CHConfig>";
 
@@ -583,11 +589,8 @@ TEST_F(InitializedConfigFixture, CompositeObjectsReadWriteString)
 	m_cfg.WriteToString(wstrWithDeletion);
 
 	EXPECT_EQ(TString(_T("<?xml version=\"1.0\" encoding=\"utf-8\"?>\n\
-<CHConfig><Core><AutosaveInterval>30000</AutosaveInterval>\
-<CompositeObjects><Object><Name>FirstName</Name><Path>&lt;WINDOWS&gt;\\FirstPath</Path></Object><Object><Name>SecondName</Name><Path>&lt;WINDOWS&gt;\\SecondPath</Path></Object></CompositeObjects>\
-<Notifications><PathList><Path>c:\\Windows\\System32</Path><Path>d:\\Movies</Path><Path>x:\\Music</Path><Path>s:\\projects\\ch-rw</Path></PathList>\
-<Sounds><Enable>true</Enable><ErrorSoundPath>&lt;WINDOWS&gt;\\media\\chord.wav</ErrorSoundPath>\
-<FinishedSoundPath>&lt;WINDOWS&gt;\\\x597D\x8FD0\\ding.wav</FinishedSoundPath></Sounds></Notifications></Core></CHConfig>")), wstrWithDeletion);
+<CHConfig><Core><AutosaveInterval>30000</AutosaveInterval><CompositeObjects><Object><Name>FirstName</Name><Path>&lt;WINDOWS&gt;\\FirstPath</Path></Object><Object><Name>SecondName</Name><Path>&lt;WINDOWS&gt;\\SecondPath</Path></Object></CompositeObjects><Notifications><PathList><Path>c:\\Windows\\System32</Path><Path>d:\\Movies</Path><Path>x:\\Music</Path><Path>s:\\projects\\ch-rw</Path></PathList><Sounds><Enable>true</Enable><ErrorSoundPath>&lt;WINDOWS&gt;\\media\\chord.wav</ErrorSoundPath><FinishedSoundPath>&lt;WINDOWS&gt;\\\x597D\x8FD0\\ding.wav</FinishedSoundPath></Sounds></Notifications><SingleObject><Object><Name>FirstName</Name><Path>&lt;WINDOWS&gt;\\FirstPath</Path></Object></SingleObject></Core></CHConfig>")),
+	wstrWithDeletion);
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -599,8 +602,8 @@ TEST_F(InitializedConfigFixture, DeleteNodeTest)
 	m_cfg.WriteToString(wstrWithDeletion);
 
 	EXPECT_EQ(TString(_T("<?xml version=\"1.0\" encoding=\"utf-8\"?>\n\
-<CHConfig><Core><AutosaveInterval>30000</AutosaveInterval><CompositeObjects><Object><Name>FirstName</Name><Path>&lt;WINDOWS&gt;\\FirstPath</Path></Object>\
-<Object><Name>SecondName</Name><Path>&lt;WINDOWS&gt;\\SecondPath</Path></Object></CompositeObjects></Core></CHConfig>")), wstrWithDeletion);
+<CHConfig><Core><AutosaveInterval>30000</AutosaveInterval><CompositeObjects><Object><Name>FirstName</Name><Path>&lt;WINDOWS&gt;\\FirstPath</Path></Object><Object><Name>SecondName</Name><Path>&lt;WINDOWS&gt;\\SecondPath</Path></Object></CompositeObjects><SingleObject><Object><Name>FirstName</Name><Path>&lt;WINDOWS&gt;\\FirstPath</Path></Object></SingleObject></Core></CHConfig>")),
+	wstrWithDeletion);
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -626,6 +629,18 @@ TEST_F(InitializedConfigFixture, ExtractMultipleConfigs)
 	EXPECT_EQ(TString(_T("<WINDOWS>\\FirstPath")), cfgSubArray.GetAt(0).GetString(_T("Path")));
 	EXPECT_EQ(TString(_T("SecondName")), cfgSubArray.GetAt(1).GetString(_T("Name")));
 	EXPECT_EQ(TString(_T("<WINDOWS>\\SecondPath")), cfgSubArray.GetAt(1).GetString(_T("Path")));
+}
+
+TEST_F(InitializedConfigFixture, ExtractMultipleConfigsWithSingleNode)
+{
+	TConfigArray cfgSubArray;
+
+	m_cfg.ExtractMultiSubConfigs(_T("CHConfig.Core.SingleObject.Object"), cfgSubArray);
+
+	EXPECT_EQ(1UL, cfgSubArray.GetCount());
+
+	EXPECT_EQ(TString(_T("FirstName")), cfgSubArray.GetAt(0).GetString(_T("Name")));
+	EXPECT_EQ(TString(_T("<WINDOWS>\\FirstPath")), cfgSubArray.GetAt(0).GetString(_T("Path")));
 }
 
 TEST(TConfigTests, PutSubConfig)

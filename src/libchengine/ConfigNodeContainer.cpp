@@ -285,7 +285,6 @@ namespace chengine
 		{
 			bool bFound = false;
 			TString strReplace(pszNode);
-			strReplace += _T("[");
 
 			boost::shared_lock<boost::shared_mutex> lock(m_lock);
 
@@ -300,13 +299,23 @@ namespace chengine
 
 					TString strName = iter->m_strNodeName.Get();
 					strName.MidSelf(strReplace.GetLength());
-					size_t stPos = strName.Find(_T("]"));
-					if (stPos == std::numeric_limits<size_t>::max())
-						throw TCoreException(eErr_InvalidData, L"] character not found", LOCATION);
-					if (strName.GetAt(stPos + 1) != _T('.'))
-						throw TCoreException(eErr_InvalidData, L". character not found", LOCATION);
 
-					size_t stNodeIndex = boost::lexical_cast<size_t>(strName.Left(stPos));
+					size_t stNodeIndex = 0;
+					if (strName.StartsWith(L"["))
+					{
+						size_t stPos = strName.Find(_T("]"));
+						if (stPos == std::numeric_limits<size_t>::max())
+							throw TCoreException(eErr_InvalidData, L"] character not found", LOCATION);
+						if (strName.GetAt(stPos + 1) != _T('.'))
+							throw TCoreException(eErr_InvalidData, L". character not found", LOCATION);
+
+						stNodeIndex = boost::lexical_cast<size_t>(strName.Mid(1, stPos - 1));
+
+						strName.Delete(0, stPos + 2);	// skip "]." at the beginning
+					}
+					else
+						strName.Delete(0, 1);	// skip "." at the beginning
+
 					if (stNodeIndex != stLastIndex)
 					{
 						tNewContainers.push_back(ConfigNodeContainer());
@@ -315,7 +324,6 @@ namespace chengine
 						stLastIndex = stNodeIndex;
 					}
 
-					strName.Delete(0, stPos + 2);	// skip "]." at the beginning
 					if (!pCurrentContainer)
 						throw TCoreException(eErr_InvalidPointer, L"pCurrentContainer", LOCATION);
 
