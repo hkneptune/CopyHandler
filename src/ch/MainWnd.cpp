@@ -685,8 +685,6 @@ LRESULT CMainWnd::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 
 	case WM_CONFIGNOTIFY:
 		{
-			GetApp().SetAutorun(GetPropValue<PP_PRELOADAFTERRESTART>(GetConfig()));
-
 			// set this process class
 			HANDLE hProcess=GetCurrentProcess();
 			::SetPriorityClass(hProcess, (DWORD)GetPropValue<PP_PPROCESSPRIORITYCLASS>(GetConfig()));

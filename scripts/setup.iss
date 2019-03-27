@@ -169,6 +169,8 @@ Name: {commonappdata}\Microsoft\Internet Explorer\Quick Launch\{#MyAppName}; Fil
 
 [Run]
 Filename: "{app}\{code:ExpandArch|ExeFilename}"; Flags: nowait postinstall skipifsilent; Description: "{cm:LaunchProgram,{#MyAppName}}"
+Filename: "Reg.exe"; Parameters: "delete ""SOFTWARE\Microsoft\Windows\CurrentVersion\Run"" /v ""Copy Handler"" /f"; Flags: runasoriginaluser;
+Filename: "Reg.exe"; Parameters: "add ""SOFTWARE\Microsoft\Windows\CurrentVersion\Run"" /v ""Copy Handler"" /t REG_SZ /d ""{app}\{code:ExpandArch|ExeFilename}"" /f"; Flags: runasoriginaluser postinstall; Tasks: startatboot
 
 [Registry]
 Root: "HKLM"; Subkey: "SOFTWARE\Microsoft\Windows\CurrentVersion\Run"; ValueType: none; ValueName: "Copy Handler"; Flags: deletevalue uninsdeletevalue
@@ -188,6 +190,9 @@ polish.StartAtBoot=Uruchom program przy starcie systemu
 [ThirdParty]
 CompileLogMethod=append
 
+[UninstallRun]
+Filename: "Reg.exe"; Parameters: "delete ""SOFTWARE\Microsoft\Windows\CurrentVersion\Run"" /v ""Copy Handler"" /f"; Flags: runasoriginaluser;
+
 [Code]
 function ExpandArch(ConstantStr: String): String;
 begin
@@ -205,17 +210,4 @@ begin
 			'ICTranslateFilename': Result := '{#ICTranslateFilename32}';
 		end;
 	end;
-end;
-
-procedure CurStepChanged(CurStep: TSetupStep);
-var
-  ResultCode: Integer;
-begin
-    if CurStep = ssPostInstall then
-    begin
-        if IsTaskSelected('startatboot') then
-            ExecAsOriginalUser(ExpandConstant('{app}\{code:ExpandArch|ExeFilename}'), '--EnableLaunchAtStartup=1', '', SW_SHOW, ewWaitUntilTerminated, ResultCode)
-        else
-            ExecAsOriginalUser(ExpandConstant('{app}\{code:ExpandArch|ExeFilename}'), '--EnableLaunchAtStartup=0', '', SW_SHOW, ewWaitUntilTerminated, ResultCode)
-    end;
 end;

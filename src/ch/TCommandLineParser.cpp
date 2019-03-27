@@ -43,8 +43,7 @@ void TCommandLineParser::ParseCommandLine(const wchar_t* pszCommandLine)
 
 	po::options_description desc("");
 	desc.add_options()
-		("ImportTaskDefinition", po::wvalue< std::vector<std::wstring> >(), "")
-		("EnableLaunchAtStartup", po::wvalue<bool>(), "");
+		("ImportTaskDefinition", po::wvalue< std::vector<std::wstring> >(), "");
 
 	po::variables_map vm;
 	po::store(po::wcommand_line_parser(args).options(desc).run(), m_mapVariables);
@@ -73,15 +72,4 @@ void TCommandLineParser::GetTaskDefinitionPaths(chcore::TPathContainer& vPaths) 
 			vPaths.Add(chcore::PathFromString(strPath.c_str()));
 		}
 	}
-}
-
-bool TCommandLineParser::HasSystemStartupOption() const
-{
-	return m_mapVariables.count("EnableLaunchAtStartup") == 1;
-}
-
-bool TCommandLineParser::IsSystemStartupEnabled() const
-{
-	bool bValue = m_mapVariables["EnableLaunchAtStartup"].as<bool>();
-	return bValue;
 }

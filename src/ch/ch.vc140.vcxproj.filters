@@ -257,6 +257,9 @@
     <ClInclude Include="..\common\TRegistry.h">
       <Filter>Source Files\Shared</Filter>
     </ClInclude>
+    <ClInclude Include="AppAutorun.h">
+      <Filter>Source Files\Tools</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\common\TShellExtMenuConfig.cpp">
@@ -435,6 +438,9 @@
     </ClCompile>
     <ClCompile Include="..\common\TRegistry.cpp">
       <Filter>Source Files\Shared</Filter>
+    </ClCompile>
+    <ClCompile Include="AppAutorun.cpp">
+      <Filter>Source Files\Tools</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

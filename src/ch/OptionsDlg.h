@@ -20,6 +20,7 @@
 #define __OPTIONSDLG_H__
 
 #include "PropertyListCtrl.h"
+#include "AppAutorun.h"
 
 #define WM_CONFIGNOTIFY		WM_USER+13
 
@@ -52,6 +53,9 @@ private:
 	bool GetBoolProp(int iPosition);
 	CString MakeCompoundString(UINT uiBase, int iCount, LPCTSTR lpszSeparator);
 
+	bool IsAutorunEnabled() const;
+	bool EnableAutorun(bool bEnable);
+
 	// Generated message map functions
 	BOOL OnInitDialog() override;
 	void OnOK() override;
@@ -62,6 +66,7 @@ private:
 
 private:
 	logger::TLoggerPtr m_spLog;
+	AppAutorun m_autoRun;
 	static bool m_bLock;				// locker
 
 	std::vector<CString> m_cvRecent;

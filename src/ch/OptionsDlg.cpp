@@ -41,7 +41,8 @@ bool COptionsDlg::m_bLock=false;
 
 COptionsDlg::COptionsDlg(CWnd* pParent /*=nullptr*/)
 	:ictranslate::CLanguageDialog(IDD_OPTIONS_DIALOG, pParent, &m_bLock),
-	m_spLog(logger::MakeLogger(GetLogFileData(), L"OptionsDlg"))
+	m_spLog(logger::MakeLogger(GetLogFileData(), L"OptionsDlg")),
+	m_autoRun(GetApp().GetAppName(), chcore::PathFromString(GetApp().GetFullProgramPath()))
 {
 }
 
@@ -237,7 +238,8 @@ void COptionsDlg::FillPropertyList()
 	PROP_SEPARATOR(IDS_PROGRAM_STRING);
 	PROP_BOOL(IDS_CLIPBOARDMONITORING_STRING, GetPropValue<PP_PCLIPBOARDMONITORING>(GetConfig()));
 	PROP_UINT(IDS_CLIPBOARDINTERVAL_STRING, GetPropValue<PP_PMONITORSCANINTERVAL>(GetConfig()));
-	PROP_BOOL(IDS_AUTORUNPROGRAM_STRING, GetPropValue<PP_PRELOADAFTERRESTART>(GetConfig()));
+
+	PROP_BOOL(IDS_AUTORUNPROGRAM_STRING, IsAutorunEnabled());
 
 	PROP_COMBO(IDS_CFG_CHECK_FOR_UPDATES_FREQUENCY, IDS_UPDATE_FREQUENCIES, GetPropValue<PP_PCHECK_FOR_UPDATES_FREQUENCY>(GetConfig()));
 	PROP_COMBO(IDS_CFG_UPDATECHANNEL, IDS_CFGUPDATECHANNELITEMS_STRING, GetPropValue<PP_PUPDATECHANNEL>(GetConfig()));
@@ -370,7 +372,7 @@ void COptionsDlg::ApplyProperties()
 	SKIP_SEPARATOR(iPosition);
 	SetPropValue<PP_PCLIPBOARDMONITORING>(rConfig, GetBoolProp(iPosition++));
 	SetPropValue<PP_PMONITORSCANINTERVAL>(rConfig, GetUintProp(iPosition++));
-	SetPropValue<PP_PRELOADAFTERRESTART>(rConfig, GetBoolProp(iPosition++));
+	EnableAutorun(GetBoolProp(iPosition++));
 
 	SetPropValue<PP_PCHECK_FOR_UPDATES_FREQUENCY>(rConfig, GetIndexProp(iPosition++));
 	SetPropValue<PP_PUPDATECHANNEL>(rConfig, GetBoolProp(iPosition++));
@@ -531,6 +533,33 @@ CString COptionsDlg::MakeCompoundString(UINT uiBase, int iCount, LPCTSTR lpszSep
 	}
 
 	return strText;
+}
+
+bool COptionsDlg::IsAutorunEnabled() const
+{
+	try
+	{
+		return m_autoRun.IsAutorunEnabled();
+	}
+	catch (const std::exception& e)
+	{
+		LOG_ERROR(m_spLog) << L"Failed to determine if autorun is enabled. Assuming it is not. Error: " << e.what();
+		return false;
+	}
+}
+
+bool COptionsDlg::EnableAutorun(bool bEnable)
+{
+	try
+	{
+		m_autoRun.SetAutorun(bEnable);
+		return true;
+	}
+	catch (const std::exception& e)
+	{
+		LOG_ERROR(m_spLog) << L"Failed to change autorun to '" << bEnable << "'. Error: " << e.what();
+		return false;
+	}
 }
 
 bool COptionsDlg::GetBoolProp(int iPosition)

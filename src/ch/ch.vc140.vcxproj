@@ -522,6 +522,7 @@
     <ClInclude Include="..\common\TShellExtIpcConfigDataProvider.h" />
     <ClInclude Include="..\common\TShellExtMenuConfig.h" />
     <ClInclude Include="..\common\version.h" />
+    <ClInclude Include="AppAutorun.h" />
     <ClInclude Include="AsyncHttpFile.h" />
     <ClInclude Include="CDragDropComboEx.h" />
     <ClInclude Include="CDragDropListCtrl.h" />
@@ -776,6 +777,7 @@ makehm /h IDC_,IDH_,0x00000 "%(Filename)%(Extension)" &gt;&gt; "help\HTMLDefines
     <ClCompile Include="..\common\TRegistry.cpp" />
     <ClCompile Include="..\common\TShellExtIpcConfigDataProvider.cpp" />
     <ClCompile Include="..\common\TShellExtMenuConfig.cpp" />
+    <ClCompile Include="AppAutorun.cpp" />
     <ClCompile Include="AsyncHttpFile.cpp" />
     <ClCompile Include="CDragDropComboEx.cpp" />
     <ClCompile Include="CDragDropListCtrl.cpp" />

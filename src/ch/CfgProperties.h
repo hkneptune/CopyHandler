@@ -29,7 +29,6 @@ enum ECHProperties
 {
 	PP_PCLIPBOARDMONITORING = 0,
 	PP_PMONITORSCANINTERVAL,
-	PP_PRELOADAFTERRESTART,
 
 	PP_PCHECK_FOR_UPDATES_FREQUENCY,
 	PP_PUPDATECHANNEL,
@@ -200,7 +199,6 @@ typedef std::vector<CString> CStringVector;
 // General settings
 PROPERTY(PP_PCLIPBOARDMONITORING, bool, _T("CHConfig.General.Program.EnableClipboardMonitoring"), false);
 PROPERTY_MINMAX(PP_PMONITORSCANINTERVAL, unsigned int, _T("CHConfig.General.Program.ClipboardMonitorScanInterval"), 1000, 0, 3600UL*1000UL);
-PROPERTY(PP_PRELOADAFTERRESTART, bool, _T("CHConfig.General.Program.RunWithSystem"), false);
 
 PROPERTY_MINMAX(PP_PCHECK_FOR_UPDATES_FREQUENCY, unsigned int, _T("CHConfig.General.Program.Updates.Frequency"), eFreq_Weekly, eFreq_Never, eFreq_Max - 1);
 PROPERTY_MINMAX(PP_PUPDATECHANNEL, int, _T("CHConfig.General.Program.Updates.UpdateChannel"), UpdateVersionInfo::eReleaseCandidate, UpdateVersionInfo::eStable, UpdateVersionInfo::eMax - 1);
