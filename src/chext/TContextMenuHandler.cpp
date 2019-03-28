@@ -155,7 +155,7 @@ void TContextMenuHandler::UpdateMenuRecursive(const TShellMenuItemPtr& spRootMen
 
 				MENUITEMINFO mii = {0};
 				mii.cbSize = sizeof(MENUITEMINFO);
-				mii.fMask = MIIM_ID | MIIM_STATE | MIIM_SUBMENU | MIIM_STRING | MIIM_DATA;
+				mii.fMask = MIIM_ID | MIIM_STATE | MIIM_SUBMENU | MIIM_STRING | MIIM_DATA | MIIM_FTYPE;
 				mii.fType = MFT_STRING;
 				mii.fState = (spRootMenuItem->GetChildrenCount() > 0) ? MFS_ENABLED : MFS_GRAYED;
 				mii.wID = m_uiNextMenuID++;
@@ -181,7 +181,7 @@ void TContextMenuHandler::UpdateMenuRecursive(const TShellMenuItemPtr& spRootMen
 
 				MENUITEMINFO mii = {0};
 				mii.cbSize = sizeof(MENUITEMINFO);
-				mii.fMask = MIIM_ID | MIIM_STATE | MIIM_STRING | MIIM_DATA;
+				mii.fMask = MIIM_ID | MIIM_STATE | MIIM_STRING | MIIM_DATA | MIIM_FTYPE;
 				mii.fType = MFT_STRING | (bEnableOwnerDrawnItem ? MFT_OWNERDRAW : 0);
 				mii.fState = bEnableItem ? MFS_ENABLED : MFS_GRAYED;
 				mii.wID = m_uiNextMenuID;
@@ -219,7 +219,9 @@ std::wstring TContextMenuHandler::GetDisplayText(const TShellMenuItemPtr& spMenu
 
 				m_fsLocal.GetDynamicFreeSpace(spMenuItem->GetDestinationPathInfo().GetDefaultDestinationPath(), ullSize, ullTotal);
 
-				wstrItemName += std::wstring(L" (") + spFormatter->GetSizeString(ullSize) + L")";
+				wstrItemName += std::wstring(L" (");
+				wstrItemName += spFormatter->GetSizeString(ullSize).c_str();
+				wstrItemName += L")";
 				spMenuItem->SetLocalName(wstrItemName.c_str());
 			}
 			catch(const std::exception&)

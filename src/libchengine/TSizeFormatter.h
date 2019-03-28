@@ -22,6 +22,8 @@
 #include <memory>
 #include "libchengine.h"
 
+namespace string { class TString; }
+
 namespace chengine
 {
 	class TConfig;
@@ -37,7 +39,7 @@ namespace chengine
 
 		void SetValues(const wchar_t* strBytes, const wchar_t* strKBytes, const wchar_t* strMBytes, const wchar_t* strGBytes, const wchar_t* strTBytes);
 
-		std::wstring GetSizeString(unsigned long long ullData, bool bStrict = false) const;
+		string::TString GetSizeString(unsigned long long ullData, bool bStrict = false) const;
 
 		void StoreInConfig(chengine::TConfig& rConfig, PCTSTR pszNodeName) const;
 		bool ReadFromConfig(chengine::TConfig& rConfig, PCTSTR pszNodeName);

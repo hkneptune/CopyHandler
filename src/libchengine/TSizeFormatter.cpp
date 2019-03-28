@@ -62,7 +62,7 @@ namespace chengine
 		m_strTBytes = strTBytes;
 	}
 
-	std::wstring TSizeFormatter::GetSizeString(unsigned long long ullData, bool bStrict) const
+	string::TString TSizeFormatter::GetSizeString(unsigned long long ullData, bool bStrict) const
 	{
 		const size_t stMaxSize = 512;
 		wchar_t szData[ stMaxSize ] = { 0 };

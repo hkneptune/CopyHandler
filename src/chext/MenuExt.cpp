@@ -256,7 +256,7 @@ HRESULT CMenuExt::HandleMenuMsg(UINT uMsg, WPARAM wParam, LPARAM lParam)
 	return HandleMenuMsg2(uMsg, wParam, lParam, nullptr);
 }
 
-HRESULT CMenuExt::HandleMenuMsg2(UINT uMsg, WPARAM /*wParam*/, LPARAM lParam, LRESULT* /*plResult*/)
+HRESULT CMenuExt::HandleMenuMsg2(UINT uMsg, WPARAM /*wParam*/, LPARAM lParam, LRESULT* plResult)
 {
 	try
 	{
@@ -308,6 +308,8 @@ HRESULT CMenuExt::HandleMenuMsg2(UINT uMsg, WPARAM /*wParam*/, LPARAM lParam, LR
 			lpmis->itemWidth = size.cx + GetSystemMetrics(SM_CXMENUCHECK) + 2 * GetSystemMetrics(SM_CXSMICON);
 			lpmis->itemHeight = std::max<int>(size.cy + 3, GetSystemMetrics(SM_CYMENU) + 3);
 
+			if (plResult)
+				*plResult = TRUE;
 			break;
 		}
 		}
