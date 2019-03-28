@@ -401,11 +401,6 @@ BOOL CCopyHandlerApp::InitInstance()
 	HANDLE hProcess = GetCurrentProcess();
 	::SetPriorityClass(hProcess, GetPropValue<PP_PPROCESSPRIORITYCLASS>(rCfg));
 
-#ifndef _DEBUG		// for easier writing the program - doesn't collide with std CH
-	// set "run with system" registry settings
-	SetAutorun(GetPropValue<PP_PRELOADAFTERRESTART>(rCfg));
-#endif
-
 	// ================================= Shell extension config =============================
 	LOG_INFO(m_spLog) << _T("Initializing shell extension configuration");
 	try
