@@ -169,8 +169,6 @@ Name: {commonappdata}\Microsoft\Internet Explorer\Quick Launch\{#MyAppName}; Fil
 
 [Run]
 Filename: "{app}\{code:ExpandArch|ExeFilename}"; Flags: nowait postinstall skipifsilent; Description: "{cm:LaunchProgram,{#MyAppName}}"
-Filename: "Reg.exe"; Parameters: "delete ""HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Run"" /v ""Copy Handler"" /f"; Flags: runasoriginaluser;
-Filename: "Reg.exe"; Parameters: "add ""HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Run"" /v ""Copy Handler"" /t REG_SZ /d ""{app}\{code:ExpandArch|ExeFilename}"" /f"; Flags: runasoriginaluser postinstall; Tasks: startatboot
 
 [Registry]
 Root: "HKLM"; Subkey: "SOFTWARE\Microsoft\Windows\CurrentVersion\Run"; ValueType: none; ValueName: "Copy Handler"; Flags: deletevalue uninsdeletevalue
@@ -207,4 +205,17 @@ begin
 			'ICTranslateFilename': Result := '{#ICTranslateFilename32}';
 		end;
 	end;
+end;
+
+procedure CurStepChanged(CurStep: TSetupStep);
+var
+  ResultCode: Integer;
+begin
+    if CurStep = ssPostInstall then
+    begin
+        if IsTaskSelected('startatboot') then
+            ExecAsOriginalUser('Reg.exe', 'add "HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Run" /v "Copy Handler" /d "' + ExpandConstant('{app}\{code:ExpandArch|ExeFilename}') + '" /f', '', SW_HIDE, ewWaitUntilTerminated, ResultCode)
+        else
+            ExecAsOriginalUser('Reg.exe', 'delete "HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Run" /v "Copy Handler" /f', '', SW_HIDE, ewWaitUntilTerminated, ResultCode)
+    end;
 end;
