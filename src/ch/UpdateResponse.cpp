@@ -18,6 +18,8 @@
 // ============================================================================
 #include "stdafx.h"
 #include "UpdateResponse.h"
+#pragma warning(push)
+#pragma warning(disable: 4244)
 #include <codecvt>
 #include <locale>
 #include <boost/property_tree/xml_parser.hpp>
@@ -25,6 +27,7 @@
 #include <boost/algorithm/string.hpp>
 #include <boost/date_time/gregorian/gregorian.hpp>
 #include <sstream>
+#pragma warning(pop)
 
 UpdateResponse::UpdateResponse(std::stringstream& tDataStream)
 {
