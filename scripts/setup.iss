@@ -52,7 +52,7 @@ AppPublisher={#MyAppPublisher}
 AppPublisherURL={#MyAppURL}
 AppSupportURL={#MyAppURL}
 AppUpdatesURL={#MyAppURL}
-DefaultDirName={pf}\{#MyAppName}
+DefaultDirName={commonpf}\{#MyAppName}
 DefaultGroupName={#MyAppName}
 AllowNoIcons=true
 LicenseFile=..\License.txt
@@ -209,7 +209,7 @@ var
 begin
     if CurStep = ssPostInstall then
     begin
-        if IsTaskSelected('startatboot') then
+        if WizardIsTaskSelected('startatboot') then
             ExecAsOriginalUser('Reg.exe', 'add "HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Run" /v "Copy Handler" /d "' + ExpandConstant('{app}\{code:ExpandArch|ExeFilename}') + '" /f', '', SW_HIDE, ewWaitUntilTerminated, ResultCode)
         else
             ExecAsOriginalUser('Reg.exe', 'delete "HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Run" /v "Copy Handler" /f', '', SW_HIDE, ewWaitUntilTerminated, ResultCode)
