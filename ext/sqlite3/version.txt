@@ -1,2 +1,2 @@
-SQLite 3.27.1
+SQLite 3.33.0
 Downloaded from www.sqlite.org
