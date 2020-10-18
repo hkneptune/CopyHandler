@@ -83,7 +83,13 @@ namespace chengine
 
 	TTask::~TTask()
 	{
-		KillThread();
+		try
+		{
+			KillThread();
+		}
+		catch (const std::exception& e)
+		{
+		}
 	}
 
 	void TTask::SetTaskDefinition(const TTaskDefinition& rTaskDefinition)

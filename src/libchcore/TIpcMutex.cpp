@@ -35,7 +35,13 @@ namespace chcore
 
 	TIpcMutex::~TIpcMutex()
 	{
-		Close();
+		try
+		{
+			Close();
+		}
+		catch (const std::exception& e)
+		{
+		}
 	}
 
 	void TIpcMutex::CreateMutex(const wchar_t* pszName)

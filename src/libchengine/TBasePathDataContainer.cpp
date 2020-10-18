@@ -36,8 +36,14 @@ namespace chengine
 
 	TBasePathDataContainer::~TBasePathDataContainer()
 	{
-		// clear works with critical section to avoid destruction while item in use
-		Clear();
+		try
+		{
+			// clear works with critical section to avoid destruction while item in use
+			Clear();
+		}
+		catch (const std::exception& e)
+		{
+		}
 	}
 
 	void TBasePathDataContainer::Store(const ISerializerContainerPtr& spContainer) const

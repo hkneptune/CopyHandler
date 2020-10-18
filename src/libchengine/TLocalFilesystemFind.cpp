@@ -36,7 +36,13 @@ namespace chengine
 
 	TLocalFilesystemFind::~TLocalFilesystemFind()
 	{
-		InternalClose();
+		try
+		{
+			InternalClose();
+		}
+		catch (const std::exception& e)
+		{
+		}
 	}
 
 	bool TLocalFilesystemFind::FindNext(TFileInfoPtr& rspFileInfo)

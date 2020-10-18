@@ -32,6 +32,12 @@ namespace chcore
 
 	TIpcMutexLock::~TIpcMutexLock()
 	{
-		m_rMutex.Unlock();
+		try
+		{
+			m_rMutex.Unlock();
+		}
+		catch (const std::exception& e)
+		{
+		}
 	}
 }

@@ -40,7 +40,13 @@ CClipboardMonitor::CClipboardMonitor()
 
 CClipboardMonitor::~CClipboardMonitor()
 {
-	Stop();
+	try
+	{
+		Stop();
+	}
+	catch (const std::exception& e)
+	{
+	}
 }
 
 void CClipboardMonitor::StartMonitor(chengine::TTaskManagerPtr spTasks)

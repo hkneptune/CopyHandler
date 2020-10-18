@@ -39,7 +39,13 @@ namespace chengine
 
 	TOrderedBufferQueue::~TOrderedBufferQueue()
 	{
-		ClearBuffers();
+		try
+		{
+			ClearBuffers();
+		}
+		catch (const std::exception& e)
+		{
+		}
 	}
 
 	void TOrderedBufferQueue::Push(TOverlappedDataBuffer* pBuffer)

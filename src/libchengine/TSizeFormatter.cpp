@@ -68,15 +68,15 @@ namespace chengine
 		wchar_t szData[ stMaxSize ] = { 0 };
 
 		if(ullData >= 1288490188800 && (!bStrict || (ullData % 1099511627776) == 0))
-			_sntprintf_s(szData, stMaxSize, L"%.2f %s", (double)(ullData / 1099511627776.0), m_strTBytes.c_str());
+			_sntprintf_s(szData, stMaxSize, _TRUNCATE, L"%.2f %s", (double)(ullData / 1099511627776.0), m_strTBytes.c_str());
 		else if(ullData >= 1258291200 && (!bStrict || (ullData % 1073741824) == 0))
-			_sntprintf_s(szData, stMaxSize, L"%.2f %s", (double)(ullData / 1073741824.0), m_strGBytes.c_str());
+			_sntprintf_s(szData, stMaxSize, _TRUNCATE, L"%.2f %s", (double)(ullData / 1073741824.0), m_strGBytes.c_str());
 		else if(ullData >= 1228800 && (!bStrict || (ullData % 1048576) == 0))
-			_sntprintf_s(szData, stMaxSize, _T("%.2f %s"), (double)(ullData / 1048576.0), m_strMBytes.c_str());
+			_sntprintf_s(szData, stMaxSize, _TRUNCATE, _T("%.2f %s"), (double)(ullData / 1048576.0), m_strMBytes.c_str());
 		else if(ullData >= 1200 && (!bStrict || (ullData % 1024) == 0))
-			_sntprintf_s(szData, stMaxSize, _T("%.2f %s"), (double)(ullData / 1024.0), m_strKBytes.c_str());
+			_sntprintf_s(szData, stMaxSize, _TRUNCATE, _T("%.2f %s"), (double)(ullData / 1024.0), m_strKBytes.c_str());
 		else
-			_sntprintf_s(szData, stMaxSize, _T("%I64u %s"), ullData, m_strBytes.c_str());
+			_sntprintf_s(szData, stMaxSize, _TRUNCATE, _T("%I64u %s"), ullData, m_strBytes.c_str());
 
 		return szData;
 	}
