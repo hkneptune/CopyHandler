@@ -576,7 +576,6 @@ goto end
     <ClCompile Include="DropMenuExtClassFactory.cpp" />
     <ClCompile Include="MenuExtClassFactory.cpp" />
     <ClCompile Include="DropMenuExt.cpp" />
-    <ClCompile Include="GuidFormatter.cpp" />
     <ClCompile Include="HResultFormatter.cpp" />
     <ClCompile Include="MenuExt.cpp" />
     <ClCompile Include="ShellExtControl.cpp" />
@@ -610,7 +609,6 @@ goto end
     <ClInclude Include="IShellExtControl.h" />
     <ClInclude Include="MenuExtClassFactory.h" />
     <ClInclude Include="DropMenuExt.h" />
-    <ClInclude Include="GuidFormatter.h" />
     <ClInclude Include="HResultFormatter.h" />
     <ClInclude Include="MenuExt.h" />
     <ClInclude Include="ShellExtControl.h" />
