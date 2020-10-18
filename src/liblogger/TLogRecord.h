@@ -71,7 +71,7 @@ namespace logger
 			*this << L"\r\n";
 			m_spFileData->PushLogEntry(str().c_str());
 		}
-		catch (const std::exception& e)
+		catch (const std::exception&)
 		{
 		}
 	}

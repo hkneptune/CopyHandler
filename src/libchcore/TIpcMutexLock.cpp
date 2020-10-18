@@ -36,7 +36,7 @@ namespace chcore
 		{
 			m_rMutex.Unlock();
 		}
-		catch (const std::exception& e)
+		catch (const std::exception&)
 		{
 		}
 	}

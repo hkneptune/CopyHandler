@@ -41,7 +41,7 @@ namespace chengine
 			// clear works with critical section to avoid destruction while item in use
 			Clear();
 		}
-		catch (const std::exception& e)
+		catch (const std::exception&)
 		{
 		}
 	}
