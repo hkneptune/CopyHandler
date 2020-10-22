@@ -19,6 +19,7 @@
 #include "stdafx.h"
 #include "TComRegistrar.h"
 #include <shlwapi.h>
+#include <stdexcept>
 
 TComRegistrar::TComRegistrar()
 {

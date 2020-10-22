@@ -21,6 +21,7 @@
 #include <string>
 #include <map>
 #include <assert.h>
+#include <stdexcept>
 
 /// Buffer size for reading xml data from a file
 #define INI_BUFFER	65536

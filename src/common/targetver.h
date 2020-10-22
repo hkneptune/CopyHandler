@@ -24,16 +24,16 @@
 // your application.  The macros work by enabling all features available on platform versions up to and 
 // including the version specified.
 
+#ifndef NTDDI_VERSION
+	#define NTDDI_VERSION NTDDI_WIN7
+#endif
+
 // Modify the following defines if you have to target a platform prior to the ones specified below.
 // Refer to MSDN for the latest info on corresponding values for different platforms.
 #ifndef WINVER                          // Specifies that the minimum required platform is Windows Vista.
-#define WINVER 0x0501           // Change this to the appropriate value to target other versions of Windows.
+	#define WINVER _WIN32_WINNT_WIN7           // Change this to the appropriate value to target other versions of Windows.
 #endif
 
 #ifndef _WIN32_WINNT            // Specifies that the minimum required platform is Windows Vista.
-#define _WIN32_WINNT 0x0501     // Change this to the appropriate value to target other versions of Windows.
-#endif
-
-#ifndef _WIN32_IE                       // Specifies that the minimum required platform is Internet Explorer 7.0.
-#define _WIN32_IE 0x0501        // Change this to the appropriate value to target other versions of IE.
+	#define _WIN32_WINNT _WIN32_WINNT_WIN7      // Change this to the appropriate value to target other versions of Windows.
 #endif

@@ -37,7 +37,6 @@
 #include "TFileException.h"
 #include <boost/thread/locks.hpp>
 #include "../libchcore/StreamingHelpers.h"
-#include <fileextd.h>
 
 using namespace chcore;
 

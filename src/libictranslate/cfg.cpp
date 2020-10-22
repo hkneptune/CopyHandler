@@ -26,6 +26,7 @@
 #include <vector>
 #include <set>
 #include "cfg_ini.h"
+#include <stdexcept>
 
 //////////////////////////////////////////////////////////////////////////////////
 // property_tracker class

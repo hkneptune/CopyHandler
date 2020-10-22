@@ -25,7 +25,6 @@
 #include "TFileInfo.h"
 #include "TOverlappedMemoryPool.h"
 #include "OverlappedCallbacks.h"
-#include <fileextd.h>
 #include "../libchcore/RoundingFunctions.h"
 #include "../libchcore/TFileTime.h"
 #include "../libchcore/StreamingHelpers.h"

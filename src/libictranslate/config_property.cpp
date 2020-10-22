@@ -20,6 +20,8 @@
 #include "config_property.h"
 #include <vector>
 #include <assert.h>
+#include <string>
+#include <stdexcept>
 
 //////////////////////////////////////////////////////////////////////////////////
 // property class

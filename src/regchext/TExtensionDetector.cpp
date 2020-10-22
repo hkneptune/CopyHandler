@@ -19,6 +19,7 @@
 #include "stdafx.h"
 #include "TExtensionDetector.h"
 #include <shlwapi.h>
+#include <stdexcept>
 
 #ifdef _WIN64
 	#define DLL_NATIVE L"chext64.dll"

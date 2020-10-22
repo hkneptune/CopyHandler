@@ -20,12 +20,18 @@
 #define __RANDOMACCESSITERATORS_H__
 
 template<class T>
-class RandomAccessIteratorWrapper : public std::iterator<std::random_access_iterator_tag, T>
+class RandomAccessIteratorWrapper
 {
 protected:
 	explicit RandomAccessIteratorWrapper(typename std::vector<T>::iterator iterArray);
 
 public:
+	using iterator_category = std::random_access_iterator_tag;
+	using value_type = T;
+	using difference_type = std::ptrdiff_t;
+	using pointer = T*;
+	using reference = T&;
+
 	RandomAccessIteratorWrapper();
 	~RandomAccessIteratorWrapper();
 
@@ -62,12 +68,18 @@ private:
 };
 
 template<class T>
-class RandomAccessConstIteratorWrapper : public std::iterator<std::random_access_iterator_tag, T>
+class RandomAccessConstIteratorWrapper
 {
 protected:
 	explicit RandomAccessConstIteratorWrapper(typename std::vector<T>::const_iterator iterArray);
 
 public:
+	using iterator_category = std::random_access_iterator_tag;
+	using value_type = T;
+	using difference_type = std::ptrdiff_t;
+	using pointer = T*;
+	using reference = T&;
+
 	RandomAccessConstIteratorWrapper();
 	explicit RandomAccessConstIteratorWrapper(const RandomAccessIteratorWrapper<T>& rIterator);
 	~RandomAccessConstIteratorWrapper();
