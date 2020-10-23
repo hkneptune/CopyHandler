@@ -61,7 +61,7 @@ namespace chengine
 		{
 			LOG_TRACE(m_spLog) << "Find first" << GetFindLogData();
 
-			m_hFind = FindFirstFileEx(pathCurrent.ToString(), FindExInfoStandard, &wfd, FindExSearchNameMatch, nullptr, 0);
+			m_hFind = FindFirstFileEx(pathCurrent.ToString(), FindExInfoBasic, &wfd, FindExSearchNameMatch, nullptr, FIND_FIRST_EX_LARGE_FETCH);
 			bContinue = (m_hFind != INVALID_HANDLE_VALUE);
 		}
 		if (bContinue)

@@ -90,7 +90,7 @@ namespace chengine
 
 		LOG_DEBUG(m_spLog) << L"Checking for path existence: " << pathToCheck << L" (using search pattern: " << findPath << L")";
 
-		HANDLE hFind = FindFirstFile(findPath.ToString(), &fd);
+		HANDLE hFind = FindFirstFileEx(findPath.ToString(), FindExInfoBasic, &fd, FindExSearchNameMatch, nullptr, 0);
 		if (hFind != INVALID_HANDLE_VALUE)
 		{
 			::FindClose(hFind);
@@ -263,7 +263,7 @@ namespace chengine
 
 		LOG_DEBUG(m_spLog) << L"Retrieving file information for " << pathFile << L". Using search pattern: " << findPath;
 
-		HANDLE hFind = FindFirstFileEx(PrependPathExtensionIfNeeded(findPath).ToString(), FindExInfoStandard, &wfd, FindExSearchNameMatch, nullptr, 0);
+		HANDLE hFind = FindFirstFileEx(PrependPathExtensionIfNeeded(findPath).ToString(), FindExInfoBasic, &wfd, FindExSearchNameMatch, nullptr, 0);
 		if (hFind != INVALID_HANDLE_VALUE)
 		{
 			FindClose(hFind);
