@@ -205,10 +205,6 @@ namespace ictranslate
 			return m_pFont ? m_pFont : ((CDialog*)this)->GetFont();
 		}
 
-		afx_msg BOOL OnHelpInfo(HELPINFO* pHelpInfo);
-		afx_msg void OnContextMenu(CWnd* pWnd, CPoint point);
-		void OnHelpButton();
-
 		// Controls resize support
 		void InitializeResizableControls();
 		void ClearResizableControls();

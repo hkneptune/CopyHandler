@@ -39,7 +39,6 @@ public:
 	afx_msg void OnBnClickedApply();
 	afx_msg void OnEnKillFocusDstAuthorEdit();
 	afx_msg void OnEnKillFocusDstLanguageNameEdit();
-	afx_msg void OnEnKillFocusDstHelpFilenameEdit();
 	afx_msg void OnBnClickedDstRtlCheck();
 	afx_msg void OnEditPreviousToTranslate();
 	afx_msg void OnEditNextToTranslate();
@@ -89,13 +88,11 @@ protected:
 	CEdit m_ctlSrcFilename;
 	CEdit m_ctlSrcAuthor;
 	CEdit m_ctlSrcLanguageName;
-	CEdit m_ctlSrcHelpFilename;
 	CEdit m_ctlSrcFont;
 	CButton m_ctlSrcRTL;
 	CEdit m_ctlDstFilename;
 	CEdit m_ctlDstAuthor;
 	CEdit m_ctlDstLanguageName;
-	CEdit m_ctlDstHelpFilename;
 	CEdit m_ctlDstFont;
 	CButton m_ctlDstRTL;
 };

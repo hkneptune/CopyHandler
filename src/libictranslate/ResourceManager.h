@@ -169,12 +169,6 @@ namespace ictranslate
 			return m_bRTL;
 		}
 
-		void SetHelpName(PCTSTR psz);
-		PCTSTR GetHelpName() const
-		{
-			return m_pszHelpName;
-		}
-
 		void SetAuthor(PCTSTR psz);
 		PCTSTR GetAuthor() const
 		{
@@ -193,7 +187,6 @@ namespace ictranslate
 		bool IsValidDescription() const;
 
 	protected:
-		void SetFnameData(PTSTR *ppszDst, PCTSTR pszSrc);
 		static void EnumAttributesCallback(bool bGroup, const wchar_t* pszName, const wchar_t* pszValue, void* pData);
 		static void UnescapeString(wchar_t* pszData);
 
@@ -202,7 +195,6 @@ namespace ictranslate
 		TCHAR *m_pszLngName;		// name of the language (ie. Chinese (PRC))
 		TCHAR *m_pszFontFace;		// face name of the font that will be used in dialogs
 		WORD m_wPointSize;		// font point size
-		TCHAR *m_pszHelpName;		// help name (wo the directory) for this language
 		TCHAR *m_pszAuthor;		// author name
 		bool m_bRTL;				// does the language require right-to-left reading order ?
 

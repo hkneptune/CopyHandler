@@ -145,7 +145,6 @@ BOOL CCustomCopyDlg::OnInitDialog()
 	AddResizableControl(IDC_BAR5_STATIC, 0.0, 1.0, 1.0, 0.0);
 	AddResizableControl(IDOK, 1.0, 1.0, 0.0, 0.0);
 	AddResizableControl(IDCANCEL, 1.0, 1.0, 0.0, 0.0);
-	AddResizableControl(IDC_HELP_BUTTON, 1.0, 1.0, 0.0, 0.0);
 	AddResizableControl(IDC_EXPORT_BUTTON, 0.0, 1.0, 0.0, 0.0);
 
 	InitializeResizableControls();

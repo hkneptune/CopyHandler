@@ -38,6 +38,7 @@
 #include "../liblogger/TAsyncMultiLogger.h"
 #include "TWindowMessageFilterHelper.h"
 #include "../libchengine/TConfigSerializers.h"
+#include "../libictranslate/ResourceManager.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -133,23 +134,6 @@ chengine::TConfig& CCopyHandlerApp::GetConfig()
 int CCopyHandlerApp::MsgBox(UINT uiID, UINT nType, UINT nIDHelp)
 {
 	return AfxMessageBox(GetResManager().LoadString(uiID), nType, nIDHelp);
-}
-
-bool CCopyHandlerApp::UpdateHelpPaths()
-{
-	bool bChanged=false;		// flag that'll be returned - if the paths has changed
-
-	// generate the current filename - uses language from config
-	CString strHelpPath = m_pathProcessor.ExpandPath(_T("<PROGRAM>\\Help\\"));
-	strHelpPath += GetResManager().m_ld.GetHelpName();
-	if(strHelpPath != m_pszHelpFilePath)
-	{
-		free((void*)m_pszHelpFilePath);
-		m_pszHelpFilePath = _tcsdup(strHelpPath);
-		bChanged=true;
-	}
-
-	return bChanged;
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -308,7 +292,6 @@ BOOL CCopyHandlerApp::InitInstance()
 	rResManager.Init(AfxGetInstanceHandle());
 	rResManager.SetCallback(ResManCallback);
 	GetPropValue<PP_PLANGUAGE>(rCfg, strPath);
-	TRACE(_T("Help path=%s\n"), (PCTSTR)strPath);
 	if(!rResManager.SetLanguage(m_pathProcessor.ExpandPath(strPath)))
 	{
 		TCHAR szData[2048];
@@ -318,12 +301,8 @@ BOOL CCopyHandlerApp::InitInstance()
 		return FALSE;
 	}
 
-	UpdateHelpPaths();
-
 	// for dialogs
 	ictranslate::CLanguageDialog::SetResManager(&rResManager);
-
-	EnableHtmlHelp();
 
 	// ================================= Checking for running instances of CH ========================================
 	// check instance - return false if it's the second one
@@ -672,77 +651,6 @@ void CCopyHandlerApp::OnResManNotify(UINT uiType)
 {
 	if (uiType == RMNT_LANGCHANGE)
 	{
-		// language has been changed - close the current help file
-		if (UpdateHelpPaths())
-			HtmlHelp(0, HH_CLOSE_ALL);
-	}
-}
-
-HWND CCopyHandlerApp::HHelp(HWND hwndCaller, LPCTSTR pszFile, UINT uCommand, DWORD_PTR dwData)
-{
-	PCTSTR pszPath=nullptr;
-	WIN32_FIND_DATA wfd;
-	HANDLE handle=::FindFirstFile(m_pszHelpFilePath, &wfd);
-	if (handle != INVALID_HANDLE_VALUE)
-	{
-		pszPath=m_pszHelpFilePath;
-		::FindClose(handle);
-	}
-
-	if (pszPath == nullptr)
-		return nullptr;
-
-	if (pszFile != nullptr)
-	{
-		CString strAdd = pszPath;
-		strAdd += pszFile;
-		return ::HtmlHelp(hwndCaller, strAdd, uCommand, dwData);
-	}
-
-	return ::HtmlHelp(hwndCaller, pszPath, uCommand, dwData);
-}
-
-void CCopyHandlerApp::HtmlHelp(DWORD_PTR dwData, UINT nCmd)
-{
-	switch (nCmd)
-	{
-	case HH_DISPLAY_TOPIC:
-	case HH_HELP_CONTEXT:
-		{
-			HHelp(GetDesktopWindow(), nullptr, nCmd, dwData);
-			break;
-		}
-	case HH_CLOSE_ALL:
-		::HtmlHelp(nullptr, nullptr, HH_CLOSE_ALL, 0);
-		break;
-	case HH_DISPLAY_TEXT_POPUP:
-		{
-			HELPINFO* pHelp=(HELPINFO*)dwData;
-			if ( pHelp->dwContextId == 0 || pHelp->iCtrlId == 0
-				|| ::GetWindowContextHelpId((HWND)pHelp->hItemHandle) == 0)
-				return;
-
-			HH_POPUP hhp;
-			hhp.cbStruct=sizeof(HH_POPUP);
-			hhp.hinst=nullptr;
-			hhp.idString=(pHelp->dwContextId & 0xffff);
-			hhp.pszText=nullptr;
-			hhp.pt=pHelp->MousePos;
-			hhp.pt.y+=::GetSystemMetrics(SM_CYCURSOR)/2;
-			hhp.clrForeground=(COLORREF)-1;
-			hhp.clrBackground=(COLORREF)-1;
-			hhp.rcMargins.left=-1;
-			hhp.rcMargins.right=-1;
-			hhp.rcMargins.top=-1;
-			hhp.rcMargins.bottom=-1;
-			hhp.pszFont=_T("Tahoma, 8, , ");
-
-			TCHAR szPath[_MAX_PATH];
-			_sntprintf(szPath, _MAX_PATH, _T("::/%lu.txt"), (DWORD)((pHelp->dwContextId >> 16) & 0x7fff));
-			HHelp(GetDesktopWindow(), szPath, HH_DISPLAY_TEXT_POPUP, (DWORD_PTR)&hhp);
-
-			break;
-		}
 	}
 }
 

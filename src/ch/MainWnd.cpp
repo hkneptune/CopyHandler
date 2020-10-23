@@ -154,7 +154,6 @@ BEGIN_MESSAGE_MAP(CMainWnd, CWnd)
 	ON_COMMAND(ID_POPUP_REGISTERDLL, OnPopupRegisterdll)
 	ON_COMMAND(ID_POPUP_UNREGISTERDLL, OnPopupUnregisterdll)
 	ON_COMMAND(ID_APP_EXIT, OnAppExit)
-	ON_COMMAND(ID_POPUP_HELP, OnPopupHelp)
 	//}}AFX_MSG_MAP
 	ON_MESSAGE(WM_ICON_NOTIFY, OnTrayNotification)
 	ON_COMMAND(ID_POPUP_CHECKFORUPDATES, &CMainWnd::OnPopupCheckForUpdates)
@@ -788,11 +787,6 @@ void CMainWnd::PrepareToExit()
 void CMainWnd::OnAppExit()
 {
 	PostMessage(WM_CLOSE);
-}
-
-void CMainWnd::OnPopupHelp() 
-{
-	GetApp().HtmlHelp(HH_DISPLAY_TOPIC, 0);
 }
 
 void CMainWnd::OnPopupCheckForUpdates()

@@ -85,7 +85,6 @@ BOOL CShortcutsDlg::OnInitDialog()
 	AddResizableControl(IDC_DELETE_BUTTON, 0, 1, 0, 0);
 	AddResizableControl(IDOK, 1, 1, 0, 0);
 	AddResizableControl(IDCANCEL, 1, 1, 0, 0);
-	AddResizableControl(IDC_HELP_BUTTON, 1, 1, 0, 0);
 
 	InitializeResizableControls();
 

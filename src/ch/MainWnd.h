@@ -69,7 +69,6 @@ protected:
 	afx_msg void OnPopupRegisterdll();
 	afx_msg void OnPopupUnregisterdll();
 	afx_msg void OnAppExit();
-	afx_msg void OnPopupHelp();
 	afx_msg LRESULT OnTrayNotification(WPARAM wParam, LPARAM lParam);
 	afx_msg void OnPopupCheckForUpdates();
 

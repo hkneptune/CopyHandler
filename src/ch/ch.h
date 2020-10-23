@@ -37,10 +37,6 @@ public:
 	BOOL InitInstance() override;
 	int ExitInstance() override;
 
-	void HtmlHelp(DWORD_PTR dwData, UINT nCmd) override;
-
-	PCTSTR GetHelpPath() const { return m_pszHelpFilePath; }
-
 	static int MsgBox(UINT uiID, UINT nType=MB_OK, UINT nIDHelp=0);
 
 	friend CCopyHandlerApp& GetApplication();
@@ -60,9 +56,6 @@ public:
 	const TCommandLineParser& GetCommandLine() const { return m_cmdLineParser; }
 
 protected:
-	bool UpdateHelpPaths();
-	HWND HHelp(HWND hwndCaller, LPCTSTR pszFile, UINT uCommand, DWORD_PTR dwData);
-
 	void InitShellExtension();
 	bool ParseCommandLine();
 

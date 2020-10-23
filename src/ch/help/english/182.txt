@@ -1,2 +1,0 @@
-.topic 2
-Cancels the shutdown sequence and closes this dialog box.

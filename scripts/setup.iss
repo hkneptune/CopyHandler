@@ -101,7 +101,6 @@ Name: quicklaunchicon; Description: {cm:CreateQuickLaunchIcon}; GroupDescription
 Name: startatboot; Description: {cm:StartAtBoot}; Flags: unchecked
 
 [Files]
-Source: "..\bin\release\help\*.chm"; DestDir: "{app}\help"; Flags: ignoreversion recursesubdirs createallsubdirs restartreplace uninsrestartdelete
 Source: "..\bin\release\langs\*.lng"; DestDir: "{app}\langs"; Flags: ignoreversion recursesubdirs createallsubdirs restartreplace uninsrestartdelete
 Source: "..\License.txt"; DestDir: "{app}"; Flags: ignoreversion restartreplace uninsrestartdelete
 
@@ -170,7 +169,6 @@ Filename: "{app}\{code:ExpandArch|ExeFilename}"; Flags: nowait postinstall skipi
 Root: "HKLM"; Subkey: "SOFTWARE\Microsoft\Windows\CurrentVersion\Run"; ValueType: none; ValueName: "Copy Handler"; Flags: deletevalue uninsdeletevalue
 
 [Dirs]
-Name: {app}\help; Flags: uninsalwaysuninstall
 Name: {app}\langs; Flags: uninsalwaysuninstall
 
 [CustomMessages]

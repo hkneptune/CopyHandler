@@ -88,13 +88,11 @@ void CICTranslateDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_SRC_FILENAME_EDIT, m_ctlSrcFilename);
 	DDX_Control(pDX, IDC_SRC_AUTHOR_EDIT, m_ctlSrcAuthor);
 	DDX_Control(pDX, IDC_SRC_LANGUAGE_NAME_EDIT, m_ctlSrcLanguageName);
-	DDX_Control(pDX, IDC_SRC_HELP_FILENAME_EDIT, m_ctlSrcHelpFilename);
 	DDX_Control(pDX, IDC_SRC_FONT_EDIT, m_ctlSrcFont);
 	DDX_Control(pDX, IDC_SRC_RTL_CHECK, m_ctlSrcRTL);
 	DDX_Control(pDX, IDC_DST_FILENAME_EDIT, m_ctlDstFilename);
 	DDX_Control(pDX, IDC_DST_AUTHOR_EDIT, m_ctlDstAuthor);
 	DDX_Control(pDX, IDC_DST_LANGUAGE_NAME_EDIT, m_ctlDstLanguageName);
-	DDX_Control(pDX, IDC_DST_HELP_FILENAME_EDIT, m_ctlDstHelpFilename);
 	DDX_Control(pDX, IDC_DST_FONT_EDIT, m_ctlDstFont);
 	DDX_Control(pDX, IDC_DST_RTL_CHECK, m_ctlDstRTL);
 }
@@ -117,7 +115,6 @@ BEGIN_MESSAGE_MAP(CICTranslateDlg, CDialog)
 	ON_COMMAND(ID_FILE_SAVETRANSLATION, &CICTranslateDlg::OnFileSaveTranslation)
 	ON_EN_KILLFOCUS(IDC_DST_AUTHOR_EDIT, &CICTranslateDlg::OnEnKillFocusDstAuthorEdit)
 	ON_EN_KILLFOCUS(IDC_DST_LANGUAGE_NAME_EDIT, &CICTranslateDlg::OnEnKillFocusDstLanguageNameEdit)
-	ON_EN_KILLFOCUS(IDC_DST_HELP_FILENAME_EDIT, &CICTranslateDlg::OnEnKillFocusDstHelpFilenameEdit)
 	ON_BN_CLICKED(IDC_DST_RTL_CHECK, &CICTranslateDlg::OnBnClickedDstRtlCheck)
 	ON_COMMAND(ID_EDIT_PREVIOUS_TO_TRANSLATE, &CICTranslateDlg::OnEditPreviousToTranslate)
 	ON_COMMAND(ID_EDIT_NEXT_TO_TRANSLATE, &CICTranslateDlg::OnEditNextToTranslate)
@@ -436,7 +433,6 @@ void CICTranslateDlg::UpdateBaseLanguageList()
 	m_ctlSrcFilename.SetWindowText(m_ldBase.GetFilename(true));
 	m_ctlSrcAuthor.SetWindowText(m_ldBase.GetAuthor());
 	m_ctlSrcLanguageName.SetWindowText(m_ldBase.GetLangName());
-	m_ctlSrcHelpFilename.SetWindowText(m_ldBase.GetHelpName());
 	CString strFont;
 	if(m_ldBase.GetFontFace())
 		strFont.Format(L"%s, %u", m_ldBase.GetFontFace(), m_ldBase.GetPointSize());
@@ -458,7 +454,6 @@ void CICTranslateDlg::UpdateCustomLanguageList()
 	m_ctlDstFilename.SetWindowText(m_ldCustom.GetFilename(true));
 	m_ctlDstAuthor.SetWindowText(m_ldCustom.GetAuthor());
 	m_ctlDstLanguageName.SetWindowText(m_ldCustom.GetLangName());
-	m_ctlDstHelpFilename.SetWindowText(m_ldCustom.GetHelpName());
 	m_ctlDstRTL.SetCheck(m_ldCustom.GetDirection() ? BST_CHECKED : BST_UNCHECKED);
 	CString strFont;
 	if(m_ldCustom.GetFontFace())
@@ -718,8 +713,6 @@ void CICTranslateDlg::OnFileSaveTranslationAs()
 		m_ldCustom.SetAuthor(str);
 		m_ctlDstLanguageName.GetWindowText(str);
 		m_ldCustom.SetLangName(str);
-		m_ctlDstHelpFilename.GetWindowText(str);
-		m_ldCustom.SetHelpName(str);
 		bool bRTL = (m_ctlDstRTL.GetCheck() == BST_CHECKED);
 		m_ldCustom.SetDirection(bRTL);
 
@@ -761,8 +754,6 @@ void CICTranslateDlg::OnFileSaveTranslation()
 		m_ldCustom.SetAuthor(str);
 		m_ctlDstLanguageName.GetWindowText(str);
 		m_ldCustom.SetLangName(str);
-		m_ctlDstHelpFilename.GetWindowText(str);
-		m_ldCustom.SetHelpName(str);
 		bool bRTL = (m_ctlDstRTL.GetCheck() == BST_CHECKED);
 		m_ldCustom.SetDirection(bRTL);
 
@@ -815,15 +806,6 @@ void CICTranslateDlg::OnEnKillFocusDstLanguageNameEdit()
 	const wchar_t* psz = m_ldCustom.GetLangName();
 	if(!psz || psz != str)
 		m_ldCustom.SetLangName(str);
-}
-
-void CICTranslateDlg::OnEnKillFocusDstHelpFilenameEdit()
-{
-	CString str;
-	m_ctlDstHelpFilename.GetWindowText(str);
-	const wchar_t* psz = m_ldCustom.GetHelpName();
-	if(!psz || psz != str)
-		m_ldCustom.SetHelpName(str);
 }
 
 void CICTranslateDlg::OnBnClickedDstRtlCheck()

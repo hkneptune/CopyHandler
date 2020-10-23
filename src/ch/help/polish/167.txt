@@ -1,8 +1,0 @@
-.topic 2
-Anuluje ca³e zadanie.
-
-.topic IDH_RETRY_BUTTON
-Ponawia próbê otwarcia pliku.
-
-.topic IDH_IGNORE_BUTTON
-Ignoruje b³¹d i pomija kopiowany plik.

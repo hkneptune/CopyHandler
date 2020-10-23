@@ -217,7 +217,7 @@
       <Culture>0x0409</Culture>
     </ResourceCompile>
     <Link>
-      <AdditionalDependencies>winmm.lib;imagehlp.lib;version.lib;htmlhelp.lib;Dbghelp.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>winmm.lib;imagehlp.lib;version.lib;Dbghelp.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>
       <TargetMachine>MachineX86</TargetMachine>
@@ -260,7 +260,7 @@
       <Culture>0x0409</Culture>
     </ResourceCompile>
     <Link>
-      <AdditionalDependencies>winmm.lib;imagehlp.lib;version.lib;htmlhelp.lib;Dbghelp.lib;gmock-dynamic-crt32d.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>winmm.lib;imagehlp.lib;version.lib;Dbghelp.lib;gmock-dynamic-crt32d.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Console</SubSystem>
       <TargetMachine>MachineX86</TargetMachine>
@@ -307,7 +307,7 @@
       <Culture>0x0409</Culture>
     </ResourceCompile>
     <Link>
-      <AdditionalDependencies>winmm.lib;imagehlp.lib;version.lib;htmlhelp.lib;Dbghelp.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>winmm.lib;imagehlp.lib;version.lib;Dbghelp.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>
       <TargetMachine>MachineX64</TargetMachine>
@@ -351,7 +351,7 @@
       <Culture>0x0409</Culture>
     </ResourceCompile>
     <Link>
-      <AdditionalDependencies>winmm.lib;imagehlp.lib;version.lib;htmlhelp.lib;Dbghelp.lib;gmock-dynamic-crt64d.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>winmm.lib;imagehlp.lib;version.lib;Dbghelp.lib;gmock-dynamic-crt64d.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Console</SubSystem>
       <TargetMachine>MachineX64</TargetMachine>
@@ -397,7 +397,7 @@
       <Culture>0x0409</Culture>
     </ResourceCompile>
     <Link>
-      <AdditionalDependencies>winmm.lib;imagehlp.lib;version.lib;htmlhelp.lib;Dbghelp.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>winmm.lib;imagehlp.lib;version.lib;Dbghelp.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>
       <TargetMachine>MachineX86</TargetMachine>
@@ -442,7 +442,7 @@
       <Culture>0x0409</Culture>
     </ResourceCompile>
     <Link>
-      <AdditionalDependencies>winmm.lib;imagehlp.lib;version.lib;htmlhelp.lib;Dbghelp.lib;gmock-dynamic-crt32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>winmm.lib;imagehlp.lib;version.lib;Dbghelp.lib;gmock-dynamic-crt32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Console</SubSystem>
       <TargetMachine>MachineX86</TargetMachine>
@@ -489,7 +489,7 @@
       <Culture>0x0409</Culture>
     </ResourceCompile>
     <Link>
-      <AdditionalDependencies>winmm.lib;imagehlp.lib;version.lib;htmlhelp.lib;Dbghelp.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>winmm.lib;imagehlp.lib;version.lib;Dbghelp.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>
       <TargetMachine>MachineX64</TargetMachine>
@@ -534,7 +534,7 @@
       <Culture>0x0409</Culture>
     </ResourceCompile>
     <Link>
-      <AdditionalDependencies>winmm.lib;imagehlp.lib;version.lib;htmlhelp.lib;Dbghelp.lib;gmock-dynamic-crt64.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>winmm.lib;imagehlp.lib;version.lib;Dbghelp.lib;gmock-dynamic-crt64.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Console</SubSystem>
       <TargetMachine>MachineX64</TargetMachine>
@@ -612,184 +612,7 @@
     <ClInclude Include="UpdateResponse.h" />
     <ClInclude Include="UpdateVersionInfo.h" />
     <ClInclude Include="WindowsVersion.h" />
-    <CustomBuild Include="resource.h">
-      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Generating map file for help compiler...</Message>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Testing Debug|Win32'">Generating map file for help compiler...</Message>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">echo // Generated Help Map file.  Used by Copy Handler help files. &gt; "help\HTMLDefines.h"
-echo. &gt; "help\HTMLDefines.h"
-echo // Commands (ID_* and IDM_*) &gt;&gt; "help\HTMLDefines.h"
-makehm /h ID_,HID_,0x10000 IDM_,HIDM_,0x10000 "%(Filename)%(Extension)" &gt;&gt; "help\HTMLDefines.h"
-echo. &gt;&gt; "help\HTMLDefines.h"
-echo // Prompts (IDP_*) &gt;&gt; "help\HTMLDefines.h"
-makehm /h IDP_,HIDP_,0x30000 "%(Filename)%(Extension)" &gt;&gt; "help\HTMLDefines.h"
-echo. &gt;&gt; "help\HTMLDefines.h"
-echo // Resources (IDR_*) &gt;&gt; "help\HTMLDefines.h"
-makehm /h IDR_,HIDR_,0x20000 "%(Filename)%(Extension)" &gt;&gt; "help\HTMLDefines.h"
-echo. &gt;&gt; "help\HTMLDefines.h"
-echo // Dialogs (IDD_*) &gt;&gt; "help\HTMLDefines.h"
-makehm /h IDD_,HIDD_,0x20000 "%(Filename)%(Extension)" &gt;&gt; "help\HTMLDefines.h"
-echo. &gt;&gt; "help\HTMLDefines.h"
-echo // Frame Controls (IDW_*) &gt;&gt; "help\HTMLDefines.h"
-makehm /h /a afxhh.h IDW_,HIDW_,0x50000 "%(Filename)%(Extension)" &gt;&gt; "help\HTMLDefines.h"
-echo. &gt;&gt; "help\HTMLDefines.h"
-echo // Controls (IDC_*) &gt;&gt; "help\HTMLDefines.h"
-makehm /h IDC_,IDH_,0x00000 "%(Filename)%(Extension)" &gt;&gt; "help\HTMLDefines.h"
-</Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Testing Debug|Win32'">echo // Generated Help Map file.  Used by Copy Handler help files. &gt; "help\HTMLDefines.h"
-echo. &gt; "help\HTMLDefines.h"
-echo // Commands (ID_* and IDM_*) &gt;&gt; "help\HTMLDefines.h"
-makehm /h ID_,HID_,0x10000 IDM_,HIDM_,0x10000 "%(Filename)%(Extension)" &gt;&gt; "help\HTMLDefines.h"
-echo. &gt;&gt; "help\HTMLDefines.h"
-echo // Prompts (IDP_*) &gt;&gt; "help\HTMLDefines.h"
-makehm /h IDP_,HIDP_,0x30000 "%(Filename)%(Extension)" &gt;&gt; "help\HTMLDefines.h"
-echo. &gt;&gt; "help\HTMLDefines.h"
-echo // Resources (IDR_*) &gt;&gt; "help\HTMLDefines.h"
-makehm /h IDR_,HIDR_,0x20000 "%(Filename)%(Extension)" &gt;&gt; "help\HTMLDefines.h"
-echo. &gt;&gt; "help\HTMLDefines.h"
-echo // Dialogs (IDD_*) &gt;&gt; "help\HTMLDefines.h"
-makehm /h IDD_,HIDD_,0x20000 "%(Filename)%(Extension)" &gt;&gt; "help\HTMLDefines.h"
-echo. &gt;&gt; "help\HTMLDefines.h"
-echo // Frame Controls (IDW_*) &gt;&gt; "help\HTMLDefines.h"
-makehm /h /a afxhh.h IDW_,HIDW_,0x50000 "%(Filename)%(Extension)" &gt;&gt; "help\HTMLDefines.h"
-echo. &gt;&gt; "help\HTMLDefines.h"
-echo // Controls (IDC_*) &gt;&gt; "help\HTMLDefines.h"
-makehm /h IDC_,IDH_,0x00000 "%(Filename)%(Extension)" &gt;&gt; "help\HTMLDefines.h"
-</Command>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">help\HTMLDefines.h;%(Outputs)</Outputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Testing Debug|Win32'">help\HTMLDefines.h;%(Outputs)</Outputs>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Generating map file for help compiler...</Message>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Testing Debug|x64'">Generating map file for help compiler...</Message>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">echo // Generated Help Map file.  Used by Copy Handler help files. &gt; "help\HTMLDefines.h"
-echo. &gt; "help\HTMLDefines.h"
-echo // Commands (ID_* and IDM_*) &gt;&gt; "help\HTMLDefines.h"
-makehm /h ID_,HID_,0x10000 IDM_,HIDM_,0x10000 "%(Filename)%(Extension)" &gt;&gt; "help\HTMLDefines.h"
-echo. &gt;&gt; "help\HTMLDefines.h"
-echo // Prompts (IDP_*) &gt;&gt; "help\HTMLDefines.h"
-makehm /h IDP_,HIDP_,0x30000 "%(Filename)%(Extension)" &gt;&gt; "help\HTMLDefines.h"
-echo. &gt;&gt; "help\HTMLDefines.h"
-echo // Resources (IDR_*) &gt;&gt; "help\HTMLDefines.h"
-makehm /h IDR_,HIDR_,0x20000 "%(Filename)%(Extension)" &gt;&gt; "help\HTMLDefines.h"
-echo. &gt;&gt; "help\HTMLDefines.h"
-echo // Dialogs (IDD_*) &gt;&gt; "help\HTMLDefines.h"
-makehm /h IDD_,HIDD_,0x20000 "%(Filename)%(Extension)" &gt;&gt; "help\HTMLDefines.h"
-echo. &gt;&gt; "help\HTMLDefines.h"
-echo // Frame Controls (IDW_*) &gt;&gt; "help\HTMLDefines.h"
-makehm /h /a afxhh.h IDW_,HIDW_,0x50000 "%(Filename)%(Extension)" &gt;&gt; "help\HTMLDefines.h"
-echo. &gt;&gt; "help\HTMLDefines.h"
-echo // Controls (IDC_*) &gt;&gt; "help\HTMLDefines.h"
-makehm /h IDC_,IDH_,0x00000 "%(Filename)%(Extension)" &gt;&gt; "help\HTMLDefines.h"
-</Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Testing Debug|x64'">echo // Generated Help Map file.  Used by Copy Handler help files. &gt; "help\HTMLDefines.h"
-echo. &gt; "help\HTMLDefines.h"
-echo // Commands (ID_* and IDM_*) &gt;&gt; "help\HTMLDefines.h"
-makehm /h ID_,HID_,0x10000 IDM_,HIDM_,0x10000 "%(Filename)%(Extension)" &gt;&gt; "help\HTMLDefines.h"
-echo. &gt;&gt; "help\HTMLDefines.h"
-echo // Prompts (IDP_*) &gt;&gt; "help\HTMLDefines.h"
-makehm /h IDP_,HIDP_,0x30000 "%(Filename)%(Extension)" &gt;&gt; "help\HTMLDefines.h"
-echo. &gt;&gt; "help\HTMLDefines.h"
-echo // Resources (IDR_*) &gt;&gt; "help\HTMLDefines.h"
-makehm /h IDR_,HIDR_,0x20000 "%(Filename)%(Extension)" &gt;&gt; "help\HTMLDefines.h"
-echo. &gt;&gt; "help\HTMLDefines.h"
-echo // Dialogs (IDD_*) &gt;&gt; "help\HTMLDefines.h"
-makehm /h IDD_,HIDD_,0x20000 "%(Filename)%(Extension)" &gt;&gt; "help\HTMLDefines.h"
-echo. &gt;&gt; "help\HTMLDefines.h"
-echo // Frame Controls (IDW_*) &gt;&gt; "help\HTMLDefines.h"
-makehm /h /a afxhh.h IDW_,HIDW_,0x50000 "%(Filename)%(Extension)" &gt;&gt; "help\HTMLDefines.h"
-echo. &gt;&gt; "help\HTMLDefines.h"
-echo // Controls (IDC_*) &gt;&gt; "help\HTMLDefines.h"
-makehm /h IDC_,IDH_,0x00000 "%(Filename)%(Extension)" &gt;&gt; "help\HTMLDefines.h"
-</Command>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">help\HTMLDefines.h;%(Outputs)</Outputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Testing Debug|x64'">help\HTMLDefines.h;%(Outputs)</Outputs>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Generating map file for help compiler...</Message>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Testing Release|Win32'">Generating map file for help compiler...</Message>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">echo // Generated Help Map file.  Used by Copy Handler help files. &gt; "help\HTMLDefines.h"
-echo. &gt; "help\HTMLDefines.h"
-echo // Commands (ID_* and IDM_*) &gt;&gt; "help\HTMLDefines.h"
-makehm /h ID_,HID_,0x10000 IDM_,HIDM_,0x10000 "%(Filename)%(Extension)" &gt;&gt; "help\HTMLDefines.h"
-echo. &gt;&gt; "help\HTMLDefines.h"
-echo // Prompts (IDP_*) &gt;&gt; "help\HTMLDefines.h"
-makehm /h IDP_,HIDP_,0x30000 "%(Filename)%(Extension)" &gt;&gt; "help\HTMLDefines.h"
-echo. &gt;&gt; "help\HTMLDefines.h"
-echo // Resources (IDR_*) &gt;&gt; "help\HTMLDefines.h"
-makehm /h IDR_,HIDR_,0x20000 "%(Filename)%(Extension)" &gt;&gt; "help\HTMLDefines.h"
-echo. &gt;&gt; "help\HTMLDefines.h"
-echo // Dialogs (IDD_*) &gt;&gt; "help\HTMLDefines.h"
-makehm /h IDD_,HIDD_,0x20000 "%(Filename)%(Extension)" &gt;&gt; "help\HTMLDefines.h"
-echo. &gt;&gt; "help\HTMLDefines.h"
-echo // Frame Controls (IDW_*) &gt;&gt; "help\HTMLDefines.h"
-makehm /h /a afxhh.h IDW_,HIDW_,0x50000 "%(Filename)%(Extension)" &gt;&gt; "help\HTMLDefines.h"
-echo. &gt;&gt; "help\HTMLDefines.h"
-echo // Controls (IDC_*) &gt;&gt; "help\HTMLDefines.h"
-makehm /h IDC_,IDH_,0x00000 "%(Filename)%(Extension)" &gt;&gt; "help\HTMLDefines.h"
-</Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Testing Release|Win32'">echo // Generated Help Map file.  Used by Copy Handler help files. &gt; "help\HTMLDefines.h"
-echo. &gt; "help\HTMLDefines.h"
-echo // Commands (ID_* and IDM_*) &gt;&gt; "help\HTMLDefines.h"
-makehm /h ID_,HID_,0x10000 IDM_,HIDM_,0x10000 "%(Filename)%(Extension)" &gt;&gt; "help\HTMLDefines.h"
-echo. &gt;&gt; "help\HTMLDefines.h"
-echo // Prompts (IDP_*) &gt;&gt; "help\HTMLDefines.h"
-makehm /h IDP_,HIDP_,0x30000 "%(Filename)%(Extension)" &gt;&gt; "help\HTMLDefines.h"
-echo. &gt;&gt; "help\HTMLDefines.h"
-echo // Resources (IDR_*) &gt;&gt; "help\HTMLDefines.h"
-makehm /h IDR_,HIDR_,0x20000 "%(Filename)%(Extension)" &gt;&gt; "help\HTMLDefines.h"
-echo. &gt;&gt; "help\HTMLDefines.h"
-echo // Dialogs (IDD_*) &gt;&gt; "help\HTMLDefines.h"
-makehm /h IDD_,HIDD_,0x20000 "%(Filename)%(Extension)" &gt;&gt; "help\HTMLDefines.h"
-echo. &gt;&gt; "help\HTMLDefines.h"
-echo // Frame Controls (IDW_*) &gt;&gt; "help\HTMLDefines.h"
-makehm /h /a afxhh.h IDW_,HIDW_,0x50000 "%(Filename)%(Extension)" &gt;&gt; "help\HTMLDefines.h"
-echo. &gt;&gt; "help\HTMLDefines.h"
-echo // Controls (IDC_*) &gt;&gt; "help\HTMLDefines.h"
-makehm /h IDC_,IDH_,0x00000 "%(Filename)%(Extension)" &gt;&gt; "help\HTMLDefines.h"
-</Command>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">help\HTMLDefines.h;%(Outputs)</Outputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Testing Release|Win32'">help\HTMLDefines.h;%(Outputs)</Outputs>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Generating map file for help compiler...</Message>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Testing Release|x64'">Generating map file for help compiler...</Message>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">echo // Generated Help Map file.  Used by Copy Handler help files. &gt; "help\HTMLDefines.h"
-echo. &gt; "help\HTMLDefines.h"
-echo // Commands (ID_* and IDM_*) &gt;&gt; "help\HTMLDefines.h"
-makehm /h ID_,HID_,0x10000 IDM_,HIDM_,0x10000 "%(Filename)%(Extension)" &gt;&gt; "help\HTMLDefines.h"
-echo. &gt;&gt; "help\HTMLDefines.h"
-echo // Prompts (IDP_*) &gt;&gt; "help\HTMLDefines.h"
-makehm /h IDP_,HIDP_,0x30000 "%(Filename)%(Extension)" &gt;&gt; "help\HTMLDefines.h"
-echo. &gt;&gt; "help\HTMLDefines.h"
-echo // Resources (IDR_*) &gt;&gt; "help\HTMLDefines.h"
-makehm /h IDR_,HIDR_,0x20000 "%(Filename)%(Extension)" &gt;&gt; "help\HTMLDefines.h"
-echo. &gt;&gt; "help\HTMLDefines.h"
-echo // Dialogs (IDD_*) &gt;&gt; "help\HTMLDefines.h"
-makehm /h IDD_,HIDD_,0x20000 "%(Filename)%(Extension)" &gt;&gt; "help\HTMLDefines.h"
-echo. &gt;&gt; "help\HTMLDefines.h"
-echo // Frame Controls (IDW_*) &gt;&gt; "help\HTMLDefines.h"
-makehm /h /a afxhh.h IDW_,HIDW_,0x50000 "%(Filename)%(Extension)" &gt;&gt; "help\HTMLDefines.h"
-echo. &gt;&gt; "help\HTMLDefines.h"
-echo // Controls (IDC_*) &gt;&gt; "help\HTMLDefines.h"
-makehm /h IDC_,IDH_,0x00000 "%(Filename)%(Extension)" &gt;&gt; "help\HTMLDefines.h"
-</Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Testing Release|x64'">echo // Generated Help Map file.  Used by Copy Handler help files. &gt; "help\HTMLDefines.h"
-echo. &gt; "help\HTMLDefines.h"
-echo // Commands (ID_* and IDM_*) &gt;&gt; "help\HTMLDefines.h"
-makehm /h ID_,HID_,0x10000 IDM_,HIDM_,0x10000 "%(Filename)%(Extension)" &gt;&gt; "help\HTMLDefines.h"
-echo. &gt;&gt; "help\HTMLDefines.h"
-echo // Prompts (IDP_*) &gt;&gt; "help\HTMLDefines.h"
-makehm /h IDP_,HIDP_,0x30000 "%(Filename)%(Extension)" &gt;&gt; "help\HTMLDefines.h"
-echo. &gt;&gt; "help\HTMLDefines.h"
-echo // Resources (IDR_*) &gt;&gt; "help\HTMLDefines.h"
-makehm /h IDR_,HIDR_,0x20000 "%(Filename)%(Extension)" &gt;&gt; "help\HTMLDefines.h"
-echo. &gt;&gt; "help\HTMLDefines.h"
-echo // Dialogs (IDD_*) &gt;&gt; "help\HTMLDefines.h"
-makehm /h IDD_,HIDD_,0x20000 "%(Filename)%(Extension)" &gt;&gt; "help\HTMLDefines.h"
-echo. &gt;&gt; "help\HTMLDefines.h"
-echo // Frame Controls (IDW_*) &gt;&gt; "help\HTMLDefines.h"
-makehm /h /a afxhh.h IDW_,HIDW_,0x50000 "%(Filename)%(Extension)" &gt;&gt; "help\HTMLDefines.h"
-echo. &gt;&gt; "help\HTMLDefines.h"
-echo // Controls (IDC_*) &gt;&gt; "help\HTMLDefines.h"
-makehm /h IDC_,IDH_,0x00000 "%(Filename)%(Extension)" &gt;&gt; "help\HTMLDefines.h"
-</Command>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">help\HTMLDefines.h;%(Outputs)</Outputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Testing Release|x64'">help\HTMLDefines.h;%(Outputs)</Outputs>
-    </CustomBuild>
+    <ClInclude Include="resource.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\tests\tests_shared\TestsExports.cpp">
@@ -929,242 +752,6 @@ rc.exe /l 0x409 /d "NDEBUG" /d "_AFXDLL" /fo"$(OutDir)%(Filename).res" "$(IntDir
   </ItemGroup>
   <ItemGroup>
     <None Include="res\ch.rc2" />
-    <None Include="resource.hm" />
-    <None Include="help\english\advmenu.htm">
-      <DeploymentContent>true</DeploymentContent>
-    </None>
-    <None Include="help\english\buffersize.htm">
-      <DeploymentContent>true</DeploymentContent>
-    </None>
-    <None Include="help\english\bugs.htm">
-      <DeploymentContent>true</DeploymentContent>
-    </None>
-    <None Include="help\english\customcopy.htm">
-      <DeploymentContent>true</DeploymentContent>
-    </None>
-    <None Include="help\english\explorermenu.htm">
-      <DeploymentContent>true</DeploymentContent>
-    </None>
-    <None Include="help\english\faq.htm">
-      <DeploymentContent>true</DeploymentContent>
-    </None>
-    <None Include="help\english\feeddstfile.htm">
-      <DeploymentContent>true</DeploymentContent>
-    </None>
-    <None Include="help\english\feediwr.htm">
-      <DeploymentContent>true</DeploymentContent>
-    </None>
-    <None Include="help\english\feednotenoughroom.htm">
-      <DeploymentContent>true</DeploymentContent>
-    </None>
-    <None Include="help\english\feedreplacefiles.htm">
-      <DeploymentContent>true</DeploymentContent>
-    </None>
-    <None Include="help\english\feedsmallreplace.htm">
-      <DeploymentContent>true</DeploymentContent>
-    </None>
-    <None Include="help\english\filterdlg.htm">
-      <DeploymentContent>true</DeploymentContent>
-    </None>
-    <None Include="help\english\folderdlg.htm">
-      <DeploymentContent>true</DeploymentContent>
-    </None>
-    <None Include="help\english\headfoot.js" />
-    <None Include="help\english\help.hhc" />
-    <None Include="help\english\help.hhk" />
-    <CustomBuild Include="help\english\help.hhp">
-      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Making help file...</Message>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Testing Debug|Win32'">Making help file...</Message>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">copy "help\HTMLDefines.h" "%(RootDir)%(Directory)HTMLDefines.h"
-SET PATH=%PATH%;$(VS_ExecutablePath)
-hhc "%(FullPath)"
-if not exist "%(RootDir)%(Directory)english.chm" goto :HelpError
-mkdir "$(OutDir)help" &gt;nul 2&gt;nul
-copy "%(RootDir)%(Directory)english.chm" "$(OutDir)help\english.chm"
-goto :HelpDone
-:HelpError
-echo %(FullPath)(1) : error:Problem encountered creating help file
-echo.
-exit 1
-:HelpDone
-echo.
-</Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Testing Debug|Win32'">copy "help\HTMLDefines.h" "%(RootDir)%(Directory)HTMLDefines.h"
-SET PATH=%PATH%;$(VS_ExecutablePath)
-hhc "%(FullPath)"
-if not exist "%(RootDir)%(Directory)english.chm" goto :HelpError
-mkdir "$(OutDir)help" &gt;nul 2&gt;nul
-copy "%(RootDir)%(Directory)english.chm" "$(OutDir)help\english.chm"
-goto :HelpDone
-:HelpError
-echo %(FullPath)(1) : error:Problem encountered creating help file
-echo.
-exit 1
-:HelpDone
-echo.
-</Command>
-      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">help\HTMLDefines.h;%(AdditionalInputs)</AdditionalInputs>
-      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Testing Debug|Win32'">help\HTMLDefines.h;%(AdditionalInputs)</AdditionalInputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">help\english\english.chm;%(Outputs)</Outputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Testing Debug|Win32'">help\english\english.chm;%(Outputs)</Outputs>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Making help file...</Message>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Testing Debug|x64'">Making help file...</Message>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">copy "help\HTMLDefines.h" "%(RootDir)%(Directory)HTMLDefines.h"
-SET PATH=%PATH%;$(VS_ExecutablePath)
-hhc "%(FullPath)"
-if not exist "%(RootDir)%(Directory)english.chm" goto :HelpError
-mkdir "$(OutDir)help" &gt;nul 2&gt;nul
-copy "%(RootDir)%(Directory)english.chm" "$(OutDir)help\english.chm"
-goto :HelpDone
-:HelpError
-echo %(FullPath)(1) : error:Problem encountered creating help file
-echo.
-exit 1
-:HelpDone
-echo.
-</Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Testing Debug|x64'">copy "help\HTMLDefines.h" "%(RootDir)%(Directory)HTMLDefines.h"
-SET PATH=%PATH%;$(VS_ExecutablePath)
-hhc "%(FullPath)"
-if not exist "%(RootDir)%(Directory)english.chm" goto :HelpError
-mkdir "$(OutDir)help" &gt;nul 2&gt;nul
-copy "%(RootDir)%(Directory)english.chm" "$(OutDir)help\english.chm"
-goto :HelpDone
-:HelpError
-echo %(FullPath)(1) : error:Problem encountered creating help file
-echo.
-exit 1
-:HelpDone
-echo.
-</Command>
-      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">help\HTMLDefines.h;%(AdditionalInputs)</AdditionalInputs>
-      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Testing Debug|x64'">help\HTMLDefines.h;%(AdditionalInputs)</AdditionalInputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">help\english\english.chm;%(Outputs)</Outputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Testing Debug|x64'">help\english\english.chm;%(Outputs)</Outputs>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Making help file...</Message>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Testing Release|Win32'">Making help file...</Message>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">copy "help\HTMLDefines.h" "%(RootDir)%(Directory)HTMLDefines.h"
-SET PATH=%PATH%;$(VS_ExecutablePath)
-hhc "%(FullPath)"
-if not exist "%(RootDir)%(Directory)english.chm" goto :HelpError
-mkdir "$(OutDir)help" &gt;nul 2&gt;nul
-copy "%(RootDir)%(Directory)english.chm" "$(OutDir)help\english.chm"
-goto :HelpDone
-:HelpError
-echo %(FullPath)(1) : error:Problem encountered creating help file
-echo.
-exit 1
-:HelpDone
-echo.
-</Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Testing Release|Win32'">copy "help\HTMLDefines.h" "%(RootDir)%(Directory)HTMLDefines.h"
-SET PATH=%PATH%;$(VS_ExecutablePath)
-hhc "%(FullPath)"
-if not exist "%(RootDir)%(Directory)english.chm" goto :HelpError
-mkdir "$(OutDir)help" &gt;nul 2&gt;nul
-copy "%(RootDir)%(Directory)english.chm" "$(OutDir)help\english.chm"
-goto :HelpDone
-:HelpError
-echo %(FullPath)(1) : error:Problem encountered creating help file
-echo.
-exit 1
-:HelpDone
-echo.
-</Command>
-      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">help\HTMLDefines.h;%(AdditionalInputs)</AdditionalInputs>
-      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Testing Release|Win32'">help\HTMLDefines.h;%(AdditionalInputs)</AdditionalInputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">help\english\english.chm;%(Outputs)</Outputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Testing Release|Win32'">help\english\english.chm;%(Outputs)</Outputs>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Making help file...</Message>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Testing Release|x64'">Making help file...</Message>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">copy "help\HTMLDefines.h" "%(RootDir)%(Directory)HTMLDefines.h"
-SET PATH=%PATH%;$(VS_ExecutablePath)
-hhc "%(FullPath)"
-if not exist "%(RootDir)%(Directory)english.chm" goto :HelpError
-mkdir "$(OutDir)help" &gt;nul 2&gt;nul
-copy "%(RootDir)%(Directory)english.chm" "$(OutDir)help\english.chm"
-goto :HelpDone
-:HelpError
-echo %(FullPath)(1) : error:Problem encountered creating help file
-echo.
-exit 1
-:HelpDone
-echo.
-</Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Testing Release|x64'">copy "help\HTMLDefines.h" "%(RootDir)%(Directory)HTMLDefines.h"
-SET PATH=%PATH%;$(VS_ExecutablePath)
-hhc "%(FullPath)"
-if not exist "%(RootDir)%(Directory)english.chm" goto :HelpError
-mkdir "$(OutDir)help" &gt;nul 2&gt;nul
-copy "%(RootDir)%(Directory)english.chm" "$(OutDir)help\english.chm"
-goto :HelpDone
-:HelpError
-echo %(FullPath)(1) : error:Problem encountered creating help file
-echo.
-exit 1
-:HelpDone
-echo.
-</Command>
-      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">help\HTMLDefines.h;%(AdditionalInputs)</AdditionalInputs>
-      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Testing Release|x64'">help\HTMLDefines.h;%(AdditionalInputs)</AdditionalInputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">help\english\english.chm;%(Outputs)</Outputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Testing Release|x64'">help\english\english.chm;%(Outputs)</Outputs>
-    </CustomBuild>
-    <None Include="help\english\history.htm">
-      <DeploymentContent>true</DeploymentContent>
-    </None>
-    <None Include="help\english\installation.htm">
-      <DeploymentContent>true</DeploymentContent>
-    </None>
-    <None Include="help\english\license.htm">
-      <DeploymentContent>true</DeploymentContent>
-    </None>
-    <None Include="help\english\mainmenu.htm">
-      <DeploymentContent>true</DeploymentContent>
-    </None>
-    <None Include="help\english\miniview.htm">
-      <DeploymentContent>true</DeploymentContent>
-    </None>
-    <None Include="help\english\options.htm">
-      <DeploymentContent>true</DeploymentContent>
-    </None>
-    <None Include="help\english\recentdlg.htm">
-      <DeploymentContent>true</DeploymentContent>
-    </None>
-    <None Include="help\english\replacepaths.htm">
-      <DeploymentContent>true</DeploymentContent>
-    </None>
-    <None Include="help\english\reporting.htm">
-      <DeploymentContent>true</DeploymentContent>
-    </None>
-    <None Include="help\english\requirements.htm">
-      <DeploymentContent>true</DeploymentContent>
-    </None>
-    <None Include="help\english\shortcutsdlg.htm">
-      <DeploymentContent>true</DeploymentContent>
-    </None>
-    <None Include="help\english\shutdowndlg.htm">
-      <DeploymentContent>true</DeploymentContent>
-    </None>
-    <None Include="help\english\status.htm">
-      <DeploymentContent>true</DeploymentContent>
-    </None>
-    <None Include="help\english\style.css" />
-    <None Include="help\english\support.htm">
-      <DeploymentContent>true</DeploymentContent>
-    </None>
-    <None Include="help\english\template.htm">
-      <DeploymentContent>true</DeploymentContent>
-    </None>
-    <None Include="help\english\thanks.htm">
-      <DeploymentContent>true</DeploymentContent>
-    </None>
-    <None Include="help\english\using.htm">
-      <DeploymentContent>true</DeploymentContent>
-    </None>
-    <None Include="help\english\welcome.htm">
-      <DeploymentContent>true</DeploymentContent>
-    </None>
     <CustomBuild Include="langs\bulgarian.lng">
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Copying language file %(Filename)%(Extension)...</Message>
       <Message Condition="'$(Configuration)|$(Platform)'=='Testing Debug|Win32'">Copying language file %(Filename)%(Extension)...</Message>
@@ -1709,241 +1296,6 @@ echo.
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(OutDir)langs\%(Filename)%(Extension);%(Outputs)</Outputs>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Testing Release|x64'">$(OutDir)langs\%(Filename)%(Extension);%(Outputs)</Outputs>
     </CustomBuild>
-    <None Include="help\polish\advmenu.htm">
-      <DeploymentContent>true</DeploymentContent>
-    </None>
-    <None Include="help\polish\buffersize.htm">
-      <DeploymentContent>true</DeploymentContent>
-    </None>
-    <None Include="help\polish\bugs.htm">
-      <DeploymentContent>true</DeploymentContent>
-    </None>
-    <None Include="help\polish\customcopy.htm">
-      <DeploymentContent>true</DeploymentContent>
-    </None>
-    <None Include="help\polish\explorermenu.htm">
-      <DeploymentContent>true</DeploymentContent>
-    </None>
-    <None Include="help\polish\faq.htm">
-      <DeploymentContent>true</DeploymentContent>
-    </None>
-    <None Include="help\polish\feeddstfile.htm">
-      <DeploymentContent>true</DeploymentContent>
-    </None>
-    <None Include="help\polish\feediwr.htm">
-      <DeploymentContent>true</DeploymentContent>
-    </None>
-    <None Include="help\polish\feednotenoughroom.htm">
-      <DeploymentContent>true</DeploymentContent>
-    </None>
-    <None Include="help\polish\feedreplacefiles.htm">
-      <DeploymentContent>true</DeploymentContent>
-    </None>
-    <None Include="help\polish\feedsmallreplace.htm">
-      <DeploymentContent>true</DeploymentContent>
-    </None>
-    <None Include="help\polish\filterdlg.htm">
-      <DeploymentContent>true</DeploymentContent>
-    </None>
-    <None Include="help\polish\folderdlg.htm">
-      <DeploymentContent>true</DeploymentContent>
-    </None>
-    <None Include="help\polish\headfoot.js" />
-    <None Include="help\polish\help.hhc" />
-    <None Include="help\polish\help.hhk" />
-    <CustomBuild Include="help\polish\help.hhp">
-      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Making help file...</Message>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Testing Debug|Win32'">Making help file...</Message>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">copy "help\HTMLDefines.h" "%(RootDir)%(Directory)HTMLDefines.h"
-SET PATH=%PATH%;$(VS_ExecutablePath)
-hhc "%(FullPath)"
-if not exist "%(RootDir)%(Directory)polish.chm" goto :HelpError
-mkdir "$(OutDir)help" &gt;nul 2&gt;nul
-copy "%(RootDir)%(Directory)polish.chm" "$(OutDir)help\polish.chm"
-goto :HelpDone
-:HelpError
-echo %(FullPath)(1) : error:Problem encountered creating help file
-echo.
-exit 1
-:HelpDone
-echo.
-</Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Testing Debug|Win32'">copy "help\HTMLDefines.h" "%(RootDir)%(Directory)HTMLDefines.h"
-SET PATH=%PATH%;$(VS_ExecutablePath)
-hhc "%(FullPath)"
-if not exist "%(RootDir)%(Directory)polish.chm" goto :HelpError
-mkdir "$(OutDir)help" &gt;nul 2&gt;nul
-copy "%(RootDir)%(Directory)polish.chm" "$(OutDir)help\polish.chm"
-goto :HelpDone
-:HelpError
-echo %(FullPath)(1) : error:Problem encountered creating help file
-echo.
-exit 1
-:HelpDone
-echo.
-</Command>
-      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">help\HTMLDefines.h;%(AdditionalInputs)</AdditionalInputs>
-      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Testing Debug|Win32'">help\HTMLDefines.h;%(AdditionalInputs)</AdditionalInputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">help\polish\polish.chm;%(Outputs)</Outputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Testing Debug|Win32'">help\polish\polish.chm;%(Outputs)</Outputs>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Making help file...</Message>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Testing Debug|x64'">Making help file...</Message>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">copy "help\HTMLDefines.h" "%(RootDir)%(Directory)HTMLDefines.h"
-SET PATH=%PATH%;$(VS_ExecutablePath)
-hhc "%(FullPath)"
-if not exist "%(RootDir)%(Directory)polish.chm" goto :HelpError
-mkdir "$(OutDir)help" &gt;nul 2&gt;nul
-copy "%(RootDir)%(Directory)polish.chm" "$(OutDir)help\polish.chm"
-goto :HelpDone
-:HelpError
-echo %(FullPath)(1) : error:Problem encountered creating help file
-echo.
-exit 1
-:HelpDone
-echo.
-</Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Testing Debug|x64'">copy "help\HTMLDefines.h" "%(RootDir)%(Directory)HTMLDefines.h"
-SET PATH=%PATH%;$(VS_ExecutablePath)
-hhc "%(FullPath)"
-if not exist "%(RootDir)%(Directory)polish.chm" goto :HelpError
-mkdir "$(OutDir)help" &gt;nul 2&gt;nul
-copy "%(RootDir)%(Directory)polish.chm" "$(OutDir)help\polish.chm"
-goto :HelpDone
-:HelpError
-echo %(FullPath)(1) : error:Problem encountered creating help file
-echo.
-exit 1
-:HelpDone
-echo.
-</Command>
-      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">help\HTMLDefines.h;%(AdditionalInputs)</AdditionalInputs>
-      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Testing Debug|x64'">help\HTMLDefines.h;%(AdditionalInputs)</AdditionalInputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">help\polish\polish.chm;%(Outputs)</Outputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Testing Debug|x64'">help\polish\polish.chm;%(Outputs)</Outputs>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Making help file...</Message>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Testing Release|Win32'">Making help file...</Message>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">copy "help\HTMLDefines.h" "%(RootDir)%(Directory)HTMLDefines.h"
-SET PATH=%PATH%;$(VS_ExecutablePath)
-hhc "%(FullPath)"
-if not exist "%(RootDir)%(Directory)polish.chm" goto :HelpError
-mkdir "$(OutDir)help" &gt;nul 2&gt;nul
-copy "%(RootDir)%(Directory)polish.chm" "$(OutDir)help\polish.chm"
-goto :HelpDone
-:HelpError
-echo %(FullPath)(1) : error:Problem encountered creating help file
-echo.
-exit 1
-:HelpDone
-echo.
-</Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Testing Release|Win32'">copy "help\HTMLDefines.h" "%(RootDir)%(Directory)HTMLDefines.h"
-SET PATH=%PATH%;$(VS_ExecutablePath)
-hhc "%(FullPath)"
-if not exist "%(RootDir)%(Directory)polish.chm" goto :HelpError
-mkdir "$(OutDir)help" &gt;nul 2&gt;nul
-copy "%(RootDir)%(Directory)polish.chm" "$(OutDir)help\polish.chm"
-goto :HelpDone
-:HelpError
-echo %(FullPath)(1) : error:Problem encountered creating help file
-echo.
-exit 1
-:HelpDone
-echo.
-</Command>
-      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">help\HTMLDefines.h;%(AdditionalInputs)</AdditionalInputs>
-      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Testing Release|Win32'">help\HTMLDefines.h;%(AdditionalInputs)</AdditionalInputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">help\polish\polish.chm;%(Outputs)</Outputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Testing Release|Win32'">help\polish\polish.chm;%(Outputs)</Outputs>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Making help file...</Message>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Testing Release|x64'">Making help file...</Message>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">copy "help\HTMLDefines.h" "%(RootDir)%(Directory)HTMLDefines.h"
-SET PATH=%PATH%;$(VS_ExecutablePath)
-hhc "%(FullPath)"
-if not exist "%(RootDir)%(Directory)polish.chm" goto :HelpError
-mkdir "$(OutDir)help" &gt;nul 2&gt;nul
-copy "%(RootDir)%(Directory)polish.chm" "$(OutDir)help\polish.chm"
-goto :HelpDone
-:HelpError
-echo %(FullPath)(1) : error:Problem encountered creating help file
-echo.
-exit 1
-:HelpDone
-echo.
-</Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Testing Release|x64'">copy "help\HTMLDefines.h" "%(RootDir)%(Directory)HTMLDefines.h"
-SET PATH=%PATH%;$(VS_ExecutablePath)
-hhc "%(FullPath)"
-if not exist "%(RootDir)%(Directory)polish.chm" goto :HelpError
-mkdir "$(OutDir)help" &gt;nul 2&gt;nul
-copy "%(RootDir)%(Directory)polish.chm" "$(OutDir)help\polish.chm"
-goto :HelpDone
-:HelpError
-echo %(FullPath)(1) : error:Problem encountered creating help file
-echo.
-exit 1
-:HelpDone
-echo.
-</Command>
-      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">help\HTMLDefines.h;%(AdditionalInputs)</AdditionalInputs>
-      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Testing Release|x64'">help\HTMLDefines.h;%(AdditionalInputs)</AdditionalInputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">help\polish\polish.chm;%(Outputs)</Outputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Testing Release|x64'">help\polish\polish.chm;%(Outputs)</Outputs>
-    </CustomBuild>
-    <None Include="help\polish\history.htm">
-      <DeploymentContent>true</DeploymentContent>
-    </None>
-    <None Include="help\polish\installation.htm">
-      <DeploymentContent>true</DeploymentContent>
-    </None>
-    <None Include="help\polish\license.htm">
-      <DeploymentContent>true</DeploymentContent>
-    </None>
-    <None Include="help\polish\mainmenu.htm">
-      <DeploymentContent>true</DeploymentContent>
-    </None>
-    <None Include="help\polish\miniview.htm">
-      <DeploymentContent>true</DeploymentContent>
-    </None>
-    <None Include="help\polish\options.htm">
-      <DeploymentContent>true</DeploymentContent>
-    </None>
-    <None Include="help\polish\recentdlg.htm">
-      <DeploymentContent>true</DeploymentContent>
-    </None>
-    <None Include="help\polish\replacepaths.htm">
-      <DeploymentContent>true</DeploymentContent>
-    </None>
-    <None Include="help\polish\reporting.htm">
-      <DeploymentContent>true</DeploymentContent>
-    </None>
-    <None Include="help\polish\requirements.htm">
-      <DeploymentContent>true</DeploymentContent>
-    </None>
-    <None Include="help\polish\shortcutsdlg.htm">
-      <DeploymentContent>true</DeploymentContent>
-    </None>
-    <None Include="help\polish\shutdowndlg.htm">
-      <DeploymentContent>true</DeploymentContent>
-    </None>
-    <None Include="help\polish\status.htm">
-      <DeploymentContent>true</DeploymentContent>
-    </None>
-    <None Include="help\polish\style.css" />
-    <None Include="help\polish\support.htm">
-      <DeploymentContent>true</DeploymentContent>
-    </None>
-    <None Include="help\polish\template.htm">
-      <DeploymentContent>true</DeploymentContent>
-    </None>
-    <None Include="help\polish\thanks.htm">
-      <DeploymentContent>true</DeploymentContent>
-    </None>
-    <None Include="help\polish\using.htm">
-      <DeploymentContent>true</DeploymentContent>
-    </None>
-    <None Include="help\polish\welcome.htm">
-      <DeploymentContent>true</DeploymentContent>
-    </None>
   </ItemGroup>
   <ItemGroup>
     <Image Include="res\main_toolbar.bmp" />
@@ -1972,38 +1324,6 @@ echo.
     <Image Include="res\waiting.ico" />
     <Image Include="res\warning.ico" />
     <Image Include="res\working.ico" />
-    <Image Include="help\english\ch.gif" />
-    <Image Include="help\polish\ch.gif" />
-  </ItemGroup>
-  <ItemGroup>
-    <Text Include="help\english\0.txt" />
-    <Text Include="help\english\100.txt" />
-    <Text Include="help\english\131.txt" />
-    <Text Include="help\english\137.txt" />
-    <Text Include="help\english\144.txt" />
-    <Text Include="help\english\145.txt" />
-    <Text Include="help\english\149.txt" />
-    <Text Include="help\english\161.txt" />
-    <Text Include="help\english\167.txt" />
-    <Text Include="help\english\173.txt" />
-    <Text Include="help\english\182.txt" />
-    <Text Include="help\english\195.txt" />
-    <Text Include="help\english\208.txt" />
-    <Text Include="help\english\209.txt" />
-    <Text Include="help\polish\0.txt" />
-    <Text Include="help\polish\100.txt" />
-    <Text Include="help\polish\131.txt" />
-    <Text Include="help\polish\137.txt" />
-    <Text Include="help\polish\144.txt" />
-    <Text Include="help\polish\145.txt" />
-    <Text Include="help\polish\149.txt" />
-    <Text Include="help\polish\161.txt" />
-    <Text Include="help\polish\167.txt" />
-    <Text Include="help\polish\173.txt" />
-    <Text Include="help\polish\182.txt" />
-    <Text Include="help\polish\195.txt" />
-    <Text Include="help\polish\208.txt" />
-    <Text Include="help\polish\209.txt" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\libchcore\libchcore.vc140.vcxproj">

@@ -305,7 +305,6 @@
 #define IDC_BAR5_STATIC                 1253
 #define IDC_HEADER_STATIC               1254
 #define IDC_HOSTLINK_STATIC             1255
-#define IDC_HELP_BUTTON                 1257
 #define IDC_PROGRAM_STATICEX            1263
 #define IDC_FULLVERSION_STATICEX        1264
 #define IDC_HOMEPAGE_STATICEX           1265
@@ -521,8 +520,6 @@
 #define IDS_CFGLOGFILE_STRING           8085
 #define IDS_CFGMAXLIMIT_STRING          8088
 #define IDS_CFGROTATEDCOUNT_STRING      8089
-#define IDS_CFGHELPDIR_STRING           8091
-#define IDS_CFGHELPDIRCHOOSE_STRING     8092
 #define IDS_LANGUAGESFOLDER_STRING      8093
 #define IDS_LANGSFOLDERCHOOSE_STRING    8094
 #define IDS_ABOUT_LANGUAGE_STRING       8095
@@ -721,7 +718,6 @@
 #define ID_POPUP_SHUTAFTERFINISHED      32807
 #define ID_POPUP_REGISTERDLL            32809
 #define ID_POPUP_UNREGISTERDLL          32810
-#define ID_POPUP_HELP                   32814
 #define ID_POPUP_TEMP                   32815
 #define ID_POPUP_CHECKFORUPDATES        32816
 #define ID_POPUP_TOOLS                  32817

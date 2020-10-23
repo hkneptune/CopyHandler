@@ -1,8 +1,0 @@
-.topic 2
-Cancels the whole task.
-
-.topic IDH_RETRY_BUTTON
-Retries the opening operation.
-
-.topic IDH_IGNORE_BUTTON
-Ignores the error and skips copying the file.

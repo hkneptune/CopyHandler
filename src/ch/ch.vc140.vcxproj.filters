@@ -42,17 +42,9 @@
     <Filter Include="Localization">
       <UniqueIdentifier>{ca6137b1-4022-4488-af7a-48bfbcdaa51c}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Localization\EN Help Files">
-      <UniqueIdentifier>{0908a1a6-24cd-40d8-a65d-105ecf31514d}</UniqueIdentifier>
-      <Extensions>htm;html;css;txt;hhp;hhc;hhk;js;gif</Extensions>
-    </Filter>
     <Filter Include="Localization\Languages">
       <UniqueIdentifier>{0549f736-3a28-48ed-864b-f53c8c790c8e}</UniqueIdentifier>
       <Extensions>lng</Extensions>
-    </Filter>
-    <Filter Include="Localization\PL Help Files">
-      <UniqueIdentifier>{13791876-3eb5-454d-a0e2-8fea6dd685f3}</UniqueIdentifier>
-      <Extensions>htm;html;css;txt;hhp;hhc;hhk;js;gif</Extensions>
     </Filter>
     <Filter Include="Generated Files">
       <UniqueIdentifier>{4ab952d0-201f-4dc7-9493-c74c95fcae45}</UniqueIdentifier>
@@ -260,6 +252,9 @@
     <ClInclude Include="AppAutorun.h">
       <Filter>Source Files\Tools</Filter>
     </ClInclude>
+    <ClInclude Include="resource.h">
+      <Filter>Resource Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\common\TShellExtMenuConfig.cpp">
@@ -447,219 +442,6 @@
     <None Include="res\ch.rc2">
       <Filter>Resource Files</Filter>
     </None>
-    <None Include="resource.hm">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="help\english\advmenu.htm">
-      <Filter>Localization\EN Help Files</Filter>
-    </None>
-    <None Include="help\english\buffersize.htm">
-      <Filter>Localization\EN Help Files</Filter>
-    </None>
-    <None Include="help\english\bugs.htm">
-      <Filter>Localization\EN Help Files</Filter>
-    </None>
-    <None Include="help\english\customcopy.htm">
-      <Filter>Localization\EN Help Files</Filter>
-    </None>
-    <None Include="help\english\explorermenu.htm">
-      <Filter>Localization\EN Help Files</Filter>
-    </None>
-    <None Include="help\english\faq.htm">
-      <Filter>Localization\EN Help Files</Filter>
-    </None>
-    <None Include="help\english\feeddstfile.htm">
-      <Filter>Localization\EN Help Files</Filter>
-    </None>
-    <None Include="help\english\feediwr.htm">
-      <Filter>Localization\EN Help Files</Filter>
-    </None>
-    <None Include="help\english\feednotenoughroom.htm">
-      <Filter>Localization\EN Help Files</Filter>
-    </None>
-    <None Include="help\english\feedreplacefiles.htm">
-      <Filter>Localization\EN Help Files</Filter>
-    </None>
-    <None Include="help\english\feedsmallreplace.htm">
-      <Filter>Localization\EN Help Files</Filter>
-    </None>
-    <None Include="help\english\filterdlg.htm">
-      <Filter>Localization\EN Help Files</Filter>
-    </None>
-    <None Include="help\english\folderdlg.htm">
-      <Filter>Localization\EN Help Files</Filter>
-    </None>
-    <None Include="help\english\headfoot.js">
-      <Filter>Localization\EN Help Files</Filter>
-    </None>
-    <None Include="help\english\help.hhc">
-      <Filter>Localization\EN Help Files</Filter>
-    </None>
-    <None Include="help\english\help.hhk">
-      <Filter>Localization\EN Help Files</Filter>
-    </None>
-    <None Include="help\english\history.htm">
-      <Filter>Localization\EN Help Files</Filter>
-    </None>
-    <None Include="help\english\installation.htm">
-      <Filter>Localization\EN Help Files</Filter>
-    </None>
-    <None Include="help\english\license.htm">
-      <Filter>Localization\EN Help Files</Filter>
-    </None>
-    <None Include="help\english\mainmenu.htm">
-      <Filter>Localization\EN Help Files</Filter>
-    </None>
-    <None Include="help\english\miniview.htm">
-      <Filter>Localization\EN Help Files</Filter>
-    </None>
-    <None Include="help\english\options.htm">
-      <Filter>Localization\EN Help Files</Filter>
-    </None>
-    <None Include="help\english\recentdlg.htm">
-      <Filter>Localization\EN Help Files</Filter>
-    </None>
-    <None Include="help\english\replacepaths.htm">
-      <Filter>Localization\EN Help Files</Filter>
-    </None>
-    <None Include="help\english\reporting.htm">
-      <Filter>Localization\EN Help Files</Filter>
-    </None>
-    <None Include="help\english\requirements.htm">
-      <Filter>Localization\EN Help Files</Filter>
-    </None>
-    <None Include="help\english\shortcutsdlg.htm">
-      <Filter>Localization\EN Help Files</Filter>
-    </None>
-    <None Include="help\english\shutdowndlg.htm">
-      <Filter>Localization\EN Help Files</Filter>
-    </None>
-    <None Include="help\english\status.htm">
-      <Filter>Localization\EN Help Files</Filter>
-    </None>
-    <None Include="help\english\style.css">
-      <Filter>Localization\EN Help Files</Filter>
-    </None>
-    <None Include="help\english\support.htm">
-      <Filter>Localization\EN Help Files</Filter>
-    </None>
-    <None Include="help\english\template.htm">
-      <Filter>Localization\EN Help Files</Filter>
-    </None>
-    <None Include="help\english\thanks.htm">
-      <Filter>Localization\EN Help Files</Filter>
-    </None>
-    <None Include="help\english\using.htm">
-      <Filter>Localization\EN Help Files</Filter>
-    </None>
-    <None Include="help\english\welcome.htm">
-      <Filter>Localization\EN Help Files</Filter>
-    </None>
-    <None Include="help\polish\advmenu.htm">
-      <Filter>Localization\PL Help Files</Filter>
-    </None>
-    <None Include="help\polish\buffersize.htm">
-      <Filter>Localization\PL Help Files</Filter>
-    </None>
-    <None Include="help\polish\bugs.htm">
-      <Filter>Localization\PL Help Files</Filter>
-    </None>
-    <None Include="help\polish\customcopy.htm">
-      <Filter>Localization\PL Help Files</Filter>
-    </None>
-    <None Include="help\polish\explorermenu.htm">
-      <Filter>Localization\PL Help Files</Filter>
-    </None>
-    <None Include="help\polish\faq.htm">
-      <Filter>Localization\PL Help Files</Filter>
-    </None>
-    <None Include="help\polish\feeddstfile.htm">
-      <Filter>Localization\PL Help Files</Filter>
-    </None>
-    <None Include="help\polish\feediwr.htm">
-      <Filter>Localization\PL Help Files</Filter>
-    </None>
-    <None Include="help\polish\feednotenoughroom.htm">
-      <Filter>Localization\PL Help Files</Filter>
-    </None>
-    <None Include="help\polish\feedreplacefiles.htm">
-      <Filter>Localization\PL Help Files</Filter>
-    </None>
-    <None Include="help\polish\feedsmallreplace.htm">
-      <Filter>Localization\PL Help Files</Filter>
-    </None>
-    <None Include="help\polish\filterdlg.htm">
-      <Filter>Localization\PL Help Files</Filter>
-    </None>
-    <None Include="help\polish\folderdlg.htm">
-      <Filter>Localization\PL Help Files</Filter>
-    </None>
-    <None Include="help\polish\headfoot.js">
-      <Filter>Localization\PL Help Files</Filter>
-    </None>
-    <None Include="help\polish\help.hhc">
-      <Filter>Localization\PL Help Files</Filter>
-    </None>
-    <None Include="help\polish\help.hhk">
-      <Filter>Localization\PL Help Files</Filter>
-    </None>
-    <None Include="help\polish\history.htm">
-      <Filter>Localization\PL Help Files</Filter>
-    </None>
-    <None Include="help\polish\installation.htm">
-      <Filter>Localization\PL Help Files</Filter>
-    </None>
-    <None Include="help\polish\license.htm">
-      <Filter>Localization\PL Help Files</Filter>
-    </None>
-    <None Include="help\polish\mainmenu.htm">
-      <Filter>Localization\PL Help Files</Filter>
-    </None>
-    <None Include="help\polish\miniview.htm">
-      <Filter>Localization\PL Help Files</Filter>
-    </None>
-    <None Include="help\polish\options.htm">
-      <Filter>Localization\PL Help Files</Filter>
-    </None>
-    <None Include="help\polish\recentdlg.htm">
-      <Filter>Localization\PL Help Files</Filter>
-    </None>
-    <None Include="help\polish\replacepaths.htm">
-      <Filter>Localization\PL Help Files</Filter>
-    </None>
-    <None Include="help\polish\reporting.htm">
-      <Filter>Localization\PL Help Files</Filter>
-    </None>
-    <None Include="help\polish\requirements.htm">
-      <Filter>Localization\PL Help Files</Filter>
-    </None>
-    <None Include="help\polish\shortcutsdlg.htm">
-      <Filter>Localization\PL Help Files</Filter>
-    </None>
-    <None Include="help\polish\shutdowndlg.htm">
-      <Filter>Localization\PL Help Files</Filter>
-    </None>
-    <None Include="help\polish\status.htm">
-      <Filter>Localization\PL Help Files</Filter>
-    </None>
-    <None Include="help\polish\style.css">
-      <Filter>Localization\PL Help Files</Filter>
-    </None>
-    <None Include="help\polish\support.htm">
-      <Filter>Localization\PL Help Files</Filter>
-    </None>
-    <None Include="help\polish\template.htm">
-      <Filter>Localization\PL Help Files</Filter>
-    </None>
-    <None Include="help\polish\thanks.htm">
-      <Filter>Localization\PL Help Files</Filter>
-    </None>
-    <None Include="help\polish\using.htm">
-      <Filter>Localization\PL Help Files</Filter>
-    </None>
-    <None Include="help\polish\welcome.htm">
-      <Filter>Localization\PL Help Files</Filter>
-    </None>
   </ItemGroup>
   <ItemGroup>
     <Image Include="res\main_toolbar.bmp">
@@ -740,108 +522,10 @@
     <Image Include="res\working.ico">
       <Filter>Resource Files\Icons</Filter>
     </Image>
-    <Image Include="help\english\ch.gif">
-      <Filter>Localization\EN Help Files</Filter>
-    </Image>
-    <Image Include="help\polish\ch.gif">
-      <Filter>Localization\PL Help Files</Filter>
-    </Image>
-  </ItemGroup>
-  <ItemGroup>
-    <Text Include="help\english\0.txt">
-      <Filter>Localization\EN Help Files</Filter>
-    </Text>
-    <Text Include="help\english\100.txt">
-      <Filter>Localization\EN Help Files</Filter>
-    </Text>
-    <Text Include="help\english\131.txt">
-      <Filter>Localization\EN Help Files</Filter>
-    </Text>
-    <Text Include="help\english\137.txt">
-      <Filter>Localization\EN Help Files</Filter>
-    </Text>
-    <Text Include="help\english\144.txt">
-      <Filter>Localization\EN Help Files</Filter>
-    </Text>
-    <Text Include="help\english\145.txt">
-      <Filter>Localization\EN Help Files</Filter>
-    </Text>
-    <Text Include="help\english\149.txt">
-      <Filter>Localization\EN Help Files</Filter>
-    </Text>
-    <Text Include="help\english\161.txt">
-      <Filter>Localization\EN Help Files</Filter>
-    </Text>
-    <Text Include="help\english\167.txt">
-      <Filter>Localization\EN Help Files</Filter>
-    </Text>
-    <Text Include="help\english\173.txt">
-      <Filter>Localization\EN Help Files</Filter>
-    </Text>
-    <Text Include="help\english\182.txt">
-      <Filter>Localization\EN Help Files</Filter>
-    </Text>
-    <Text Include="help\english\195.txt">
-      <Filter>Localization\EN Help Files</Filter>
-    </Text>
-    <Text Include="help\english\208.txt">
-      <Filter>Localization\EN Help Files</Filter>
-    </Text>
-    <Text Include="help\english\209.txt">
-      <Filter>Localization\EN Help Files</Filter>
-    </Text>
-    <Text Include="help\polish\0.txt">
-      <Filter>Localization\PL Help Files</Filter>
-    </Text>
-    <Text Include="help\polish\100.txt">
-      <Filter>Localization\PL Help Files</Filter>
-    </Text>
-    <Text Include="help\polish\131.txt">
-      <Filter>Localization\PL Help Files</Filter>
-    </Text>
-    <Text Include="help\polish\137.txt">
-      <Filter>Localization\PL Help Files</Filter>
-    </Text>
-    <Text Include="help\polish\144.txt">
-      <Filter>Localization\PL Help Files</Filter>
-    </Text>
-    <Text Include="help\polish\145.txt">
-      <Filter>Localization\PL Help Files</Filter>
-    </Text>
-    <Text Include="help\polish\149.txt">
-      <Filter>Localization\PL Help Files</Filter>
-    </Text>
-    <Text Include="help\polish\161.txt">
-      <Filter>Localization\PL Help Files</Filter>
-    </Text>
-    <Text Include="help\polish\167.txt">
-      <Filter>Localization\PL Help Files</Filter>
-    </Text>
-    <Text Include="help\polish\173.txt">
-      <Filter>Localization\PL Help Files</Filter>
-    </Text>
-    <Text Include="help\polish\182.txt">
-      <Filter>Localization\PL Help Files</Filter>
-    </Text>
-    <Text Include="help\polish\195.txt">
-      <Filter>Localization\PL Help Files</Filter>
-    </Text>
-    <Text Include="help\polish\208.txt">
-      <Filter>Localization\PL Help Files</Filter>
-    </Text>
-    <Text Include="help\polish\209.txt">
-      <Filter>Localization\PL Help Files</Filter>
-    </Text>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="ch.rc">
       <Filter>Resource Files</Filter>
-    </CustomBuild>
-    <CustomBuild Include="resource.h">
-      <Filter>Resource Files</Filter>
-    </CustomBuild>
-    <CustomBuild Include="help\english\help.hhp">
-      <Filter>Localization\EN Help Files</Filter>
     </CustomBuild>
     <CustomBuild Include="langs\bulgarian.lng">
       <Filter>Localization\Languages</Filter>
@@ -890,9 +574,6 @@
     </CustomBuild>
     <CustomBuild Include="langs\valencian.lng">
       <Filter>Localization\Languages</Filter>
-    </CustomBuild>
-    <CustomBuild Include="help\polish\help.hhp">
-      <Filter>Localization\PL Help Files</Filter>
     </CustomBuild>
   </ItemGroup>
 </Project>

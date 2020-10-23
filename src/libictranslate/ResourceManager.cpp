@@ -316,7 +316,6 @@ namespace ictranslate
 		m_pszLngName(nullptr),
 		m_pszFontFace(nullptr),
 		m_wPointSize(0),
-		m_pszHelpName(nullptr),
 		m_pszAuthor(nullptr),
 		m_bRTL(false),
 		m_uiSectionID(0),
@@ -330,7 +329,6 @@ namespace ictranslate
 		delete[] m_pszFilename;
 		delete[] m_pszLngName;
 		delete[] m_pszFontFace;
-		delete[] m_pszHelpName;
 		delete[] m_pszAuthor;
 	}
 
@@ -342,8 +340,6 @@ namespace ictranslate
 		m_pszLngName = nullptr;
 		delete[] m_pszFontFace;
 		m_pszFontFace = nullptr;
-		delete[] m_pszHelpName;
-		m_pszHelpName = nullptr;
 		delete[] m_pszAuthor;
 		m_pszAuthor = nullptr;
 		m_bModified = false;
@@ -360,7 +356,6 @@ namespace ictranslate
 		m_pszLngName(nullptr),
 		m_pszFontFace(nullptr),
 		m_wPointSize(ld.m_wPointSize),
-		m_pszHelpName(nullptr),
 		m_pszAuthor(nullptr),
 		m_bRTL(ld.m_bRTL),
 		m_uiSectionID(ld.m_uiSectionID),
@@ -372,7 +367,6 @@ namespace ictranslate
 		SetFontFace(ld.GetFontFace());
 		SetPointSize(ld.GetPointSize());
 		SetDirection(ld.GetDirection());
-		SetHelpName(ld.GetHelpName());
 		SetAuthor(ld.GetAuthor());
 
 		m_mapTranslation.insert(ld.m_mapTranslation.begin(), ld.m_mapTranslation.end());
@@ -387,7 +381,6 @@ namespace ictranslate
 			SetFontFace(rSrc.GetFontFace());
 			SetPointSize(rSrc.GetPointSize());
 			SetDirection(rSrc.GetDirection());
-			SetHelpName(rSrc.GetHelpName());
 			SetAuthor(rSrc.GetAuthor());
 			m_bRTL = rSrc.m_bRTL;
 			m_bUpdating = rSrc.m_bUpdating;
@@ -412,7 +405,6 @@ namespace ictranslate
 			const unsigned int uiFontFace = cfg.register_string(_T("Info/Font Face"), _T(""));
 			const unsigned int uiSize = cfg.register_signed_num(_T("Info/Size"), 0, 0, 0xffff);
 			const unsigned int uiRTL = cfg.register_bool(_T("Info/RTL reading order"), false);
-			const unsigned int uiHelpName = cfg.register_string(_T("Info/Help name"), _T(""));
 			const unsigned int uiAuthor = cfg.register_string(_T("Info/Author"), _T(""));
 			const unsigned int uiVersion = cfg.register_string(_T("Info/Format version"), _T("1"));
 
@@ -439,11 +431,6 @@ namespace ictranslate
 			SetPointSize((WORD)ll);
 
 			SetDirection(cfg.get_bool(uiRTL));
-
-			psz = cfg.get_string(uiHelpName);
-			if(!psz || psz[ 0 ] == _T('\0'))
-				return false;
-			SetHelpName(psz);
 
 			psz = cfg.get_string(uiAuthor);
 			if(!psz || psz[ 0 ] == _T('\0'))
@@ -582,7 +569,6 @@ namespace ictranslate
 			const unsigned int uiFontFace = cfg.register_string(_T("Info/Font Face"), _T(""));
 			const unsigned int uiSize = cfg.register_signed_num(_T("Info/Size"), 0, 0, 0xffff);
 			const unsigned int uiRTL = cfg.register_bool(_T("Info/RTL reading order"), false);
-			const unsigned int uiHelpName = cfg.register_string(_T("Info/Help name"), _T(""));
 			const unsigned int uiAuthor = cfg.register_string(_T("Info/Author"), _T(""));
 			const unsigned int uiVersion = cfg.register_string(_T("Info/Format version"), _T("1"));
 
@@ -612,11 +598,6 @@ namespace ictranslate
 			SetPointSize((WORD)ll);
 
 			SetDirection(cfg.get_bool(uiRTL));
-
-			psz = cfg.get_string(uiHelpName);
-			if(!psz || psz[ 0 ] == _T('\0'))
-				return false;
-			SetHelpName(psz);
 
 			psz = cfg.get_string(uiAuthor);
 			if(!psz || psz[ 0 ] == _T('\0'))
@@ -659,7 +640,6 @@ namespace ictranslate
 		cfg.set_string(_T("Info/Font Face"), m_pszFontFace);
 		cfg.set_string(_T("Info/Size"), _itot(m_wPointSize, szTemp, 10));
 		cfg.set_string(_T("Info/RTL reading order"), m_bRTL ? _T("1") : _T("0"));
-		cfg.set_string(_T("Info/Help name"), m_pszHelpName);
 		cfg.set_string(_T("Info/Author"), m_pszAuthor);
 		cfg.set_string(_T("Info/Format version"), TRANSLATION_FORMAT_VERSION);
 
@@ -801,12 +781,6 @@ namespace ictranslate
 		m_bModified = true;
 	}
 
-	void CLangData::SetHelpName(PCTSTR psz)
-	{
-		SetFnameData(&m_pszHelpName, psz);
-		m_bModified = true;
-	}
-
 	void CLangData::SetAuthor(PCTSTR psz)
 	{
 		if(m_pszAuthor)
@@ -825,21 +799,6 @@ namespace ictranslate
 			m_wPointSize == 0)
 			return false;
 		return true;
-	}
-
-	void CLangData::SetFnameData(PTSTR *ppszDst, PCTSTR pszSrc)
-	{
-		if(*ppszDst)
-			delete[](*ppszDst);
-		const TCHAR* pszLast = nullptr;
-		if((pszLast = _tcsrchr(pszSrc, _T('\\'))) != nullptr)
-			pszLast++;
-		else
-			pszLast = pszSrc;
-
-		// copy
-		*ppszDst = new TCHAR[ _tcslen(pszLast) + 1 ];
-		_tcscpy(*ppszDst, pszLast);
 	}
 
 	CResourceManager::CResourceManager() :

@@ -332,9 +332,6 @@ namespace ictranslate
 	// CLanguageDialog dialog
 
 	BEGIN_MESSAGE_MAP(CLanguageDialog, CDialog)
-		ON_WM_HELPINFO()
-		ON_WM_CONTEXTMENU()
-		ON_BN_CLICKED(IDHELP, OnHelpButton)
 	END_MESSAGE_MAP()
 
 
@@ -776,36 +773,6 @@ namespace ictranslate
 			m_iBaseY = HIWORD(GetDialogBaseUnits());
 		}
 		::ReleaseDC(nullptr, hDC);
-	}
-
-	BOOL CLanguageDialog::OnHelpInfo(HELPINFO* pHelpInfo)
-	{
-		if(pHelpInfo->iContextType == HELPINFO_WINDOW)
-		{
-			pHelpInfo->dwContextId = (m_uiResID << 16) | pHelpInfo->iCtrlId;
-			AfxGetApp()->HtmlHelp((DWORD_PTR)pHelpInfo, HH_DISPLAY_TEXT_POPUP);
-			return true;
-		}
-
-		return false;
-	}
-
-	void CLanguageDialog::OnContextMenu(CWnd* pWnd, CPoint point)
-	{
-		HELPINFO hi;
-		hi.cbSize = sizeof(HELPINFO);
-		hi.iCtrlId = pWnd->GetDlgCtrlID();
-		hi.dwContextId = (m_uiResID << 16) | hi.iCtrlId;
-		hi.hItemHandle = pWnd->m_hWnd;
-		hi.iContextType = HELPINFO_WINDOW;
-		hi.MousePos = point;
-
-		AfxGetApp()->HtmlHelp((DWORD_PTR)&hi, HH_DISPLAY_TEXT_POPUP);
-	}
-
-	void CLanguageDialog::OnHelpButton()
-	{
-		AfxGetApp()->HtmlHelp(m_uiResID + 0x20000, HH_HELP_CONTEXT);
 	}
 
 	// ============================================================================
