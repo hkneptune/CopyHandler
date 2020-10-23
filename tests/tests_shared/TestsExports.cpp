@@ -17,7 +17,7 @@ class TFailedOutputPrinter : public testing::EmptyTestEventListener
 	{
 		if(test_part_result.failed())
 		{
-			char* pszFailureText = nullptr;
+			const char* pszFailureText = nullptr;
 			if(test_part_result.fatally_failed())
 				pszFailureText = "FATAL";
 			else

@@ -64,7 +64,7 @@ TEST(TestsTSharedMemory, Create_FromFullString)
 
 TEST(TestsTSharedMemory, Create_FromBufferZeroSize)
 {
-	char* pszData = "SomeString";
+	const char* pszData = "SomeString";
 	TSharedMemory memory;
 	EXPECT_THROW(memory.Create(L"UnitTestsSharedMemoryName", (BYTE*)pszData, 0), TCoreException);
 }
@@ -83,7 +83,7 @@ TEST(TestsTSharedMemory, Create_FromNullBufferWithNonZeroSize)
 
 TEST(TestsTSharedMemory, Create_FromEmptyBuffer)
 {
-	char* pszData = "";
+	const char* pszData = "";
 	TSharedMemory memory;
 	memory.Create(L"UnitTestsSharedMemoryName", (BYTE*)pszData, 1);
 	EXPECT_TRUE(memory.GetData() != nullptr);
@@ -96,7 +96,7 @@ TEST(TestsTSharedMemory, Create_FromEmptyBuffer)
 
 TEST(TestsTSharedMemory, Create_FromFullBuffer)
 {
-	char* pszData = "SomeString";
+	const char* pszData = "SomeString";
 	TSharedMemory memory;
 	memory.Create(L"UnitTestsSharedMemoryName", (BYTE*)pszData, 4);
 	EXPECT_TRUE(memory.GetData() != nullptr);
@@ -112,7 +112,7 @@ TEST(TestsTSharedMemory, Create_FromFullBuffer)
 
 TEST(TestsTSharedMemory, Open)
 {
-	char* pszData = "SomeString";
+	const char* pszData = "SomeString";
 	TSharedMemory srcMemory;
 	srcMemory.Create(L"UnitTestsSharedMemoryName", (BYTE*)pszData, 4);
 
@@ -157,7 +157,7 @@ TEST(TestsTSharedMemory, WriteStringReadString)
 
 TEST(TestsTSharedMemory, WriteBufferReadString)
 {
-	wchar_t* pszData = L"SomeString";
+	const wchar_t* pszData = L"SomeString";
 	TSharedMemory memory;
 	memory.Create(L"UnitTestsSharedMemoryName", 256);
 	memory.Write((BYTE*)pszData, (unsigned int)((wcslen(pszData) + 1) * sizeof(wchar_t)));
@@ -198,7 +198,7 @@ TEST(TestsTSharedMemory, WriteStringReadString_ReceiverSide)
 
 TEST(TestsTSharedMemory, WriteBufferReadString_ReceiverSide)
 {
-	wchar_t* pszData = L"SomeString";
+	const wchar_t* pszData = L"SomeString";
 	TSharedMemory srcMemory;
 	srcMemory.Create(L"UnitTestsSharedMemoryName", 256);
 	srcMemory.Write((BYTE*)pszData, (unsigned int)((wcslen(pszData) + 1) * sizeof(wchar_t)));
