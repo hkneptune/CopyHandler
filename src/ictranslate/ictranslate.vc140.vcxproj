@@ -375,6 +375,7 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <TargetMachine>MachineX86</TargetMachine>
       <AdditionalLibraryDirectories>"$(OutDir)"</AdditionalLibraryDirectories>
+      <LinkTimeCodeGeneration>UseLinkTimeCodeGeneration</LinkTimeCodeGeneration>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Testing Release|Win32'">
@@ -416,6 +417,7 @@
       <TargetMachine>MachineX86</TargetMachine>
       <AdditionalDependencies>gmock-dynamic-crt32.lib</AdditionalDependencies>
       <AdditionalLibraryDirectories>"$(OutDir)"</AdditionalLibraryDirectories>
+      <LinkTimeCodeGeneration>UseLinkTimeCodeGeneration</LinkTimeCodeGeneration>
     </Link>
     <PostBuildEvent>
       <Command>cd "$(TargetDir)"
@@ -460,6 +462,7 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <TargetMachine>MachineX64</TargetMachine>
       <AdditionalLibraryDirectories>"$(OutDir)"</AdditionalLibraryDirectories>
+      <LinkTimeCodeGeneration>UseLinkTimeCodeGeneration</LinkTimeCodeGeneration>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Testing Release|x64'">
@@ -501,6 +504,7 @@
       <TargetMachine>MachineX64</TargetMachine>
       <AdditionalDependencies>gmock-dynamic-crt64.lib</AdditionalDependencies>
       <AdditionalLibraryDirectories>"$(OutDir)"</AdditionalLibraryDirectories>
+      <LinkTimeCodeGeneration>UseLinkTimeCodeGeneration</LinkTimeCodeGeneration>
     </Link>
     <PostBuildEvent>
       <Command>cd "$(TargetDir)"
