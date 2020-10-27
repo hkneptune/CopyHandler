@@ -39,7 +39,7 @@
     <ProjectGuid>{DD1F3242-7EE4-4F41-8B8D-D833300C445F}</ProjectGuid>
     <RootNamespace>libictranslate</RootNamespace>
     <Keyword>MFCDLLProj</Keyword>
-    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0.19041.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
