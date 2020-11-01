@@ -18,7 +18,6 @@
 ***************************************************************************/
 #include "stdafx.h"
 #include "ProgressListBox.h"
-#include "MemDC.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -215,10 +214,10 @@ void CProgressListBox::OnPaint()
 	CRect rcClip;
 	dc.GetClipBox(&rcClip);
 
-	CMemDC memDC(&dc, &rcClip);
-	memDC.FillSolidRect(&rcClip, GetSysColor(COLOR_3DFACE));
+	CMemDC memDC(dc, &rcClip);
+	memDC.GetDC().FillSolidRect(&rcClip, GetSysColor(COLOR_3DFACE));
 
-	DefWindowProc(WM_PAINT, reinterpret_cast<WPARAM>(memDC.m_hDC), 0);
+	DefWindowProc(WM_PAINT, reinterpret_cast<WPARAM>(memDC.GetDC().m_hDC), 0);
 }
 
 BOOL CProgressListBox::OnEraseBkgnd(CDC*) 

@@ -8,6 +8,7 @@
 #include "FeedbackHandler.h"
 #include "resource.h"
 #include "../libchengine/TFileInfo.h"
+#include "StringHelpers.h"
 
 // CFeedbackReplaceDlg dialog
 
@@ -41,7 +42,7 @@ void CFeedbackReplaceDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_DST_MODIFIEDDATE_EDIT, m_ctlDstDate);
 	DDX_Control(pDX, IDC_DST_FILESIZE_EDIT, m_ctlDstSize);
 
-	DDX_Check(pDX, IDC_ALL_ITEMS_CHECK, m_bAllItems);
+	DDX_Control(pDX, IDC_MFCMENUBUTTON1, m_mfcButton);
 }
 
 BEGIN_MESSAGE_MAP(CFeedbackReplaceDlg, ictranslate::CLanguageDialog)
@@ -50,6 +51,7 @@ BEGIN_MESSAGE_MAP(CFeedbackReplaceDlg, ictranslate::CLanguageDialog)
 	ON_BN_CLICKED(IDC_SKIP_BUTTON, &CFeedbackReplaceDlg::OnBnClickedSkipButton)
 	ON_BN_CLICKED(IDC_PAUSE_BUTTON, &CFeedbackReplaceDlg::OnBnClickedPauseButton)
 	ON_BN_CLICKED(IDC_CANCEL_BUTTON, &CFeedbackReplaceDlg::OnBnClickedCancelButton)
+	ON_BN_CLICKED(IDC_MFCMENUBUTTON1, &CFeedbackReplaceDlg::OnBnMfcMenu)
 END_MESSAGE_MAP()
 
 
@@ -65,37 +67,56 @@ BOOL CFeedbackReplaceDlg::OnInitDialog()
 
 	AddResizableControl(IDC_INFO_STATIC, 0.0, 0.0, 1.0, 0.0);
 
-	AddResizableControl(IDC_00_STATIC, 0.0, 0.0, 1.0, 0.0);
 	AddResizableControl(IDC_SRC_ICON_STATIC, 0.0, 0.0, 0.0, 0.0);
 
 	AddResizableControl(IDC_SRCFILE_STATIC, 0.0, 0.0, 1.0, 0.0);
+
+	AddResizableControl(IDC_SRC_NAME_STATIC, 0.0, 0.0, 0.0, 0.0);
 	AddResizableControl(IDC_SRC_FILENAME_EDIT, 0.0, 0.0, 1.0, 0.0);
+	AddResizableControl(IDC_SRC_LOCATION_STATIC, 0.0, 0.0, 0.0, 0.0);
 	AddResizableControl(IDC_SRC_PATH_EDIT, 0.0, 0.0, 1.0, 0.0);
+	AddResizableControl(IDC_SRC_SIZE_STATIC, 0.0, 0.0, 0.0, 0.0);
 	AddResizableControl(IDC_SRC_FILESIZE_EDIT, 0.0, 0.0, 1.0, 0.0);
+	AddResizableControl(IDC_SRC_TIME_STATIC, 0.0, 0.0, 0.0, 0.0);
 	AddResizableControl(IDC_SRC_MODIFIEDDATE_EDIT, 0.0, 0.0, 1.0, 0.0);
 
-	AddResizableControl(IDC_01_STATIC, 0.0, 0.5, 1.0, 0.0);
-	AddResizableControl(IDC_DST_ICON_STATIC, 0.0, 0.5, 0.0, 0.0);
+	AddResizableControl(IDC_DST_ICON_STATIC, 0.0, 0.0, 0.0, 0.0);
 
 	AddResizableControl(IDC_DSTFILE_STATIC, 0.0, 0.0, 1.0, 0.0);
-	AddResizableControl(IDC_DST_FILENAME_EDIT, 0.0, 1.0, 1.0, 0.0);
-	AddResizableControl(IDC_DST_PATH_EDIT, 0.0, 1.0, 1.0, 0.0);
-	AddResizableControl(IDC_DST_FILESIZE_EDIT, 0.0, 1.0, 1.0, 0.0);
-	AddResizableControl(IDC_DST_MODIFIEDDATE_EDIT, 0.0, 1.0, 1.0, 0.0);
 
-	AddResizableControl(IDC_COPY_REST_BUTTON, 0.0, 1.0, 0.0, 0.0);
-	AddResizableControl(IDC_SKIP_BUTTON, 0.0, 1.0, 0.0, 0.0);
-	AddResizableControl(IDC_PAUSE_BUTTON, 0.0, 1.0, 0.0, 0.0);
-	AddResizableControl(IDC_CANCEL_BUTTON, 0.0, 1.0, 0.0, 0.0);
-	AddResizableControl(IDC_REPLACE_BUTTON, 0.0, 1.0, 0.0, 0.0);
+	AddResizableControl(IDC_DST_NAME_STATIC, 0.0, 0.0, 0.0, 0.0);
+	AddResizableControl(IDC_DST_FILENAME_EDIT, 0.0, 0.0, 1.0, 0.0);
+	AddResizableControl(IDC_DST_LOCATION_STATIC, 0.0, 0.0, 0.0, 0.0);
+	AddResizableControl(IDC_DST_PATH_EDIT, 0.0, 0.0, 1.0, 0.0);
+	AddResizableControl(IDC_DST_SIZE_STATIC, 0.0, 0.0, 0.0, 0.0);
+	AddResizableControl(IDC_DST_FILESIZE_EDIT, 0.0, 0.0, 1.0, 0.0);
+	AddResizableControl(IDC_DST_TIME_STATIC, 0.0, 0.0, 0.0, 0.0);
+	AddResizableControl(IDC_DST_MODIFIEDDATE_EDIT, 0.0, 0.0, 1.0, 0.0);
 
-	AddResizableControl(IDC_ALL_ITEMS_CHECK, 0.0, 1.0, 1.0, 0.0);
+	AddResizableControl(IDC_REPLACE_BUTTON, 0.0, 0.0, 0.25, 0.0);
+	AddResizableControl(IDC_MASS_REPLACE_MENUBUTTON, 0.25, 0.0, 0.0, 0.0);
+	AddResizableControl(IDC_RENAME_BUTTON, 0.25, 0.0, 0.25, 0.0);
+	AddResizableControl(IDC_MASS_RENAME_MENUBUTTON, 0.5, 0.0, 0.0, 0.0);
+	AddResizableControl(IDC_COPY_REST_BUTTON, 0.5, 0.0, 0.25, 0.0);
+	AddResizableControl(IDC_MASS_RESUME_MENUBUTTON, 0.75, 0.0, 0.0, 0.0);
+	AddResizableControl(IDC_SKIP_BUTTON, 0.75, 0.0, 0.25, 0.0);
+	AddResizableControl(IDC_MASS_SKIP_MENUBUTTON, 1.0, 0.0, 0.0, 0.0);
+
+	AddResizableControl(IDC_PAUSE_BUTTON, 0.5, 0.0, 0.25, 0.0);
+	AddResizableControl(IDC_CANCEL_BUTTON, 0.75, 0.0, 0.25, 0.0);
 
 	InitializeResizableControls();
 
 	// load the informations about files
 	RefreshFilesInfo();
 	RefreshImages();
+
+	HMENU hMenu = GetResManager().LoadMenu(MAKEINTRESOURCE(IDR_PRIORITY_MENU));
+	m_mfcMenu.Attach(hMenu);
+
+	m_mfcButton.m_hMenu = m_mfcMenu.GetSubMenu(0)->GetSafeHmenu();
+
+	m_mfcButton.SetWindowText(L"Unattended operation");
 
 	return TRUE;  // return TRUE unless you set the focus to a control
 	// EXCEPTION: OCX Property Pages should return FALSE
@@ -116,23 +137,14 @@ void CFeedbackReplaceDlg::RefreshFilesInfo()
 	m_ctlSrcName.SetWindowText(pathSrc.GetFileName().ToString());
 
 	// path
-	strTemplate = rManager.LoadString(IDS_INFO_PATH_STRING);
-	ictranslate::CFormat fmt(strTemplate);
-	fmt.SetParam(_T("%pathname"), pathSrc.GetParent().ToString());
-	m_ctlSrcPath.SetWindowText(fmt.ToString());
+	m_ctlSrcPath.SetWindowText(pathSrc.GetParent().ToString());
 
 	// size
-	strTemplate = rManager.LoadString(IDS_INFO_SIZE_STRING);
-	fmt.SetFormat(strTemplate);
-	fmt.SetParam(_T("%size"), m_rSrcFile.GetLength64());
-	m_ctlSrcSize.SetWindowText(fmt.ToString());
+	m_ctlSrcSize.SetWindowText(GetSizeString(m_rSrcFile.GetLength64()));
 
 	// modified date
-	strTemplate = rManager.LoadString(IDS_INFO_MODIFIED_STRING);
-	fmt.SetFormat(strTemplate);
 	COleDateTime dtTemp = m_rSrcFile.GetLastWriteTime().GetAsFiletime();
-	fmt.SetParam(_T("%datemod"), dtTemp.Format(LOCALE_NOUSEROVERRIDE, LANG_USER_DEFAULT));
-	m_ctlSrcDate.SetWindowText(fmt.ToString());
+	m_ctlSrcDate.SetWindowText(dtTemp.Format(LOCALE_NOUSEROVERRIDE, LANG_USER_DEFAULT));
 
 	/////////////////////////////////////////////////////////////
 	// dst file
@@ -142,23 +154,14 @@ void CFeedbackReplaceDlg::RefreshFilesInfo()
 	m_ctlDstName.SetWindowText(pathDst.GetFileName().ToString());
 
 	// path
-	strTemplate = rManager.LoadString(IDS_INFO_PATH_STRING);
-	fmt.SetFormat(strTemplate);
-	fmt.SetParam(_T("%pathname"), pathDst.GetParent().ToString());
-	m_ctlDstPath.SetWindowText(fmt.ToString());
+	m_ctlDstPath.SetWindowText(pathDst.GetParent().ToString());
 
 	// size
-	strTemplate = rManager.LoadString(IDS_INFO_SIZE_STRING);
-	fmt.SetFormat(strTemplate);
-	fmt.SetParam(_T("%size"), m_rDstFile.GetLength64());
-	m_ctlDstSize.SetWindowText(fmt.ToString());
+	m_ctlDstSize.SetWindowText(GetSizeString(m_rDstFile.GetLength64()));
 
 	// modified date
-	strTemplate = rManager.LoadString(IDS_INFO_MODIFIED_STRING);
-	fmt.SetFormat(strTemplate);
 	dtTemp = m_rDstFile.GetLastWriteTime().GetAsFiletime();
-	fmt.SetParam(_T("%datemod"), dtTemp.Format(LOCALE_NOUSEROVERRIDE, LANG_USER_DEFAULT));
-	m_ctlDstDate.SetWindowText(fmt.ToString());
+	m_ctlDstDate.SetWindowText(dtTemp.Format(LOCALE_NOUSEROVERRIDE, LANG_USER_DEFAULT));
 
 	// button captions
 	CWnd* pAppendButton = GetDlgItem(IDC_COPY_REST_BUTTON);
@@ -212,6 +215,24 @@ void CFeedbackReplaceDlg::OnBnClickedCancelButton()
 {
 	UpdateData(TRUE);
 	EndDialog(chengine::EFeedbackResult::eResult_Cancel);
+}
+
+void CFeedbackReplaceDlg::OnBnMfcMenu()
+{
+	CString str;
+	switch (m_mfcButton.m_nMenuResult)
+	{
+	case ID_POPUP_TIME_CRITICAL:
+		str = L"first menu item clicked";
+		break;
+	case ID_POPUP_HIGHEST:
+		str = L"second menu item clicked";
+		break;
+	default:
+		str = L"Default";
+		break;
+	}
+	MessageBox(str);
 }
 
 void CFeedbackReplaceDlg::OnCancel()

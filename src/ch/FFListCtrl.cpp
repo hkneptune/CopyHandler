@@ -18,7 +18,6 @@
 ***************************************************************************/
 #include "stdafx.h"
 #include "FFListCtrl.h"
-#include "MemDC.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -65,13 +64,13 @@ void CFFListCtrl::OnPaint()
 
 	CRect rect;
 	GetClientRect(&rect);
-	CMemDC memDC(&dc, rect);
+	CMemDC memDC(dc, rect);
 	
 	CRect clip;
-	memDC.GetClipBox(&clip);
-	memDC.FillSolidRect(clip, GetSysColor(COLOR_WINDOW));
+	memDC.GetDC().GetClipBox(&clip);
+	memDC.GetDC().FillSolidRect(clip, GetSysColor(COLOR_WINDOW));
 
-	DefWindowProc(WM_PAINT, (WPARAM)memDC.m_hDC, (LPARAM)0);
+	DefWindowProc(WM_PAINT, (WPARAM)memDC.GetDC().m_hDC, (LPARAM)0);
 }
 
 void CFFListCtrl::LimitItems(int iLimit)

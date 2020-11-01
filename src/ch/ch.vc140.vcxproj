@@ -580,7 +580,6 @@
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="TCommandLineParser.h" />
     <ClInclude Include="MainWnd.h" />
-    <ClInclude Include="MemDC.h" />
     <ClInclude Include="Theme Helpers.h" />
     <ClInclude Include="TrayIcon.h" />
     <ClInclude Include="DirTreeCtrl.h" />

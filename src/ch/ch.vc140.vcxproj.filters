@@ -105,9 +105,6 @@
     <ClInclude Include="MainWnd.h">
       <Filter>Source Files\GUI</Filter>
     </ClInclude>
-    <ClInclude Include="MemDC.h">
-      <Filter>Source Files\GUI</Filter>
-    </ClInclude>
     <ClInclude Include="Theme Helpers.h">
       <Filter>Source Files\GUI</Filter>
     </ClInclude>

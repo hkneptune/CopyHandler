@@ -323,6 +323,7 @@
 #define IDC_OPEN_WEBPAGE_BUTTON         1283
 #define IDC_LANGUAGE_STATIC             1284
 #define IDC_REPLACE_BUTTON              1285
+#define IDC_RENAME_BUTTON               1286
 #define IDC_ALL_ITEMS_CHECK             1287
 #define IDC_SKIP_BUTTON                 1288
 #define IDC_SRC_ICON_STATIC             1291
@@ -362,8 +363,8 @@
 #define IDC_UPDATESFREQ_COMBO           1326
 #define IDC_MAXREADAHEAD_EDIT           1326
 #define IDC_LIST1                       1327
-#define IDC_MAXCONCURRENTREADS_EDIT            1327
-#define IDC_MAXCONCURRENTWRITES_EDIT           1328
+#define IDC_MAXCONCURRENTREADS_EDIT     1327
+#define IDC_MAXCONCURRENTWRITES_EDIT    1328
 #define IDC_RICHEDIT21                  1329
 #define IDC_CHANGELOG_RICHEDIT          1329
 #define IDC_MAINUPDATEINFO_CUSTOM       1330
@@ -381,6 +382,19 @@
 #define IDC_SRC_PATH_EDIT               1346
 #define IDC_SRCFILE_STATIC              1347
 #define IDC_DSTFILE_STATIC              1348
+#define IDC_MASS_REPLACE_MENUBUTTON     1376
+#define IDC_MASS_RENAME_MENUBUTTON      1377
+#define IDC_NAME_STATIC                 1378
+#define IDC_SRC_NAME_STATIC             1378
+#define IDC_SRC_LOCATION_STATIC         1379
+#define IDC_SRC_SIZE_STATIC             1380
+#define IDC_SRC_TIME_STATIC             1381
+#define IDC_DST_NAME_STATIC             1382
+#define IDC_DST_LOCATION_STATIC         1383
+#define IDC_DST_SIZE_STATIC             1384
+#define IDC_DST_TIME_STATIC             1385
+#define IDC_MASS_RESUME_MENUBUTTON      1386
+#define IDC_MASS_SKIP_MENUBUTTON        1387
 #define IDS_APPNAME_STRING              5000
 #define IDS_PRIORITY0_STRING            5001
 #define IDS_PRIORITY1_STRING            5002
@@ -544,8 +558,8 @@
 #define IDS_CFGLOGLEVEL_SUBTASK_FASTMOVE 8115
 #define IDS_CFGLOGLEVEL_SUBTASK_DELETE  8116
 #define IDS_CFGLOGLEVEL_FILESYSTEM      8117
-#define IDS_BUFFER_MAX_READAHEAD         8118
-#define IDS_BUFFER_MAX_CONCURRENT_READS  8119
+#define IDS_BUFFER_MAX_READAHEAD        8118
+#define IDS_BUFFER_MAX_CONCURRENT_READS 8119
 #define IDS_BUFFER_MAX_CONCURRENT_WRITES 8120
 #define IDS_MENUCOPY_STRING             9000
 #define IDS_MENUMOVE_STRING             9001
@@ -602,9 +616,6 @@
 #define IDS_BDDIR_STRING                13034
 #define IDS_BDTREE_STRING               13035
 #define IDS_BDNDSCONTAINER_STRING       13036
-#define IDS_INFO_PATH_STRING            13037
-#define IDS_INFO_SIZE_STRING            13038
-#define IDS_INFO_MODIFIED_STRING        13039
 #define IDS_INFO_REASON_STRING          13040
 #define IDS_INFO_FILE_STRING            13041
 #define IDS_TITLECOPY_STRING            13500
@@ -728,9 +739,9 @@
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_3D_CONTROLS                     1
-#define _APS_NEXT_RESOURCE_VALUE        221
+#define _APS_NEXT_RESOURCE_VALUE        225
 #define _APS_NEXT_COMMAND_VALUE         32819
-#define _APS_NEXT_CONTROL_VALUE         1348
+#define _APS_NEXT_CONTROL_VALUE         1387
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

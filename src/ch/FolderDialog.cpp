@@ -20,7 +20,6 @@
 #include "ch.h"
 #include "DirTreeCtrl.h"
 #include "FolderDialog.h"
-#include "memdc.h"
 #include "Theme Helpers.h"
 #include "shlobj.h"
 #include "StringHelpers.h"
@@ -67,6 +66,10 @@ LRESULT CALLBACK InternalWindowProc(WNDPROC pfWndProc, HWND hwnd, UINT uMsg, WPA
 		CWnd* pWnd=CWnd::FromHandle(hwnd);
 		CPaintDC dc(pWnd);
 
+		CRect rcPaint(dc.m_ps.rcPaint);
+		if (rcPaint.IsRectEmpty())
+			break;
+
 		// exclude header from update rect (only in report view)
 		int iID=GetDlgCtrlID(hwnd);
 		if (iID == IDC_SHORTCUT_LIST)
@@ -89,12 +92,12 @@ LRESULT CALLBACK InternalWindowProc(WNDPROC pfWndProc, HWND hwnd, UINT uMsg, WPA
 			}
 		}
 
-		CMemDC memdc(&dc, &dc.m_ps.rcPaint);
+		CMemDC memdc(dc, &dc.m_ps.rcPaint);
 
 		if (dc.m_ps.fErase)
-			memdc.FillSolidRect(&dc.m_ps.rcPaint, GetSysColor(COLOR_WINDOW));
+			memdc.GetDC().FillSolidRect(&dc.m_ps.rcPaint, GetSysColor(COLOR_WINDOW));
 
-		CallWindowProc(pfWndProc, hwnd, WM_PAINT, (WPARAM)memdc.GetSafeHdc(), 0);
+		CallWindowProc(pfWndProc, hwnd, WM_PAINT, (WPARAM)memdc.GetDC().GetSafeHdc(), 0);
 		return 0;
 
 	}

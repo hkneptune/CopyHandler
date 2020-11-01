@@ -59,6 +59,9 @@ private:
 	CEdit m_ctlDstSize;
 	CEdit m_ctlDstDate;
 
+	CMFCMenuButton m_mfcButton;
+	CMenu m_mfcMenu;
+
 	BOOL m_bAllItems;
 
 protected:
@@ -71,6 +74,7 @@ public:
 	afx_msg void OnBnClickedSkipButton();
 	afx_msg void OnBnClickedPauseButton();
 	afx_msg void OnBnClickedCancelButton();
+	afx_msg void OnBnMfcMenu();
 };
 
 #endif

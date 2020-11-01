@@ -331,7 +331,7 @@ namespace ictranslate
 	/////////////////////////////////////////////////////////////////////////////
 	// CLanguageDialog dialog
 
-	BEGIN_MESSAGE_MAP(CLanguageDialog, CDialog)
+	BEGIN_MESSAGE_MAP(CLanguageDialog, CDialogEx)
 	END_MESSAGE_MAP()
 
 
@@ -344,7 +344,7 @@ namespace ictranslate
 	//		already been shown. Should be declared in derived class
 	//		as 'static bool m_xxx;' and initialized to 0.
 	///////////////////////////////////////////////////////////////
-	CLanguageDialog::CLanguageDialog(bool* pLock) : CDialog()
+	CLanguageDialog::CLanguageDialog(bool* pLock) : CDialogEx()
 	{
 		m_pszResName = nullptr;
 		m_uiResID = 0;
@@ -368,7 +368,7 @@ namespace ictranslate
 	// pParent [in] - logical (everyone knows)
 	// pLock [in] - address of a bool for dialog instance checks
 	///////////////////////////////////////////////////////////////
-	CLanguageDialog::CLanguageDialog(PCTSTR lpszTemplateName, CWnd* pParent, bool* pLock) : CDialog()
+	CLanguageDialog::CLanguageDialog(PCTSTR lpszTemplateName, CWnd* pParent, bool* pLock) : CDialogEx()
 	{
 		m_pszResName = lpszTemplateName;
 		if(IS_INTRESOURCE(lpszTemplateName))
@@ -395,7 +395,7 @@ namespace ictranslate
 	// pParent [in] - logical (everyone knows)
 	// pLock [in] - address of a bool for dialog instance checks
 	///////////////////////////////////////////////////////////////
-	CLanguageDialog::CLanguageDialog(UINT uiIDTemplate, CWnd* pParent, bool* pLock) : CDialog()
+	CLanguageDialog::CLanguageDialog(UINT uiIDTemplate, CWnd* pParent, bool* pLock) : CDialogEx()
 	{
 		m_pszResName = MAKEINTRESOURCE(uiIDTemplate);
 		m_uiResID = uiIDTemplate;
@@ -450,7 +450,7 @@ namespace ictranslate
 				return -1;
 		}
 		m_cType = 0;
-		return CDialog::DoModal();
+		return CDialogEx::DoModal();
 	}
 
 	///////////////////////////////////////////////////////////////
@@ -609,7 +609,12 @@ namespace ictranslate
 			pWnd->SetWindowPos(nullptr, rc.left, rc.top, rc.Width(), rc.Height(), SWP_FRAMECHANGED | SWP_NOZORDER | SWP_NOOWNERZORDER | SWP_NOACTIVATE);
 
 			// text/caption
-			if((*it).m_wClass == 0x0080 || (*it).m_wClass == 0x0082 || (*it).m_wClass == 0x0086 || ((*it).m_pszClass != nullptr && _tcscmp((*it).m_pszClass, _T("STATICEX")) == 0))
+			if((*it).m_wClass == 0x0080 ||
+				(*it).m_wClass == 0x0082 ||
+				(*it).m_wClass == 0x0086 ||
+				((*it).m_pszClass != nullptr && _tcscmp((*it).m_pszClass, _T("STATICEX")) == 0) ||
+				((*it).m_pszClass != nullptr && _tcscmp((*it).m_pszClass, _T("MfcMenuButton")) == 0)
+				)
 				pWnd->SetWindowText(m_prm->LoadString((WORD)m_uiResID, (*it).m_itemTemplate.id));
 		}
 
@@ -641,7 +646,7 @@ namespace ictranslate
 	///////////////////////////////////////////////////////////////
 	BOOL CLanguageDialog::OnInitDialog()
 	{
-		CDialog::OnInitDialog();
+		CDialogEx::OnInitDialog();
 
 		UpdateLanguage();		// because initially all the texts are empty
 
@@ -660,7 +665,7 @@ namespace ictranslate
 		switch(m_cType)
 		{
 		case 0:
-			CDialog::OnCancel();
+			CDialogEx::OnCancel();
 			break;
 		case 1:
 			DestroyWindow();
@@ -677,7 +682,7 @@ namespace ictranslate
 		switch(m_cType)
 		{
 		case 0:
-			CDialog::OnOK();
+			CDialogEx::OnOK();
 			break;
 		case 1:
 			DestroyWindow();
@@ -690,7 +695,7 @@ namespace ictranslate
 	///////////////////////////////////////////////////////////////
 	void CLanguageDialog::PostNcDestroy()
 	{
-		CDialog::PostNcDestroy();
+		CDialogEx::PostNcDestroy();
 		Cleanup();
 	}
 
@@ -734,7 +739,7 @@ namespace ictranslate
 		}
 		}
 
-		return CDialog::WindowProc(message, wParam, lParam);
+		return CDialogEx::WindowProc(message, wParam, lParam);
 	}
 
 	///////////////////////////////////////////////////////////////
