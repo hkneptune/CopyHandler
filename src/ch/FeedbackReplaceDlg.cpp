@@ -42,16 +42,26 @@ void CFeedbackReplaceDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_DST_MODIFIEDDATE_EDIT, m_ctlDstDate);
 	DDX_Control(pDX, IDC_DST_FILESIZE_EDIT, m_ctlDstSize);
 
-	DDX_Control(pDX, IDC_MFCMENUBUTTON1, m_mfcButton);
+	DDX_Control(pDX, IDC_REPLACE_BUTTON, m_btnReplace);
+	DDX_Control(pDX, IDC_RENAME_BUTTON, m_btnRename);
+	DDX_Control(pDX, IDC_RESUME_BUTTON, m_btnResume);
+	DDX_Control(pDX, IDC_SKIP_BUTTON, m_btnSkip);
+	DDX_Control(pDX, IDC_PAUSE_BUTTON, m_btnPause);
+	DDX_Control(pDX, IDC_CANCEL_BUTTON, m_btnCancel);
+
+	DDX_Control(pDX, IDC_MASS_REPLACE_MENUBUTTON, m_btnMassReplace);
+	DDX_Control(pDX, IDC_MASS_RENAME_MENUBUTTON, m_btnMassRename);
+	DDX_Control(pDX, IDC_MASS_RESUME_MENUBUTTON, m_btnMassResume);
+	DDX_Control(pDX, IDC_MASS_SKIP_MENUBUTTON, m_btnMassSkip);
 }
 
 BEGIN_MESSAGE_MAP(CFeedbackReplaceDlg, ictranslate::CLanguageDialog)
 	ON_BN_CLICKED(IDC_REPLACE_BUTTON, &CFeedbackReplaceDlg::OnBnClickedReplaceButton)
-	ON_BN_CLICKED(IDC_COPY_REST_BUTTON, &CFeedbackReplaceDlg::OnBnClickedCopyRestButton)
+	ON_BN_CLICKED(IDC_RESUME_BUTTON, &CFeedbackReplaceDlg::OnBnClickedCopyRestButton)
 	ON_BN_CLICKED(IDC_SKIP_BUTTON, &CFeedbackReplaceDlg::OnBnClickedSkipButton)
 	ON_BN_CLICKED(IDC_PAUSE_BUTTON, &CFeedbackReplaceDlg::OnBnClickedPauseButton)
 	ON_BN_CLICKED(IDC_CANCEL_BUTTON, &CFeedbackReplaceDlg::OnBnClickedCancelButton)
-	ON_BN_CLICKED(IDC_MFCMENUBUTTON1, &CFeedbackReplaceDlg::OnBnMfcMenu)
+	ON_BN_CLICKED(IDC_MASS_REPLACE_MENUBUTTON, &CFeedbackReplaceDlg::OnBnMassReplace)
 END_MESSAGE_MAP()
 
 
@@ -97,7 +107,7 @@ BOOL CFeedbackReplaceDlg::OnInitDialog()
 	AddResizableControl(IDC_MASS_REPLACE_MENUBUTTON, 0.25, 0.0, 0.0, 0.0);
 	AddResizableControl(IDC_RENAME_BUTTON, 0.25, 0.0, 0.25, 0.0);
 	AddResizableControl(IDC_MASS_RENAME_MENUBUTTON, 0.5, 0.0, 0.0, 0.0);
-	AddResizableControl(IDC_COPY_REST_BUTTON, 0.5, 0.0, 0.25, 0.0);
+	AddResizableControl(IDC_RESUME_BUTTON, 0.5, 0.0, 0.25, 0.0);
 	AddResizableControl(IDC_MASS_RESUME_MENUBUTTON, 0.75, 0.0, 0.0, 0.0);
 	AddResizableControl(IDC_SKIP_BUTTON, 0.75, 0.0, 0.25, 0.0);
 	AddResizableControl(IDC_MASS_SKIP_MENUBUTTON, 1.0, 0.0, 0.0, 0.0);
@@ -114,9 +124,10 @@ BOOL CFeedbackReplaceDlg::OnInitDialog()
 	HMENU hMenu = GetResManager().LoadMenu(MAKEINTRESOURCE(IDR_PRIORITY_MENU));
 	m_mfcMenu.Attach(hMenu);
 
-	m_mfcButton.m_hMenu = m_mfcMenu.GetSubMenu(0)->GetSafeHmenu();
-
-	m_mfcButton.SetWindowText(L"Unattended operation");
+	m_btnMassReplace.m_hMenu = m_mfcMenu.GetSubMenu(0)->GetSafeHmenu();
+	m_btnMassResume.m_hMenu = m_mfcMenu.GetSubMenu(0)->GetSafeHmenu();
+	m_btnMassRename.m_hMenu = m_mfcMenu.GetSubMenu(0)->GetSafeHmenu();
+	m_btnMassSkip.m_hMenu = m_mfcMenu.GetSubMenu(0)->GetSafeHmenu();
 
 	return TRUE;  // return TRUE unless you set the focus to a control
 	// EXCEPTION: OCX Property Pages should return FALSE
@@ -124,11 +135,6 @@ BOOL CFeedbackReplaceDlg::OnInitDialog()
 
 void CFeedbackReplaceDlg::RefreshFilesInfo()
 {
-	// load template
-	ictranslate::CResourceManager& rManager = GetResManager();
-
-	CString strTemplate;
-
 	/////////////////////////////////////////////////////////////
 	// src file
 	chcore::TSmartPath pathSrc = m_rSrcFile.GetFullFilePath();
@@ -164,15 +170,9 @@ void CFeedbackReplaceDlg::RefreshFilesInfo()
 	m_ctlDstDate.SetWindowText(dtTemp.Format(LOCALE_NOUSEROVERRIDE, LANG_USER_DEFAULT));
 
 	// button captions
-	CWnd* pAppendButton = GetDlgItem(IDC_COPY_REST_BUTTON);
-	if(pAppendButton)
-	{
-		if(m_rDstFile.GetLength64() > m_rSrcFile.GetLength64())
-		{
-			CString strAltButtonCaption = rManager.LoadString(IDS_BUTTON_TRUNCATE_STRING);
-			pAppendButton->SetWindowText(strAltButtonCaption);
-		}
-	}
+	m_btnResume.EnableWindow(m_rDstFile.GetLength64() < m_rSrcFile.GetLength64());
+	m_btnResume.SetTooltip(L"Some tooltip");
+	m_btnReplace.SetTooltip(L"Replace tooltip");
 }
 
 void CFeedbackReplaceDlg::RefreshImages()
@@ -217,10 +217,10 @@ void CFeedbackReplaceDlg::OnBnClickedCancelButton()
 	EndDialog(chengine::EFeedbackResult::eResult_Cancel);
 }
 
-void CFeedbackReplaceDlg::OnBnMfcMenu()
+void CFeedbackReplaceDlg::OnBnMassReplace()
 {
 	CString str;
-	switch (m_mfcButton.m_nMenuResult)
+	switch (m_btnMassReplace.m_nMenuResult)
 	{
 	case ID_POPUP_TIME_CRITICAL:
 		str = L"first menu item clicked";

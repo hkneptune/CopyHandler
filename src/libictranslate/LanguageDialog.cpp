@@ -613,7 +613,8 @@ namespace ictranslate
 				(*it).m_wClass == 0x0082 ||
 				(*it).m_wClass == 0x0086 ||
 				((*it).m_pszClass != nullptr && _tcscmp((*it).m_pszClass, _T("STATICEX")) == 0) ||
-				((*it).m_pszClass != nullptr && _tcscmp((*it).m_pszClass, _T("MfcMenuButton")) == 0)
+				((*it).m_pszClass != nullptr && _tcscmp((*it).m_pszClass, _T("MfcMenuButton")) == 0) ||
+				((*it).m_pszClass != nullptr && _tcscmp((*it).m_pszClass, _T("MfcButton")) == 0)
 				)
 				pWnd->SetWindowText(m_prm->LoadString((WORD)m_uiResID, (*it).m_itemTemplate.id));
 		}

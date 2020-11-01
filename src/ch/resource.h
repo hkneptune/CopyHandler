@@ -150,7 +150,6 @@
 #define IDC_DESTFILENAME_EDIT           1090
 #define IDC_IGNORE_BUTTON               1097
 #define IDC_RETRY_BUTTON                1100
-#define IDC_COPY_REST_BUTTON            1103
 #define IDC_SHOW_LOG_BUTTON             1120
 #define IDC_STICK_BUTTON                1122
 #define IDC_FREESPACE_STATIC            1123
@@ -711,7 +710,6 @@
 #define IDS_EMPTYSUBTASKNAME_STRING     21554
 #define IDS_STATUS_LOADERROR_STRING     21555
 #define IDS_EXPORTING_TASK_FAILED       21556
-#define IDS_BUTTON_TRUNCATE_STRING      21557
 #define IDS_LOGFILEEMPTY_STRING         21558
 #define ID_POPUP_SHOW_STATUS            32773
 #define ID_POPUP_TIME_CRITICAL          32774
