@@ -62,6 +62,9 @@ BEGIN_MESSAGE_MAP(CFeedbackReplaceDlg, ictranslate::CLanguageDialog)
 	ON_BN_CLICKED(IDC_PAUSE_BUTTON, &CFeedbackReplaceDlg::OnBnClickedPauseButton)
 	ON_BN_CLICKED(IDC_CANCEL_BUTTON, &CFeedbackReplaceDlg::OnBnClickedCancelButton)
 	ON_BN_CLICKED(IDC_MASS_REPLACE_MENUBUTTON, &CFeedbackReplaceDlg::OnBnMassReplace)
+	ON_BN_CLICKED(IDC_MASS_RENAME_MENUBUTTON, &CFeedbackReplaceDlg::OnBnMassRename)
+	ON_BN_CLICKED(IDC_MASS_RESUME_MENUBUTTON, &CFeedbackReplaceDlg::OnBnMassResume)
+	ON_BN_CLICKED(IDC_MASS_SKIP_MENUBUTTON, &CFeedbackReplaceDlg::OnBnMassSkip)
 END_MESSAGE_MAP()
 
 
@@ -121,13 +124,19 @@ BOOL CFeedbackReplaceDlg::OnInitDialog()
 	RefreshFilesInfo();
 	RefreshImages();
 
-	HMENU hMenu = GetResManager().LoadMenu(MAKEINTRESOURCE(IDR_PRIORITY_MENU));
-	m_mfcMenu.Attach(hMenu);
+	HMENU hMenu = GetResManager().LoadMenu(MAKEINTRESOURCE(IDR_FEEDBACK_MASS_REPLACE_MENU));
+	m_menuMassReplace.Attach(hMenu);
+	hMenu = GetResManager().LoadMenu(MAKEINTRESOURCE(IDR_FEEDBACK_MASS_RENAME_MENU));
+	m_menuMassRename.Attach(hMenu);
+	hMenu = GetResManager().LoadMenu(MAKEINTRESOURCE(IDR_FEEDBACK_MASS_RESUME_MENU));
+	m_menuMassResume.Attach(hMenu);
+	hMenu = GetResManager().LoadMenu(MAKEINTRESOURCE(IDR_FEEDBACK_MASS_SKIP_MENU));
+	m_menuMassSkip.Attach(hMenu);
 
-	m_btnMassReplace.m_hMenu = m_mfcMenu.GetSubMenu(0)->GetSafeHmenu();
-	m_btnMassResume.m_hMenu = m_mfcMenu.GetSubMenu(0)->GetSafeHmenu();
-	m_btnMassRename.m_hMenu = m_mfcMenu.GetSubMenu(0)->GetSafeHmenu();
-	m_btnMassSkip.m_hMenu = m_mfcMenu.GetSubMenu(0)->GetSafeHmenu();
+	m_btnMassReplace.m_hMenu = m_menuMassReplace.GetSubMenu(0)->GetSafeHmenu();
+	m_btnMassResume.m_hMenu = m_menuMassResume.GetSubMenu(0)->GetSafeHmenu();
+	m_btnMassRename.m_hMenu = m_menuMassRename.GetSubMenu(0)->GetSafeHmenu();
+	m_btnMassSkip.m_hMenu = m_menuMassSkip.GetSubMenu(0)->GetSafeHmenu();
 
 	return TRUE;  // return TRUE unless you set the focus to a control
 	// EXCEPTION: OCX Property Pages should return FALSE
@@ -222,11 +231,83 @@ void CFeedbackReplaceDlg::OnBnMassReplace()
 	CString str;
 	switch (m_btnMassReplace.m_nMenuResult)
 	{
-	case ID_POPUP_TIME_CRITICAL:
-		str = L"first menu item clicked";
+	case ID_FEEDBACK_REPLACE_ALLEXISTINGFILES:
+		str = L"Replace all existing files";
 		break;
-	case ID_POPUP_HIGHEST:
-		str = L"second menu item clicked";
+	case ID_FEEDBACK_REPLACE_FILESWITHDIFFERENTDATESORSIZES:
+		str = L"Replace files with different dates or sizes";
+		break;
+	case ID_FEEDBACK_REPLACE_OLDERFILESWITHNEWERVERSIONS:
+		str = L"Replace older files with newer ones";
+		break;
+	case ID_FEEDBACK_REPLACE_NEWERFILESWITHOLDERVERSIONS:
+		str = L"Replace newer files with older ones";
+		break;
+	default:
+		str = L"Default";
+		break;
+	}
+	MessageBox(str);
+}
+
+void CFeedbackReplaceDlg::OnBnMassRename()
+{
+	CString str;
+	switch (m_btnMassRename.m_nMenuResult)
+	{
+	case ID_FEEDBACK_RENAME_WHENDESTIONATIONFILEEXISTS:
+		str = L"Rename when destination file exists";
+		break;
+	case ID_FEEDBACK_RENAME_WHENDATEORSIZEDIFFERS:
+		str = L"Rename when size or date differs";
+		break;
+	case ID_FEEDBACK_RENAME_WHENDATEANDSZEARESAME:
+		str = L"Rename when date and size are same";
+		break;
+	case ID_FEEDBACK_RENAME_WHENNEWERTHANDESTINATION:
+		str = L"Rename when newer than destination";
+		break;
+	case ID_FEEDBACK_RENAME_WHENOLDERTHANDESTINATION:
+		str = L"Rename when older than destination";
+		break;
+	default:
+		str = L"Default";
+		break;
+	}
+	MessageBox(str);
+}
+
+void CFeedbackReplaceDlg::OnBnMassResume()
+{
+	CString str;
+	switch (m_btnMassResume.m_nMenuResult)
+	{
+	case ID_FEEDBACK_RESUME_WHENFILEBIGGERTHANDESTINATION:
+		str = L"Resume when file is bigger than destination";
+		break;
+	default:
+		str = L"Default";
+		break;
+	}
+	MessageBox(str);
+}
+
+void CFeedbackReplaceDlg::OnBnMassSkip()
+{
+	CString str;
+	switch (m_btnMassSkip.m_nMenuResult)
+	{
+	case ID_FEEDBACK_SKIP_ALLEXISTINGDESTINATIONFILES:
+		str = L"Skip all files already existing in destination dir";
+		break;
+	case ID_FEEDBACK_SKIP_ALLFILESWITHSAMEDATESANDSIZES:
+		str = L"Skip files with same date and size";
+		break;
+	case ID_FEEDBACK_SKIP_FILESTHATAREOLDERTHANDESTINATION:
+		str = L"Skip files that are older than existing destination";
+		break;
+	case ID_FEEDBACK_SKIP_FILESTHATARENEWERTHANDESTINATION:
+		str = L"Skip files that are newer than destination";
 		break;
 	default:
 		str = L"Default";

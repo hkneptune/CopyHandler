@@ -792,6 +792,54 @@ BEGIN
     END
 END
 
+IDR_FEEDBACK_MASS_REPLACE_MENU MENU
+BEGIN
+    POPUP "POPUP"
+    BEGIN
+        MENUITEM "Replace all existing files",  ID_FEEDBACK_REPLACE_ALLEXISTINGFILES
+        MENUITEM SEPARATOR
+        MENUITEM "Replace files with different dates/sizes", ID_FEEDBACK_REPLACE_FILESWITHDIFFERENTDATESORSIZES
+        MENUITEM SEPARATOR
+        MENUITEM "Replace older files with newer versions", ID_FEEDBACK_REPLACE_OLDERFILESWITHNEWERVERSIONS
+        MENUITEM "Replace newer files with older versions", ID_FEEDBACK_REPLACE_NEWERFILESWITHOLDERVERSIONS
+    END
+END
+
+IDR_FEEDBACK_MASS_RENAME_MENU MENU
+BEGIN
+    POPUP "POPUP"
+    BEGIN
+        MENUITEM "Auto-rename when destination file exists", ID_FEEDBACK_RENAME_WHENDESTIONATIONFILEEXISTS
+        MENUITEM SEPARATOR
+        MENUITEM "Auto-rename when file date or size differs", ID_FEEDBACK_RENAME_WHENDATEORSIZEDIFFERS
+        MENUITEM "Auto-rename when file date and size are same", ID_FEEDBACK_RENAME_WHENDATEANDSZEARESAME
+        MENUITEM SEPARATOR
+        MENUITEM "Auto-rename files when newer than destination", ID_FEEDBACK_RENAME_WHENNEWERTHANDESTINATION
+        MENUITEM "Auto-rename files when older than destination", ID_FEEDBACK_RENAME_WHENOLDERTHANDESTINATION
+    END
+END
+
+IDR_FEEDBACK_MASS_RESUME_MENU MENU
+BEGIN
+    POPUP "POPUP"
+    BEGIN
+        MENUITEM "Resume when file bigger than destination", ID_FEEDBACK_RESUME_WHENFILEBIGGERTHANDESTINATION
+    END
+END
+
+
+IDR_FEEDBACK_MASS_SKIP_MENU MENU
+BEGIN
+    POPUP "POPUP"
+    BEGIN
+        MENUITEM "Skip all existing destination files", ID_FEEDBACK_SKIP_ALLEXISTINGDESTINATIONFILES
+        MENUITEM SEPARATOR
+        MENUITEM "Skip all files with same dates and sizes", ID_FEEDBACK_SKIP_ALLFILESWITHSAMEDATESANDSIZES
+        MENUITEM "Skip files that are older than destination", ID_FEEDBACK_SKIP_FILESTHATAREOLDERTHANDESTINATION
+        MENUITEM SEPARATOR
+        MENUITEM "Skip files that are newer than destination", ID_FEEDBACK_SKIP_FILESTHATARENEWERTHANDESTINATION
+    END
+END
 
 #ifdef APSTUDIO_INVOKED
 /////////////////////////////////////////////////////////////////////////////

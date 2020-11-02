@@ -59,14 +59,17 @@ private:
 	CEdit m_ctlDstSize;
 	CEdit m_ctlDstDate;
 
-	CMenu m_mfcMenu;
-
 	CMFCButton m_btnReplace;
 	CMFCButton m_btnRename;
 	CMFCButton m_btnResume;
 	CMFCButton m_btnSkip;
 	CMFCButton m_btnPause;
 	CMFCButton m_btnCancel;
+
+	CMenu m_menuMassReplace;
+	CMenu m_menuMassRename;
+	CMenu m_menuMassResume;
+	CMenu m_menuMassSkip;
 
 	CMFCMenuButton m_btnMassReplace;
 	CMFCMenuButton m_btnMassRename;
@@ -85,7 +88,11 @@ public:
 	afx_msg void OnBnClickedSkipButton();
 	afx_msg void OnBnClickedPauseButton();
 	afx_msg void OnBnClickedCancelButton();
+
 	afx_msg void OnBnMassReplace();
+	afx_msg void OnBnMassRename();
+	afx_msg void OnBnMassResume();
+	afx_msg void OnBnMassSkip();
 };
 
 #endif
