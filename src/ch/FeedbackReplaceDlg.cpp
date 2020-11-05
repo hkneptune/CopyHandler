@@ -50,6 +50,7 @@ BEGIN_MESSAGE_MAP(CFeedbackReplaceDlg, ictranslate::CLanguageDialog)
 	ON_BN_CLICKED(IDC_SKIP_BUTTON, &CFeedbackReplaceDlg::OnBnClickedSkipButton)
 	ON_BN_CLICKED(IDC_PAUSE_BUTTON, &CFeedbackReplaceDlg::OnBnClickedPauseButton)
 	ON_BN_CLICKED(IDC_CANCEL_BUTTON, &CFeedbackReplaceDlg::OnBnClickedCancelButton)
+	ON_WM_GETMINMAXINFO()
 END_MESSAGE_MAP()
 
 
@@ -58,6 +59,8 @@ END_MESSAGE_MAP()
 BOOL CFeedbackReplaceDlg::OnInitDialog()
 {
 	CLanguageDialog::OnInitDialog();
+
+	GetWindowRect(&m_rcInitial);
 
 	// set dialog icon
 	HICON hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
@@ -75,21 +78,21 @@ BOOL CFeedbackReplaceDlg::OnInitDialog()
 	AddResizableControl(IDC_SRC_MODIFIEDDATE_EDIT, 0.0, 0.0, 1.0, 0.0);
 
 	AddResizableControl(IDC_01_STATIC, 0.0, 0.5, 1.0, 0.0);
-	AddResizableControl(IDC_DST_ICON_STATIC, 0.0, 0.5, 0.0, 0.0);
+	AddResizableControl(IDC_DST_ICON_STATIC, 0.0, 0.0, 0.0, 0.0);
 
 	AddResizableControl(IDC_DSTFILE_STATIC, 0.0, 0.0, 1.0, 0.0);
-	AddResizableControl(IDC_DST_FILENAME_EDIT, 0.0, 1.0, 1.0, 0.0);
-	AddResizableControl(IDC_DST_PATH_EDIT, 0.0, 1.0, 1.0, 0.0);
-	AddResizableControl(IDC_DST_FILESIZE_EDIT, 0.0, 1.0, 1.0, 0.0);
-	AddResizableControl(IDC_DST_MODIFIEDDATE_EDIT, 0.0, 1.0, 1.0, 0.0);
+	AddResizableControl(IDC_DST_FILENAME_EDIT, 0.0, 0.0, 1.0, 0.0);
+	AddResizableControl(IDC_DST_PATH_EDIT, 0.0, 0.0, 1.0, 0.0);
+	AddResizableControl(IDC_DST_FILESIZE_EDIT, 0.0, 0.0, 1.0, 0.0);
+	AddResizableControl(IDC_DST_MODIFIEDDATE_EDIT, 0.0, 0.0, 1.0, 0.0);
 
-	AddResizableControl(IDC_COPY_REST_BUTTON, 0.0, 1.0, 0.0, 0.0);
-	AddResizableControl(IDC_SKIP_BUTTON, 0.0, 1.0, 0.0, 0.0);
-	AddResizableControl(IDC_PAUSE_BUTTON, 0.0, 1.0, 0.0, 0.0);
-	AddResizableControl(IDC_CANCEL_BUTTON, 0.0, 1.0, 0.0, 0.0);
-	AddResizableControl(IDC_REPLACE_BUTTON, 0.0, 1.0, 0.0, 0.0);
+	AddResizableControl(IDC_REPLACE_BUTTON, 0.0, 0.0, 0.2, 0.0);
+	AddResizableControl(IDC_COPY_REST_BUTTON, 0.2, 0.0, 0.2, 0.0);
+	AddResizableControl(IDC_SKIP_BUTTON, 0.4, 0.0, 0.2, 0.0);
+	AddResizableControl(IDC_PAUSE_BUTTON, 0.6, 0.0, 0.2, 0.0);
+	AddResizableControl(IDC_CANCEL_BUTTON, 0.8, 0.0, 0.2, 0.0);
 
-	AddResizableControl(IDC_ALL_ITEMS_CHECK, 0.0, 1.0, 1.0, 0.0);
+	AddResizableControl(IDC_ALL_ITEMS_CHECK, 0.0, 0.0, 1.0, 0.0);
 
 	InitializeResizableControls();
 
@@ -223,4 +226,13 @@ void CFeedbackReplaceDlg::OnCancel()
 bool CFeedbackReplaceDlg::IsApplyToAllItemsChecked() const
 {
 	return m_bAllItems != FALSE;
+}
+
+void CFeedbackReplaceDlg::OnGetMinMaxInfo(MINMAXINFO* lpMMI)
+{
+	if(m_rcInitial.Width() != 0 && m_rcInitial.Height() != 0)
+	{
+		lpMMI->ptMinTrackSize.y = m_rcInitial.Height();
+		lpMMI->ptMaxTrackSize.y = m_rcInitial.Height();
+	}
 }

@@ -61,16 +61,20 @@ private:
 
 	BOOL m_bAllItems;
 
+	CRect m_rcInitial;
+
 protected:
 	const chengine::TFileInfo& m_rSrcFile;
 	const chengine::TFileInfo& m_rDstFile;
 
-public:
+protected:
 	afx_msg void OnBnClickedReplaceButton();
 	afx_msg void OnBnClickedCopyRestButton();
 	afx_msg void OnBnClickedSkipButton();
 	afx_msg void OnBnClickedPauseButton();
 	afx_msg void OnBnClickedCancelButton();
+
+	void OnGetMinMaxInfo(MINMAXINFO* lpMMI);
 };
 
 #endif
