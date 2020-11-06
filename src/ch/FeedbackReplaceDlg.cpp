@@ -65,6 +65,7 @@ BEGIN_MESSAGE_MAP(CFeedbackReplaceDlg, ictranslate::CLanguageDialog)
 	ON_BN_CLICKED(IDC_MASS_RENAME_MENUBUTTON, &CFeedbackReplaceDlg::OnBnMassRename)
 	ON_BN_CLICKED(IDC_MASS_RESUME_MENUBUTTON, &CFeedbackReplaceDlg::OnBnMassResume)
 	ON_BN_CLICKED(IDC_MASS_SKIP_MENUBUTTON, &CFeedbackReplaceDlg::OnBnMassSkip)
+	ON_WM_GETMINMAXINFO()
 END_MESSAGE_MAP()
 
 
@@ -73,6 +74,8 @@ END_MESSAGE_MAP()
 BOOL CFeedbackReplaceDlg::OnInitDialog()
 {
 	CLanguageDialog::OnInitDialog();
+
+	GetWindowRect(&m_rcInitial);
 
 	// set dialog icon
 	HICON hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
@@ -325,4 +328,13 @@ void CFeedbackReplaceDlg::OnCancel()
 bool CFeedbackReplaceDlg::IsApplyToAllItemsChecked() const
 {
 	return m_bAllItems != FALSE;
+}
+
+void CFeedbackReplaceDlg::OnGetMinMaxInfo(MINMAXINFO* lpMMI)
+{
+	if (m_rcInitial.Width() != 0 && m_rcInitial.Height() != 0)
+	{
+		lpMMI->ptMinTrackSize.y = m_rcInitial.Height();
+		lpMMI->ptMaxTrackSize.y = m_rcInitial.Height();
+	}
 }

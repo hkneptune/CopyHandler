@@ -78,6 +78,8 @@ private:
 
 	BOOL m_bAllItems;
 
+	CRect m_rcInitial;
+
 protected:
 	const chengine::TFileInfo& m_rSrcFile;
 	const chengine::TFileInfo& m_rDstFile;
@@ -93,6 +95,8 @@ public:
 	afx_msg void OnBnMassRename();
 	afx_msg void OnBnMassResume();
 	afx_msg void OnBnMassSkip();
+
+	afx_msg void OnGetMinMaxInfo(MINMAXINFO* lpMMI);
 };
 
 #endif
