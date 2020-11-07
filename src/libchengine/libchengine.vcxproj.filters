@@ -381,6 +381,15 @@
     <ClInclude Include="TObsoleteFiles.h">
       <Filter>Source Files\Tools</Filter>
     </ClInclude>
+    <ClInclude Include="FeedbackRule.h">
+      <Filter>Source Files\Feedback</Filter>
+    </ClInclude>
+    <ClInclude Include="FeedbackRuleList.h">
+      <Filter>Source Files\Feedback</Filter>
+    </ClInclude>
+    <ClInclude Include="ECompareType.h">
+      <Filter>Source Files\Tools</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="TSubTaskArray.cpp">
@@ -658,6 +667,12 @@
     </ClCompile>
     <ClCompile Include="TObsoleteFiles.cpp">
       <Filter>Source Files\Tools</Filter>
+    </ClCompile>
+    <ClCompile Include="FeedbackRule.cpp">
+      <Filter>Source Files\Feedback</Filter>
+    </ClCompile>
+    <ClCompile Include="FeedbackRuleList.cpp">
+      <Filter>Source Files\Feedback</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

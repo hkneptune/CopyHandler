@@ -36,19 +36,19 @@ namespace chengine
 		m_bUseExcludeMask(m_setModifications, false),
 		m_astrExcludeMask(m_setModifications),
 		m_bUseSize1(m_setModifications, false),
-		m_eSizeCmpType1(m_setModifications, eSizeCmp_Greater),
+		m_eSizeCmpType1(m_setModifications, eCmp_Greater),
 		m_ullSize1(m_setModifications, 0),
 		m_bUseSize2(m_setModifications, false),
-		m_eSizeCmpType2(m_setModifications, eSizeCmp_Less),
+		m_eSizeCmpType2(m_setModifications, eCmp_Less),
 		m_ullSize2(m_setModifications, 0),
 		m_eDateType(m_setModifications, eDateType_Created),
 		m_bUseDateTime1(m_setModifications, false),
-		m_eDateCmpType1(m_setModifications, eDateCmp_Greater),
+		m_eDateCmpType1(m_setModifications, eCmp_Greater),
 		m_bUseDate1(m_setModifications, false),
 		m_bUseTime1(m_setModifications, false),
 		m_tDateTime1(m_setModifications),
 		m_bUseDateTime2(m_setModifications, false),
-		m_eDateCmpType2(m_setModifications, eDateCmp_Less),
+		m_eDateCmpType2(m_setModifications, eCmp_Less),
 		m_bUseDate2(m_setModifications, false),
 		m_bUseTime2(m_setModifications, false),
 		m_tDateTime2(m_setModifications),
@@ -185,42 +185,7 @@ namespace chengine
 		m_oidObjectID = rFilter.m_oidObjectID;
 		m_setModifications = rFilter.m_setModifications;
 
-		// files mask
-		m_bUseMask = rFilter.m_bUseMask;
-		m_astrMask = rFilter.m_astrMask;
-
-		m_bUseExcludeMask = rFilter.m_bUseExcludeMask;
-		m_astrExcludeMask = rFilter.m_astrExcludeMask;
-
-		// size filtering
-		m_bUseSize1 = rFilter.m_bUseSize1;
-		m_eSizeCmpType1 = rFilter.m_eSizeCmpType1;
-		m_ullSize1 = rFilter.m_ullSize1;
-		m_bUseSize2 = rFilter.m_bUseSize2;
-		m_eSizeCmpType2 = rFilter.m_eSizeCmpType2;
-		m_ullSize2 = rFilter.m_ullSize2;
-
-		// date filtering
-		m_bUseDateTime1 = rFilter.m_bUseDateTime1;
-		m_eDateType = rFilter.m_eDateType;
-		m_eDateCmpType1 = rFilter.m_eDateCmpType1;
-		m_bUseDate1 = rFilter.m_bUseDate1;
-		m_bUseTime1 = rFilter.m_bUseTime1;
-		m_tDateTime1 = rFilter.m_tDateTime1;
-
-		m_bUseDateTime2 = rFilter.m_bUseDateTime2;
-		m_eDateCmpType2 = rFilter.m_eDateCmpType2;
-		m_bUseDate2 = rFilter.m_bUseDate2;
-		m_bUseTime2 = rFilter.m_bUseTime2;
-		m_tDateTime2 = rFilter.m_tDateTime2;
-
-		// attribute filtering
-		m_bUseAttributes = rFilter.m_bUseAttributes;
-		m_iArchive = rFilter.m_iArchive;
-		m_iReadOnly = rFilter.m_iReadOnly;
-		m_iHidden = rFilter.m_iHidden;
-		m_iSystem = rFilter.m_iSystem;
-		m_iDirectory = rFilter.m_iDirectory;
+		SetData(rFilter);
 
 		return *this;
 	}
@@ -305,13 +270,13 @@ namespace chengine
 		if (!GetConfigValue(rConfig, _T("SizeA.Use"), m_bUseSize1.Modify()))
 			m_bUseSize1 = false;
 		if (!GetConfigValue(rConfig, _T("SizeA.FilteringType"), *(int*)m_eSizeCmpType1.Modify()))
-			m_eSizeCmpType1 = eSizeCmp_Equal;
+			m_eSizeCmpType1 = eCmp_Equal;
 		if (!GetConfigValue(rConfig, _T("SizeA.Value"), m_ullSize1.Modify()))
 			m_ullSize1 = 0;
 		if (!GetConfigValue(rConfig, _T("SizeB.Use"), m_bUseSize2.Modify()))
 			m_bUseSize2 = false;
 		if (!GetConfigValue(rConfig, _T("SizeB.FilteringType"), *(int*)m_eSizeCmpType2.Modify()))
-			m_eSizeCmpType2 = eSizeCmp_Equal;
+			m_eSizeCmpType2 = eCmp_Equal;
 		if (!GetConfigValue(rConfig, _T("SizeB.Value"), m_ullSize2.Modify()))
 			m_ullSize2 = 0;
 
@@ -321,7 +286,7 @@ namespace chengine
 		if (!GetConfigValue(rConfig, _T("DateA.Type"), *(int*)m_eDateType.Modify()))	// created/last modified/last accessed
 			m_eDateType = eDateType_Created;
 		if (!GetConfigValue(rConfig, _T("DateA.FilteringType"), *(int*)m_eDateCmpType1.Modify()))	// before/after
-			m_eDateCmpType1 = eDateCmp_Equal;
+			m_eDateCmpType1 = eCmp_Equal;
 		if (!GetConfigValue(rConfig, _T("DateA.EnableDatePart"), m_bUseDate1.Modify()))
 			m_bUseDate1 = false;
 		if (!GetConfigValue(rConfig, _T("DateA.EnableTimePart"), m_bUseTime1.Modify()))
@@ -333,7 +298,7 @@ namespace chengine
 		if (!GetConfigValue(rConfig, _T("DateB.Type"), m_bUseDateTime2.Modify()))
 			m_bUseDateTime2 = false;
 		if (!GetConfigValue(rConfig, _T("DateB.FilteringType"), *(int*)m_eDateCmpType2.Modify()))
-			m_eDateCmpType2 = eDateCmp_Equal;
+			m_eDateCmpType2 = eCmp_Equal;
 		if (!GetConfigValue(rConfig, _T("DateB.EnableDatePart"), m_bUseDate2.Modify()))
 			m_bUseDate2 = false;
 
@@ -377,23 +342,23 @@ namespace chengine
 		{
 			switch (m_eSizeCmpType1)
 			{
-			case eSizeCmp_Less:
+			case eCmp_Less:
 				if (m_ullSize1 <= spInfo->GetLength64())
 					return false;
 				break;
-			case eSizeCmp_LessOrEqual:
+			case eCmp_LessOrEqual:
 				if (m_ullSize1 < spInfo->GetLength64())
 					return false;
 				break;
-			case eSizeCmp_Equal:
+			case eCmp_Equal:
 				if (m_ullSize1 != spInfo->GetLength64())
 					return false;
 				break;
-			case eSizeCmp_GreaterOrEqual:
+			case eCmp_GreaterOrEqual:
 				if (m_ullSize1 > spInfo->GetLength64())
 					return false;
 				break;
-			case eSizeCmp_Greater:
+			case eCmp_Greater:
 				if (m_ullSize1 >= spInfo->GetLength64())
 					return false;
 				break;
@@ -404,23 +369,23 @@ namespace chengine
 			{
 				switch (m_eSizeCmpType2)
 				{
-				case eSizeCmp_Less:
+				case eCmp_Less:
 					if (m_ullSize2 <= spInfo->GetLength64())
 						return false;
 					break;
-				case eSizeCmp_LessOrEqual:
+				case eCmp_LessOrEqual:
 					if (m_ullSize2 < spInfo->GetLength64())
 						return false;
 					break;
-				case eSizeCmp_Equal:
+				case eCmp_Equal:
 					if (m_ullSize2 != spInfo->GetLength64())
 						return false;
 					break;
-				case eSizeCmp_GreaterOrEqual:
+				case eCmp_GreaterOrEqual:
 					if (m_ullSize2 > spInfo->GetLength64())
 						return false;
 					break;
-				case eSizeCmp_Greater:
+				case eCmp_Greater:
 					if (m_ullSize2 >= spInfo->GetLength64())
 						return false;
 					break;
@@ -451,23 +416,23 @@ namespace chengine
 			// ... and comparing
 			switch (m_eDateCmpType1)
 			{
-			case eDateCmp_Less:
+			case eCmp_Less:
 				if (tDiff >= 0)
 					return false;
 				break;
-			case eDateCmp_LessOrEqual:
+			case eCmp_LessOrEqual:
 				if (tDiff > 0)
 					return false;
 				break;
-			case eDateCmp_Equal:
+			case eCmp_Equal:
 				if (tDiff != 0)
 					return false;
 				break;
-			case eDateCmp_GreaterOrEqual:
+			case eCmp_GreaterOrEqual:
 				if (tDiff < 0)
 					return false;
 				break;
-			case eDateCmp_Greater:
+			case eCmp_Greater:
 				if (tDiff <= 0)
 					return false;
 				break;
@@ -481,23 +446,23 @@ namespace chengine
 				// ... comparing
 				switch (m_eDateCmpType2)
 				{
-				case eDateCmp_Less:
+				case eCmp_Less:
 					if (tDiff >= 0)
 						return false;
 					break;
-				case eDateCmp_LessOrEqual:
+				case eCmp_LessOrEqual:
 					if (tDiff > 0)
 						return false;
 					break;
-				case eDateCmp_Equal:
+				case eCmp_Equal:
 					if (tDiff != 0)
 						return false;
 					break;
-				case eDateCmp_GreaterOrEqual:
+				case eCmp_GreaterOrEqual:
 					if (tDiff < 0)
 						return false;
 					break;
-				case eDateCmp_Greater:
+				case eCmp_Greater:
 					if (tDiff <= 0)
 						return false;
 					break;
@@ -749,12 +714,12 @@ namespace chengine
 		m_bUseSize1 = bUseSize1;
 	}
 
-	TFileFilter::ESizeCompareType TFileFilter::GetSizeType1() const
+	ECompareType TFileFilter::GetSizeType1() const
 	{
 		return m_eSizeCmpType1;
 	}
 
-	void TFileFilter::SetSizeType1(ESizeCompareType eSizeType1)
+	void TFileFilter::SetSizeType1(ECompareType eSizeType1)
 	{
 		m_eSizeCmpType1 = eSizeType1;
 	}
@@ -779,12 +744,12 @@ namespace chengine
 		m_bUseSize2 = bUseSize2;
 	}
 
-	TFileFilter::ESizeCompareType TFileFilter::GetSizeType2() const
+	ECompareType TFileFilter::GetSizeType2() const
 	{
 		return m_eSizeCmpType2;
 	}
 
-	void TFileFilter::SetSizeType2(ESizeCompareType eSizeType2)
+	void TFileFilter::SetSizeType2(ECompareType eSizeType2)
 	{
 		m_eSizeCmpType2 = eSizeType2;
 	}
@@ -819,12 +784,12 @@ namespace chengine
 		m_bUseDateTime1 = bUseDateTime1;
 	}
 
-	TFileFilter::EDateCompareType TFileFilter::GetDateCmpType1() const
+	ECompareType TFileFilter::GetDateCmpType1() const
 	{
 		return m_eDateCmpType1;
 	}
 
-	void TFileFilter::SetDateCmpType1(TFileFilter::EDateCompareType eCmpType1)
+	void TFileFilter::SetDateCmpType1(ECompareType eCmpType1)
 	{
 		m_eDateCmpType1 = eCmpType1;
 	}
@@ -869,12 +834,12 @@ namespace chengine
 		m_bUseDateTime2 = bUseDateTime2;
 	}
 
-	TFileFilter::EDateCompareType TFileFilter::GetDateCmpType2() const
+	ECompareType TFileFilter::GetDateCmpType2() const
 	{
 		return m_eDateCmpType2;
 	}
 
-	void TFileFilter::SetDateCmpType2(TFileFilter::EDateCompareType eCmpType2)
+	void TFileFilter::SetDateCmpType2(ECompareType eCmpType2)
 	{
 		m_eDateCmpType2 = eCmpType2;
 	}

@@ -24,6 +24,7 @@
 #include <bitset>
 #include "../libstring/TStringPatternArray.h"
 #include "../libserializer/TSharedModificationTracker.h"
+#include "ECompareType.h"
 
 namespace chengine
 {
@@ -34,24 +35,6 @@ namespace chengine
 	class LIBCHENGINE_API TFileFilter
 	{
 	public:
-		enum ESizeCompareType
-		{
-			eSizeCmp_Less = 0,
-			eSizeCmp_LessOrEqual = 1,
-			eSizeCmp_Equal = 2,
-			eSizeCmp_GreaterOrEqual = 3,
-			eSizeCmp_Greater = 4
-		};
-
-		enum EDateCompareType
-		{
-			eDateCmp_Less = 0,
-			eDateCmp_LessOrEqual = 1,
-			eDateCmp_Equal = 2,
-			eDateCmp_GreaterOrEqual = 3,
-			eDateCmp_Greater = 4
-		};
-
 		enum EDateType
 		{
 			eDateType_Created = 0,
@@ -101,8 +84,8 @@ namespace chengine
 		bool GetUseSize1() const;
 		void SetUseSize1(bool bUseSize1);
 
-		ESizeCompareType GetSizeType1() const;
-		void SetSizeType1(ESizeCompareType eSizeType1);
+		ECompareType GetSizeType1() const;
+		void SetSizeType1(ECompareType eSizeType1);
 
 		unsigned long long GetSize1() const;
 		void SetSize1(unsigned long long ullSize1);
@@ -110,8 +93,8 @@ namespace chengine
 		bool GetUseSize2() const;
 		void SetUseSize2(bool bUseSize2);
 
-		ESizeCompareType GetSizeType2() const;
-		void SetSizeType2(ESizeCompareType eSizeType2);
+		ECompareType GetSizeType2() const;
+		void SetSizeType2(ECompareType eSizeType2);
 
 		unsigned long long GetSize2() const;
 		void SetSize2(unsigned long long ullSize2);
@@ -124,8 +107,8 @@ namespace chengine
 		bool GetUseDateTime1() const;
 		void SetUseDateTime1(bool bUseDateTime1);
 
-		TFileFilter::EDateCompareType GetDateCmpType1() const;
-		void SetDateCmpType1(TFileFilter::EDateCompareType eCmpType1);
+		ECompareType GetDateCmpType1() const;
+		void SetDateCmpType1(ECompareType eCmpType1);
 
 		bool GetUseDate1() const;
 		void SetUseDate1(bool tDate1);
@@ -140,8 +123,8 @@ namespace chengine
 		bool GetUseDateTime2() const;
 		void SetUseDateTime2(bool bUseDateTime2);
 
-		TFileFilter::EDateCompareType GetDateCmpType2() const;
-		void SetDateCmpType2(TFileFilter::EDateCompareType eCmpType2);
+		ECompareType GetDateCmpType2() const;
+		void SetDateCmpType2(ECompareType eCmpType2);
 
 		bool GetUseDate2() const;
 		void SetUseDate2(bool tDate2);
@@ -225,11 +208,11 @@ namespace chengine
 
 		// size filtering
 		serializer::TSharedModificationTracker<bool, Bitset, eMod_UseSize1> m_bUseSize1;
-		serializer::TSharedModificationTracker<ESizeCompareType, Bitset, eMod_SizeCmpType1> m_eSizeCmpType1;
+		serializer::TSharedModificationTracker<ECompareType, Bitset, eMod_SizeCmpType1> m_eSizeCmpType1;
 		serializer::TSharedModificationTracker<unsigned long long, Bitset, eMod_Size1> m_ullSize1;
 
 		serializer::TSharedModificationTracker<bool, Bitset, eMod_UseSize2> m_bUseSize2;
-		serializer::TSharedModificationTracker<ESizeCompareType, Bitset, eMod_SizeCmpType2> m_eSizeCmpType2;
+		serializer::TSharedModificationTracker<ECompareType, Bitset, eMod_SizeCmpType2> m_eSizeCmpType2;
 		serializer::TSharedModificationTracker<unsigned long long, Bitset, eMod_Size2> m_ullSize2;
 
 		// date filtering
@@ -237,14 +220,14 @@ namespace chengine
 
 		serializer::TSharedModificationTracker<bool, Bitset, eMod_UseDateTime1> m_bUseDateTime1;
 
-		serializer::TSharedModificationTracker<EDateCompareType, Bitset, eMod_DateCmpType1> m_eDateCmpType1;	// before/after
+		serializer::TSharedModificationTracker<ECompareType, Bitset, eMod_DateCmpType1> m_eDateCmpType1;	// before/after
 		serializer::TSharedModificationTracker<bool, Bitset, eMod_UseDate1> m_bUseDate1;
 		serializer::TSharedModificationTracker<bool, Bitset, eMod_UseTime1> m_bUseTime1;
 		serializer::TSharedModificationTracker<TDateTime, Bitset, eMod_DateTime1> m_tDateTime1;
 
 		serializer::TSharedModificationTracker<bool, Bitset, eMod_UseDateTime2> m_bUseDateTime2;
 
-		serializer::TSharedModificationTracker<EDateCompareType, Bitset, eMod_DateCmpType2> m_eDateCmpType2;
+		serializer::TSharedModificationTracker<ECompareType, Bitset, eMod_DateCmpType2> m_eDateCmpType2;
 		serializer::TSharedModificationTracker<bool, Bitset, eMod_UseDate2> m_bUseDate2;
 		serializer::TSharedModificationTracker<bool, Bitset, eMod_UseTime2> m_bUseTime2;
 		serializer::TSharedModificationTracker<TDateTime, Bitset, eMod_DateTime2> m_tDateTime2;

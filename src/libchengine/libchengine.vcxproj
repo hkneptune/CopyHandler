@@ -503,12 +503,15 @@ goto end
     <ClInclude Include="CommonDataTypes.h" />
     <ClInclude Include="ConfigNode.h" />
     <ClInclude Include="ConfigNodeContainer.h" />
+    <ClInclude Include="ECompareType.h" />
     <ClInclude Include="EFeedbackResult.h" />
     <ClInclude Include="EFileError.h" />
     <ClInclude Include="EngineConstants.h" />
     <ClInclude Include="EOperationTypes.h" />
     <ClInclude Include="ESubTaskTypes.h" />
     <ClInclude Include="ETaskCurrentState.h" />
+    <ClInclude Include="FeedbackRule.h" />
+    <ClInclude Include="FeedbackRuleList.h" />
     <ClInclude Include="IFeedbackHandler.h" />
     <ClInclude Include="IFeedbackHandlerFactory.h" />
     <ClInclude Include="IFilesystem.h" />
@@ -612,6 +615,8 @@ goto end
     </ClCompile>
     <ClCompile Include="ConfigNode.cpp" />
     <ClCompile Include="ConfigNodeContainer.cpp" />
+    <ClCompile Include="FeedbackRule.cpp" />
+    <ClCompile Include="FeedbackRuleList.cpp" />
     <ClCompile Include="IFeedbackHandler.cpp" />
     <ClCompile Include="IFeedbackHandlerFactory.cpp" />
     <ClCompile Include="IFilesystem.cpp" />

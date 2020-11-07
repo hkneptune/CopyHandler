@@ -21,7 +21,7 @@
 
 namespace serializer
 {
-	typedef unsigned long object_id_t;
+	using object_id_t = unsigned long;
 }
 
 #endif

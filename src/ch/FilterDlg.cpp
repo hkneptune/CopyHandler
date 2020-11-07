@@ -347,8 +347,8 @@ void CFilterDlg::OnOK()
 	m_ffFilter.SetUseSize1(m_bSize != 0);
 	m_ffFilter.SetUseSize2(m_bSize2 != 0);
 
-	m_ffFilter.SetSizeType1((chengine::TFileFilter::ESizeCompareType)m_ctlSizeType1.GetCurSel());
-	m_ffFilter.SetSizeType2((chengine::TFileFilter::ESizeCompareType)m_ctlSizeType2.GetCurSel());
+	m_ffFilter.SetSizeType1((chengine::ECompareType)m_ctlSizeType1.GetCurSel());
+	m_ffFilter.SetSizeType2((chengine::ECompareType)m_ctlSizeType2.GetCurSel());
 
 	m_ffFilter.SetSize1(static_cast<unsigned __int64>(m_uiSize1)*static_cast<unsigned __int64>(GetMultiplier(m_ctlSize1Multi.GetCurSel())));
 	m_ffFilter.SetSize2(static_cast<unsigned __int64>(m_uiSize2)*static_cast<unsigned __int64>(GetMultiplier(m_ctlSize2Multi.GetCurSel())));
@@ -356,8 +356,8 @@ void CFilterDlg::OnOK()
 	// date
 	m_ffFilter.SetDateType((chengine::TFileFilter::EDateType)m_ctlDateType.GetCurSel());
 
-	m_ffFilter.SetDateCmpType1((chengine::TFileFilter::EDateCompareType)m_ctlDateType1.GetCurSel());
-	m_ffFilter.SetDateCmpType2((chengine::TFileFilter::EDateCompareType)m_ctlDateType2.GetCurSel());
+	m_ffFilter.SetDateCmpType1((chengine::ECompareType)m_ctlDateType1.GetCurSel());
+	m_ffFilter.SetDateCmpType2((chengine::ECompareType)m_ctlDateType2.GetCurSel());
 
 	CTime tDate;
 	CTime tTime;

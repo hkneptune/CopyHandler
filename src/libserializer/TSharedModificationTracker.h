@@ -75,6 +75,16 @@ namespace serializer
 			return *this;
 		}
 
+		bool operator==(const TSharedModificationTracker& rValue) const
+		{
+			return m_tValue == rValue;
+		}
+
+		bool operator!=(const TSharedModificationTracker& rValue) const
+		{
+			return m_tValue != rValue;
+		}
+
 		operator const T&() const
 		{
 			return m_tValue;

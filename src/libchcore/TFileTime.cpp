@@ -53,6 +53,26 @@ namespace chcore
 		return m_ftTime.dwHighDateTime != rSrc.m_ftTime.dwHighDateTime || m_ftTime.dwLowDateTime != rSrc.m_ftTime.dwLowDateTime;
 	}
 
+	bool TFileTime::operator<(const TFileTime& rSrc) const
+	{
+		return ToUInt64() < rSrc.ToUInt64();
+	}
+
+	bool TFileTime::operator<=(const TFileTime& rSrc) const
+	{
+		return ToUInt64() <= rSrc.ToUInt64();
+	}
+
+	bool TFileTime::operator>(const TFileTime& rSrc) const
+	{
+		return ToUInt64() > rSrc.ToUInt64();
+	}
+
+	bool TFileTime::operator>=(const TFileTime& rSrc) const
+	{
+		return ToUInt64() >= rSrc.ToUInt64();
+	}
+
 	void TFileTime::FromUInt64(unsigned long long ullTime)
 	{
 		ULARGE_INTEGER uli;
