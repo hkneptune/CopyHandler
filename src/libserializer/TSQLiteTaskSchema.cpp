@@ -126,7 +126,7 @@ namespace serializer
 		tStatement.Step();
 
 		// and finally set the database version to current one
-		tVersion.SetVersion(5);
+		tVersion.SetVersion(6);
 	}
 
 	void TSQLiteTaskSchema::Migrate_001_002(const sqlite::TSQLiteDatabasePtr& spDatabase, TSerializerVersion &tVersion)
