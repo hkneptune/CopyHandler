@@ -48,23 +48,15 @@ void CFeedbackReplaceDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_SKIP_BUTTON, m_btnSkip);
 	DDX_Control(pDX, IDC_PAUSE_BUTTON, m_btnPause);
 	DDX_Control(pDX, IDC_CANCEL_BUTTON, m_btnCancel);
-
-	DDX_Control(pDX, IDC_MASS_REPLACE_MENUBUTTON, m_btnMassReplace);
-	DDX_Control(pDX, IDC_MASS_RENAME_MENUBUTTON, m_btnMassRename);
-	DDX_Control(pDX, IDC_MASS_RESUME_MENUBUTTON, m_btnMassResume);
-	DDX_Control(pDX, IDC_MASS_SKIP_MENUBUTTON, m_btnMassSkip);
 }
 
 BEGIN_MESSAGE_MAP(CFeedbackReplaceDlg, ictranslate::CLanguageDialog)
 	ON_BN_CLICKED(IDC_REPLACE_BUTTON, &CFeedbackReplaceDlg::OnBnClickedReplaceButton)
+	ON_BN_CLICKED(IDC_RENAME_BUTTON, &CFeedbackReplaceDlg::OnBnClickedRenameButton)
 	ON_BN_CLICKED(IDC_RESUME_BUTTON, &CFeedbackReplaceDlg::OnBnClickedCopyRestButton)
 	ON_BN_CLICKED(IDC_SKIP_BUTTON, &CFeedbackReplaceDlg::OnBnClickedSkipButton)
 	ON_BN_CLICKED(IDC_PAUSE_BUTTON, &CFeedbackReplaceDlg::OnBnClickedPauseButton)
 	ON_BN_CLICKED(IDC_CANCEL_BUTTON, &CFeedbackReplaceDlg::OnBnClickedCancelButton)
-	ON_BN_CLICKED(IDC_MASS_REPLACE_MENUBUTTON, &CFeedbackReplaceDlg::OnBnMassReplace)
-	ON_BN_CLICKED(IDC_MASS_RENAME_MENUBUTTON, &CFeedbackReplaceDlg::OnBnMassRename)
-	ON_BN_CLICKED(IDC_MASS_RESUME_MENUBUTTON, &CFeedbackReplaceDlg::OnBnMassResume)
-	ON_BN_CLICKED(IDC_MASS_SKIP_MENUBUTTON, &CFeedbackReplaceDlg::OnBnMassSkip)
 	ON_WM_GETMINMAXINFO()
 END_MESSAGE_MAP()
 
@@ -110,13 +102,9 @@ BOOL CFeedbackReplaceDlg::OnInitDialog()
 	AddResizableControl(IDC_DST_MODIFIEDDATE_EDIT, 0.0, 0.0, 1.0, 0.0);
 
 	AddResizableControl(IDC_REPLACE_BUTTON, 0.0, 0.0, 0.25, 0.0);
-	AddResizableControl(IDC_MASS_REPLACE_MENUBUTTON, 0.25, 0.0, 0.0, 0.0);
 	AddResizableControl(IDC_RENAME_BUTTON, 0.25, 0.0, 0.25, 0.0);
-	AddResizableControl(IDC_MASS_RENAME_MENUBUTTON, 0.5, 0.0, 0.0, 0.0);
 	AddResizableControl(IDC_RESUME_BUTTON, 0.5, 0.0, 0.25, 0.0);
-	AddResizableControl(IDC_MASS_RESUME_MENUBUTTON, 0.75, 0.0, 0.0, 0.0);
 	AddResizableControl(IDC_SKIP_BUTTON, 0.75, 0.0, 0.25, 0.0);
-	AddResizableControl(IDC_MASS_SKIP_MENUBUTTON, 1.0, 0.0, 0.0, 0.0);
 
 	AddResizableControl(IDC_PAUSE_BUTTON, 0.5, 0.0, 0.25, 0.0);
 	AddResizableControl(IDC_CANCEL_BUTTON, 0.75, 0.0, 0.25, 0.0);
@@ -136,10 +124,14 @@ BOOL CFeedbackReplaceDlg::OnInitDialog()
 	hMenu = GetResManager().LoadMenu(MAKEINTRESOURCE(IDR_FEEDBACK_MASS_SKIP_MENU));
 	m_menuMassSkip.Attach(hMenu);
 
-	m_btnMassReplace.m_hMenu = m_menuMassReplace.GetSubMenu(0)->GetSafeHmenu();
-	m_btnMassResume.m_hMenu = m_menuMassResume.GetSubMenu(0)->GetSafeHmenu();
-	m_btnMassRename.m_hMenu = m_menuMassRename.GetSubMenu(0)->GetSafeHmenu();
-	m_btnMassSkip.m_hMenu = m_menuMassSkip.GetSubMenu(0)->GetSafeHmenu();
+	m_btnReplace.m_hMenu = m_menuMassReplace.GetSubMenu(0)->GetSafeHmenu();
+	m_btnReplace.m_bDefaultClick = TRUE;
+	m_btnResume.m_hMenu = m_menuMassResume.GetSubMenu(0)->GetSafeHmenu();
+	m_btnResume.m_bDefaultClick = TRUE;
+	m_btnRename.m_hMenu = m_menuMassRename.GetSubMenu(0)->GetSafeHmenu();
+	m_btnRename.m_bDefaultClick = TRUE;
+	m_btnSkip.m_hMenu = m_menuMassSkip.GetSubMenu(0)->GetSafeHmenu();
+	m_btnSkip.m_bDefaultClick = TRUE;
 
 	return TRUE;  // return TRUE unless you set the focus to a control
 	// EXCEPTION: OCX Property Pages should return FALSE
@@ -202,36 +194,8 @@ void CFeedbackReplaceDlg::RefreshImages()
 void CFeedbackReplaceDlg::OnBnClickedReplaceButton()
 {
 	UpdateData(TRUE);
-	EndDialog(chengine::EFeedbackResult::eResult_Overwrite);
-}
 
-void CFeedbackReplaceDlg::OnBnClickedCopyRestButton()
-{
-	UpdateData(TRUE);
-	EndDialog(chengine::EFeedbackResult::eResult_CopyRest);
-}
-
-void CFeedbackReplaceDlg::OnBnClickedSkipButton()
-{
-	UpdateData(TRUE);
-	EndDialog(chengine::EFeedbackResult::eResult_Skip);
-}
-
-void CFeedbackReplaceDlg::OnBnClickedPauseButton()
-{
-	UpdateData(TRUE);
-	EndDialog(chengine::EFeedbackResult::eResult_Pause);
-}
-
-void CFeedbackReplaceDlg::OnBnClickedCancelButton()
-{
-	UpdateData(TRUE);
-	EndDialog(chengine::EFeedbackResult::eResult_Cancel);
-}
-
-void CFeedbackReplaceDlg::OnBnMassReplace()
-{
-	switch (m_btnMassReplace.m_nMenuResult)
+	switch(m_btnReplace.m_nMenuResult)
 	{
 	case ID_FEEDBACK_REPLACE_ALLEXISTINGFILES:
 		m_feedbackRules = FeedbackPredefinedRules::CreateAlreadyExistsRule(EPredefinedRuleCondition::eCondition_ApplyToAll, eResult_Overwrite);
@@ -250,9 +214,11 @@ void CFeedbackReplaceDlg::OnBnMassReplace()
 	EndDialog(chengine::EFeedbackResult::eResult_Overwrite);
 }
 
-void CFeedbackReplaceDlg::OnBnMassRename()
+void CFeedbackReplaceDlg::OnBnClickedRenameButton()
 {
-	switch (m_btnMassRename.m_nMenuResult)
+	UpdateData(TRUE);
+
+	switch(m_btnRename.m_nMenuResult)
 	{
 	case ID_FEEDBACK_RENAME_WHENDESTIONATIONFILEEXISTS:
 		m_feedbackRules = FeedbackPredefinedRules::CreateAlreadyExistsRule(EPredefinedRuleCondition::eCondition_ApplyToAll, eResult_Rename);
@@ -274,9 +240,10 @@ void CFeedbackReplaceDlg::OnBnMassRename()
 	EndDialog(chengine::EFeedbackResult::eResult_Rename);
 }
 
-void CFeedbackReplaceDlg::OnBnMassResume()
+void CFeedbackReplaceDlg::OnBnClickedCopyRestButton()
 {
-	switch (m_btnMassResume.m_nMenuResult)
+	UpdateData(TRUE);
+	switch(m_btnResume.m_nMenuResult)
 	{
 	case ID_FEEDBACK_RESUME_WHENFILEBIGGERTHANDESTINATION:
 		m_feedbackRules = FeedbackPredefinedRules::CreateAlreadyExistsRule(EPredefinedRuleCondition::eCondition_WhenBiggerThanDst, eResult_CopyRest);
@@ -286,9 +253,10 @@ void CFeedbackReplaceDlg::OnBnMassResume()
 	EndDialog(chengine::EFeedbackResult::eResult_CopyRest);
 }
 
-void CFeedbackReplaceDlg::OnBnMassSkip()
+void CFeedbackReplaceDlg::OnBnClickedSkipButton()
 {
-	switch (m_btnMassSkip.m_nMenuResult)
+	UpdateData(TRUE);
+	switch(m_btnSkip.m_nMenuResult)
 	{
 	case ID_FEEDBACK_SKIP_ALLEXISTINGDESTINATIONFILES:
 		m_feedbackRules = FeedbackPredefinedRules::CreateAlreadyExistsRule(EPredefinedRuleCondition::eCondition_ApplyToAll, eResult_Skip);
@@ -305,6 +273,18 @@ void CFeedbackReplaceDlg::OnBnMassSkip()
 	}
 
 	EndDialog(chengine::EFeedbackResult::eResult_Skip);
+}
+
+void CFeedbackReplaceDlg::OnBnClickedPauseButton()
+{
+	UpdateData(TRUE);
+	EndDialog(chengine::EFeedbackResult::eResult_Pause);
+}
+
+void CFeedbackReplaceDlg::OnBnClickedCancelButton()
+{
+	UpdateData(TRUE);
+	EndDialog(chengine::EFeedbackResult::eResult_Cancel);
 }
 
 void CFeedbackReplaceDlg::OnCancel()

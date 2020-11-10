@@ -385,8 +385,6 @@
 #define IDC_SRC_PATH_EDIT               1346
 #define IDC_SRCFILE_STATIC              1347
 #define IDC_DSTFILE_STATIC              1348
-#define IDC_MASS_REPLACE_MENUBUTTON     1376
-#define IDC_MASS_RENAME_MENUBUTTON      1377
 #define IDC_NAME_STATIC                 1378
 #define IDC_SRC_NAME_STATIC             1378
 #define IDC_SRC_LOCATION_STATIC         1379
@@ -396,8 +394,6 @@
 #define IDC_DST_LOCATION_STATIC         1383
 #define IDC_DST_SIZE_STATIC             1384
 #define IDC_DST_TIME_STATIC             1385
-#define IDC_MASS_RESUME_MENUBUTTON      1386
-#define IDC_MASS_SKIP_MENUBUTTON        1387
 #define IDS_APPNAME_STRING              5000
 #define IDS_PRIORITY0_STRING            5001
 #define IDS_PRIORITY1_STRING            5002

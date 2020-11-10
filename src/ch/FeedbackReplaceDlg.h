@@ -46,6 +46,7 @@ protected:
 	void RefreshImages();
 
 	afx_msg void OnBnClickedReplaceButton();
+	afx_msg void OnBnClickedRenameButton();
 	afx_msg void OnBnClickedCopyRestButton();
 	afx_msg void OnBnClickedSkipButton();
 	afx_msg void OnBnClickedPauseButton();
@@ -74,10 +75,10 @@ private:
 	CEdit m_ctlDstSize;
 	CEdit m_ctlDstDate;
 
-	CMFCButton m_btnReplace;
-	CMFCButton m_btnRename;
-	CMFCButton m_btnResume;
-	CMFCButton m_btnSkip;
+	CMFCMenuButton m_btnReplace;
+	CMFCMenuButton m_btnRename;
+	CMFCMenuButton m_btnResume;
+	CMFCMenuButton m_btnSkip;
 	CMFCButton m_btnPause;
 	CMFCButton m_btnCancel;
 
@@ -85,11 +86,6 @@ private:
 	CMenu m_menuMassRename;
 	CMenu m_menuMassResume;
 	CMenu m_menuMassSkip;
-
-	CMFCMenuButton m_btnMassReplace;
-	CMFCMenuButton m_btnMassRename;
-	CMFCMenuButton m_btnMassResume;
-	CMFCMenuButton m_btnMassSkip;
 
 	CRect m_rcInitial;
 
