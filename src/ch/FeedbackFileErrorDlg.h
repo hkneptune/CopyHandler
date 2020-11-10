@@ -19,6 +19,8 @@
 #ifndef __FEEDBACKFILEERRORDLG_H__
 #define __FEEDBACKFILEERRORDLG_H__
 
+#include "../libchengine/FeedbackErrorRuleList.h"
+
 // CFeedbackFileErrorDlg dialog
 class CFeedbackFileErrorDlg : public ictranslate::CLanguageDialog
 {
@@ -28,23 +30,30 @@ public:
 	CFeedbackFileErrorDlg(const wchar_t* pszSrcPath, const wchar_t* pszDstPath, unsigned long ulSysError, CWnd* pParent = nullptr);   // standard constructor
 	virtual ~CFeedbackFileErrorDlg();
 
+	bool IsApplyToAllItemsChecked() const;
+
+	const chengine::FeedbackErrorRuleList& GetRules() const;
+
+protected:
+	void DoDataExchange(CDataExchange* pDX) override;    // DDX/DDV support
+	void OnCancel() override;
+	BOOL OnInitDialog() override;
+
 	afx_msg void OnBnClickedRetryButton();
 	afx_msg void OnBnClickedSkipButton();
 	afx_msg void OnBnClickedPauseButton();
 	afx_msg void OnBnClickedCancel();
 
-protected:
-	void DoDataExchange(CDataExchange* pDX) override;    // DDX/DDV support
-	void OnCancel() override;
-
 	DECLARE_MESSAGE_MAP()
-public:
-	BOOL m_bAllItems;
+
+private:
+	BOOL m_bAllItems = FALSE;
 	CStatic m_ctlErrorInfo;
 	CString m_strSrcPath;
 	CString m_strDstPath;
-	unsigned long m_ulSysError;
-	BOOL OnInitDialog() override;
+	unsigned long m_ulSysError = 0;
+
+	chengine::FeedbackErrorRuleList m_feedbackRules;	// feedback rules resulting from choices made in this dialog box
 };
 
 #endif

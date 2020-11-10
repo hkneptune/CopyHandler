@@ -22,6 +22,7 @@
 #include "IFilesystem.h"
 #include "TSubTaskBase.h"
 #include "../liblogger/TLogger.h"
+#include "FeedbackManager.h"
 
 namespace chcore {
 	class TWorkerThreadController;
@@ -32,7 +33,7 @@ namespace chengine
 	class TFilesystemFeedbackWrapper
 	{
 	public:
-		TFilesystemFeedbackWrapper(const IFeedbackHandlerPtr& spFeedbackHandler, const IFilesystemPtr& spFilesystem,
+		TFilesystemFeedbackWrapper(const FeedbackManagerPtr& spFeedbackManager, const IFilesystemPtr& spFilesystem,
 			const logger::TLogFileDataPtr& spLogFileData, chcore::TWorkerThreadController& rThreadController);
 		TFilesystemFeedbackWrapper& operator=(const TFilesystemFeedbackWrapper&) = delete;
 
@@ -56,7 +57,7 @@ namespace chengine
 		bool WasKillRequested(const TFeedbackResult& rFeedbackResult) const;
 
 	private:
-		IFeedbackHandlerPtr m_spFeedbackHandler;
+		FeedbackManagerPtr m_spFeedbackManager;
 		IFilesystemPtr m_spFilesystem;
 		logger::TLoggerPtr m_spLog;
 		chcore::TWorkerThreadController& m_rThreadController;

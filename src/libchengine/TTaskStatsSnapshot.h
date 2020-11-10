@@ -29,6 +29,8 @@
 #include "EOperationTypes.h"
 #include "ETaskCurrentState.h"
 #include "TaskID.h"
+#include "FeedbackAlreadyExistsRuleList.h"
+#include "FeedbackRules.h"
 
 namespace chengine
 {
@@ -79,6 +81,9 @@ namespace chengine
 		const TFileFiltersArray& GetFilters() const { return m_filters; }
 		void SetFilters(const TFileFiltersArray& val) { m_filters = val; }
 
+		const FeedbackRules& GetFeedbackRules() const { return m_feedbackRules; }
+		void SetFeedbackRules(const FeedbackRules& val) { m_feedbackRules = val; }
+
 		ETaskCurrentState GetTaskState() const { return m_eTaskState; }
 		void SetTaskState(ETaskCurrentState val) { m_eTaskState = val; }
 
@@ -118,7 +123,11 @@ namespace chengine
 
 		int m_iThreadPriority;
 		string::TString m_strDestinationPath;
+
 		TFileFiltersArray m_filters;
+
+		FeedbackRules m_feedbackRules;
+
 		ETaskCurrentState m_eTaskState;
 		string::TString m_strTaskID;
 		EOperationType m_eOperationType;

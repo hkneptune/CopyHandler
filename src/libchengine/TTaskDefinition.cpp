@@ -173,6 +173,7 @@ namespace chengine
 			throw TCoreException(eErr_MissingXmlData, L"Missing TaskDefinition.SourcePaths.Path", LOCATION);
 
 		GetConfigValue(rDataSrc, _T("TaskDefinition.Filters"), m_afFilters);
+		GetConfigValue(rDataSrc, _T("TaskDefinition.Feedback"), m_feedbackRules);
 
 		// destination path
 		if (!GetConfigValue(rDataSrc, _T("TaskDefinition.DestinationPath"), m_pathDestinationPath) || (!bAllowEmptyDstPath && m_pathDestinationPath.IsEmpty()))
@@ -251,9 +252,10 @@ namespace chengine
 
 		SetConfigValue(rConfig, _T("TaskDefinition.Version"), m_ullTaskVersion);
 
+		SetConfigValue(rConfig, _T("TaskDefinition.Feedback"), m_feedbackRules);
+
 		rConfig.PutSubConfig(_T("TaskDefinition.TaskSettings"), m_tConfiguration);
 	}
-
 
 	const TFileFiltersArray& TTaskDefinition::GetFilters() const
 	{
@@ -268,5 +270,20 @@ namespace chengine
 	void TTaskDefinition::SetFilters(const TFileFiltersArray& rFilters)
 	{
 		m_afFilters = rFilters;
+	}
+
+	const FeedbackRules& TTaskDefinition::GetFeedbackRules() const
+	{
+		return m_feedbackRules;
+	}
+
+	FeedbackRules& TTaskDefinition::GetFeedbackRules()
+	{
+		return m_feedbackRules;
+	}
+
+	void TTaskDefinition::SetFeedbackRules(const FeedbackRules& rFeedbackRules)
+	{
+		m_feedbackRules = rFeedbackRules;
 	}
 }

@@ -20,33 +20,28 @@
 #define __FEEDBACKNOTENOUGHSPACEDLG_H__
 
 #include "../libchengine/TLocalFilesystem.h"
+#include "../libchengine/FeedbackNotEnoughSpaceRuleList.h"
 
 /////////////////////////////////////////////////////////////////////////////
 // CFeedbackNotEnoughSpaceDlg dialog
 
 class CFeedbackNotEnoughSpaceDlg : public ictranslate::CLanguageDialog
 {
-// Construction
 public:
 	CFeedbackNotEnoughSpaceDlg(unsigned long long ullSizeRequired, const wchar_t* pszSrcPath, const wchar_t* pszDstPath);   // standard constructor
 
-// Overrides
+	bool IsApplyToAllItemsChecked() const;
+
+	const chengine::FeedbackNotEnoughSpaceRuleList& GetRules() const;
+
 protected:
 	void DoDataExchange(CDataExchange* pDX) override;    // DDX/DDV support
-
-// Implementation
-public:
-	CString	m_strDisk;
-	unsigned long long m_ullRequired;
-	std::vector<std::wstring> m_vstrFiles;
-	CListBox	m_ctlFiles;
-
-protected:
 	void UpdateDialog();
 	void OnLanguageChanged() override;
 	void OnCancel() override;
 
 	BOOL OnInitDialog() override;
+
 	afx_msg void OnTimer(UINT_PTR nIDEvent);
 	afx_msg void OnRetryButton();
 	afx_msg void OnIgnoreButton();
@@ -54,11 +49,16 @@ protected:
 
 	DECLARE_MESSAGE_MAP()
 
-public:
-	BOOL m_bAllItems;
-
 private:
+	BOOL m_bAllItems = FALSE;
+	CString m_strDisk;
+	unsigned long long m_ullRequired = 0;
+	std::vector<std::wstring> m_vstrFiles;
+
+	CListBox m_ctlFiles;
+
 	chengine::TLocalFilesystem m_fsLocal;
+	chengine::FeedbackNotEnoughSpaceRuleList m_feedbackRules;	// feedback rules resulting from choices made in this dialog box
 };
 
 #endif

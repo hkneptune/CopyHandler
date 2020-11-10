@@ -23,6 +23,11 @@
 #include "TFeedbackResult.h"
 #include "../libstring/TString.h"
 #include "../libserializer/ISerializerContainer.h"
+#include "EOperationEvent.h"
+#include "FeedbackErrorRuleList.h"
+#include "FeedbackAlreadyExistsRuleList.h"
+#include "FeedbackNotEnoughSpaceRuleList.h"
+#include "FeedbackOperationEventRuleList.h"
 
 namespace chengine
 {
@@ -33,24 +38,10 @@ namespace chengine
 	public:
 		virtual ~IFeedbackHandler();
 
-		// requests with some processing data
-		virtual TFeedbackResult FileError(const string::TString& strSrcPath, const string::TString& strDstPath, EFileError eFileError, unsigned long ulError) = 0;
-		virtual TFeedbackResult FileAlreadyExists(const TFileInfo& spSrcFileInfo, const TFileInfo& spDstFileInfo) = 0;
-		virtual TFeedbackResult NotEnoughSpace(const string::TString& strSrcPath, const string::TString& strDstPath, unsigned long long ullRequiredSize) = 0;
-
-		// no-data requests
-		virtual TFeedbackResult OperationFinished() = 0;
-		virtual TFeedbackResult OperationError() = 0;
-
-		// retry interval (in ms)
-		virtual DWORD GetRetryInterval() const = 0;
-
-		// reset permanent states
-		virtual void RestoreDefaults() = 0;
-
-		//serialization
-		virtual void Store(const serializer::ISerializerContainerPtr& spContainer) const = 0;
-		virtual void Load(const serializer::ISerializerContainerPtr& spContainer) = 0;
+		virtual EFeedbackResult FileError(const string::TString& strSrcPath, const string::TString& strDstPath, EFileError eFileError, unsigned long ulError, FeedbackErrorRuleList& rNewRules) = 0;
+		virtual EFeedbackResult FileAlreadyExists(const TFileInfo& spSrcFileInfo, const TFileInfo& spDstFileInfo, FeedbackAlreadyExistsRuleList& rNewRules) = 0;
+		virtual EFeedbackResult NotEnoughSpace(const string::TString& strSrcPath, const string::TString& strDstPath, unsigned long long ullRequiredSize, FeedbackNotEnoughSpaceRuleList& rNewRules) = 0;
+		virtual EFeedbackResult OperationEvent(EOperationEvent eEvent, FeedbackOperationEventRuleList& rNewRules) = 0;
 	};
 
 	typedef std::shared_ptr<IFeedbackHandler> IFeedbackHandlerPtr;

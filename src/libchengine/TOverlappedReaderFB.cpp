@@ -27,7 +27,7 @@ using namespace chcore;
 namespace chengine
 {
 	TOverlappedReaderFB::TOverlappedReaderFB(const IFilesystemPtr& spFilesystem,
-		const IFeedbackHandlerPtr& spFeedbackHandler,
+		const FeedbackManagerPtr& spFeedbackManager,
 		TWorkerThreadController& rThreadController,
 		const TSubTaskStatsInfoPtr& spStats,
 		const TFileInfoPtr& spSrcFileInfo,
@@ -50,7 +50,7 @@ namespace chengine
 		m_rThreadController(rThreadController),
 		m_spLog(logger::MakeLogger(spLogFileData, L"File-Reader"))
 	{
-		if(!spFeedbackHandler)
+		if(!spFeedbackManager)
 			throw TCoreException(eErr_InvalidArgument, L"spFeedbackHandler is NULL", LOCATION);
 		if(!spFilesystem)
 			throw TCoreException(eErr_InvalidArgument, L"spFilesystem is NULL", LOCATION);
@@ -66,7 +66,7 @@ namespace chengine
 			throw TCoreException(eErr_InvalidArgument, L"spDataRange is NULL", LOCATION);
 
 		IFilesystemFilePtr fileSrc = m_spFilesystem->CreateFileObject(IFilesystemFile::eMode_Read, m_spSrcFileInfo->GetFullFilePath(), bNoBuffering, bProtectReadOnlyFiles);
-		m_spSrcFile = std::make_shared<TFilesystemFileFeedbackWrapper>(fileSrc, spFeedbackHandler, spLogFileData, rThreadController, spFilesystem);
+		m_spSrcFile = std::make_shared<TFilesystemFileFeedbackWrapper>(fileSrc, spFeedbackManager, spLogFileData, rThreadController, spFilesystem);
 	}
 
 	TOverlappedReaderFB::~TOverlappedReaderFB()

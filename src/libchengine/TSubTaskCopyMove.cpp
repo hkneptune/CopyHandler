@@ -33,7 +33,6 @@
 #include "TFileInfo.h"
 #include "TFileInfoArray.h"
 #include "TScopedRunningTimeTracker.h"
-#include "TFeedbackHandlerWrapper.h"
 #include "TOverlappedMemoryPool.h"
 #include "TTaskConfigBufferSizes.h"
 #include "TFilesystemFeedbackWrapper.h"
@@ -42,6 +41,7 @@
 #include "TThreadedQueueRunner.h"
 #include "TOverlappedThreadPool.h"
 #include "../libchcore/RoundingFunctions.h"
+#include <boost/scope_exit.hpp>
 
 using namespace chcore;
 using namespace string;
@@ -98,10 +98,15 @@ namespace chengine
 		m_spSubTaskStats->SetCurrentPath(spFileInfo->GetFullFilePath().ToString());
 	}
 
-	TSubTaskBase::ESubOperationResult TSubTaskCopyMove::Exec(const IFeedbackHandlerPtr& spFeedback)
+	TSubTaskBase::ESubOperationResult TSubTaskCopyMove::Exec()
 	{
 		TScopedRunningTimeTracker guard(*m_spSubTaskStats);
-		TFeedbackHandlerWrapperPtr spFeedbackHandler(std::make_shared<TFeedbackHandlerWrapper>(spFeedback, guard));
+		FeedbackManagerPtr spFeedbackManager = GetContext().GetFeedbackManager();
+		spFeedbackManager->SetSecondaryTimeTracker(&guard);
+
+		BOOST_SCOPE_EXIT(&spFeedbackManager) {
+			spFeedbackManager->SetSecondaryTimeTracker(nullptr);
+		} BOOST_SCOPE_EXIT_END
 
 		TFileInfoArray& rFilesCache = GetContext().GetFilesCache();
 		TTaskConfigTracker& rCfgTracker = GetContext().GetCfgTracker();
@@ -111,7 +116,7 @@ namespace chengine
 		IFilesystemPtr spFilesystem = GetContext().GetLocalFilesystem();
 		TBasePathDataContainerPtr spSrcPaths = GetContext().GetBasePaths();
 
-		TFilesystemFeedbackWrapper tFilesystemFBWrapper(spFeedbackHandler, spFilesystem, GetContext().GetLogFileData(), rThreadController);
+		TFilesystemFeedbackWrapper tFilesystemFBWrapper(spFeedbackManager, spFilesystem, GetContext().GetLogFileData(), rThreadController);
 
 		// log
 		LOG_INFO(m_spLog) << _T("Processing files/folders (ProcessFiles)");
@@ -230,7 +235,7 @@ namespace chengine
 				ccp.spSrcFile = spFileInfo;
 
 				// copy data
-				eResult = CustomCopyFileFB(spFeedbackHandler, threadPool, &ccp);
+				eResult = CustomCopyFileFB(spFeedbackManager, threadPool, &ccp);
 				if (eResult == eSubResult_SkipFile)
 				{
 					spFileInfo->MarkAsProcessed(false);
@@ -338,7 +343,7 @@ namespace chengine
 		}
 	}
 
-	TSubTaskBase::ESubOperationResult TSubTaskCopyMove::CustomCopyFileFB(const IFeedbackHandlerPtr& spFeedbackHandler,
+	TSubTaskBase::ESubOperationResult TSubTaskCopyMove::CustomCopyFileFB(const FeedbackManagerPtr& spFeedbackManager,
 		TOverlappedThreadPool& rThreadPool,
 		CUSTOM_COPY_PARAMS* pData)
 	{
@@ -368,7 +373,7 @@ namespace chengine
 		unsigned long long ullNextReadPos = m_spSubTaskStats->GetCurrentItemProcessedSize();
 
 		TOverlappedReaderWriterFB tReaderWriter(spFilesystem,
-			spFeedbackHandler,
+			spFeedbackManager,
 			rThreadController,
 			rThreadPool,
 			pData->spSrcFile,

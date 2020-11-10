@@ -19,6 +19,8 @@
 #ifndef __FEEDBACKREPLACEDLG_H__
 #define __FEEDBACKREPLACEDLG_H__
 
+#include "../libchengine/FeedbackAlreadyExistsRuleList.h"
+
 namespace chengine
 {
 	class TFileInfo;
@@ -34,7 +36,7 @@ public:
 
 	BOOL OnInitDialog() override;
 
-	bool IsApplyToAllItemsChecked() const;
+	const chengine::FeedbackAlreadyExistsRuleList& GetRules() const;
 
 protected:
 	void DoDataExchange(CDataExchange* pDX) override;    // DDX/DDV support
@@ -42,6 +44,19 @@ protected:
 
 	void RefreshFilesInfo();
 	void RefreshImages();
+
+	afx_msg void OnBnClickedReplaceButton();
+	afx_msg void OnBnClickedCopyRestButton();
+	afx_msg void OnBnClickedSkipButton();
+	afx_msg void OnBnClickedPauseButton();
+	afx_msg void OnBnClickedCancelButton();
+
+	afx_msg void OnBnMassReplace();
+	afx_msg void OnBnMassRename();
+	afx_msg void OnBnMassResume();
+	afx_msg void OnBnMassSkip();
+
+	afx_msg void OnGetMinMaxInfo(MINMAXINFO* lpMMI);
 
 	DECLARE_MESSAGE_MAP()
 
@@ -76,27 +91,12 @@ private:
 	CMFCMenuButton m_btnMassResume;
 	CMFCMenuButton m_btnMassSkip;
 
-	BOOL m_bAllItems;
-
 	CRect m_rcInitial;
 
-protected:
 	const chengine::TFileInfo& m_rSrcFile;
 	const chengine::TFileInfo& m_rDstFile;
 
-public:
-	afx_msg void OnBnClickedReplaceButton();
-	afx_msg void OnBnClickedCopyRestButton();
-	afx_msg void OnBnClickedSkipButton();
-	afx_msg void OnBnClickedPauseButton();
-	afx_msg void OnBnClickedCancelButton();
-
-	afx_msg void OnBnMassReplace();
-	afx_msg void OnBnMassRename();
-	afx_msg void OnBnMassResume();
-	afx_msg void OnBnMassSkip();
-
-	afx_msg void OnGetMinMaxInfo(MINMAXINFO* lpMMI);
+	chengine::FeedbackAlreadyExistsRuleList m_feedbackRules;	// feedback rules resulting from choices made in this dialog box
 };
 
 #endif

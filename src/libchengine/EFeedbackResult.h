@@ -30,7 +30,8 @@ namespace chengine
 		eResult_Cancel,
 		eResult_Pause,
 		eResult_Retry,
-		eResult_Ignore
+		eResult_Ignore,
+		eResult_Rename
 	};
 }
 

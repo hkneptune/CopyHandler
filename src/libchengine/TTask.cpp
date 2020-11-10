@@ -26,12 +26,12 @@
 #include "TTaskStatsSnapshot.h"
 #include "TScopedRunningTimeTracker.h"
 #include "TScopedRunningTimeTrackerPause.h"
-#include "TFeedbackHandlerWrapper.h"
 #include "TTaskConfigBufferSizes.h"
 #include <wchar.h>
 #include "TLocalFilesystem.h"
 #include "TTaskConfigVerifier.h"
 #include "../liblogger/TAsyncMultiLogger.h"
+#include <boost/scope_exit.hpp>
 
 using namespace chcore;
 using namespace string;
@@ -45,13 +45,12 @@ namespace chengine
 	TTask::TTask(const ISerializerPtr& spSerializer, const IFeedbackHandlerPtr& spFeedbackHandler,
 		const TTaskDefinition& rTaskDefinition, const logger::TLogFileDataPtr& spLogFileData) :
 		m_spSerializer(spSerializer),
-		m_spInternalFeedbackHandler(spFeedbackHandler),
+		m_spFeedbackManager(std::make_shared<FeedbackManager>(spFeedbackHandler)),
 		m_spLog(logger::MakeLogger(spLogFileData, L"Task")),
 		m_spSrcPaths(new TBasePathDataContainer),
+		m_tSubTaskContext(m_tConfiguration, m_spSrcPaths, m_afFilters, m_cfgTracker, spLogFileData, m_workerThread, 
+			std::make_shared<TLocalFilesystem>(spLogFileData), m_spFeedbackManager),
 		m_tSubTasksArray(m_tSubTaskContext),
-		m_tSubTaskContext(m_tConfiguration, m_spSrcPaths, m_afFilters,
-		                  m_cfgTracker, spLogFileData, m_workerThread,
-		                  std::make_shared<TLocalFilesystem>(spLogFileData)),
 		m_bForce(false),
 		m_bContinue(false)
 	{
@@ -65,18 +64,15 @@ namespace chengine
 
 	TTask::TTask(const ISerializerPtr& spSerializer, const IFeedbackHandlerPtr& spFeedbackHandler, const logger::TLogFileDataPtr& spLogFileData) :
 		m_spSerializer(spSerializer),
-		m_spInternalFeedbackHandler(spFeedbackHandler),
+		m_spFeedbackManager(std::make_shared<FeedbackManager>(spFeedbackHandler)),
 		m_spLog(logger::MakeLogger(spLogFileData, L"Task")),
 		m_spSrcPaths(new TBasePathDataContainer),
+		m_tSubTaskContext(m_tConfiguration, m_spSrcPaths, m_afFilters, m_cfgTracker, m_spLog->GetLogFileData(), m_workerThread,
+			std::make_shared<TLocalFilesystem>(m_spLog->GetLogFileData()), m_spFeedbackManager),
 		m_tSubTasksArray(m_tSubTaskContext),
-		m_tSubTaskContext(m_tConfiguration, m_spSrcPaths, m_afFilters,
-		                  m_cfgTracker, m_spLog->GetLogFileData(), m_workerThread,
-		                  std::make_shared<TLocalFilesystem>(m_spLog->GetLogFileData())),
 		m_bForce(false),
 		m_bContinue(false)
 	{
-		if(!spFeedbackHandler)
-			throw TCoreException(eErr_InvalidArgument, L"spFeedbackHandler", LOCATION);
 		if(!spSerializer)
 			throw TCoreException(eErr_InvalidArgument, L"spSerializer", LOCATION);
 	}
@@ -98,6 +94,7 @@ namespace chengine
 		m_tConfiguration = rTaskDefinition.GetConfiguration();
 		*m_spSrcPaths = rTaskDefinition.GetSourcePaths();
 		m_afFilters = rTaskDefinition.GetFilters();
+		m_spFeedbackManager->SetRules(rTaskDefinition.GetFeedbackRules());
 		m_tBaseData.SetTaskName(rTaskDefinition.GetTaskName());
 
 		m_tSubTasksArray.Init(rTaskDefinition.GetOperationPlan());
@@ -170,11 +167,10 @@ namespace chengine
 			spContainer = m_spSerializer->GetContainer(_T("filters"));
 			m_afFilters.Load(spContainer);
 
+			m_spFeedbackManager->Load(m_spSerializer);
+
 			spContainer = m_spSerializer->GetContainer(_T("local_stats"));
 			m_tLocalStats.Load(spContainer);
-
-			spContainer = m_spSerializer->GetContainer(_T("feedback"));
-			m_spInternalFeedbackHandler->Load(spContainer);
 
 			// ensure copy-based context entries are properly updated after loading
 			m_tSubTaskContext.SetDestinationPath(m_tBaseData.GetDestinationPath());
@@ -274,11 +270,10 @@ namespace chengine
 			spContainer = m_spSerializer->GetContainer(_T("filters"));
 			m_afFilters.Store(spContainer);
 
+			m_spFeedbackManager->Store(m_spSerializer);
+
 			spContainer = m_spSerializer->GetContainer(_T("local_stats"));
 			m_tLocalStats.Store(spContainer);
-
-			spContainer = m_spSerializer->GetContainer(_T("feedback"));
-			m_spInternalFeedbackHandler->Store(spContainer);
 
 			m_tSubTasksArray.Store(m_spSerializer);
 		}
@@ -349,7 +344,7 @@ namespace chengine
 
 		SetTaskState(eTaskState_None);
 
-		m_spInternalFeedbackHandler->RestoreDefaults();
+		m_spFeedbackManager->RestoreDefaults();
 		m_tSubTasksArray.ResetProgressAndStats();
 		m_tLocalStats.Clear();
 		m_spSrcPaths->ResetProcessingFlags();
@@ -362,7 +357,7 @@ namespace chengine
 
 	void TTask::RestoreFeedbackDefaults()
 	{
-		m_spInternalFeedbackHandler->RestoreDefaults();
+		m_spFeedbackManager->RestoreDefaults();
 	}
 
 	void TTask::PauseProcessing()
@@ -402,6 +397,7 @@ namespace chengine
 		spSnapshot->SetThreadPriority(GetTaskPropValue<eTO_ThreadPriority>(m_tConfiguration));
 		spSnapshot->SetDestinationPath(m_tBaseData.GetDestinationPath().ToString());
 		spSnapshot->SetFilters(m_afFilters);
+		spSnapshot->SetFeedbackRules(m_spFeedbackManager->GetRules());
 		spSnapshot->SetTaskState(m_tBaseData.GetCurrentState());
 		spSnapshot->SetOperationType(m_tSubTasksArray.GetOperationType());
 
@@ -550,7 +546,13 @@ namespace chengine
 	{
 		// start tracking time for this thread
 		TScopedRunningTimeTracker tProcessingGuard(m_tLocalStats);
-		TFeedbackHandlerWrapperPtr spFeedbackHandler(std::make_shared<TFeedbackHandlerWrapper>(m_spInternalFeedbackHandler, tProcessingGuard));
+
+		// set time tracker and ensure it is unset on scope exit
+		m_spFeedbackManager->SetTimeTracker(&tProcessingGuard);
+
+		BOOST_SCOPE_EXIT(&m_spFeedbackManager) {
+			m_spFeedbackManager->SetTimeTracker(nullptr);
+		} BOOST_SCOPE_EXIT_END
 
 		const size_t ExceptionBufferSize = 2048;
 		std::unique_ptr<wchar_t[]> upExceptionInfoBuffer(new wchar_t[ExceptionBufferSize]);
@@ -574,7 +576,7 @@ namespace chengine
 			m_tSubTasksArray.InitBeforeExec();
 
 			// exec the estimation subtasks
-			TSubTaskBase::ESubOperationResult eResult = m_tSubTasksArray.Execute(spFeedbackHandler, true);
+			TSubTaskBase::ESubOperationResult eResult = m_tSubTasksArray.Execute(true);
 
 			// go into wait state only in case the preprocessing did not finish the operation already
 			// (only fast move can do that right now)
@@ -585,7 +587,7 @@ namespace chengine
 				eResult = CheckForWaitState();	// operation limiting
 			}
 			if (eResult == TSubTaskBase::eSubResult_Continue)
-				eResult = m_tSubTasksArray.Execute(spFeedbackHandler, false);
+				eResult = m_tSubTasksArray.Execute(false);
 
 			// change status to finished
 			if (eResult == TSubTaskBase::eSubResult_Continue)
@@ -596,7 +598,7 @@ namespace chengine
 			switch (eResult)
 			{
 			case TSubTaskBase::eSubResult_Error:
-				spFeedbackHandler->OperationError();
+				m_spFeedbackManager->OperationEvent(eOperationEvent_Error);
 				SetTaskState(eTaskState_Error);
 				break;
 
@@ -615,7 +617,7 @@ namespace chengine
 				break;
 
 			case TSubTaskBase::eSubResult_Continue:
-				spFeedbackHandler->OperationFinished();
+				m_spFeedbackManager->OperationEvent(eOperationEvent_Finished);
 				SetTaskState(eTaskState_Finished);
 				break;
 
@@ -664,7 +666,7 @@ namespace chengine
 		LOG_ERROR(m_spLog) << strMsg.c_str();
 
 		// let others know some error happened
-		spFeedbackHandler->OperationError();
+		m_spFeedbackManager->OperationEvent(eOperationEvent_Error);
 		SetTaskState(eTaskState_Error);
 
 		SetContinueFlag(false);

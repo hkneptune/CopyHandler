@@ -27,6 +27,7 @@
 #include "TBufferSizes.h"
 #include "../liblogger/TLogger.h"
 #include "TOverlappedMemoryPool.h"
+#include "FeedbackManager.h"
 
 namespace chengine
 {
@@ -46,7 +47,7 @@ namespace chengine
 		void Reset() override;
 
 		void InitBeforeExec() override;
-		ESubOperationResult Exec(const IFeedbackHandlerPtr& spFeedbackHandler) override;
+		ESubOperationResult Exec() override;
 		ESubOperationType GetSubOperationType() const override { return eSubOperation_Copying; }
 
 		void Store(const serializer::ISerializerPtr& spSerializer) const override;
@@ -60,7 +61,7 @@ namespace chengine
 		TBufferSizes::EBufferType GetBufferIndex(const TBufferSizes& rBufferSizes, const TFileInfoPtr& spFileInfo);
 		bool AdjustBufferIfNeeded(const TOverlappedMemoryPoolPtr& spBuffer, TBufferSizes& rBufferSizes, bool bForce = false);
 
-		ESubOperationResult CustomCopyFileFB(const IFeedbackHandlerPtr& spFeedbackHandler,
+		ESubOperationResult CustomCopyFileFB(const FeedbackManagerPtr& spFeedbackManager,
 			TOverlappedThreadPool& rThreadPool,
 			CUSTOM_COPY_PARAMS* pData);
 

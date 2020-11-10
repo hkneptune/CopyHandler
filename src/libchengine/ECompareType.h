@@ -8,7 +8,8 @@ namespace chengine
 		eCmp_LessOrEqual = 1,
 		eCmp_Equal = 2,
 		eCmp_GreaterOrEqual = 3,
-		eCmp_Greater = 4
+		eCmp_Greater = 4,
+		eCmp_NotEqual = 5
 	};
 
 	template<class T>
@@ -26,6 +27,8 @@ namespace chengine
 			return value1 >= value2;
 		case eCmp_Greater:
 			return value1 > value2;
+		case eCmp_NotEqual:
+			return value1 != value2;
 		}
 
 		throw std::runtime_error("Invalid compare type");

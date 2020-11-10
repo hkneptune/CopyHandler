@@ -31,10 +31,10 @@
 #include "TFileInfo.h"
 #include <boost/lexical_cast.hpp>
 #include "TScopedRunningTimeTracker.h"
-#include "TFeedbackHandlerWrapper.h"
 #include "TBufferSizes.h"
 #include "TFilesystemFeedbackWrapper.h"
 #include "TDestinationPathProvider.h"
+#include <boost/scope_exit.hpp>
 
 using namespace chcore;
 using namespace string;
@@ -77,10 +77,16 @@ namespace chengine
 			m_tSubTaskStats.SetCurrentPath(TString());
 	}
 
-	TSubTaskFastMove::ESubOperationResult TSubTaskFastMove::Exec(const IFeedbackHandlerPtr& spFeedback)
+	TSubTaskFastMove::ESubOperationResult TSubTaskFastMove::Exec()
 	{
 		TScopedRunningTimeTracker guard(m_tSubTaskStats);
-		TFeedbackHandlerWrapperPtr spFeedbackHandler(std::make_shared<TFeedbackHandlerWrapper>(spFeedback, guard));
+		FeedbackManagerPtr spFeedbackManager = GetContext().GetFeedbackManager();
+		spFeedbackManager->SetSecondaryTimeTracker(&guard);
+
+		BOOST_SCOPE_EXIT(&spFeedbackManager) {
+			spFeedbackManager->SetSecondaryTimeTracker(nullptr);
+		} BOOST_SCOPE_EXIT_END
+
 
 		// log
 		TWorkerThreadController& rThreadController = GetContext().GetThreadController();
@@ -90,7 +96,7 @@ namespace chengine
 		const TFileFiltersArray& rafFilters = GetContext().GetFilters();
 		IFilesystemPtr spFilesystem = GetContext().GetLocalFilesystem();
 
-		TFilesystemFeedbackWrapper tFilesystemFBWrapper(spFeedbackHandler, spFilesystem, GetContext().GetLogFileData(), rThreadController);
+		TFilesystemFeedbackWrapper tFilesystemFBWrapper(spFeedbackManager, spFilesystem, GetContext().GetLogFileData(), rThreadController);
 
 		LOG_INFO(m_spLog) << _T("Performing initial fast-move operation...");
 

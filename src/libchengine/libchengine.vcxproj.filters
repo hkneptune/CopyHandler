@@ -96,6 +96,18 @@
     <Filter Include="Source Files\Filesystems\OverlappedIO\ThreadSupport">
       <UniqueIdentifier>{1412ea6d-b28c-4a96-b076-3094c476ce45}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Feedback\AlreadyExists">
+      <UniqueIdentifier>{675e75c1-b53c-4cfa-baf0-73fd29efd52e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Feedback\Error">
+      <UniqueIdentifier>{3e00c6b6-92d8-4f97-8689-9df059db42f1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Feedback\NotEnoughSpace">
+      <UniqueIdentifier>{19f5e9c0-f34a-482a-9f3c-f3eb712da553}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Feedback\OperationEvent">
+      <UniqueIdentifier>{4a4f6b0e-39cc-4228-a3ae-566d54464f05}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ESubTaskTypes.h">
@@ -212,9 +224,6 @@
     <ClInclude Include="TTaskBaseData.h">
       <Filter>Source Files\Task</Filter>
     </ClInclude>
-    <ClInclude Include="TFeedbackHandlerWrapper.h">
-      <Filter>Source Files\Feedback</Filter>
-    </ClInclude>
     <ClInclude Include="TScopedRunningTimeTracker.h">
       <Filter>Source Files\Stats</Filter>
     </ClInclude>
@@ -223,9 +232,6 @@
     </ClInclude>
     <ClInclude Include="IRunningTimeControl.h">
       <Filter>Source Files\Stats</Filter>
-    </ClInclude>
-    <ClInclude Include="TFeedbackHandlerBase.h">
-      <Filter>Source Files\Feedback</Filter>
     </ClInclude>
     <ClInclude Include="EFeedbackResult.h">
       <Filter>Source Files\Feedback</Filter>
@@ -238,9 +244,6 @@
     </ClInclude>
     <ClInclude Include="TTaskConfigBufferSizes.h">
       <Filter>Source Files\Task Config</Filter>
-    </ClInclude>
-    <ClInclude Include="EFileError.h">
-      <Filter>Source Files\Feedback</Filter>
     </ClInclude>
     <ClInclude Include="IFilesystem.h">
       <Filter>Source Files\Filesystems</Filter>
@@ -381,14 +384,47 @@
     <ClInclude Include="TObsoleteFiles.h">
       <Filter>Source Files\Tools</Filter>
     </ClInclude>
-    <ClInclude Include="FeedbackRule.h">
-      <Filter>Source Files\Feedback</Filter>
-    </ClInclude>
-    <ClInclude Include="FeedbackRuleList.h">
-      <Filter>Source Files\Feedback</Filter>
-    </ClInclude>
     <ClInclude Include="ECompareType.h">
       <Filter>Source Files\Tools</Filter>
+    </ClInclude>
+    <ClInclude Include="FeedbackPredefinedRules.h">
+      <Filter>Source Files\Feedback</Filter>
+    </ClInclude>
+    <ClInclude Include="FeedbackManager.h">
+      <Filter>Source Files\Feedback</Filter>
+    </ClInclude>
+    <ClInclude Include="FeedbackAlreadyExistsRule.h">
+      <Filter>Source Files\Feedback\AlreadyExists</Filter>
+    </ClInclude>
+    <ClInclude Include="FeedbackAlreadyExistsRuleList.h">
+      <Filter>Source Files\Feedback\AlreadyExists</Filter>
+    </ClInclude>
+    <ClInclude Include="FeedbackErrorRule.h">
+      <Filter>Source Files\Feedback\Error</Filter>
+    </ClInclude>
+    <ClInclude Include="FeedbackErrorRuleList.h">
+      <Filter>Source Files\Feedback\Error</Filter>
+    </ClInclude>
+    <ClInclude Include="FeedbackNotEnoughSpaceRule.h">
+      <Filter>Source Files\Feedback\NotEnoughSpace</Filter>
+    </ClInclude>
+    <ClInclude Include="FeedbackNotEnoughSpaceRuleList.h">
+      <Filter>Source Files\Feedback\NotEnoughSpace</Filter>
+    </ClInclude>
+    <ClInclude Include="EFileError.h">
+      <Filter>Source Files\Feedback\Error</Filter>
+    </ClInclude>
+    <ClInclude Include="EOperationEvent.h">
+      <Filter>Source Files\Feedback\OperationEvent</Filter>
+    </ClInclude>
+    <ClInclude Include="FeedbackOperationEventRuleList.h">
+      <Filter>Source Files\Feedback\OperationEvent</Filter>
+    </ClInclude>
+    <ClInclude Include="FeedbackOperationEventRule.h">
+      <Filter>Source Files\Feedback\OperationEvent</Filter>
+    </ClInclude>
+    <ClInclude Include="FeedbackRules.h">
+      <Filter>Source Files\Feedback</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -506,9 +542,6 @@
     <ClCompile Include="Tests\TestsTConfig.cpp">
       <Filter>Tests</Filter>
     </ClCompile>
-    <ClCompile Include="TFeedbackHandlerWrapper.cpp">
-      <Filter>Source Files\Feedback</Filter>
-    </ClCompile>
     <ClCompile Include="TScopedRunningTimeTracker.cpp">
       <Filter>Source Files\Stats</Filter>
     </ClCompile>
@@ -517,9 +550,6 @@
     </ClCompile>
     <ClCompile Include="IRunningTimeControl.cpp">
       <Filter>Source Files\Stats</Filter>
-    </ClCompile>
-    <ClCompile Include="TFeedbackHandlerBase.cpp">
-      <Filter>Source Files\Feedback</Filter>
     </ClCompile>
     <ClCompile Include="TTaskConfigTracker.cpp">
       <Filter>Source Files\Task Config</Filter>
@@ -668,10 +698,37 @@
     <ClCompile Include="TObsoleteFiles.cpp">
       <Filter>Source Files\Tools</Filter>
     </ClCompile>
-    <ClCompile Include="FeedbackRule.cpp">
+    <ClCompile Include="FeedbackPredefinedRules.cpp">
       <Filter>Source Files\Feedback</Filter>
     </ClCompile>
-    <ClCompile Include="FeedbackRuleList.cpp">
+    <ClCompile Include="FeedbackManager.cpp">
+      <Filter>Source Files\Feedback</Filter>
+    </ClCompile>
+    <ClCompile Include="FeedbackAlreadyExistsRule.cpp">
+      <Filter>Source Files\Feedback\AlreadyExists</Filter>
+    </ClCompile>
+    <ClCompile Include="FeedbackAlreadyExistsRuleList.cpp">
+      <Filter>Source Files\Feedback\AlreadyExists</Filter>
+    </ClCompile>
+    <ClCompile Include="FeedbackErrorRuleList.cpp">
+      <Filter>Source Files\Feedback\Error</Filter>
+    </ClCompile>
+    <ClCompile Include="FeedbackErrorRule.cpp">
+      <Filter>Source Files\Feedback\Error</Filter>
+    </ClCompile>
+    <ClCompile Include="FeedbackNotEnoughSpaceRuleList.cpp">
+      <Filter>Source Files\Feedback\NotEnoughSpace</Filter>
+    </ClCompile>
+    <ClCompile Include="FeedbackNotEnoughSpaceRule.cpp">
+      <Filter>Source Files\Feedback\NotEnoughSpace</Filter>
+    </ClCompile>
+    <ClCompile Include="FeedbackOperationEventRuleList.cpp">
+      <Filter>Source Files\Feedback\OperationEvent</Filter>
+    </ClCompile>
+    <ClCompile Include="FeedbackOperationEventRule.cpp">
+      <Filter>Source Files\Feedback\OperationEvent</Filter>
+    </ClCompile>
+    <ClCompile Include="FeedbackRules.cpp">
       <Filter>Source Files\Feedback</Filter>
     </ClCompile>
   </ItemGroup>

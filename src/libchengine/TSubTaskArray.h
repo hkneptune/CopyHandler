@@ -59,7 +59,7 @@ namespace chengine
 		void Load(const serializer::ISerializerPtr& spSerializer);
 
 		void InitBeforeExec();
-		TSubTaskBase::ESubOperationResult Execute(const IFeedbackHandlerPtr& spFeedbackHandler, bool bRunOnlyEstimationSubTasks);
+		TSubTaskBase::ESubOperationResult Execute(bool bRunOnlyEstimationSubTasks);
 
 		// checks if the fast move already marked all base paths as not be be further processed
 		bool AreAllBasePathsProcessed() const;

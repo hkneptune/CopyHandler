@@ -24,7 +24,7 @@
 namespace chengine
 {
 	TOverlappedReaderWriterFB::TOverlappedReaderWriterFB(const IFilesystemPtr& spFilesystem,
-		const IFeedbackHandlerPtr& spFeedbackHandler,
+		const FeedbackManagerPtr& spFeedbackManager,
 		TWorkerThreadController& rThreadController,
 		TOverlappedThreadPool& rThreadPool,
 		const TFileInfoPtr& spSrcFileInfo,
@@ -47,8 +47,8 @@ namespace chengine
 		m_rThreadController(rThreadController),
 		m_spRange(std::make_shared<TOverlappedProcessorRange>(ullResumePosition)),
 		m_spMemoryPool(spMemoryPool),
-		m_spReader(std::make_shared<TOverlappedReaderFB>(spFilesystem, spFeedbackHandler, rThreadController, spStats, spSrcFileInfo, spLogFileData, spMemoryPool ? spMemoryPool->GetBufferList() : TBufferListPtr(), m_spRange, dwChunkSize, uiMaxConcurrentReads, uiMaxReadAhead, bNoBuffering, bProtectReadOnlyFiles)),
-		m_spWriter(std::make_shared<TOverlappedWriterFB>(spFilesystem, spFeedbackHandler, rThreadController, spStats, spSrcFileInfo, pathDst, spLogFileData, m_spReader->GetFinishedQueue(), m_spRange, spMemoryPool ? spMemoryPool->GetBufferList() : TBufferListPtr(), uiMaxConcurrentWrites, bOnlyCreate, bNoBuffering, bProtectReadOnlyFiles, bUpdateFileAttributesAndTimes))
+		m_spReader(std::make_shared<TOverlappedReaderFB>(spFilesystem, spFeedbackManager, rThreadController, spStats, spSrcFileInfo, spLogFileData, spMemoryPool ? spMemoryPool->GetBufferList() : TBufferListPtr(), m_spRange, dwChunkSize, uiMaxConcurrentReads, uiMaxReadAhead, bNoBuffering, bProtectReadOnlyFiles)),
+		m_spWriter(std::make_shared<TOverlappedWriterFB>(spFilesystem, spFeedbackManager, rThreadController, spStats, spSrcFileInfo, pathDst, spLogFileData, m_spReader->GetFinishedQueue(), m_spRange, spMemoryPool ? spMemoryPool->GetBufferList() : TBufferListPtr(), uiMaxConcurrentWrites, bOnlyCreate, bNoBuffering, bProtectReadOnlyFiles, bUpdateFileAttributesAndTimes))
 	{
 	}
 

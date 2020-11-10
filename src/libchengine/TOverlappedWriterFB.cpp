@@ -29,7 +29,7 @@
 namespace chengine
 {
 	TOverlappedWriterFB::TOverlappedWriterFB(const IFilesystemPtr& spFilesystem,
-		const IFeedbackHandlerPtr& spFeedbackHandler,
+		const FeedbackManagerPtr& spFeedbackManager,
 		TWorkerThreadController& rThreadController,
 		const TSubTaskStatsInfoPtr& spStats,
 		const TFileInfoPtr& spSrcFileInfo,
@@ -58,7 +58,7 @@ namespace chengine
 	{
 		if(!spFilesystem)
 			throw TCoreException(eErr_InvalidArgument, L"spFilesystem is NULL", LOCATION);
-		if(!spFeedbackHandler)
+		if(!spFeedbackManager)
 			throw TCoreException(eErr_InvalidArgument, L"spFeedbackHandler is NULL", LOCATION);
 		if(!spStats)
 			throw TCoreException(eErr_InvalidArgument, L"spStats is NULL", LOCATION);
@@ -74,7 +74,7 @@ namespace chengine
 			throw TCoreException(eErr_InvalidArgument, L"spBuffersToWrite is NULL", LOCATION);
 
 		IFilesystemFilePtr fileDst = spFilesystem->CreateFileObject(IFilesystemFile::eMode_Write, pathDst, bNoBuffering, bProtectReadOnlyFiles);
-		m_spDstFile = std::make_shared<TFilesystemFileFeedbackWrapper>(fileDst, spFeedbackHandler, spLogFileData, rThreadController, spFilesystem);
+		m_spDstFile = std::make_shared<TFilesystemFileFeedbackWrapper>(fileDst, spFeedbackManager, spLogFileData, rThreadController, spFilesystem);
 	}
 
 	TOverlappedWriterFB::~TOverlappedWriterFB()

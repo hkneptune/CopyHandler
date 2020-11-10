@@ -27,13 +27,14 @@ namespace chengine
 	{
 	public:
 		explicit TScopedRunningTimeTrackerPause(TScopedRunningTimeTracker& rRunningTimeTracker);
+		explicit TScopedRunningTimeTrackerPause(TScopedRunningTimeTracker* pRunningTimeTracker);
 		~TScopedRunningTimeTrackerPause();
 
 		TScopedRunningTimeTrackerPause(const TScopedRunningTimeTrackerPause&) = delete;
 		TScopedRunningTimeTrackerPause& operator=(const TScopedRunningTimeTrackerPause&) = delete;
 
 	private:
-		TScopedRunningTimeTracker& m_rRunningTimeTracker;
+		TScopedRunningTimeTracker* m_pRunningTimeTracker;
 	};
 }
 

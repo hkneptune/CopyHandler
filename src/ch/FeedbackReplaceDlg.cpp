@@ -9,14 +9,14 @@
 #include "resource.h"
 #include "../libchengine/TFileInfo.h"
 #include "StringHelpers.h"
+#include "../libchengine/FeedbackPredefinedRules.h"
 
-// CFeedbackReplaceDlg dialog
+using namespace chengine;
 
 IMPLEMENT_DYNAMIC(CFeedbackReplaceDlg, ictranslate::CLanguageDialog)
 
 CFeedbackReplaceDlg::CFeedbackReplaceDlg(const chengine::TFileInfo& spSrcFile, const chengine::TFileInfo& spDstFile, CWnd* pParent /*=nullptr*/)
 	: ictranslate::CLanguageDialog(IDD_FEEDBACK_REPLACE_DIALOG, pParent),
-	m_bAllItems(FALSE),
 	m_rSrcFile(spSrcFile),
 	m_rDstFile(spDstFile)
 {
@@ -231,92 +231,80 @@ void CFeedbackReplaceDlg::OnBnClickedCancelButton()
 
 void CFeedbackReplaceDlg::OnBnMassReplace()
 {
-	CString str;
 	switch (m_btnMassReplace.m_nMenuResult)
 	{
 	case ID_FEEDBACK_REPLACE_ALLEXISTINGFILES:
-		str = L"Replace all existing files";
+		m_feedbackRules = FeedbackPredefinedRules::CreateAlreadyExistsRule(EPredefinedRuleCondition::eCondition_ApplyToAll, eResult_Overwrite);
 		break;
 	case ID_FEEDBACK_REPLACE_FILESWITHDIFFERENTDATESORSIZES:
-		str = L"Replace files with different dates or sizes";
+		m_feedbackRules = FeedbackPredefinedRules::CreateAlreadyExistsRule(EPredefinedRuleCondition::eCondition_WhenDifferentDateOrSize, eResult_Overwrite);
 		break;
 	case ID_FEEDBACK_REPLACE_OLDERFILESWITHNEWERVERSIONS:
-		str = L"Replace older files with newer ones";
+		m_feedbackRules = FeedbackPredefinedRules::CreateAlreadyExistsRule(EPredefinedRuleCondition::eCondition_WhenNewerThanDst, eResult_Overwrite);
 		break;
 	case ID_FEEDBACK_REPLACE_NEWERFILESWITHOLDERVERSIONS:
-		str = L"Replace newer files with older ones";
-		break;
-	default:
-		str = L"Default";
+		m_feedbackRules = FeedbackPredefinedRules::CreateAlreadyExistsRule(EPredefinedRuleCondition::eCondition_WhenOlderThanDst, eResult_Overwrite);
 		break;
 	}
-	MessageBox(str);
+
+	EndDialog(chengine::EFeedbackResult::eResult_Overwrite);
 }
 
 void CFeedbackReplaceDlg::OnBnMassRename()
 {
-	CString str;
 	switch (m_btnMassRename.m_nMenuResult)
 	{
 	case ID_FEEDBACK_RENAME_WHENDESTIONATIONFILEEXISTS:
-		str = L"Rename when destination file exists";
+		m_feedbackRules = FeedbackPredefinedRules::CreateAlreadyExistsRule(EPredefinedRuleCondition::eCondition_ApplyToAll, eResult_Rename);
 		break;
 	case ID_FEEDBACK_RENAME_WHENDATEORSIZEDIFFERS:
-		str = L"Rename when size or date differs";
+		m_feedbackRules = FeedbackPredefinedRules::CreateAlreadyExistsRule(EPredefinedRuleCondition::eCondition_WhenDifferentDateOrSize, eResult_Rename);
 		break;
 	case ID_FEEDBACK_RENAME_WHENDATEANDSZEARESAME:
-		str = L"Rename when date and size are same";
+		m_feedbackRules = FeedbackPredefinedRules::CreateAlreadyExistsRule(EPredefinedRuleCondition::eCondition_WhenSameDateAndSize, eResult_Rename);
 		break;
 	case ID_FEEDBACK_RENAME_WHENNEWERTHANDESTINATION:
-		str = L"Rename when newer than destination";
+		m_feedbackRules = FeedbackPredefinedRules::CreateAlreadyExistsRule(EPredefinedRuleCondition::eCondition_WhenNewerThanDst, eResult_Rename);
 		break;
 	case ID_FEEDBACK_RENAME_WHENOLDERTHANDESTINATION:
-		str = L"Rename when older than destination";
-		break;
-	default:
-		str = L"Default";
+		m_feedbackRules = FeedbackPredefinedRules::CreateAlreadyExistsRule(EPredefinedRuleCondition::eCondition_WhenOlderThanDst, eResult_Rename);
 		break;
 	}
-	MessageBox(str);
+
+	EndDialog(chengine::EFeedbackResult::eResult_Rename);
 }
 
 void CFeedbackReplaceDlg::OnBnMassResume()
 {
-	CString str;
 	switch (m_btnMassResume.m_nMenuResult)
 	{
 	case ID_FEEDBACK_RESUME_WHENFILEBIGGERTHANDESTINATION:
-		str = L"Resume when file is bigger than destination";
-		break;
-	default:
-		str = L"Default";
+		m_feedbackRules = FeedbackPredefinedRules::CreateAlreadyExistsRule(EPredefinedRuleCondition::eCondition_WhenBiggerThanDst, eResult_CopyRest);
 		break;
 	}
-	MessageBox(str);
+
+	EndDialog(chengine::EFeedbackResult::eResult_CopyRest);
 }
 
 void CFeedbackReplaceDlg::OnBnMassSkip()
 {
-	CString str;
 	switch (m_btnMassSkip.m_nMenuResult)
 	{
 	case ID_FEEDBACK_SKIP_ALLEXISTINGDESTINATIONFILES:
-		str = L"Skip all files already existing in destination dir";
+		m_feedbackRules = FeedbackPredefinedRules::CreateAlreadyExistsRule(EPredefinedRuleCondition::eCondition_ApplyToAll, eResult_Skip);
 		break;
 	case ID_FEEDBACK_SKIP_ALLFILESWITHSAMEDATESANDSIZES:
-		str = L"Skip files with same date and size";
+		m_feedbackRules = FeedbackPredefinedRules::CreateAlreadyExistsRule(EPredefinedRuleCondition::eCondition_WhenSameDateAndSize, eResult_Skip);
 		break;
 	case ID_FEEDBACK_SKIP_FILESTHATAREOLDERTHANDESTINATION:
-		str = L"Skip files that are older than existing destination";
+		m_feedbackRules = FeedbackPredefinedRules::CreateAlreadyExistsRule(EPredefinedRuleCondition::eCondition_WhenOlderThanDst, eResult_Skip);
 		break;
 	case ID_FEEDBACK_SKIP_FILESTHATARENEWERTHANDESTINATION:
-		str = L"Skip files that are newer than destination";
-		break;
-	default:
-		str = L"Default";
+		m_feedbackRules = FeedbackPredefinedRules::CreateAlreadyExistsRule(EPredefinedRuleCondition::eCondition_WhenNewerThanDst, eResult_Skip);
 		break;
 	}
-	MessageBox(str);
+
+	EndDialog(chengine::EFeedbackResult::eResult_Skip);
 }
 
 void CFeedbackReplaceDlg::OnCancel()
@@ -325,9 +313,9 @@ void CFeedbackReplaceDlg::OnCancel()
 	EndDialog(chengine::EFeedbackResult::eResult_Cancel);
 }
 
-bool CFeedbackReplaceDlg::IsApplyToAllItemsChecked() const
+const chengine::FeedbackAlreadyExistsRuleList& CFeedbackReplaceDlg::GetRules() const
 {
-	return m_bAllItems != FALSE;
+	return m_feedbackRules;
 }
 
 void CFeedbackReplaceDlg::OnGetMinMaxInfo(MINMAXINFO* lpMMI)

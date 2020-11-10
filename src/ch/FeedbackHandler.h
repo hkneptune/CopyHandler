@@ -19,24 +19,20 @@
 #ifndef __FEEDBACKHANDLER_H__
 #define __FEEDBACKHANDLER_H__
 
-#include "../libchengine/TFeedbackHandlerBase.h"
+#include "../libchengine/IFeedbackHandler.h"
 
 namespace string
 {
 	class TString;
 }
 
-class CFeedbackHandler : public chengine::TFeedbackHandlerBase
+class CFeedbackHandler : public chengine::IFeedbackHandler
 {
 public:
-	CFeedbackHandler();
-	virtual ~CFeedbackHandler();
-
-	chengine::TFeedbackResult FileError(const string::TString& strSrcPath, const string::TString& strDstPath, chengine::EFileError eFileError, unsigned long ulError) override;
-	chengine::TFeedbackResult FileAlreadyExists(const chengine::TFileInfo& spSrcFileInfo, const chengine::TFileInfo& spDstFileInfo) override;
-	chengine::TFeedbackResult NotEnoughSpace(const string::TString& strSrcPath, const string::TString& strDstPath, unsigned long long ullRequiredSize) override;
-	chengine::TFeedbackResult OperationFinished() override;
-	chengine::TFeedbackResult OperationError() override;
+	chengine::EFeedbackResult FileError(const string::TString& strSrcPath, const string::TString& strDstPath, chengine::EFileError eFileError, unsigned long ulError, chengine::FeedbackErrorRuleList& rNewRules) override;
+	chengine::EFeedbackResult FileAlreadyExists(const chengine::TFileInfo& spSrcFileInfo, const chengine::TFileInfo& spDstFileInfo, chengine::FeedbackAlreadyExistsRuleList& rNewRules) override;
+	chengine::EFeedbackResult NotEnoughSpace(const string::TString& strSrcPath, const string::TString& strDstPath, unsigned long long ullRequiredSize, chengine::FeedbackNotEnoughSpaceRuleList& rNewRules) override;
+	chengine::EFeedbackResult OperationEvent(chengine::EOperationEvent eEvent, chengine::FeedbackOperationEventRuleList& rNewRules) override;
 
 protected:
 	friend class CFeedbackHandlerFactory;

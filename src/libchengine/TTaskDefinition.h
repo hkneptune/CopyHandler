@@ -27,6 +27,8 @@
 #include "TConfig.h"
 #include "TFileFiltersArray.h"
 #include "../libchcore/TPathContainer.h"
+#include "FeedbackAlreadyExistsRuleList.h"
+#include "FeedbackRules.h"
 
 namespace chengine
 {
@@ -55,6 +57,11 @@ namespace chengine
 		const TFileFiltersArray& GetFilters() const;
 		TFileFiltersArray& GetFilters();
 		void SetFilters(const TFileFiltersArray& rFilters);
+
+		// feedback rules
+		const FeedbackRules& GetFeedbackRules() const;
+		FeedbackRules& GetFeedbackRules();
+		void SetFeedbackRules(const FeedbackRules& rFeedbackRules);
 
 		// Destination path
 		void SetDestinationPath(const chcore::TSmartPath& pathDestination);
@@ -86,6 +93,7 @@ namespace chengine
 		chcore::TPathContainer m_vSourcePaths;
 		chcore::TSmartPath m_pathDestinationPath;
 		TFileFiltersArray m_afFilters;
+		FeedbackRules m_feedbackRules;
 
 		TOperationPlan m_tOperationPlan;			///< Describes the operation along with sub-operations to be performed on the task input data
 

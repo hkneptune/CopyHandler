@@ -30,78 +30,63 @@ using namespace chcore;
 using namespace chengine;
 using namespace string;
 
-CFeedbackHandler::CFeedbackHandler() :
-	TFeedbackHandlerBase()
+chengine::EFeedbackResult CFeedbackHandler::FileError(const TString& strSrcPath, const TString& strDstPath, EFileError /*eFileError*/, unsigned long ulError, FeedbackErrorRuleList& rNewRules)
 {
-}
-
-CFeedbackHandler::~CFeedbackHandler()
-{
-}
-
-TFeedbackResult CFeedbackHandler::FileError(const TString& strSrcPath, const TString& strDstPath, EFileError /*eFileError*/, unsigned long ulError)
-{
-	EFeedbackResult eResult = eResult_Unknown;
-	if(HasFileErrorPermanentResponse(eResult))
-		return TFeedbackResult(eResult, true);
-
 	CFeedbackFileErrorDlg dlg(strSrcPath.c_str(), strDstPath.c_str(), ulError);
-	eResult = (EFeedbackResult)dlg.DoModal();
+	EFeedbackResult eResult = (EFeedbackResult)dlg.DoModal();
 
-	if (dlg.m_bAllItems)
-		SetFileErrorPermanentResponse(eResult);
+	if(!dlg.GetRules().IsEmpty())
+		rNewRules = dlg.GetRules();
 
-	return TFeedbackResult(eResult, false);
+	return eResult;
 }
 
-TFeedbackResult CFeedbackHandler::FileAlreadyExists(const TFileInfo& spSrcFileInfo, const TFileInfo& spDstFileInfo)
+chengine::EFeedbackResult CFeedbackHandler::FileAlreadyExists(const TFileInfo& spSrcFileInfo, const TFileInfo& spDstFileInfo, FeedbackAlreadyExistsRuleList& rNewRules)
 {
-	EFeedbackResult eResult = eResult_Unknown;
-	if(HasFileAlreadyExistsPermanentResponse(eResult))
-		return TFeedbackResult(eResult, true);
-
 	CFeedbackReplaceDlg dlg(spSrcFileInfo, spDstFileInfo);
-	eResult = (EFeedbackResult)dlg.DoModal();
+	EFeedbackResult eResult = (EFeedbackResult)dlg.DoModal();
 
-	if(dlg.IsApplyToAllItemsChecked())
-		SetFileAlreadyExistsPermanentResponse(eResult);
+	if(!dlg.GetRules().IsEmpty())
+		rNewRules = dlg.GetRules();
 
-	return TFeedbackResult(eResult, false);
+	return eResult;
 }
 
-TFeedbackResult CFeedbackHandler::NotEnoughSpace(const TString& strSrcPath, const TString& strDstPath, unsigned long long ullRequiredSize)
+chengine::EFeedbackResult CFeedbackHandler::NotEnoughSpace(const TString& strSrcPath, const TString& strDstPath, unsigned long long ullRequiredSize, FeedbackNotEnoughSpaceRuleList& rNewRules)
 {
-	EFeedbackResult eResult = eResult_Unknown;
-	if(HasNotEnoughSpacePermanentResponse(eResult))
-		return TFeedbackResult(eResult, true);
-
 	CFeedbackNotEnoughSpaceDlg dlg(ullRequiredSize, strSrcPath.c_str(), strDstPath.c_str());
-	eResult = (EFeedbackResult) dlg.DoModal();
+	EFeedbackResult eResult = (EFeedbackResult) dlg.DoModal();
 
-	if (dlg.m_bAllItems)
-		SetNotEnoughSpacePermanentResponse(eResult);
+	if(!dlg.GetRules().IsEmpty())
+		rNewRules = dlg.GetRules();
 
-	return TFeedbackResult(eResult, false);
+	return eResult;
 }
 
-TFeedbackResult CFeedbackHandler::OperationFinished()
+chengine::EFeedbackResult CFeedbackHandler::OperationEvent(EOperationEvent eEvent, FeedbackOperationEventRuleList&)
 {
-	if (GetPropValue<PP_SNDPLAYSOUNDS>(GetConfig()))
+	switch(eEvent)
 	{
-		CString strPath = GetPropValue<PP_SNDFINISHEDSOUNDPATH>(GetConfig());
-		PlaySound(GetApp().ExpandPath(strPath), nullptr, SND_FILENAME | SND_ASYNC);
+	case eOperationEvent_Finished:
+	{
+		if(GetPropValue<PP_SNDPLAYSOUNDS>(GetConfig()))
+		{
+			CString strPath = GetPropValue<PP_SNDFINISHEDSOUNDPATH>(GetConfig());
+			PlaySound(GetApp().ExpandPath(strPath), nullptr, SND_FILENAME | SND_ASYNC);
+		}
+		break;
+	}
+	case eOperationEvent_Error:
+	{
+		if(GetPropValue<PP_SNDPLAYSOUNDS>(GetConfig()))
+		{
+			CString strPath = GetPropValue<PP_SNDERRORSOUNDPATH>(GetConfig());
+			PlaySound(GetApp().ExpandPath(strPath), nullptr, SND_FILENAME | SND_ASYNC);
+		}
+
+		break;
+	}
 	}
 
-	return TFeedbackResult(eResult_Unknown, true);
-}
-
-TFeedbackResult CFeedbackHandler::OperationError()
-{
-	if (GetPropValue<PP_SNDPLAYSOUNDS>(GetConfig()))
-	{
-		CString strPath = GetPropValue<PP_SNDERRORSOUNDPATH>(GetConfig());
-		PlaySound(GetApp().ExpandPath(strPath), nullptr, SND_FILENAME | SND_ASYNC);
-	}
-
-	return TFeedbackResult(eResult_Unknown, true);
+	return eResult_Unknown;
 }

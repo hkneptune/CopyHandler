@@ -25,6 +25,16 @@ CFeedbackFileErrorDlg::~CFeedbackFileErrorDlg()
 {
 }
 
+bool CFeedbackFileErrorDlg::IsApplyToAllItemsChecked() const
+{
+	return m_bAllItems;
+}
+
+const chengine::FeedbackErrorRuleList& CFeedbackFileErrorDlg::GetRules() const
+{
+	return m_feedbackRules;
+}
+
 void CFeedbackFileErrorDlg::DoDataExchange(CDataExchange* pDX)
 {
 	ictranslate::CLanguageDialog::DoDataExchange(pDX);

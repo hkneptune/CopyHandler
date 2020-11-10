@@ -33,7 +33,7 @@ namespace chengine
 	{
 	public:
 		TOverlappedWriterFB(const IFilesystemPtr& spFilesystem,
-			const IFeedbackHandlerPtr& spFeedbackHandler,
+			const FeedbackManagerPtr& spFeedbackManager,
 		    TWorkerThreadController& rThreadController,
 			const TSubTaskStatsInfoPtr& spStats,
 			const TFileInfoPtr& spSrcFileInfo,

@@ -42,6 +42,15 @@ CFeedbackNotEnoughSpaceDlg::CFeedbackNotEnoughSpaceDlg(unsigned long long ullSiz
 	m_vstrFiles.push_back(pszSrcPath);
 }
 
+bool CFeedbackNotEnoughSpaceDlg::IsApplyToAllItemsChecked() const
+{
+	return m_bAllItems;
+}
+
+const chengine::FeedbackNotEnoughSpaceRuleList& CFeedbackNotEnoughSpaceDlg::GetRules() const
+{
+	return m_feedbackRules;
+}
 
 void CFeedbackNotEnoughSpaceDlg::DoDataExchange(CDataExchange* pDX)
 {

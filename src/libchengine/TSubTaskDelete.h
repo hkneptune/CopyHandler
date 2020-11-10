@@ -39,7 +39,7 @@ namespace chengine
 		void Reset() override;
 
 		void InitBeforeExec() override;
-		ESubOperationResult Exec(const IFeedbackHandlerPtr& spFeedbackHandler) override;
+		ESubOperationResult Exec() override;
 		ESubOperationType GetSubOperationType() const override { return eSubOperation_Deleting; }
 
 		void Store(const serializer::ISerializerPtr& spSerializer) const override;

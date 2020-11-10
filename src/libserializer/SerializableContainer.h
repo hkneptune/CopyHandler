@@ -62,7 +62,27 @@ namespace serializer
 			return false;
 		}
 
+		bool InsertAt(size_t stIndex, const T& rNewEntry)
+		{
+			BOOST_ASSERT(stIndex <= m_vEntries.size());
+			if(stIndex <= m_vEntries.size())
+			{
+				m_vEntries.insert(m_vEntries.begin() + stIndex, rNewEntry);
+				return true;
+			}
+
+			return false;
+		}
+
 		const T& GetAt(size_t stIndex) const
+		{
+			if(stIndex >= m_vEntries.size())
+				throw std::out_of_range("stIndex is out of range");
+
+			return m_vEntries.at(stIndex);
+		}
+
+		T& GetAt(size_t stIndex)
 		{
 			if(stIndex >= m_vEntries.size())
 				throw std::out_of_range("stIndex is out of range");

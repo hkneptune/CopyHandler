@@ -21,7 +21,7 @@
 
 namespace chengine
 {
-	enum class EFileError
+	enum EFileError
 	{
 		eDeleteError,		///< Problem occurred when tried to delete the fs object
 		eSeekError,			///< Problem occurred when tried to set file pointer

@@ -1,5 +1,5 @@
 #include "stdafx.h"
-#include "FeedbackRule.h"
+#include "FeedbackAlreadyExistsRule.h"
 #include "../libstring/TString.h"
 #include "../libstring/TStringArray.h"
 
@@ -8,7 +8,7 @@ using namespace string;
 
 namespace chengine
 {
-	FeedbackRule::FeedbackRule() :
+	FeedbackAlreadyExistsRule::FeedbackAlreadyExistsRule() :
 		m_bUseMask(m_setModifications, false),
 		m_spaMask(m_setModifications),
 		m_bUseExcludeMask(m_setModifications, false),
@@ -19,12 +19,12 @@ namespace chengine
 		m_cmpSize(m_setModifications, eCmp_Equal),
 		m_eResult(m_setModifications, eResult_Unknown)
 	{
-		m_setModifications[FeedbackRuleEnum::eMod_Added] = true;
+		m_setModifications[FeedbackAlreadyExistsRuleEnum::eMod_Added] = true;
 	}
 
 
-	FeedbackRule::FeedbackRule(const FeedbackRule& rSrc) :
-		serializer::SerializableObject<FeedbackRuleEnum::eMod_Last>(rSrc),
+	FeedbackAlreadyExistsRule::FeedbackAlreadyExistsRule(const FeedbackAlreadyExistsRule& rSrc) :
+		serializer::SerializableObject<FeedbackAlreadyExistsRuleEnum::eMod_Last>(rSrc),
 		m_bUseMask(rSrc.m_bUseMask, m_setModifications),
 		m_spaMask(rSrc.m_spaMask, m_setModifications),
 		m_bUseExcludeMask(rSrc.m_bUseExcludeMask, m_setModifications),
@@ -37,7 +37,7 @@ namespace chengine
 	{
 	}
 
-	FeedbackRule& FeedbackRule::operator=(const FeedbackRule& rSrc)
+	FeedbackAlreadyExistsRule& FeedbackAlreadyExistsRule::operator=(const FeedbackAlreadyExistsRule& rSrc)
 	{
 		if(this == &rSrc)
 			return *this;
@@ -49,7 +49,7 @@ namespace chengine
 		return *this;
 	}
 
-	bool FeedbackRule::operator==(const FeedbackRule& rSrc) const
+	bool FeedbackAlreadyExistsRule::operator==(const FeedbackAlreadyExistsRule& rSrc) const
 	{
 		if(m_bUseMask != rSrc.m_bUseMask)
 			return false;
@@ -78,12 +78,12 @@ namespace chengine
 		return true;
 	}
 
-	bool FeedbackRule::operator!=(const FeedbackRule& rSrc) const
+	bool FeedbackAlreadyExistsRule::operator!=(const FeedbackAlreadyExistsRule& rSrc) const
 	{
 		return !operator==(rSrc);
 	}
 
-	void FeedbackRule::SetData(const FeedbackRule& rSrc)
+	void FeedbackAlreadyExistsRule::SetData(const FeedbackAlreadyExistsRule& rSrc)
 	{
 		if(this == &rSrc)
 			return;
@@ -99,29 +99,29 @@ namespace chengine
 		m_eResult = rSrc.m_eResult;
 	}
 
-	bool FeedbackRule::Matches(const TFileInfoPtr& spSrcFile, const TFileInfoPtr& spDstFile, EFeedbackResult& eResult) const
+	bool FeedbackAlreadyExistsRule::Matches(const TFileInfo& rSrcFile, const TFileInfo& rDstFile, EFeedbackResult& eResult) const
 	{
 		eResult = eResult_Unknown;
 
 		if(m_bUseMask)
 		{
-			if(!m_spaMask.Get().MatchesAny(spDstFile->GetFullFilePath().GetFileName().ToString()))
+			if(!m_spaMask.Get().MatchesAny(rDstFile.GetFullFilePath().GetFileName().ToString()))
 				return false;
 		}
 		if(m_bUseExcludeMask)
 		{
-			if(m_spaExcludeMask.Get().MatchesAny(spDstFile->GetFullFilePath().GetFileName().ToString()))
+			if(m_spaExcludeMask.Get().MatchesAny(rDstFile.GetFullFilePath().GetFileName().ToString()))
 				return false;
 		}
 		if(m_bUseDateCompare)
 		{
-			if(!CompareByType(spSrcFile->GetLastWriteTime(), spDstFile->GetLastWriteTime(), m_cmpLastModified))
+			if(!CompareByType(rSrcFile.GetLastWriteTime(), rDstFile.GetLastWriteTime(), m_cmpLastModified))
 				return false;
 		}
 
 		if(m_bUseSizeCompare)
 		{
-			if(!CompareByType(spSrcFile->GetLength64(), spDstFile->GetLength64(), m_cmpSize))
+			if(!CompareByType(rSrcFile.GetLength64(), rDstFile.GetLength64(), m_cmpSize))
 				return false;
 		}
 
@@ -129,7 +129,7 @@ namespace chengine
 		return true;
 	}
 
-	void FeedbackRule::InitColumns(serializer::IColumnsDefinition& rColumns)
+	void FeedbackAlreadyExistsRule::InitColumns(serializer::IColumnsDefinition& rColumns)
 	{
 		rColumns.AddColumn(_T("id"), ColumnType<object_id_t>::value);
 		rColumns.AddColumn(_T("use_mask"), IColumnsDefinition::eType_bool);
@@ -143,41 +143,41 @@ namespace chengine
 		rColumns.AddColumn(_T("result"), IColumnsDefinition::eType_int);
 	}
 
-	void FeedbackRule::Store(const ISerializerContainerPtr& spContainer) const
+	void FeedbackAlreadyExistsRule::Store(const ISerializerContainerPtr& spContainer) const
 	{
-		bool bAdded = m_setModifications[FeedbackRuleEnum::eMod_Added];
+		bool bAdded = m_setModifications[FeedbackAlreadyExistsRuleEnum::eMod_Added];
 		if(m_setModifications.any())
 		{
 			ISerializerRowData& rRow = spContainer->GetRow(m_oidObjectID, bAdded);
 
-			if(bAdded || m_setModifications[FeedbackRuleEnum::eMod_UseMask])
+			if(bAdded || m_setModifications[FeedbackAlreadyExistsRuleEnum::eMod_UseMask])
 				rRow.SetValue(_T("use_mask"), m_bUseMask);
-			if(bAdded || m_setModifications[FeedbackRuleEnum::eMod_Mask])
+			if(bAdded || m_setModifications[FeedbackAlreadyExistsRuleEnum::eMod_Mask])
 				rRow.SetValue(_T("mask"), GetCombinedMask());
 
-			if(bAdded || m_setModifications[FeedbackRuleEnum::eMod_UseExcludeMask])
+			if(bAdded || m_setModifications[FeedbackAlreadyExistsRuleEnum::eMod_UseExcludeMask])
 				rRow.SetValue(_T("use_exclude_mask"), m_bUseExcludeMask);
-			if(bAdded || m_setModifications[FeedbackRuleEnum::eMod_ExcludeMask])
+			if(bAdded || m_setModifications[FeedbackAlreadyExistsRuleEnum::eMod_ExcludeMask])
 				rRow.SetValue(_T("exclude_mask"), GetCombinedExcludeMask());
 
-			if(bAdded || m_setModifications[FeedbackRuleEnum::eMod_UseDateCompare])
+			if(bAdded || m_setModifications[FeedbackAlreadyExistsRuleEnum::eMod_UseDateCompare])
 				rRow.SetValue(_T("use_date_compare"), m_bUseDateCompare);
-			if(bAdded || m_setModifications[FeedbackRuleEnum::eMod_DateCompare])
+			if(bAdded || m_setModifications[FeedbackAlreadyExistsRuleEnum::eMod_DateCompare])
 				rRow.SetValue(_T("date_compare_type"), m_cmpLastModified);
 
-			if(bAdded || m_setModifications[FeedbackRuleEnum::eMod_UseSizeCompare])
+			if(bAdded || m_setModifications[FeedbackAlreadyExistsRuleEnum::eMod_UseSizeCompare])
 				rRow.SetValue(_T("use_size_compare"), m_bUseSizeCompare);
-			if(bAdded || m_setModifications[FeedbackRuleEnum::eMod_SizeCompare])
+			if(bAdded || m_setModifications[FeedbackAlreadyExistsRuleEnum::eMod_SizeCompare])
 				rRow.SetValue(_T("size_compare_type"), m_cmpSize);
 
-			if(bAdded || m_setModifications[FeedbackRuleEnum::eMod_Result])
+			if(bAdded || m_setModifications[FeedbackAlreadyExistsRuleEnum::eMod_Result])
 				rRow.SetValue(_T("result"), m_eResult);
 
 			m_setModifications.reset();
 		}
 	}
 
-	void FeedbackRule::Load(const ISerializerRowReaderPtr& spRowReader)
+	void FeedbackAlreadyExistsRule::Load(const ISerializerRowReaderPtr& spRowReader)
 	{
 		TString strMask;
 
@@ -200,7 +200,7 @@ namespace chengine
 		m_setModifications.reset();
 	}
 
-	void FeedbackRule::StoreInConfig(TConfig& rConfig) const
+	void FeedbackAlreadyExistsRule::StoreInConfig(TConfig& rConfig) const
 	{
 		SetConfigValue(rConfig, _T("IncludeMask.Use"), m_bUseMask.Get());
 		SetConfigValue(rConfig, _T("IncludeMask.MaskList.Mask"), m_spaMask.Get().ToSerializedStringArray());
@@ -211,10 +211,13 @@ namespace chengine
 		SetConfigValue(rConfig, _T("DateCompare.Use"), m_bUseDateCompare.Get());
 		SetConfigValue(rConfig, _T("DateCompare.CompareType"), m_cmpLastModified.Get());
 
+		SetConfigValue(rConfig, _T("SizeCompare.Use"), m_bUseDateCompare.Get());
+		SetConfigValue(rConfig, _T("SizeCompare.CompareType"), m_cmpLastModified.Get());
+
 		SetConfigValue(rConfig, _T("Result"), m_eResult.Get());
 	}
 
-	void FeedbackRule::ReadFromConfig(const TConfig& rConfig)
+	void FeedbackAlreadyExistsRule::ReadFromConfig(const TConfig& rConfig)
 	{
 		if(!GetConfigValue(rConfig, _T("IncludeMask.Use"), m_bUseMask.Modify()))
 			m_bUseMask = false;
@@ -245,87 +248,122 @@ namespace chengine
 			m_eResult = eResult_Unknown;
 	}
 
-	void FeedbackRule::SetUseMask(bool bUseMask)
+	bool FeedbackAlreadyExistsRule::HaveSameCondition(const FeedbackAlreadyExistsRule& rSrc) const
+	{
+		if(m_bUseMask != rSrc.m_bUseMask)
+			return false;
+		else if(m_bUseMask == true && m_spaMask != rSrc.m_spaMask)
+			return false;
+
+		if(m_bUseExcludeMask != rSrc.m_bUseExcludeMask)
+			return false;
+		else if(m_bUseExcludeMask == true && m_spaExcludeMask != rSrc.m_spaExcludeMask)
+			return false;
+
+		if(m_bUseDateCompare != rSrc.m_bUseDateCompare)
+			return false;
+		else if(m_bUseDateCompare == true && m_cmpLastModified != rSrc.m_cmpLastModified)
+			return false;
+
+		if(m_bUseSizeCompare != rSrc.m_bUseSizeCompare)
+			return false;
+		else if(m_bUseSizeCompare == true && m_cmpSize != rSrc.m_cmpSize)
+			return false;
+
+		return true;
+	}
+
+	void FeedbackAlreadyExistsRule::SetUseMask(bool bUseMask)
 	{
 		m_bUseMask = bUseMask;
 	}
 
-	bool FeedbackRule::GetUseMask() const
+	bool FeedbackAlreadyExistsRule::GetUseMask() const
 	{
 		return m_bUseMask;
 	}
 
-	bool FeedbackRule::GetUseExcludeMask() const
+	bool FeedbackAlreadyExistsRule::GetUseExcludeMask() const
 	{
 		return m_bUseExcludeMask;
 	}
 
-	void FeedbackRule::SetUseExcludeMask(bool bUseExcludeMask)
+	void FeedbackAlreadyExistsRule::SetUseExcludeMask(bool bUseExcludeMask)
 	{
 		m_bUseExcludeMask = bUseExcludeMask;
 	}
 
-	bool FeedbackRule::GetUseDateCompare() const
+	bool FeedbackAlreadyExistsRule::GetUseDateCompare() const
 	{
 		return m_bUseDateCompare;
 	}
 
-	void FeedbackRule::SetUseDateCompare(bool bUseDateCompare)
+	void FeedbackAlreadyExistsRule::SetUseDateCompare(bool bUseDateCompare)
 	{
 		m_bUseDateCompare = bUseDateCompare;
 	}
 
-	ECompareType FeedbackRule::GetDateCompareType() const
+	ECompareType FeedbackAlreadyExistsRule::GetDateCompareType() const
 	{
 		return m_cmpLastModified;
 	}
 
-	void FeedbackRule::SetDateCompareType(ECompareType eCmpType)
+	void FeedbackAlreadyExistsRule::SetDateCompareType(ECompareType eCmpType)
 	{
 		m_cmpLastModified = eCmpType;
 	}
 
-	bool FeedbackRule::GetUseSizeCompare() const
+	bool FeedbackAlreadyExistsRule::GetUseSizeCompare() const
 	{
 		return m_bUseSizeCompare;
 	}
 
-	void FeedbackRule::SetUseSizeCompare(bool bUseSizeCompare)
+	void FeedbackAlreadyExistsRule::SetUseSizeCompare(bool bUseSizeCompare)
 	{
 		m_bUseSizeCompare = bUseSizeCompare;
 	}
 
-	ECompareType FeedbackRule::GetSizeCompareType() const
+	ECompareType FeedbackAlreadyExistsRule::GetSizeCompareType() const
 	{
 		return m_cmpSize;
 	}
 
-	void FeedbackRule::SetSizeCompareType(ECompareType eCmpType)
+	void FeedbackAlreadyExistsRule::SetSizeCompareType(ECompareType eCmpType)
 	{
 		m_cmpSize = eCmpType;
 	}
 
-	TString FeedbackRule::GetCombinedMask() const
+	TString FeedbackAlreadyExistsRule::GetCombinedMask() const
 	{
 		return m_spaMask.Get().ToString();
 	}
 
-	void FeedbackRule::SetCombinedMask(const TString& strMask)
+	void FeedbackAlreadyExistsRule::SetCombinedMask(const TString& strMask)
 	{
 		TStringPatternArray& rPatterns = m_spaMask.Modify();
 		rPatterns.Clear();
 		rPatterns.FromString(strMask);
 	}
 
-	TString FeedbackRule::GetCombinedExcludeMask() const
+	TString FeedbackAlreadyExistsRule::GetCombinedExcludeMask() const
 	{
 		return m_spaExcludeMask.Get().ToString();
 	}
 
-	void FeedbackRule::SetCombinedExcludeMask(const TString& strMask)
+	void FeedbackAlreadyExistsRule::SetCombinedExcludeMask(const TString& strMask)
 	{
 		TStringPatternArray& rPatterns = m_spaExcludeMask.Modify();
 		rPatterns.Clear();
 		rPatterns.FromString(strMask);
+	}
+
+	chengine::EFeedbackResult FeedbackAlreadyExistsRule::GetResult() const
+	{
+		return m_eResult;
+	}
+
+	void FeedbackAlreadyExistsRule::SetResult(EFeedbackResult eResult)
+	{
+		m_eResult = eResult;
 	}
 }
