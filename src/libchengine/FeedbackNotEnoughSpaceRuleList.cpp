@@ -53,7 +53,7 @@ namespace chengine
 	{
 		IColumnsDefinition& rColumns = spContainer->GetColumnsDefinition();
 		if(rColumns.IsEmpty())
-			TFileFilter::InitColumns(rColumns);
+			FeedbackNotEnoughSpaceRule::InitColumns(rColumns);
 	}
 
 	void FeedbackNotEnoughSpaceRuleList::StoreInConfig(TConfig& rConfig, PCTSTR pszNodeName) const

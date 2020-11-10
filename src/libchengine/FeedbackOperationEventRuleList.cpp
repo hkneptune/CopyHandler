@@ -53,7 +53,7 @@ namespace chengine
 	{
 		IColumnsDefinition& rColumns = spContainer->GetColumnsDefinition();
 		if(rColumns.IsEmpty())
-			TFileFilter::InitColumns(rColumns);
+			FeedbackOperationEventRule::InitColumns(rColumns);
 	}
 
 	void FeedbackOperationEventRuleList::StoreInConfig(TConfig& rConfig, PCTSTR pszNodeName) const
