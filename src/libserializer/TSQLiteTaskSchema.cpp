@@ -125,13 +125,27 @@ namespace serializer
 			_T("buffer_index INT NOT NULL, current_path varchar(32768) NOT NULL, ci_silent_resume boolean NOT NULL)"));
 		tStatement.Step();
 
-		tStatement.Prepare(_T("CREATE TABLE feedback(id BIGINT UNIQUE, file_error INT NOT NULL, file_already_exists INT NOT NULL, not_enough_space INT NOT NULL, operation_finished INT NOT NULL, operation_error INT NOT NULL)"));
-		tStatement.Step();
-
 		tStatement.Prepare(_T("CREATE TABLE feedback_already_exists(id BIGINT UNIQUE, use_mask INT NOT NULL, mask varchar(32768) NOT NULL, ")
 			_T("use_exclude_mask INT NOT NULL, exclude_mask varchar(32768) NOT NULL, ")
 			_T("use_date_compare INT NOT NULL, date_compare_type INT NOT NULL, ")
 			_T("use_size_compare INT NOT NULL, size_compare_type INT NOT NULL, ")
+			_T("result INT NOT NULL)"));
+		tStatement.Step();
+
+		tStatement.Prepare(_T("CREATE TABLE feedback_error(id BIGINT UNIQUE, use_mask INT NOT NULL, mask varchar(32768) NOT NULL, ")
+			_T("use_exclude_mask INT NOT NULL, exclude_mask varchar(32768) NOT NULL, ")
+			_T("use_error_type INT NOT NULL, error_type INT NOT NULL, ")
+			_T("use_system_error_no INT NOT NULL, system_error_no INT NOT NULL, ")
+			_T("result INT NOT NULL)"));
+		tStatement.Step();
+
+		tStatement.Prepare(_T("CREATE TABLE feedback_not_enough_space(id BIGINT UNIQUE, use_mask INT NOT NULL, mask varchar(32768) NOT NULL, ")
+			_T("use_exclude_mask INT NOT NULL, exclude_mask varchar(32768) NOT NULL, ")
+			_T("result INT NOT NULL)"));
+		tStatement.Step();
+
+		tStatement.Prepare(_T("CREATE TABLE feedback_operation_event(id BIGINT UNIQUE,")
+			_T("use_operation_event INT NOT NULL, operation_event INT NOT NULL, ")
 			_T("result INT NOT NULL)"));
 		tStatement.Step();
 
@@ -274,14 +288,31 @@ namespace serializer
 		sqlite::TSQLiteStatement tStatement(spDatabase);
 
 		// remove old feedback table (with no migration)
-// 		tStatement.Prepare(_T("DROP TABLE feedback"));
-// 		tStatement.Step();
+		tStatement.Prepare(_T("DROP TABLE feedback"));
+		tStatement.Step();
 
 		// create new feedback tables
 		tStatement.Prepare(_T("CREATE TABLE feedback_already_exists(id BIGINT UNIQUE, use_mask INT NOT NULL, mask varchar(32768) NOT NULL, ")
 			_T("use_exclude_mask INT NOT NULL, exclude_mask varchar(32768) NOT NULL, ")
 			_T("use_date_compare INT NOT NULL, date_compare_type INT NOT NULL, ")
 			_T("use_size_compare INT NOT NULL, size_compare_type INT NOT NULL, ")
+			_T("result INT NOT NULL)"));
+		tStatement.Step();
+
+		tStatement.Prepare(_T("CREATE TABLE feedback_error(id BIGINT UNIQUE, use_mask INT NOT NULL, mask varchar(32768) NOT NULL, ")
+			_T("use_exclude_mask INT NOT NULL, exclude_mask varchar(32768) NOT NULL, ")
+			_T("use_error_type INT NOT NULL, error_type INT NOT NULL, ")
+			_T("use_system_error_no INT NOT NULL, system_error_no INT NOT NULL, ")
+			_T("result INT NOT NULL)"));
+		tStatement.Step();
+
+		tStatement.Prepare(_T("CREATE TABLE feedback_not_enough_space(id BIGINT UNIQUE, use_mask INT NOT NULL, mask varchar(32768) NOT NULL, ")
+			_T("use_exclude_mask INT NOT NULL, exclude_mask varchar(32768) NOT NULL, ")
+			_T("result INT NOT NULL)"));
+		tStatement.Step();
+
+		tStatement.Prepare(_T("CREATE TABLE feedback_operation_event(id BIGINT UNIQUE,")
+			_T("use_operation_event INT NOT NULL, operation_event INT NOT NULL, ")
 			_T("result INT NOT NULL)"));
 		tStatement.Step();
 
