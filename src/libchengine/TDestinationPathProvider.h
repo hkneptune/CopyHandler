@@ -31,11 +31,12 @@ namespace chengine
 		TDestinationPathProvider(const IFilesystemPtr& spFilesystem, const chcore::TSmartPath& pathDestinationBase, bool bIgnoreFolders, bool bForceDirectories,
 			const string::TString& strFirstAltName, const string::TString& strNextAltName);
 
-		chcore::TSmartPath CalculateDestinationPath(const TFileInfoPtr& spFileInfo);
+		chcore::TSmartPath CalculateDestinationPath(const TFileInfoPtr& spFileInfo) const;
+		chcore::TSmartPath CalculateSuggestedDestinationPath(chcore::TSmartPath pathDstPath) const;
 
 	private:
-		chcore::TSmartPath CalculateForceDirectories(const TFileInfoPtr& spFileInfo);
-		chcore::TSmartPath CalculateIgnoreDirectories(const TFileInfoPtr& spFileInfo);
+		chcore::TSmartPath CalculateForceDirectories(const TFileInfoPtr& spFileInfo) const;
+		chcore::TSmartPath CalculateIgnoreDirectories(const TFileInfoPtr& spFileInfo) const;
 		chcore::TSmartPath FindFreeSubstituteName(chcore::TSmartPath pathSrcPath) const;
 
 	private:

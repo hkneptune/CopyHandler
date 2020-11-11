@@ -27,7 +27,7 @@ namespace chengine
 			throw TCoreException(eErr_InvalidArgument, L"spFilesystem", LOCATION);
 	}
 
-	TSmartPath TDestinationPathProvider::CalculateDestinationPath(const TFileInfoPtr& spFileInfo)
+	TSmartPath TDestinationPathProvider::CalculateDestinationPath(const TFileInfoPtr& spFileInfo) const
 	{
 		if(!spFileInfo)
 			throw TCoreException(eErr_InvalidArgument, L"spFileInfo", LOCATION);
@@ -61,13 +61,62 @@ namespace chengine
 			}
 		}
 
-		TSmartPath pathResult = m_pathDestinationBase + spPathData->GetDestinationPath() + spFileInfo->GetFilePath();
+		TSmartPath pathDstReplacement = spFileInfo->GetDstRelativePath();
+
+		TSmartPath pathResult = m_pathDestinationBase + spPathData->GetDestinationPath();
+		if(pathDstReplacement.IsEmpty())
+			pathResult += spFileInfo->GetFilePath();
+		else
+		{
+			if(spFileInfo->GetFilePath().IsEmpty())
+			{
+				pathResult.DeleteFileName();
+				pathResult += pathDstReplacement;
+			}
+			else
+				pathResult += pathDstReplacement;
+
+		}
+
 		pathResult.StripSeparatorAtEnd();
 
 		return pathResult;
 	}
 
-	TSmartPath TDestinationPathProvider::CalculateForceDirectories(const TFileInfoPtr& spFileInfo)
+	chcore::TSmartPath TDestinationPathProvider::CalculateSuggestedDestinationPath(chcore::TSmartPath pathDst) const
+	{
+		// get the name from src path
+		pathDst.StripSeparatorAtEnd();
+
+		TSmartPath pathFilename = pathDst.GetFileName();
+		pathFilename.StripPath(L":");
+
+		// get rid of extracted filename to get the parent dir
+		pathDst.DeleteFileName();
+
+		// set the dest path
+		TString strCheckPath = m_strFirstAltName;
+		strCheckPath.Replace(_T("%name"), pathFilename.GetFileTitle().ToString());
+		strCheckPath.Replace(_T("%ext"), pathFilename.GetExtension().ToString());
+
+		TSmartPath pathCheck(PathFromWString(strCheckPath));
+
+		// when adding to strDstPath check if the path already exists - if so - try again
+		int iCounter = 1;
+		TString strFmt = m_strNextAltName;
+		while(m_spFilesystem->PathExist(pathDst + pathCheck))
+		{
+			strCheckPath = strFmt;
+			strCheckPath.Replace(_T("%name"), pathFilename.GetFileTitle().ToString());
+			strCheckPath.Replace(_T("%ext"), pathFilename.GetExtension().ToString());
+			strCheckPath.Replace(_T("%count"), boost::lexical_cast<std::wstring>(++iCounter).c_str());
+			pathCheck.FromString(strCheckPath);
+		}
+
+		return pathCheck;
+	}
+
+	TSmartPath TDestinationPathProvider::CalculateForceDirectories(const TFileInfoPtr& spFileInfo) const
 	{
 		// force create directories
 		TSmartPath tFileRoot = spFileInfo->GetFullFilePath().GetFileRoot();
@@ -86,7 +135,7 @@ namespace chengine
 		return pathResult;
 	}
 
-	TSmartPath TDestinationPathProvider::CalculateIgnoreDirectories(const TFileInfoPtr& spFileInfo)
+	TSmartPath TDestinationPathProvider::CalculateIgnoreDirectories(const TFileInfoPtr& spFileInfo) const
 	{
 		TSmartPath pathFilename = spFileInfo->GetFullFilePath();
 		pathFilename.StripPath(L":");
@@ -97,7 +146,7 @@ namespace chengine
 		return pathResult;
 	}
 
-	// finds another name for a copy of src file(folder) in dest location
+	// finds another name for a copy of src file(folder) in dest location; works only for paths that ends up directly in m_pathDestinationBase (without sub-directories)
 	TSmartPath TDestinationPathProvider::FindFreeSubstituteName(TSmartPath pathSrcPath) const
 	{
 		// get the name from src path

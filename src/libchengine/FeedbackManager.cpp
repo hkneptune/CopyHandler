@@ -26,6 +26,7 @@
 
 using namespace serializer;
 using namespace chcore;
+using namespace string;
 
 namespace chengine
 {
@@ -82,22 +83,23 @@ namespace chengine
 		return { eResult, bAutomatedResponse };
 	}
 
-	chengine::TFeedbackResult FeedbackManager::FileAlreadyExists(const TFileInfo& spSrcFileInfo, const TFileInfo& spDstFileInfo)
+	chengine::TFeedbackResult FeedbackManager::FileAlreadyExists(const TFileInfoPtr& spSrcFileInfo, const TFileInfo& rDstFileInfo, const TSmartPath& suggestedPath)
 	{
 		bool bAutomatedResponse = true;
 		EFeedbackResult eResult = eResult_Unknown;
 
 		{
 			boost::shared_lock<boost::shared_mutex> lock(m_lock);
-			eResult = m_feedbackRules.GetAlreadyExistsRules().Matches(spSrcFileInfo, spDstFileInfo);
+			eResult = m_feedbackRules.GetAlreadyExistsRules().Matches(*spSrcFileInfo, rDstFileInfo);
 		}
 		if(eResult == eResult_Unknown)
 		{
 			FeedbackAlreadyExistsRuleList newRules;
+			TString strNewPath = suggestedPath.ToWString();
 			{
 				TScopedRunningTimeTrackerPause scopedTimePause(m_pTimeTracker);
 				TScopedRunningTimeTrackerPause scopedSecondaryTimePause(m_pSecondaryTimeTracker);
-				eResult = m_spFeedbackHandler->FileAlreadyExists(spSrcFileInfo, spDstFileInfo, newRules);
+				eResult = m_spFeedbackHandler->FileAlreadyExists(*spSrcFileInfo, rDstFileInfo, strNewPath, newRules);
 			}
 			if(eResult != eResult_Unknown)
 			{
@@ -107,8 +109,14 @@ namespace chengine
 					boost::unique_lock<boost::shared_mutex> lock(m_lock);
 					m_feedbackRules.GetAlreadyExistsRules().Merge(newRules);
 				}
+				else if(eResult == eResult_Rename)
+				{
+					spSrcFileInfo->SetDstRelativePath(PathFromWString(strNewPath));
+				}
 			}
 		}
+		else if(eResult == eResult_Rename)
+			spSrcFileInfo->SetDstRelativePath(suggestedPath);
 
 		return { eResult, bAutomatedResponse };
 	}

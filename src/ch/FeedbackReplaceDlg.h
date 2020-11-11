@@ -31,12 +31,13 @@ class CFeedbackReplaceDlg : public ictranslate::CLanguageDialog
 	DECLARE_DYNAMIC(CFeedbackReplaceDlg)
 
 public:
-	CFeedbackReplaceDlg(const chengine::TFileInfo& spSrcFile, const chengine::TFileInfo& spDstFile, CWnd* pParent = nullptr);   // standard constructor
+	CFeedbackReplaceDlg(const chengine::TFileInfo& spSrcFile, const chengine::TFileInfo& spDstFile, const string::TString& strSuggestedName, CWnd* pParent = nullptr);   // standard constructor
 	virtual ~CFeedbackReplaceDlg();
 
 	BOOL OnInitDialog() override;
 
 	const chengine::FeedbackAlreadyExistsRuleList& GetRules() const;
+	string::TString GetNewName() const { return m_strNewName; }
 
 protected:
 	void DoDataExchange(CDataExchange* pDX) override;    // DDX/DDV support
@@ -52,11 +53,6 @@ protected:
 	afx_msg void OnBnClickedPauseButton();
 	afx_msg void OnBnClickedCancelButton();
 
-	afx_msg void OnBnMassReplace();
-	afx_msg void OnBnMassRename();
-	afx_msg void OnBnMassResume();
-	afx_msg void OnBnMassSkip();
-
 	afx_msg void OnGetMinMaxInfo(MINMAXINFO* lpMMI);
 
 	DECLARE_MESSAGE_MAP()
@@ -71,6 +67,7 @@ private:
 	CEdit m_ctlSrcDate;
 
 	CEdit m_ctlDstName;
+	CEdit m_ctlDstRename;
 	CEdit m_ctlDstPath;
 	CEdit m_ctlDstSize;
 	CEdit m_ctlDstDate;
@@ -93,6 +90,7 @@ private:
 	const chengine::TFileInfo& m_rDstFile;
 
 	chengine::FeedbackAlreadyExistsRuleList m_feedbackRules;	// feedback rules resulting from choices made in this dialog box
+	string::TString m_strNewName;
 };
 
 #endif

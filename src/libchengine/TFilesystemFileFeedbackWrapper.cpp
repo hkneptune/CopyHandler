@@ -46,16 +46,24 @@ namespace chengine
 			throw TCoreException(eErr_InvalidArgument, L"spFilesystem is NULL", LOCATION);
 	}
 
-	TSubTaskBase::ESubOperationResult TFilesystemFileFeedbackWrapper::HandleFileAlreadyExistsFB(const TFileInfoPtr& spSrcFileInfo, bool& bShouldAppend)
+	TSubTaskBase::ESubOperationResult TFilesystemFileFeedbackWrapper::HandleFileAlreadyExistsFB(const TFileInfoPtr& spSrcFileInfo, const TDestinationPathProvider& rDstPathProvider, bool& bShouldAppend, bool& bShouldRename)
 	{
 		bShouldAppend = false;
+		bShouldRename = false;
 
 		// read info about the existing destination file,
 		TFileInfo tDstFileInfo;
 		m_spFile->GetFileInfo(tDstFileInfo);
 
+		// calculate suggested destination filename
+		TSmartPath pathOriginalPlannedDestination = tDstFileInfo.GetFullFilePath();
+		pathOriginalPlannedDestination.DeleteFileName();
+		pathOriginalPlannedDestination += spSrcFileInfo->GetFullFilePath().GetFileName();
+
+		TSmartPath suggestedPath = rDstPathProvider.CalculateSuggestedDestinationPath(pathOriginalPlannedDestination);
+
 		// src and dst files are the same
-		TFeedbackResult frResult = m_spFeedbackManager->FileAlreadyExists(*spSrcFileInfo, tDstFileInfo);
+		TFeedbackResult frResult = m_spFeedbackManager->FileAlreadyExists(spSrcFileInfo, tDstFileInfo, suggestedPath);
 		switch(frResult.GetResult())
 		{
 		case eResult_Overwrite:
@@ -80,6 +88,10 @@ namespace chengine
 		}
 		case eResult_Pause:
 			return TSubTaskBase::eSubResult_PauseRequest;
+
+		case eResult_Rename:
+			bShouldRename = true;
+			return TSubTaskBase::eSubResult_Continue;
 
 		default:
 			BOOST_ASSERT(FALSE);		// unknown result

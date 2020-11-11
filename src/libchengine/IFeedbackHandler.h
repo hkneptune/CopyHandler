@@ -39,7 +39,7 @@ namespace chengine
 		virtual ~IFeedbackHandler();
 
 		virtual EFeedbackResult FileError(const string::TString& strSrcPath, const string::TString& strDstPath, EFileError eFileError, unsigned long ulError, FeedbackErrorRuleList& rNewRules) = 0;
-		virtual EFeedbackResult FileAlreadyExists(const TFileInfo& spSrcFileInfo, const TFileInfo& spDstFileInfo, FeedbackAlreadyExistsRuleList& rNewRules) = 0;
+		virtual EFeedbackResult FileAlreadyExists(const TFileInfo& spSrcFileInfo, const TFileInfo& spDstFileInfo, string::TString& strRenameName, FeedbackAlreadyExistsRuleList& rNewRules) = 0;
 		virtual EFeedbackResult NotEnoughSpace(const string::TString& strSrcPath, const string::TString& strDstPath, unsigned long long ullRequiredSize, FeedbackNotEnoughSpaceRuleList& rNewRules) = 0;
 		virtual EFeedbackResult OperationEvent(EOperationEvent eEvent, FeedbackOperationEventRuleList& rNewRules) = 0;
 	};

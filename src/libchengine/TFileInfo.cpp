@@ -39,6 +39,7 @@ namespace chengine
 	TFileInfo::TFileInfo() :
 		m_oidObjectID(0),
 		m_pathFile(m_setModifications),
+		m_pathRelativeDstFile(m_setModifications),
 		m_spBasePathData(m_setModifications),
 		m_dwAttributes(m_setModifications, 0),
 		m_uhFileSize(m_setModifications, 0),
@@ -53,6 +54,7 @@ namespace chengine
 	TFileInfo::TFileInfo(const TBasePathDataPtr& spBasePathData, const TSmartPath& rpathFile, DWORD dwAttributes, ULONGLONG uhFileSize, const TFileTime& ftCreation, const TFileTime& ftLastAccess, const TFileTime& ftLastWrite, unsigned int uiFlags) :
 		m_oidObjectID(0),
 		m_pathFile(m_setModifications, rpathFile),
+		m_pathRelativeDstFile(m_setModifications),
 		m_spBasePathData(m_setModifications, spBasePathData),
 		m_dwAttributes(m_setModifications, dwAttributes),
 		m_uhFileSize(m_setModifications, uhFileSize),
@@ -74,6 +76,7 @@ namespace chengine
 		unsigned int uiFlags)
 	{
 		m_pathFile = rpathFile;
+		m_pathRelativeDstFile.Modify().Clear();
 		m_spBasePathData = spBasePathData;
 		m_dwAttributes = dwAttributes;
 		m_uhFileSize = uhFileSize;
@@ -90,6 +93,7 @@ namespace chengine
 		unsigned int uiFlags)
 	{
 		m_pathFile = rpathFile;
+		m_pathRelativeDstFile.Modify().Clear();
 		m_spBasePathData.Modify().reset();
 		m_dwAttributes = dwAttributes;
 		m_uhFileSize = uhFileSize;
@@ -259,23 +263,26 @@ namespace chengine
 	{
 		if (m_setModifications.any())
 		{
-			ISerializerRowData& rRow = spContainer->GetRow(m_oidObjectID, m_setModifications[eMod_Added]);
+			bool bAdded = m_setModifications[eMod_Added];
+			ISerializerRowData& rRow = spContainer->GetRow(m_oidObjectID, bAdded);
 
-			if (m_setModifications[eMod_Path])
+			if(bAdded || m_setModifications[eMod_Path])
 				rRow.SetValue(_T("rel_path"), m_pathFile);
-			if (m_setModifications[eMod_BasePath])
+			if(bAdded || m_setModifications[eMod_DstRelativePath])
+				rRow.SetValue(_T("dst_rel_path"), m_pathRelativeDstFile);
+			if (bAdded || m_setModifications[eMod_BasePath])
 				rRow.SetValue(_T("base_path_id"), m_spBasePathData.Get()->GetObjectID());
-			if (m_setModifications[eMod_Attributes])
+			if (bAdded || m_setModifications[eMod_Attributes])
 				rRow.SetValue(_T("attr"), m_dwAttributes);
-			if (m_setModifications[eMod_FileSize])
+			if (bAdded || m_setModifications[eMod_FileSize])
 				rRow.SetValue(_T("size"), m_uhFileSize);
-			if (m_setModifications[eMod_TimeCreated])
+			if (bAdded || m_setModifications[eMod_TimeCreated])
 				rRow.SetValue(_T("time_created"), m_ftCreation.Get().ToUInt64());
-			if (m_setModifications[eMod_TimeLastWrite])
+			if (bAdded || m_setModifications[eMod_TimeLastWrite])
 				rRow.SetValue(_T("time_last_write"), m_ftLastWrite.Get().ToUInt64());
-			if (m_setModifications[eMod_TimeLastAccess])
+			if (bAdded || m_setModifications[eMod_TimeLastAccess])
 				rRow.SetValue(_T("time_last_access"), m_ftLastAccess.Get().ToUInt64());
-			if (m_setModifications[eMod_Flags])
+			if (bAdded || m_setModifications[eMod_Flags])
 				rRow.SetValue(_T("flags"), m_uiFlags);
 
 			m_setModifications.reset();
@@ -286,6 +293,7 @@ namespace chengine
 	{
 		rColumns.AddColumn(_T("id"), ColumnType<object_id_t>::value);
 		rColumns.AddColumn(_T("rel_path"), IColumnsDefinition::eType_path);
+		rColumns.AddColumn(_T("dst_rel_path"), IColumnsDefinition::eType_path);
 		rColumns.AddColumn(_T("base_path_id"), ColumnType<object_id_t>::value);
 		rColumns.AddColumn(_T("attr"), IColumnsDefinition::eType_ulong);
 		rColumns.AddColumn(_T("size"), IColumnsDefinition::eType_ulonglong);
@@ -301,6 +309,7 @@ namespace chengine
 		unsigned long long ullTime = 0;
 		spRowReader->GetValue(_T("id"), m_oidObjectID);
 		spRowReader->GetValue(_T("rel_path"), m_pathFile.Modify());
+		spRowReader->GetValue(_T("dst_rel_path"), m_pathRelativeDstFile.Modify());
 		spRowReader->GetValue(_T("base_path_id"), stBaseObjectID);
 		spRowReader->GetValue(_T("attr"), m_dwAttributes.Modify());
 		spRowReader->GetValue(_T("size"), m_uhFileSize.Modify());

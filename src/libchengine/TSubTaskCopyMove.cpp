@@ -57,7 +57,7 @@ namespace chengine
 		}
 
 		TFileInfoPtr spSrcFile;		// CFileInfo - src file
-		TSmartPath pathDstFile;			// dest path with filename
+		TDestinationPathProvider* pDstPathProvider = nullptr;
 
 		TBufferSizes tBufferSizes;
 		TOverlappedMemoryPoolPtr spMemoryPool;		// buffer handling
@@ -209,16 +209,14 @@ namespace chengine
 				continue;
 			}
 
-			// set dest path with filename
-			ccp.pathDstFile = tDstPathProvider.CalculateDestinationPath(spFileInfo);
-
 			// are the files/folders lie on the same partition ?
 			bool bMove = GetContext().GetOperationType() == eOperation_Move;
 
 			// if folder - create it
 			if(spFileInfo->IsDirectory())
 			{
-				eResult = tFilesystemFBWrapper.CreateDirectoryFB(ccp.pathDstFile);
+				TSmartPath pathDstFile = tDstPathProvider.CalculateDestinationPath(spFileInfo);
+				eResult = tFilesystemFBWrapper.CreateDirectoryFB(pathDstFile);
 				if(eResult == eSubResult_SkipFile)
 				{
 					spFileInfo->MarkAsProcessed(false);
@@ -231,7 +229,7 @@ namespace chengine
 			}
 			else
 			{
-				// start copying/moving file
+				ccp.pDstPathProvider = &tDstPathProvider;
 				ccp.spSrcFile = spFileInfo;
 
 				// copy data
@@ -377,7 +375,7 @@ namespace chengine
 			rThreadController,
 			rThreadPool,
 			pData->spSrcFile,
-			pData->pathDstFile,
+			*pData->pDstPathProvider,
 			m_spSubTaskStats,
 			m_spLog->GetLogFileData(),
 			pData->spMemoryPool,

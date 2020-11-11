@@ -38,7 +38,7 @@ namespace chengine
 			TWorkerThreadController& rThreadController,
 			TOverlappedThreadPool& rThreadPool,
 			const TFileInfoPtr& spSrcFileInfo,
-			const TSmartPath& pathDst,
+			const TDestinationPathProvider& rDstPathProvider,
 			const TSubTaskStatsInfoPtr& spStats,
 			const logger::TLogFileDataPtr& spLogFileData,
 			const TOverlappedMemoryPoolPtr& spBuffers,

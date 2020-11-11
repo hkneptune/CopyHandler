@@ -40,7 +40,7 @@ namespace chengine
 		FeedbackRules GetRules() const;
 
 		TFeedbackResult FileError(const string::TString& strSrcPath, const string::TString& strDstPath, EFileError eFileError, unsigned long ulError);
-		TFeedbackResult FileAlreadyExists(const TFileInfo& spSrcFileInfo, const TFileInfo& spDstFileInfo);
+		TFeedbackResult FileAlreadyExists(const TFileInfoPtr& spSrcFileInfo, const TFileInfo& rDstFileInfo, const chcore::TSmartPath& suggestedPath);
 		TFeedbackResult NotEnoughSpace(const string::TString& strSrcPath, const string::TString& strDstPath, unsigned long long ullRequiredSize);
 		TFeedbackResult OperationEvent(EOperationEvent eEvent);
 

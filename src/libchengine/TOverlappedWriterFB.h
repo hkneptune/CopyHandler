@@ -24,6 +24,7 @@
 #include "TOverlappedProcessorRange.h"
 #include "TThreadedQueueRunner.h"
 #include "TEventCounter.h"
+#include "TDestinationPathProvider.h"
 
 using namespace chcore;
 
@@ -37,7 +38,7 @@ namespace chengine
 		    TWorkerThreadController& rThreadController,
 			const TSubTaskStatsInfoPtr& spStats,
 			const TFileInfoPtr& spSrcFileInfo,
-			const TSmartPath& pathDst,
+			const TDestinationPathProvider& rDstPathProvider,
 			const logger::TLogFileDataPtr& spLogFileData,
 			const TOrderedBufferQueuePtr& spBuffersToWrite,
 			const TOverlappedProcessorRangePtr& spRange,
@@ -86,6 +87,13 @@ namespace chengine
 		TOverlappedProcessorRangePtr m_spDataRange;
 		bool m_bOnlyCreate = false;
 		bool m_bUpdateFileAttributesAndTimes = false;
+
+		IFilesystemPtr m_spFilesystem;
+		const TDestinationPathProvider& m_rDstPathProvider;
+		FeedbackManagerPtr m_spFeedbackManager;
+		logger::TLogFileDataPtr m_spLogFileData;
+		bool m_bNoBuffering = false;
+		bool m_bProtectReadOnlyFiles = false;
 
 		TEvent m_eventProcessingFinished;
 		TEvent m_eventWritingFinished;

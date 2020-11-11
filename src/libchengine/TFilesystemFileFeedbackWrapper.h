@@ -24,6 +24,7 @@
 #include "IFilesystem.h"
 #include "../liblogger/TLogger.h"
 #include "FeedbackManager.h"
+#include "TDestinationPathProvider.h"
 
 namespace chcore
 {
@@ -40,7 +41,7 @@ namespace chengine
 			const IFilesystemPtr& spFilesystem);
 		TFilesystemFileFeedbackWrapper& operator=(const TFilesystemFileFeedbackWrapper&) = delete;
 
-		TSubTaskBase::ESubOperationResult HandleFileAlreadyExistsFB(const TFileInfoPtr& spSrcFileInfo, bool& bShouldAppend);
+		TSubTaskBase::ESubOperationResult HandleFileAlreadyExistsFB(const TFileInfoPtr& spSrcFileInfo, const TDestinationPathProvider& rDstPathProvider, bool& bShouldAppend, bool& bShouldRename);
 
 		TSubTaskBase::ESubOperationResult TruncateFileFB(file_size_t fsNewSize);
 

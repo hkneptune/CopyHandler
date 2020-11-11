@@ -41,10 +41,13 @@ chengine::EFeedbackResult CFeedbackHandler::FileError(const TString& strSrcPath,
 	return eResult;
 }
 
-chengine::EFeedbackResult CFeedbackHandler::FileAlreadyExists(const TFileInfo& spSrcFileInfo, const TFileInfo& spDstFileInfo, FeedbackAlreadyExistsRuleList& rNewRules)
+chengine::EFeedbackResult CFeedbackHandler::FileAlreadyExists(const TFileInfo& spSrcFileInfo, const TFileInfo& spDstFileInfo, TString& strRenameName, FeedbackAlreadyExistsRuleList& rNewRules)
 {
-	CFeedbackReplaceDlg dlg(spSrcFileInfo, spDstFileInfo);
+	CFeedbackReplaceDlg dlg(spSrcFileInfo, spDstFileInfo, strRenameName);
 	EFeedbackResult eResult = (EFeedbackResult)dlg.DoModal();
+
+	if(eResult == eResult_Rename)
+		strRenameName = dlg.GetNewName();
 
 	if(!dlg.GetRules().IsEmpty())
 		rNewRules = dlg.GetRules();

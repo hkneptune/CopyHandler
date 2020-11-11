@@ -30,7 +30,7 @@ class CFeedbackHandler : public chengine::IFeedbackHandler
 {
 public:
 	chengine::EFeedbackResult FileError(const string::TString& strSrcPath, const string::TString& strDstPath, chengine::EFileError eFileError, unsigned long ulError, chengine::FeedbackErrorRuleList& rNewRules) override;
-	chengine::EFeedbackResult FileAlreadyExists(const chengine::TFileInfo& spSrcFileInfo, const chengine::TFileInfo& spDstFileInfo, chengine::FeedbackAlreadyExistsRuleList& rNewRules) override;
+	chengine::EFeedbackResult FileAlreadyExists(const chengine::TFileInfo& spSrcFileInfo, const chengine::TFileInfo& spDstFileInfo, string::TString& strRenameName, chengine::FeedbackAlreadyExistsRuleList& rNewRules) override;
 	chengine::EFeedbackResult NotEnoughSpace(const string::TString& strSrcPath, const string::TString& strDstPath, unsigned long long ullRequiredSize, chengine::FeedbackNotEnoughSpaceRuleList& rNewRules) override;
 	chengine::EFeedbackResult OperationEvent(chengine::EOperationEvent eEvent, chengine::FeedbackOperationEventRuleList& rNewRules) override;
 

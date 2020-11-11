@@ -79,7 +79,7 @@ namespace serializer
 		tStatement.Prepare(_T("CREATE TABLE base_paths(id BIGINT UNIQUE, src_path varchar(32768) NOT NULL, skip_processing boolean NOT NULL, dst_path varchar(32768) NOT NULL)"));
 		tStatement.Step();
 
-		tStatement.Prepare(_T("CREATE TABLE scanned_files(id BIGINT UNIQUE, rel_path varchar(32768) NOT NULL, base_path_id BIGINT NOT NULL, attr INT NOT NULL, size BIGINT NOT NULL, time_created BIGINT NOT NULL, time_last_write BIGINT NOT NULL, time_last_access BIGINT NOT NULL, flags INT NOT NULL)"));
+		tStatement.Prepare(_T("CREATE TABLE scanned_files(id BIGINT UNIQUE, rel_path varchar(32768) NOT NULL, dst_rel_path varchar(32768) NOT NULL DEFAULT '', base_path_id BIGINT NOT NULL, attr INT NOT NULL, size BIGINT NOT NULL, time_created BIGINT NOT NULL, time_last_write BIGINT NOT NULL, time_last_access BIGINT NOT NULL, flags INT NOT NULL)"));
 		tStatement.Step();
 
 		tStatement.Prepare(_T("CREATE TABLE task_config(id BIGINT UNIQUE, name varchar(256) NOT NULL, node_order INT NOT NULL, value varchar(32768) NOT NULL)"));
@@ -314,6 +314,10 @@ namespace serializer
 		tStatement.Prepare(_T("CREATE TABLE feedback_operation_event(id BIGINT UNIQUE,")
 			_T("use_operation_event INT NOT NULL, operation_event INT NOT NULL, ")
 			_T("result INT NOT NULL)"));
+		tStatement.Step();
+
+		// adjust scanned_paths to include destination path
+		tStatement.Prepare(_T("ALTER TABLE scanned_files ADD COLUMN dst_rel_path varchar(32768) NOT NULL DEFAULT ''"));
 		tStatement.Step();
 
 		tVersion.SetVersion(7);

@@ -12,13 +12,15 @@
 #include "../libchengine/FeedbackPredefinedRules.h"
 
 using namespace chengine;
+using namespace string;
 
 IMPLEMENT_DYNAMIC(CFeedbackReplaceDlg, ictranslate::CLanguageDialog)
 
-CFeedbackReplaceDlg::CFeedbackReplaceDlg(const chengine::TFileInfo& spSrcFile, const chengine::TFileInfo& spDstFile, CWnd* pParent /*=nullptr*/)
+CFeedbackReplaceDlg::CFeedbackReplaceDlg(const chengine::TFileInfo& spSrcFile, const chengine::TFileInfo& spDstFile, const TString& strSuggestedName, CWnd* pParent /*=nullptr*/)
 	: ictranslate::CLanguageDialog(IDD_FEEDBACK_REPLACE_DIALOG, pParent),
 	m_rSrcFile(spSrcFile),
-	m_rDstFile(spDstFile)
+	m_rDstFile(spDstFile),
+	m_strNewName(strSuggestedName)
 {
 }
 
@@ -38,6 +40,7 @@ void CFeedbackReplaceDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_SRC_FILESIZE_EDIT, m_ctlSrcSize);
 
 	DDX_Control(pDX, IDC_DST_FILENAME_EDIT, m_ctlDstName);
+	DDX_Control(pDX, IDC_DST_RENAME_EDIT, m_ctlDstRename);
 	DDX_Control(pDX, IDC_DST_PATH_EDIT, m_ctlDstPath);
 	DDX_Control(pDX, IDC_DST_MODIFIEDDATE_EDIT, m_ctlDstDate);
 	DDX_Control(pDX, IDC_DST_FILESIZE_EDIT, m_ctlDstSize);
@@ -94,10 +97,16 @@ BOOL CFeedbackReplaceDlg::OnInitDialog()
 
 	AddResizableControl(IDC_DST_NAME_STATIC, 0.0, 0.0, 0.0, 0.0);
 	AddResizableControl(IDC_DST_FILENAME_EDIT, 0.0, 0.0, 1.0, 0.0);
+
+	AddResizableControl(IDC_DST_RENAME_STATIC, 0.0, 0.0, 0.0, 0.0);
+	AddResizableControl(IDC_DST_RENAME_EDIT, 0.0, 0.0, 1.0, 0.0);
+
 	AddResizableControl(IDC_DST_LOCATION_STATIC, 0.0, 0.0, 0.0, 0.0);
 	AddResizableControl(IDC_DST_PATH_EDIT, 0.0, 0.0, 1.0, 0.0);
+
 	AddResizableControl(IDC_DST_SIZE_STATIC, 0.0, 0.0, 0.0, 0.0);
 	AddResizableControl(IDC_DST_FILESIZE_EDIT, 0.0, 0.0, 1.0, 0.0);
+
 	AddResizableControl(IDC_DST_TIME_STATIC, 0.0, 0.0, 0.0, 0.0);
 	AddResizableControl(IDC_DST_MODIFIEDDATE_EDIT, 0.0, 0.0, 1.0, 0.0);
 
@@ -132,6 +141,8 @@ BOOL CFeedbackReplaceDlg::OnInitDialog()
 	m_btnRename.m_bDefaultClick = TRUE;
 	m_btnSkip.m_hMenu = m_menuMassSkip.GetSubMenu(0)->GetSafeHmenu();
 	m_btnSkip.m_bDefaultClick = TRUE;
+
+	m_ctlDstRename.SetWindowText(m_strNewName.c_str());
 
 	return TRUE;  // return TRUE unless you set the focus to a control
 	// EXCEPTION: OCX Property Pages should return FALSE
@@ -235,6 +246,12 @@ void CFeedbackReplaceDlg::OnBnClickedRenameButton()
 	case ID_FEEDBACK_RENAME_WHENOLDERTHANDESTINATION:
 		m_feedbackRules = FeedbackPredefinedRules::CreateAlreadyExistsRule(EPredefinedRuleCondition::eCondition_WhenOlderThanDst, eResult_Rename);
 		break;
+	default:
+	{
+		CString strText;
+		m_ctlDstRename.GetWindowText(strText);
+		m_strNewName = strText;
+	}
 	}
 
 	EndDialog(chengine::EFeedbackResult::eResult_Rename);
