@@ -37,6 +37,7 @@ namespace chengine
 	private:
 		chcore::TSmartPath CalculateForceDirectories(const TFileInfoPtr& spFileInfo) const;
 		chcore::TSmartPath CalculateIgnoreDirectories(const TFileInfoPtr& spFileInfo) const;
+		chcore::TSmartPath CalculateNormalDestination(const TFileInfoPtr& spFileInfo) const;
 		chcore::TSmartPath FindFreeSubstituteName(chcore::TSmartPath pathSrcPath) const;
 
 	private:

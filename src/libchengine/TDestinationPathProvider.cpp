@@ -32,55 +32,23 @@ namespace chengine
 		if(!spFileInfo)
 			throw TCoreException(eErr_InvalidArgument, L"spFileInfo", LOCATION);
 
+		TSmartPath plannedDestinationPath;
 		if (m_bForceDirectories)
-			return CalculateForceDirectories(spFileInfo);
-
-		if (m_bIgnoreFolders)
-			return CalculateIgnoreDirectories(spFileInfo);
-
-		TBasePathDataPtr spPathData = spFileInfo->GetBasePathData();
-		if(!spPathData)
-			return m_pathDestinationBase + spFileInfo->GetFilePath();
-
-		// generate new dest name
-		if(!spPathData->IsDestinationPathSet())
-		{
-			// generate something - if dest folder == src folder - search for copy
-			if(m_pathDestinationBase == spFileInfo->GetFullFilePath().GetFileRoot())
-			{
-				TSmartPath pathSubst = FindFreeSubstituteName(spFileInfo->GetFullFilePath());
-				spPathData->SetDestinationPath(pathSubst);
-			}
-			else
-			{
-				TSmartPath pathFilename = spPathData->GetSrcPath();
-				pathFilename.StripSeparatorAtEnd();
-				pathFilename.StripPath(L":");
-
-				spPathData->SetDestinationPath(pathFilename.GetFileName());
-			}
-		}
-
-		TSmartPath pathDstReplacement = spFileInfo->GetDstRelativePath();
-
-		TSmartPath pathResult = m_pathDestinationBase + spPathData->GetDestinationPath();
-		if(pathDstReplacement.IsEmpty())
-			pathResult += spFileInfo->GetFilePath();
+			plannedDestinationPath = CalculateForceDirectories(spFileInfo);
+		else if (m_bIgnoreFolders)
+			plannedDestinationPath = CalculateIgnoreDirectories(spFileInfo);
 		else
-		{
-			if(spFileInfo->GetFilePath().IsEmpty())
-			{
-				pathResult.DeleteFileName();
-				pathResult += pathDstReplacement;
-			}
-			else
-				pathResult += pathDstReplacement;
+			plannedDestinationPath = CalculateNormalDestination(spFileInfo);
 
+		// adjust the calculated path with different filename if set previously by renaming
+		TSmartPath pathDstReplacement = spFileInfo->GetDstRelativePath();
+		if(!pathDstReplacement.IsEmpty())
+		{
+			plannedDestinationPath.DeleteFileName();
+			plannedDestinationPath += pathDstReplacement;
 		}
 
-		pathResult.StripSeparatorAtEnd();
-
-		return pathResult;
+		return plannedDestinationPath;
 	}
 
 	chcore::TSmartPath TDestinationPathProvider::CalculateSuggestedDestinationPath(chcore::TSmartPath pathDst) const
@@ -143,6 +111,39 @@ namespace chengine
 
 		TSmartPath pathResult = m_pathDestinationBase + pathFilename.GetFileName();
 
+		return pathResult;
+	}
+
+	chcore::TSmartPath TDestinationPathProvider::CalculateNormalDestination(const TFileInfoPtr& spFileInfo) const
+	{
+		TBasePathDataPtr spPathData = spFileInfo->GetBasePathData();
+		if(!spPathData)
+			throw TCoreException(eErr_InvalidArgument, L"FileInfo object does not contain base path data", LOCATION);
+
+		TSmartPath plannedDestinationPath;
+
+		// generate new top-level dest name for base path
+		if(!spPathData->IsDestinationPathSet())
+		{
+			// generate something - if dest folder == src folder - search for copy
+			if(m_pathDestinationBase == spFileInfo->GetFullFilePath().GetFileRoot())
+			{
+				TSmartPath pathSubst = FindFreeSubstituteName(spFileInfo->GetFullFilePath());
+				spPathData->SetDestinationPath(pathSubst);
+			}
+			else
+			{
+				TSmartPath pathFilename = spPathData->GetSrcPath();
+				pathFilename.StripSeparatorAtEnd();
+				pathFilename.StripPath(L":");
+
+				spPathData->SetDestinationPath(pathFilename.GetFileName());
+			}
+		}
+
+
+		TSmartPath pathResult = m_pathDestinationBase + spPathData->GetDestinationPath() + spFileInfo->GetFilePath();
+		pathResult.StripSeparatorAtEnd();
 		return pathResult;
 	}
 
