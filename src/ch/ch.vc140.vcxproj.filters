@@ -58,6 +58,9 @@
     <Filter Include="Source Files\GUI\Dialogs\Feedback">
       <UniqueIdentifier>{7a5ae1dd-a331-406c-a572-4997184a5725}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\GUI\Dialogs\Feedback rule editor">
+      <UniqueIdentifier>{8c3e3738-a438-429e-8ad7-0dc13303f711}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Common\ipcstructs.h">
@@ -252,6 +255,12 @@
     <ClInclude Include="resource.h">
       <Filter>Resource Files</Filter>
     </ClInclude>
+    <ClInclude Include="RuleEditAlreadyExistsDlg.h">
+      <Filter>Source Files\GUI\Dialogs\Feedback rule editor</Filter>
+    </ClInclude>
+    <ClInclude Include="RuleEditDlg.h">
+      <Filter>Source Files\GUI\Dialogs\Feedback rule editor</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\common\TShellExtMenuConfig.cpp">
@@ -433,6 +442,12 @@
     </ClCompile>
     <ClCompile Include="AppAutorun.cpp">
       <Filter>Source Files\Tools</Filter>
+    </ClCompile>
+    <ClCompile Include="RuleEditAlreadyExistsDlg.cpp">
+      <Filter>Source Files\GUI\Dialogs\Feedback rule editor</Filter>
+    </ClCompile>
+    <ClCompile Include="RuleEditDlg.cpp">
+      <Filter>Source Files\GUI\Dialogs\Feedback rule editor</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
