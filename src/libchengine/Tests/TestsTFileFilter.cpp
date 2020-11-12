@@ -2,6 +2,7 @@
 #include "gtest/gtest.h"
 #include "gmock/gmock.h"
 #include "../TFileFilter.h"
+#include "../ECompareType.h"
 
 using namespace chengine;
 
@@ -19,11 +20,11 @@ TEST(TestsTFileFilter, DefaultConstruction)
 	EXPECT_STREQ(L"", filter.GetCombinedExcludeMask().c_str());
 
 	EXPECT_EQ(false, filter.GetUseSize1());
-	EXPECT_EQ(TFileFilter::eSizeCmp_Greater, filter.GetSizeType1());
+	EXPECT_EQ(eCmp_Greater, filter.GetSizeType1());
 	EXPECT_EQ(0, filter.GetSize1());
 
 	EXPECT_EQ(false, filter.GetUseSize2());
-	EXPECT_EQ(TFileFilter::eSizeCmp_Less, filter.GetSizeType2());
+	EXPECT_EQ(eCmp_Less, filter.GetSizeType2());
 	EXPECT_EQ(0, filter.GetSize2());
 
 	// dates
@@ -31,14 +32,14 @@ TEST(TestsTFileFilter, DefaultConstruction)
 
 	// date 1
 	EXPECT_EQ(false, filter.GetUseDateTime1());
-	EXPECT_EQ(TFileFilter::eDateCmp_Greater, filter.GetDateCmpType1());
+	EXPECT_EQ(eCmp_Greater, filter.GetDateCmpType1());
 	EXPECT_EQ(false, filter.GetUseDate1());
 	EXPECT_EQ(false, filter.GetUseTime1());
 //	EXPECT_EQ(TDateTime(), filter.GetDateTime1());
 
 	// date 2
 	EXPECT_EQ(false, filter.GetUseDateTime2());
-	EXPECT_EQ(TFileFilter::eDateCmp_Less, filter.GetDateCmpType2());
+	EXPECT_EQ(eCmp_Less, filter.GetDateCmpType2());
 	EXPECT_EQ(false, filter.GetUseDate2());
 	EXPECT_EQ(false, filter.GetUseTime2());
 //	EXPECT_EQ(TDateTime(), filter.GetDateTime2());
