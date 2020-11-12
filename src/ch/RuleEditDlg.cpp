@@ -21,6 +21,8 @@
 #include "RuleEditDlg.h"
 #include "ch.h"
 #include "RuleEditAlreadyExistsDlg.h"
+#include "RuleEditErrorDlg.h"
+#include "RuleEditNotEnoughSpaceDlg.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -594,9 +596,7 @@ void RuleEditDlg::OnErrorChangeButton()
 			return;
 
 		auto& rRule = rRules.GetAt(iItem);
-		rRule;
 
-/*
 		RuleEditErrorDlg dlg(rRule);
 		if(dlg.DoModal() == IDOK)
 		{
@@ -606,7 +606,6 @@ void RuleEditDlg::OnErrorChangeButton()
 			rRule = dlg.GetRule();
 			AddErrorRule(rRule, iItem);
 		}
-*/
 	}
 }
 
@@ -614,7 +613,6 @@ void RuleEditDlg::OnErrorAddButton()
 {
 	FeedbackErrorRule newRule;
 
-/*
 	RuleEditErrorDlg dlg(newRule);
 	if(dlg.DoModal() == IDOK)
 	{
@@ -622,7 +620,6 @@ void RuleEditDlg::OnErrorAddButton()
 		m_rules.GetErrorRules().Add(rRule);
 		AddErrorRule(rRule, -1);
 	}
-*/
 }
 
 void RuleEditDlg::OnErrorRemoveButton()
@@ -655,15 +652,14 @@ void RuleEditDlg::OnNotEnoughSpaceChangeButton()
 	POSITION pos = m_ctlNotEnoughSpaceRulesList.GetFirstSelectedItemPosition();
 	if(pos != nullptr)
 	{
-		FeedbackErrorRuleList& rRules = m_rules.GetErrorRules();
+		FeedbackNotEnoughSpaceRuleList& rRules = m_rules.GetNotEnoughSpaceRules();
 
 		int iItem = m_ctlNotEnoughSpaceRulesList.GetNextSelectedItem(pos);
 		if(iItem < 0)
 			return;
 
 		auto& rRule = rRules.GetAt(iItem);
-		rRule;
-/*
+
 		RuleEditNotEnoughSpaceDlg dlg(rRule);
 		if(dlg.DoModal() == IDOK)
 		{
@@ -673,15 +669,13 @@ void RuleEditDlg::OnNotEnoughSpaceChangeButton()
 			rRule = dlg.GetRule();
 			AddNotEnoughSpaceRule(rRule, iItem);
 		}
-*/
 	}
 }
 
 void RuleEditDlg::OnNotEnoughSpaceAddButton()
 {
-	FeedbackErrorRule newRule;
+	FeedbackNotEnoughSpaceRule newRule;
 
-/*
 	RuleEditNotEnoughSpaceDlg dlg(newRule);
 	if(dlg.DoModal() == IDOK)
 	{
@@ -689,7 +683,6 @@ void RuleEditDlg::OnNotEnoughSpaceAddButton()
 		m_rules.GetNotEnoughSpaceRules().Add(rRule);
 		AddNotEnoughSpaceRule(rRule, -1);
 	}
-*/
 }
 
 void RuleEditDlg::OnNotEnoughSpaceRemoveButton()

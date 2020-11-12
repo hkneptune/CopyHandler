@@ -563,6 +563,8 @@
     <ClInclude Include="FeedbackHandlerFactory.h" />
     <ClInclude Include="RuleEditAlreadyExistsDlg.h" />
     <ClInclude Include="RuleEditDlg.h" />
+    <ClInclude Include="RuleEditErrorDlg.h" />
+    <ClInclude Include="RuleEditNotEnoughSpaceDlg.h" />
     <ClInclude Include="structs.h" />
     <ClInclude Include="AppHelper.h" />
     <ClInclude Include="CfgProperties.h" />
@@ -642,6 +644,8 @@
     <ClCompile Include="FeedbackHandlerFactory.cpp" />
     <ClCompile Include="RuleEditAlreadyExistsDlg.cpp" />
     <ClCompile Include="RuleEditDlg.cpp" />
+    <ClCompile Include="RuleEditErrorDlg.cpp" />
+    <ClCompile Include="RuleEditNotEnoughSpaceDlg.cpp" />
     <ClCompile Include="structs.cpp" />
     <ClCompile Include="AppHelper.cpp" />
     <ClCompile Include="ClipboardMonitor.cpp" />

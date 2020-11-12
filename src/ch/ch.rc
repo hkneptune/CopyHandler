@@ -475,7 +475,7 @@ BEGIN
     LTEXT           "When all of the following conditions are met...:",IDC_HEADER_STATIC,7,7,277,8
     LTEXT           "...then respond with:",IDC_RESPONSE_STATIC,7,155,277,8
     COMBOBOX        IDC_RESPONSE_COMBO,15,168,269,133,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
-    EDITTEXT        IDC_FILTER_BY_SYSTEMERROR_EDIT,15,126,269,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_FILTER_BY_SYSTEMERROR_EDIT,15,126,269,14,ES_AUTOHSCROLL | ES_NUMBER
 END
 
 IDD_RULE_EDIT_NOTENOUGHSPACE_DIALOG DIALOGEX 0, 0, 291, 157
@@ -1415,15 +1415,6 @@ BEGIN
     IDS_DT_STRING           "<>"
     IDS_UPDATER_NEW_VERSION_STRING 
                             "Updated version: %officialver (%numericver).\nReleased: %reldate"
-    IDS_FEEDBACK_RESPONSE_UNKNOWN   "Unknown"
-    IDS_FEEDBACK_RESPONSE_OVERWRITE "Replace"
-    IDS_FEEDBACK_RESPONSE_RESUME    "Resume"
-    IDS_FEEDBACK_RESPONSE_SKIP      "Skip"
-    IDS_FEEDBACK_RESPONSE_CANCEL    "Cancel"
-    IDS_FEEDBACK_RESPONSE_PAUSE     "Pause"
-    IDS_FEEDBACK_RESPONSE_RETRY     "Retry"
-    IDS_FEEDBACK_RESPONSE_IGNORE    "Ignore"
-    IDS_FEEDBACK_RESPONSE_RENAME    "Rename"
 END
 
 STRINGTABLE
@@ -1442,6 +1433,19 @@ BEGIN
     IDS_UPDATER_NEWVERSIONEXISTS "There are updates available"
     IDS_UPDATER_RELEASENOTES "Release notes:"
     IDS_FINALIZE_CH_ERROR   "Failed to finalize Copy Handler. Some information about tasks being processed might be lost. Error: %reason."
+    IDS_FEEDBACK_RESPONSE_UNKNOWN "Unknown"
+    IDS_FEEDBACK_RESPONSE_OVERWRITE "Replace"
+    IDS_FEEDBACK_RESPONSE_RESUME "Resume"
+    IDS_FEEDBACK_RESPONSE_SKIP "Skip"
+    IDS_FEEDBACK_RESPONSE_CANCEL "Cancel"
+END
+
+STRINGTABLE
+BEGIN
+    IDS_FEEDBACK_RESPONSE_PAUSE "Pause"
+    IDS_FEEDBACK_RESPONSE_RETRY "Retry"
+    IDS_FEEDBACK_RESPONSE_IGNORE "Ignore"
+    IDS_FEEDBACK_RESPONSE_RENAME "Rename"
 END
 
 STRINGTABLE
@@ -1499,29 +1503,10 @@ BEGIN
     IDS_FILTERDATE_STRING   "any"
     IDS_HDREXCLUDEMASK_STRING "Exclude mask"
     IDS_HDREXCLUDEATTRIB_STRING "Attributes excluded"
-    IDS_HDRRESULT_STRING "Response"
-    IDS_HDROPERATION_STRING   "Operation"
-    IDS_HDRSYSTEMERROR_STRING  "System error"
     IDS_FILTERATTRIB_STRING "none"
     IDS_EMPTYFILTER_STRING  "None of filtering options were selected"
     IDS_FLTALLFILTER_STRING "All files (*.*)|*.*||"
     IDS_IMPORTREPORT_STRING "Imported %count path(s)"
-    IDS_SOURCE_FILE_STRING       "source"
-    IDS_DESTINATION_FILE_STRING  "destination"
-END
-
-STRINGTABLE
-BEGIN
-    IDS_OPERATION_DELETEERROR       "Delete"
-    IDS_OPERATION_SEEKERROR         "Seek"
-    IDS_OPERATION_RESIZEERROR       "Resize"
-    IDS_OPERATION_READERROR         "Read"
-    IDS_OPERATION_WRITEERROR        "Write"
-    IDS_OPERATION_FINALIZEERROR     "Finalize"
-    IDS_OPERATION_FASTMOVEERROR     "Fast move"
-    IDS_OPERATION_CREATEERROR       "Create"
-    IDS_OPERATION_CHECKFORFREESPACE "Check for free space"
-    IDS_OPERATION_RETRIEVEFILEINFO  "Retrieve file information"
 END
 
 STRINGTABLE
@@ -1531,6 +1516,25 @@ BEGIN
                             "Cannot initialize common controls. The application will now exit."
     IDS_ERROR_INITIALIZING_RICH_EDIT_CONTROL 
                             "Cannot initialize rich edit control. The application will now exit."
+    IDS_HDRRESULT_STRING    "Response"
+    IDS_SOURCE_FILE_STRING  "source"
+    IDS_DESTINATION_FILE_STRING "destination"
+    IDS_HDROPERATION_STRING "Operation"
+    IDS_HDRSYSTEMERROR_STRING "System error"
+    IDS_OPERATION_DELETEERROR "Delete"
+    IDS_OPERATION_SEEKERROR "Seek"
+    IDS_OPERATION_RESIZEERROR "Resize"
+    IDS_OPERATION_READERROR "Read"
+    IDS_OPERATION_WRITEERROR "Write"
+    IDS_OPERATION_FINALIZEERROR "Finalize"
+    IDS_OPERATION_FASTMOVEERROR "Fast move"
+    IDS_OPERATION_CREATEERROR "Create"
+END
+
+STRINGTABLE
+BEGIN
+    IDS_OPERATION_CHECKFORFREESPACE "Check for free space"
+    IDS_OPERATION_RETRIEVEFILEINFO "Retrieve file information"
 END
 
 STRINGTABLE

@@ -261,6 +261,12 @@
     <ClInclude Include="RuleEditDlg.h">
       <Filter>Source Files\GUI\Dialogs\Feedback rule editor</Filter>
     </ClInclude>
+    <ClInclude Include="RuleEditErrorDlg.h">
+      <Filter>Source Files\GUI\Dialogs\Feedback rule editor</Filter>
+    </ClInclude>
+    <ClInclude Include="RuleEditNotEnoughSpaceDlg.h">
+      <Filter>Source Files\GUI\Dialogs\Feedback rule editor</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\common\TShellExtMenuConfig.cpp">
@@ -447,6 +453,12 @@
       <Filter>Source Files\GUI\Dialogs\Feedback rule editor</Filter>
     </ClCompile>
     <ClCompile Include="RuleEditDlg.cpp">
+      <Filter>Source Files\GUI\Dialogs\Feedback rule editor</Filter>
+    </ClCompile>
+    <ClCompile Include="RuleEditErrorDlg.cpp">
+      <Filter>Source Files\GUI\Dialogs\Feedback rule editor</Filter>
+    </ClCompile>
+    <ClCompile Include="RuleEditNotEnoughSpaceDlg.cpp">
       <Filter>Source Files\GUI\Dialogs\Feedback rule editor</Filter>
     </ClCompile>
   </ItemGroup>
