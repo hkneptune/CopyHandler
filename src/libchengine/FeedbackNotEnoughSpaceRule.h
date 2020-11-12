@@ -23,10 +23,6 @@ namespace chengine
 			eMod_Mask,
 			eMod_UseExcludeMask,
 			eMod_ExcludeMask,
-			eMod_UseErrorType,
-			eMod_ErrorType,
-			eMod_UseSystemErrorNo,
-			eMod_SystemErrorNo,
 			eMod_Result,
 
 			eMod_Last
