@@ -11,8 +11,6 @@
 // Windows Header Files:
 #include <windows.h>
 
-#include <boost/bind.hpp>
-
 #pragma warning(push)
 #pragma warning(disable: 4985)
 
