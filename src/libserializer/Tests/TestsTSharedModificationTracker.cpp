@@ -68,8 +68,8 @@ TEST(TSharedModificationTrackerTests, AlmostCopyConstructor_Unmodified)
 	std::bitset<eLast> setBits2;
 	TSharedModificationTracker<TString, std::bitset<eLast>, eMyElement> tracker2(tracker, setBits2);
 
-	EXPECT_EQ(false, tracker2.IsModified());
-	EXPECT_EQ(false, setBits2[eMyElement]);
+	EXPECT_EQ(true, tracker2.IsModified());
+	EXPECT_EQ(true, setBits2[eMyElement]);
 }
 
 TEST(TSharedModificationTrackerTests, AlmostCopyConstructor_Unmodified_WithValue)
@@ -86,8 +86,8 @@ TEST(TSharedModificationTrackerTests, AlmostCopyConstructor_Unmodified_WithValue
 	std::bitset<eLast> setBits2;
 	TSharedModificationTracker<TString, std::bitset<eLast>, eMyElement> tracker2(tracker, setBits2);
 
-	EXPECT_EQ(false, tracker2.IsModified());
-	EXPECT_EQ(false, setBits2[eMyElement]);
+	EXPECT_EQ(true, tracker2.IsModified());
+	EXPECT_EQ(true, setBits2[eMyElement]);
 	EXPECT_EQ(TString(L"SomeString"), tracker2);
 }
 
