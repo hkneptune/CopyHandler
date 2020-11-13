@@ -1,4 +1,6 @@
 #pragma once
+#include "../libchcore/TCoreException.h"
+#include "../libchcore/ErrorCodes.h"
 
 namespace serializer
 {
@@ -6,9 +8,39 @@ namespace serializer
 	class SerializableContainer
 	{
 	public:
+		SerializableContainer() = default;
+
+		SerializableContainer(const SerializableContainer<T>& rSrc)
+		{
+			for(const T& item : rSrc.m_vEntries)
+			{
+				// ensures proper assignment of new oids
+				Add(item);
+			}
+		}
+
+		SerializableContainer<T>& operator=(const SerializableContainer<T>& rSrc)
+		{
+			if(this != &rSrc)
+			{
+				Clear();
+				for(const T& item : rSrc.m_vEntries)
+				{
+					// ensures proper assignment of new oids
+					Add(item);
+				}
+			}
+
+			return *this;
+		}
+
+		virtual ~SerializableContainer() = default;
 
 		void Store(const serializer::ISerializerContainerPtr& spContainer) const
 		{
+			if(!spContainer)
+				throw chcore::TCoreException(chcore::eErr_InvalidPointer, L"spContainer", LOCATION);
+
 			InitColumns(spContainer);
 
 			spContainer->DeleteRows(m_setRemovedObjects);
@@ -22,6 +54,12 @@ namespace serializer
 
 		void Load(const serializer::ISerializerContainerPtr& spContainer)
 		{
+			if(!spContainer)
+				throw chcore::TCoreException(chcore::eErr_InvalidPointer, L"spContainer", LOCATION);
+
+			m_setRemovedObjects.Clear();
+			m_vEntries.clear();
+
 			InitColumns(spContainer);
 
 			ISerializerRowReaderPtr spRowReader = spContainer->GetRowReader();
@@ -30,9 +68,14 @@ namespace serializer
 				T tEntry;
 				tEntry.Load(spRowReader);
 
-				tEntry.ResetModifications();
-
 				m_vEntries.push_back(tEntry);
+			}
+
+			// ensure all objects have modification flag stripped to avoid unnecessary writing the same data to db again
+			// NOTE: Load() method above should reset modification flag, but storing it in vector will set it again - hence the separate reset
+			for(T& rItem : m_vEntries)
+			{
+				rItem.ResetModifications();
 			}
 		}
 
@@ -45,7 +88,8 @@ namespace serializer
 
 		void Add(const T& rEntry)
 		{
-			m_vEntries.push_back(rEntry);
+			auto iterResult = m_vEntries.insert(m_vEntries.end(), rEntry);
+			iterResult->SetObjectID(++m_oidLastObjectID);
 		}
 
 		bool SetAt(size_t stIndex, const T& rNewEntry)
@@ -55,6 +99,7 @@ namespace serializer
 			{
 				T& rEntry = m_vEntries.at(stIndex);
 
+				// set only data, without changing oid
 				rEntry.SetData(rNewEntry);
 				return true;
 			}
@@ -67,7 +112,8 @@ namespace serializer
 			BOOST_ASSERT(stIndex <= m_vEntries.size());
 			if(stIndex <= m_vEntries.size())
 			{
-				m_vEntries.insert(m_vEntries.begin() + stIndex, rNewEntry);
+				auto iterResult = m_vEntries.insert(m_vEntries.begin() + stIndex, rNewEntry);
+				iterResult->SetObjectID(++m_oidLastObjectID);
 				return true;
 			}
 
@@ -119,6 +165,7 @@ namespace serializer
 		}
 
 	protected:
+		serializer::object_id_t m_oidLastObjectID = 0;
 		std::vector<T> m_vEntries;
 		mutable serializer::TRemovedObjects m_setRemovedObjects;
 	};
