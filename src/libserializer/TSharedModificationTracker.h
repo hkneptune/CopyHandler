@@ -41,7 +41,7 @@ namespace serializer
 			m_tValue(rSrc.m_tValue),
 			m_rBitset(rBitset)
 		{
-			m_rBitset[ChangeBit] = rSrc.m_rBitset[ChangeBit];
+			MarkAsModified();
 		}
 
 		template<class... V>
@@ -56,8 +56,7 @@ namespace serializer
 		{
 			if (this != &rValue)
 			{
-				m_tValue = rValue.m_tValue;
-				m_rBitset[ChangeBit] = rValue.m_rBitset[ChangeBit];
+				operator=(rValue.Get());
 			}
 
 			return *this;
