@@ -104,9 +104,12 @@ namespace chengine
 		FeedbackManagerPtr spFeedbackManager = GetContext().GetFeedbackManager();
 		spFeedbackManager->SetSecondaryTimeTracker(&guard);
 
+#pragma warning(push)
+#pragma warning(disable: 4459)
 		BOOST_SCOPE_EXIT(&spFeedbackManager) {
 			spFeedbackManager->SetSecondaryTimeTracker(nullptr);
 		} BOOST_SCOPE_EXIT_END
+#pragma warning(pop)
 
 		TFileInfoArray& rFilesCache = GetContext().GetFilesCache();
 		TTaskConfigTracker& rCfgTracker = GetContext().GetCfgTracker();

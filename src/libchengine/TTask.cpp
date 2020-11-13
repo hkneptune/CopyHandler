@@ -550,10 +550,12 @@ namespace chengine
 		// set time tracker and ensure it is unset on scope exit
 		m_spFeedbackManager->SetTimeTracker(&tProcessingGuard);
 
+#pragma warning(push)
+#pragma warning(disable: 4459)
 		BOOST_SCOPE_EXIT(&m_spFeedbackManager) {
 			m_spFeedbackManager->SetTimeTracker(nullptr);
 		} BOOST_SCOPE_EXIT_END
-
+#pragma warning(pop)
 		const size_t ExceptionBufferSize = 2048;
 		std::unique_ptr<wchar_t[]> upExceptionInfoBuffer(new wchar_t[ExceptionBufferSize]);
 		try
