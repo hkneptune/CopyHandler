@@ -32,14 +32,15 @@ static char THIS_FILE[] = __FILE__;
 /////////////////////////////////////////////////////////////////////////////
 // CFeedbackNotEnoughSpaceDlg dialog
 
-CFeedbackNotEnoughSpaceDlg::CFeedbackNotEnoughSpaceDlg(unsigned long long ullSizeRequired, const wchar_t* pszSrcPath, const wchar_t* pszDstPath)
+CFeedbackNotEnoughSpaceDlg::CFeedbackNotEnoughSpaceDlg(chengine::FeedbackRules& currentRules, unsigned long long ullSizeRequired, const wchar_t* pszSrcPath, const wchar_t* pszDstPath)
 	:ictranslate::CLanguageDialog(IDD_FEEDBACK_NOTENOUGHSPACE_DIALOG),
 	m_strDisk(pszDstPath),
 	m_ullRequired(ullSizeRequired),
 	m_bAllItems(FALSE),
-	m_fsLocal(GetLogFileData())
+	m_fsLocal(GetLogFileData()),
+	m_rules(currentRules)
 {
-	m_vstrFiles.push_back(pszSrcPath);
+	m_vstrFiles.emplace_back(pszSrcPath);
 }
 
 bool CFeedbackNotEnoughSpaceDlg::IsApplyToAllItemsChecked() const
@@ -47,9 +48,9 @@ bool CFeedbackNotEnoughSpaceDlg::IsApplyToAllItemsChecked() const
 	return m_bAllItems;
 }
 
-const chengine::FeedbackNotEnoughSpaceRuleList& CFeedbackNotEnoughSpaceDlg::GetRules() const
+const chengine::FeedbackRules& CFeedbackNotEnoughSpaceDlg::GetRules() const
 {
-	return m_feedbackRules;
+	return m_rules;
 }
 
 void CFeedbackNotEnoughSpaceDlg::DoDataExchange(CDataExchange* pDX)

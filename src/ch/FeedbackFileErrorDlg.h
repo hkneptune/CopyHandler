@@ -20,6 +20,7 @@
 #define __FEEDBACKFILEERRORDLG_H__
 
 #include "../libchengine/FeedbackErrorRuleList.h"
+#include "../libchengine/FeedbackRules.h"
 
 // CFeedbackFileErrorDlg dialog
 class CFeedbackFileErrorDlg : public ictranslate::CLanguageDialog
@@ -27,12 +28,12 @@ class CFeedbackFileErrorDlg : public ictranslate::CLanguageDialog
 	DECLARE_DYNAMIC(CFeedbackFileErrorDlg)
 
 public:
-	CFeedbackFileErrorDlg(const wchar_t* pszSrcPath, const wchar_t* pszDstPath, unsigned long ulSysError, CWnd* pParent = nullptr);   // standard constructor
+	CFeedbackFileErrorDlg(chengine::FeedbackRules& currentRules, const wchar_t* pszSrcPath, const wchar_t* pszDstPath, unsigned long ulSysError, CWnd* pParent = nullptr);   // standard constructor
 	virtual ~CFeedbackFileErrorDlg();
 
 	bool IsApplyToAllItemsChecked() const;
 
-	const chengine::FeedbackErrorRuleList& GetRules() const;
+	const chengine::FeedbackRules& GetRules() const;
 
 protected:
 	void DoDataExchange(CDataExchange* pDX) override;    // DDX/DDV support
@@ -53,7 +54,7 @@ private:
 	CString m_strDstPath;
 	unsigned long m_ulSysError = 0;
 
-	chengine::FeedbackErrorRuleList m_feedbackRules;	// feedback rules resulting from choices made in this dialog box
+	chengine::FeedbackRules& m_rules;
 };
 
 #endif

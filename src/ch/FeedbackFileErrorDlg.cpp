@@ -12,12 +12,13 @@
 
 IMPLEMENT_DYNAMIC(CFeedbackFileErrorDlg, ictranslate::CLanguageDialog)
 
-CFeedbackFileErrorDlg::CFeedbackFileErrorDlg(const wchar_t* pszSrcPath, const wchar_t* pszDstPath, unsigned long ulSysError, CWnd* pParent /*=nullptr*/)
+CFeedbackFileErrorDlg::CFeedbackFileErrorDlg(chengine::FeedbackRules& currentRules, const wchar_t* pszSrcPath, const wchar_t* pszDstPath, unsigned long ulSysError, CWnd* pParent /*=nullptr*/)
 	: ictranslate::CLanguageDialog(IDD_FEEDBACK_FILE_ERROR_DIALOG, pParent),
 	m_bAllItems(FALSE),
 	m_strSrcPath(pszSrcPath),
 	m_strDstPath(pszDstPath),
-	m_ulSysError(ulSysError)
+	m_ulSysError(ulSysError),
+	m_rules(currentRules)
 {
 }
 
@@ -30,9 +31,9 @@ bool CFeedbackFileErrorDlg::IsApplyToAllItemsChecked() const
 	return m_bAllItems;
 }
 
-const chengine::FeedbackErrorRuleList& CFeedbackFileErrorDlg::GetRules() const
+const chengine::FeedbackRules& CFeedbackFileErrorDlg::GetRules() const
 {
-	return m_feedbackRules;
+	return m_rules;
 }
 
 void CFeedbackFileErrorDlg::DoDataExchange(CDataExchange* pDX)

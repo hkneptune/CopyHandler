@@ -21,6 +21,7 @@
 
 #include "../libchengine/TLocalFilesystem.h"
 #include "../libchengine/FeedbackNotEnoughSpaceRuleList.h"
+#include "../libchengine/FeedbackRules.h"
 
 /////////////////////////////////////////////////////////////////////////////
 // CFeedbackNotEnoughSpaceDlg dialog
@@ -28,11 +29,11 @@
 class CFeedbackNotEnoughSpaceDlg : public ictranslate::CLanguageDialog
 {
 public:
-	CFeedbackNotEnoughSpaceDlg(unsigned long long ullSizeRequired, const wchar_t* pszSrcPath, const wchar_t* pszDstPath);   // standard constructor
+	CFeedbackNotEnoughSpaceDlg(chengine::FeedbackRules& currentRules, unsigned long long ullSizeRequired, const wchar_t* pszSrcPath, const wchar_t* pszDstPath);   // standard constructor
 
 	bool IsApplyToAllItemsChecked() const;
 
-	const chengine::FeedbackNotEnoughSpaceRuleList& GetRules() const;
+	const chengine::FeedbackRules& GetRules() const;
 
 protected:
 	void DoDataExchange(CDataExchange* pDX) override;    // DDX/DDV support
@@ -58,7 +59,7 @@ private:
 	CListBox m_ctlFiles;
 
 	chengine::TLocalFilesystem m_fsLocal;
-	chengine::FeedbackNotEnoughSpaceRuleList m_feedbackRules;	// feedback rules resulting from choices made in this dialog box
+	chengine::FeedbackRules& m_rules;
 };
 
 #endif

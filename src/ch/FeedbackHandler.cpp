@@ -30,12 +30,12 @@ using namespace chcore;
 using namespace chengine;
 using namespace string;
 
-chengine::EFeedbackResult CFeedbackHandler::FileError(const TString& strSrcPath, const TString& strDstPath, EFileError /*eFileError*/, unsigned long ulError, FeedbackErrorRuleList& rNewRules)
+chengine::EFeedbackResult CFeedbackHandler::FileError(const TString& strSrcPath, const TString& strDstPath, EFileError /*eFileError*/, unsigned long ulError, FeedbackRules& rNewRules)
 {
-	CFeedbackFileErrorDlg dlg(strSrcPath.c_str(), strDstPath.c_str(), ulError);
+	CFeedbackFileErrorDlg dlg(rNewRules, strSrcPath.c_str(), strDstPath.c_str(), ulError);
 	EFeedbackResult eResult = (EFeedbackResult)dlg.DoModal();
 
-	if(!dlg.GetRules().IsEmpty())
+	if(dlg.GetRules().IsModified())
 		rNewRules = dlg.GetRules();
 
 	return eResult;
@@ -51,24 +51,24 @@ chengine::EFeedbackResult CFeedbackHandler::FileAlreadyExists(const TFileInfo& s
 	if(eResult == eResult_Rename)
 		strRenameName = dlg.GetNewName();
 
-	if(!dlg.GetRules().IsModified())
+	if(dlg.GetRules().IsModified())
 		rNewRules = dlg.GetRules();
 
 	return eResult;
 }
 
-chengine::EFeedbackResult CFeedbackHandler::NotEnoughSpace(const TString& strSrcPath, const TString& strDstPath, unsigned long long ullRequiredSize, FeedbackNotEnoughSpaceRuleList& rNewRules)
+chengine::EFeedbackResult CFeedbackHandler::NotEnoughSpace(const TString& strSrcPath, const TString& strDstPath, unsigned long long ullRequiredSize, FeedbackRules& rNewRules)
 {
-	CFeedbackNotEnoughSpaceDlg dlg(ullRequiredSize, strSrcPath.c_str(), strDstPath.c_str());
+	CFeedbackNotEnoughSpaceDlg dlg(rNewRules, ullRequiredSize, strSrcPath.c_str(), strDstPath.c_str());
 	EFeedbackResult eResult = (EFeedbackResult) dlg.DoModal();
 
-	if(!dlg.GetRules().IsEmpty())
+	if(dlg.GetRules().IsModified())
 		rNewRules = dlg.GetRules();
 
 	return eResult;
 }
 
-chengine::EFeedbackResult CFeedbackHandler::OperationEvent(EOperationEvent eEvent, FeedbackOperationEventRuleList&)
+chengine::EFeedbackResult CFeedbackHandler::OperationEvent(EOperationEvent eEvent, FeedbackRules&)
 {
 	switch(eEvent)
 	{

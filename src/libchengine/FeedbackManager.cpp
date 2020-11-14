@@ -63,19 +63,23 @@ namespace chengine
 
 		if(eResult == eResult_Unknown)
 		{
-			FeedbackErrorRuleList newRules;
+			FeedbackRules modRules;
+			{
+				boost::shared_lock<boost::shared_mutex> lock(m_lock);
+				modRules = m_feedbackRules;
+			}
 			{
 				TScopedRunningTimeTrackerPause scopedTimePause(m_pTimeTracker);
 				TScopedRunningTimeTrackerPause scopedSecondaryTimePause(m_pSecondaryTimeTracker);
-				eResult = m_spFeedbackHandler->FileError(strSrcPath, strDstPath, eFileError, ulError, newRules);
+				eResult = m_spFeedbackHandler->FileError(strSrcPath, strDstPath, eFileError, ulError, modRules);
 			}
 			if(eResult != eResult_Unknown)
 			{
 				bAutomatedResponse = false;
-				if(!newRules.IsEmpty())
+
 				{
 					boost::unique_lock<boost::shared_mutex> lock(m_lock);
-					m_feedbackRules.GetErrorRules().Merge(newRules);
+					m_feedbackRules = modRules;
 				}
 			}
 		}
@@ -137,19 +141,23 @@ namespace chengine
 		}
 		if(eResult == eResult_Unknown)
 		{
-			FeedbackNotEnoughSpaceRuleList newRules;
+			FeedbackRules modRules;
+			{
+				boost::shared_lock<boost::shared_mutex> lock(m_lock);
+				modRules = m_feedbackRules;
+			}
 			{
 				TScopedRunningTimeTrackerPause scopedTimePause(m_pTimeTracker);
 				TScopedRunningTimeTrackerPause scopedSecondaryTimePause(m_pSecondaryTimeTracker);
-				eResult = m_spFeedbackHandler->NotEnoughSpace(strSrcPath, strDstPath, ullRequiredSize, newRules);
+				eResult = m_spFeedbackHandler->NotEnoughSpace(strSrcPath, strDstPath, ullRequiredSize, modRules);
 			}
 			if(eResult != eResult_Unknown)
 			{
 				bAutomatedResponse = false;
-				if(!newRules.IsEmpty())
+
 				{
 					boost::unique_lock<boost::shared_mutex> lock(m_lock);
-					m_feedbackRules.GetNotEnoughSpaceRules().Merge(newRules);
+					m_feedbackRules = modRules;
 				}
 			}
 		}
@@ -168,19 +176,22 @@ namespace chengine
 		}
 		if(eResult == eResult_Unknown)
 		{
-			FeedbackOperationEventRuleList newRules;
+			FeedbackRules modRules;
+			{
+				boost::shared_lock<boost::shared_mutex> lock(m_lock);
+				modRules = m_feedbackRules;
+			}
 			{
 				TScopedRunningTimeTrackerPause scopedTimePause(m_pTimeTracker);
 				TScopedRunningTimeTrackerPause scopedSecondaryTimePause(m_pSecondaryTimeTracker);
-				eResult = m_spFeedbackHandler->OperationEvent(eEvent, newRules);
+				eResult = m_spFeedbackHandler->OperationEvent(eEvent, modRules);
 			}
 			if(eResult != eResult_Unknown)
 			{
 				bAutomatedResponse = false;
-				if(!newRules.IsEmpty())
 				{
 					boost::unique_lock<boost::shared_mutex> lock(m_lock);
-					m_feedbackRules.GetOperationEventRules().Merge(newRules);
+					m_feedbackRules = modRules;
 				}
 			}
 		}
