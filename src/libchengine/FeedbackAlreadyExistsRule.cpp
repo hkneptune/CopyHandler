@@ -22,9 +22,8 @@ namespace chengine
 		m_setModifications[FeedbackAlreadyExistsRuleEnum::eMod_Added] = true;
 	}
 
-
 	FeedbackAlreadyExistsRule::FeedbackAlreadyExistsRule(const FeedbackAlreadyExistsRule& rSrc) :
-		serializer::SerializableObject<FeedbackAlreadyExistsRuleEnum::eMod_Last>(rSrc),
+		serializer::SerializableObject<FeedbackAlreadyExistsRuleEnum::eMod_Last, FeedbackAlreadyExistsRuleEnum::eMod_Added>(rSrc),
 		m_bUseMask(rSrc.m_bUseMask, m_setModifications),
 		m_spaMask(rSrc.m_spaMask, m_setModifications),
 		m_bUseExcludeMask(rSrc.m_bUseExcludeMask, m_setModifications),
@@ -180,6 +179,8 @@ namespace chengine
 	void FeedbackAlreadyExistsRule::Load(const ISerializerRowReaderPtr& spRowReader)
 	{
 		TString strMask;
+
+		spRowReader->GetValue(_T("id"), m_oidObjectID);
 
 		spRowReader->GetValue(_T("use_mask"), m_bUseMask.Modify());
 		spRowReader->GetValue(_T("mask"), strMask);

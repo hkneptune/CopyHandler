@@ -31,7 +31,7 @@ namespace chengine
 
 #pragma warning(push)
 #pragma warning(disable: 4251)
-	class LIBCHENGINE_API FeedbackNotEnoughSpaceRule : public serializer::SerializableObject<FeedbackNotEnoughSpaceRuleEnum::eMod_Last>
+	class LIBCHENGINE_API FeedbackNotEnoughSpaceRule : public serializer::SerializableObject<FeedbackNotEnoughSpaceRuleEnum::eMod_Last, FeedbackNotEnoughSpaceRuleEnum::eMod_Added>
 	{
 	public:
 		FeedbackNotEnoughSpaceRule();

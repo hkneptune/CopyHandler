@@ -26,7 +26,7 @@ namespace chengine
 
 
 	FeedbackErrorRule::FeedbackErrorRule(const FeedbackErrorRule& rSrc) :
-		serializer::SerializableObject<FeedbackErrorRuleEnum::eMod_Last>(rSrc),
+		serializer::SerializableObject<FeedbackErrorRuleEnum::eMod_Last, FeedbackErrorRuleEnum::eMod_Added>(rSrc),
 		m_bUseMask(rSrc.m_bUseMask, m_setModifications),
 		m_spaMask(rSrc.m_spaMask, m_setModifications),
 		m_bUseExcludeMask(rSrc.m_bUseExcludeMask, m_setModifications),
@@ -183,6 +183,8 @@ namespace chengine
 	void FeedbackErrorRule::Load(const ISerializerRowReaderPtr& spRowReader)
 	{
 		TString strMask;
+
+		spRowReader->GetValue(_T("id"), m_oidObjectID);
 
 		spRowReader->GetValue(_T("use_mask"), m_bUseMask.Modify());
 		spRowReader->GetValue(_T("mask"), strMask);

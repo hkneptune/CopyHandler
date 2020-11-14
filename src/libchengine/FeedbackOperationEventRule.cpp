@@ -19,7 +19,7 @@ namespace chengine
 	}
 
 	FeedbackOperationEventRule::FeedbackOperationEventRule(const FeedbackOperationEventRule& rSrc) :
-		serializer::SerializableObject<FeedbackOperationEventRuleEnum::eMod_Last>(rSrc),
+		serializer::SerializableObject<FeedbackOperationEventRuleEnum::eMod_Last, FeedbackOperationEventRuleEnum::eMod_Added>(rSrc),
 		m_bUseOperationEvent(rSrc.m_bUseOperationEvent, m_setModifications),
 		m_eOperationEvent(rSrc.m_eOperationEvent, m_setModifications),
 		m_eResult(rSrc.m_eResult, m_setModifications)
@@ -110,6 +110,8 @@ namespace chengine
 	void FeedbackOperationEventRule::Load(const ISerializerRowReaderPtr& spRowReader)
 	{
 		TString strMask;
+
+		spRowReader->GetValue(_T("id"), m_oidObjectID);
 
 		spRowReader->GetValue(_T("use_operation_event"), m_bUseOperationEvent.Modify());
 		spRowReader->GetValue(_T("operation_event"), *(int*)&m_eOperationEvent.Modify());

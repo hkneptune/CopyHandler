@@ -47,6 +47,7 @@ namespace chengine
 	{
 		boost::unique_lock<boost::shared_mutex> lock(m_lock);
 		spFileInfo->SetObjectID(++m_oidLastObjectID);
+		spFileInfo->MarkAsAdded();
 		m_vFiles.push_back(spFileInfo);
 	}
 

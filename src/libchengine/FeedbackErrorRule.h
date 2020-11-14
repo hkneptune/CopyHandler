@@ -35,7 +35,7 @@ namespace chengine
 
 #pragma warning(push)
 #pragma warning(disable: 4251)
-	class LIBCHENGINE_API FeedbackErrorRule : public serializer::SerializableObject<FeedbackErrorRuleEnum::eMod_Last>
+	class LIBCHENGINE_API FeedbackErrorRule : public serializer::SerializableObject<FeedbackErrorRuleEnum::eMod_Last, FeedbackErrorRuleEnum::eMod_Added>
 	{
 	public:
 		FeedbackErrorRule();

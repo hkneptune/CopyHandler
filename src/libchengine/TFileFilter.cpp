@@ -518,9 +518,9 @@ namespace chengine
 
 	void TFileFilter::Store(const ISerializerContainerPtr& spContainer) const
 	{
-		bool bAdded = m_setModifications[FileFilterEnum::eMod_Added];
 		if (m_setModifications.any())
 		{
+			bool bAdded = m_setModifications[FileFilterEnum::eMod_Added];
 			ISerializerRowData& rRow = spContainer->GetRow(m_oidObjectID, bAdded);
 
 			if (bAdded || m_setModifications[FileFilterEnum::eMod_UseMask])
@@ -587,6 +587,7 @@ namespace chengine
 		time_t tValue = 0;
 		TString strMask;
 
+		spRowReader->GetValue(_T("id"), m_oidObjectID);
 		spRowReader->GetValue(_T("use_mask"), m_bUseMask.Modify());
 		spRowReader->GetValue(_T("mask"), strMask);
 		SetCombinedMask(strMask);

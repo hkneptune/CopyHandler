@@ -106,6 +106,8 @@ namespace chengine
 		static void InitColumns(serializer::IColumnsDefinition& rColumns);
 		void Load(const serializer::ISerializerRowReaderPtr& spRowReader, const TBasePathDataContainerPtr& spSrcContainer);
 
+		void MarkAsAdded() { m_setModifications[eMod_Added] = true; }
+
 	private:
 		enum EModifications
 		{

@@ -59,6 +59,7 @@ namespace serializer
 
 			m_setRemovedObjects.Clear();
 			m_vEntries.clear();
+			m_oidLastObjectID = 0;
 
 			InitColumns(spContainer);
 
@@ -68,6 +69,7 @@ namespace serializer
 				T tEntry;
 				tEntry.Load(spRowReader);
 
+				m_oidLastObjectID = std::max(m_oidLastObjectID, tEntry.GetObjectID());
 				m_vEntries.push_back(tEntry);
 			}
 
@@ -87,6 +89,7 @@ namespace serializer
 		{
 			auto iterResult = m_vEntries.insert(m_vEntries.end(), rEntry);
 			iterResult->SetObjectID(++m_oidLastObjectID);
+			iterResult->MarkAsAdded();
 		}
 
 		bool SetAt(size_t stIndex, const T& rNewEntry)
@@ -111,6 +114,7 @@ namespace serializer
 			{
 				auto iterResult = m_vEntries.insert(m_vEntries.begin() + stIndex, rNewEntry);
 				iterResult->SetObjectID(++m_oidLastObjectID);
+				iterResult->MarkAsAdded();
 				return true;
 			}
 

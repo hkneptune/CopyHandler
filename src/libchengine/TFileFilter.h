@@ -72,7 +72,7 @@ namespace chengine
 
 #pragma warning(push)
 #pragma warning(disable: 4251)
-	class LIBCHENGINE_API TFileFilter : public serializer::SerializableObject<FileFilterEnum::eMod_Last>
+	class LIBCHENGINE_API TFileFilter : public serializer::SerializableObject<FileFilterEnum::eMod_Last, FileFilterEnum::eMod_Added>
 	{
 	public:
 		enum EDateType

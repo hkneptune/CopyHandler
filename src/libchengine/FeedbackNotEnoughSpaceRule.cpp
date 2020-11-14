@@ -22,7 +22,7 @@ namespace chengine
 
 
 	FeedbackNotEnoughSpaceRule::FeedbackNotEnoughSpaceRule(const FeedbackNotEnoughSpaceRule& rSrc) :
-		serializer::SerializableObject<FeedbackNotEnoughSpaceRuleEnum::eMod_Last>(rSrc),
+		serializer::SerializableObject<FeedbackNotEnoughSpaceRuleEnum::eMod_Last, FeedbackNotEnoughSpaceRuleEnum::eMod_Added>(rSrc),
 		m_bUseMask(rSrc.m_bUseMask, m_setModifications),
 		m_spaMask(rSrc.m_spaMask, m_setModifications),
 		m_bUseExcludeMask(rSrc.m_bUseExcludeMask, m_setModifications),
@@ -136,6 +136,8 @@ namespace chengine
 	void FeedbackNotEnoughSpaceRule::Load(const ISerializerRowReaderPtr& spRowReader)
 	{
 		TString strMask;
+
+		spRowReader->GetValue(_T("id"), m_oidObjectID);
 
 		spRowReader->GetValue(_T("use_mask"), m_bUseMask.Modify());
 		spRowReader->GetValue(_T("mask"), strMask);

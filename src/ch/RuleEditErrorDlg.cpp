@@ -110,7 +110,8 @@ BOOL RuleEditErrorDlg::OnInitDialog()
 		const wchar_t* pszData = GetResManager().LoadString(iIndex);
 		m_ctlResponse.AddString(pszData);
 	}
-	
+	m_ctlResponse.SetCurSel(IDS_FEEDBACK_RESPONSE_SKIP - IDS_FEEDBACK_RESPONSE_UNKNOWN);
+
 	UpdateData(FALSE);
 
 	EnableControls();
@@ -177,7 +178,7 @@ void RuleEditErrorDlg::OnOK()
 
 	CString strErrorNo;
 	m_ctlSystemError.GetWindowText(strErrorNo);
-	unsigned int uiErrorNo = boost::lexical_cast<unsigned int>(strErrorNo);
+	unsigned int uiErrorNo = boost::lexical_cast<unsigned int>((PCTSTR)strErrorNo);
 	m_rule.SetSystemErrorNo(uiErrorNo);
 
 	// date

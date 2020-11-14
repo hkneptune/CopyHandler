@@ -10,6 +10,7 @@
 #include "../libchengine/TFileInfo.h"
 #include "StringHelpers.h"
 #include "../libchengine/FeedbackPredefinedRules.h"
+#include "RuleEditDlg.h"
 
 using namespace chengine;
 using namespace string;
@@ -52,6 +53,8 @@ void CFeedbackReplaceDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_SKIP_BUTTON, m_btnSkip);
 	DDX_Control(pDX, IDC_PAUSE_BUTTON, m_btnPause);
 	DDX_Control(pDX, IDC_CANCEL_BUTTON, m_btnCancel);
+
+	DDX_Control(pDX, IDC_CUSTOM_RULES_BUTTON, m_btnCustomRules);
 }
 
 BEGIN_MESSAGE_MAP(CFeedbackReplaceDlg, ictranslate::CLanguageDialog)
@@ -61,6 +64,7 @@ BEGIN_MESSAGE_MAP(CFeedbackReplaceDlg, ictranslate::CLanguageDialog)
 	ON_BN_CLICKED(IDC_SKIP_BUTTON, &CFeedbackReplaceDlg::OnBnClickedSkipButton)
 	ON_BN_CLICKED(IDC_PAUSE_BUTTON, &CFeedbackReplaceDlg::OnBnClickedPauseButton)
 	ON_BN_CLICKED(IDC_CANCEL_BUTTON, &CFeedbackReplaceDlg::OnBnClickedCancelButton)
+	ON_BN_CLICKED(IDC_CUSTOM_RULES_BUTTON, &CFeedbackReplaceDlg::OnBnCustomRulesButton)
 	ON_WM_GETMINMAXINFO()
 END_MESSAGE_MAP()
 
@@ -303,6 +307,15 @@ void CFeedbackReplaceDlg::OnBnClickedCancelButton()
 {
 	UpdateData(TRUE);
 	EndDialog(chengine::EFeedbackResult::eResult_Cancel);
+}
+
+void CFeedbackReplaceDlg::OnBnCustomRulesButton()
+{
+	RuleEditDlg dlg(m_rules);
+	if(dlg.DoModal() == IDOK)
+	{
+		// todo: apply modified rules
+	}
 }
 
 void CFeedbackReplaceDlg::OnCancel()

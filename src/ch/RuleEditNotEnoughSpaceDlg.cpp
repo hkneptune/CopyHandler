@@ -83,7 +83,8 @@ BOOL RuleEditNotEnoughSpaceDlg::OnInitDialog()
 		const wchar_t* pszData = GetResManager().LoadString(iIndex);
 		m_ctlResponse.AddString(pszData);
 	}
-	
+	m_ctlResponse.SetCurSel(IDS_FEEDBACK_RESPONSE_IGNORE - IDS_FEEDBACK_RESPONSE_UNKNOWN);
+
 	UpdateData(FALSE);
 
 	EnableControls();

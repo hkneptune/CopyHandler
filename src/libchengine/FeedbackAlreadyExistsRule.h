@@ -34,7 +34,7 @@ namespace chengine
 
 #pragma warning(push)
 #pragma warning(disable: 4251)
-	class LIBCHENGINE_API FeedbackAlreadyExistsRule : public serializer::SerializableObject<FeedbackAlreadyExistsRuleEnum::eMod_Last>
+	class LIBCHENGINE_API FeedbackAlreadyExistsRule : public serializer::SerializableObject<FeedbackAlreadyExistsRuleEnum::eMod_Last, FeedbackAlreadyExistsRuleEnum::eMod_Added>
 	{
 	public:
 		FeedbackAlreadyExistsRule();

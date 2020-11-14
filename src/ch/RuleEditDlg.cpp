@@ -37,6 +37,7 @@ RuleEditDlg::RuleEditDlg(const FeedbackRules& rRules) :
 	ictranslate::CLanguageDialog(IDD_RULE_EDIT_ALL_DIALOG),
 	m_rules(rRules)
 {
+	m_rules.ResetModifications();
 }
 
 void RuleEditDlg::DoDataExchange(CDataExchange* pDX)
@@ -128,35 +129,35 @@ void RuleEditDlg::InitAlreadyExistsColumns()
 	lvc.iSubItem = -1;
 	lvc.pszText = (PTSTR)GetResManager().LoadString(IDS_HDRMASK_STRING);
 	lvc.cchTextMax = lstrlen(lvc.pszText);
-	lvc.cx = static_cast<int>(0.15 * rc.Width());
+	lvc.cx = static_cast<int>(0.2 * rc.Width());
 	m_ctlAlreadyExistsRulesList.InsertColumn(1, &lvc);
 
 	// exclude mask
 	lvc.iSubItem = 0;
 	lvc.pszText = (PTSTR)GetResManager().LoadString(IDS_HDREXCLUDEMASK_STRING);
 	lvc.cchTextMax = lstrlen(lvc.pszText);
-	lvc.cx = static_cast<int>(0.15 * rc.Width());
+	lvc.cx = static_cast<int>(0.2 * rc.Width());
 	m_ctlAlreadyExistsRulesList.InsertColumn(2, &lvc);
 
 	// size
 	lvc.iSubItem = 1;
 	lvc.pszText = (PTSTR)GetResManager().LoadString(IDS_HDRSIZE_STRING);
 	lvc.cchTextMax = lstrlen(lvc.pszText);
-	lvc.cx = static_cast<int>(0.3 * rc.Width());
+	lvc.cx = static_cast<int>(0.2 * rc.Width());
 	m_ctlAlreadyExistsRulesList.InsertColumn(3, &lvc);
 
 	// time
 	lvc.iSubItem = 2;
 	lvc.pszText = (PTSTR)GetResManager().LoadString(IDS_HDRDATE_STRING);
 	lvc.cchTextMax = lstrlen(lvc.pszText);
-	lvc.cx = static_cast<int>(0.3 * rc.Width());
+	lvc.cx = static_cast<int>(0.2 * rc.Width());
 	m_ctlAlreadyExistsRulesList.InsertColumn(4, &lvc);
 
 	// attributes
 	lvc.iSubItem = 3;
 	lvc.pszText = (PTSTR)GetResManager().LoadString(IDS_HDRRESULT_STRING);
 	lvc.cchTextMax = lstrlen(lvc.pszText);
-	lvc.cx = static_cast<int>(0.1 * rc.Width());
+	lvc.cx = static_cast<int>(0.2 * rc.Width());
 	m_ctlAlreadyExistsRulesList.InsertColumn(5, &lvc);
 }
 
@@ -174,35 +175,35 @@ void RuleEditDlg::InitErrorColumns()
 	lvc.iSubItem = -1;
 	lvc.pszText = (PTSTR)GetResManager().LoadString(IDS_HDRMASK_STRING);
 	lvc.cchTextMax = lstrlen(lvc.pszText);
-	lvc.cx = static_cast<int>(0.15 * rc.Width());
+	lvc.cx = static_cast<int>(0.2 * rc.Width());
 	m_ctlErrorRulesList.InsertColumn(1, &lvc);
 
 	// exclude mask
 	lvc.iSubItem = 0;
 	lvc.pszText = (PTSTR)GetResManager().LoadString(IDS_HDREXCLUDEMASK_STRING);
 	lvc.cchTextMax = lstrlen(lvc.pszText);
-	lvc.cx = static_cast<int>(0.15 * rc.Width());
+	lvc.cx = static_cast<int>(0.2 * rc.Width());
 	m_ctlErrorRulesList.InsertColumn(2, &lvc);
 
 	// operation type
 	lvc.iSubItem = 1;
 	lvc.pszText = (PTSTR)GetResManager().LoadString(IDS_HDROPERATION_STRING);
 	lvc.cchTextMax = lstrlen(lvc.pszText);
-	lvc.cx = static_cast<int>(0.3 * rc.Width());
+	lvc.cx = static_cast<int>(0.2 * rc.Width());
 	m_ctlErrorRulesList.InsertColumn(3, &lvc);
 
 	// system error
 	lvc.iSubItem = 2;
 	lvc.pszText = (PTSTR)GetResManager().LoadString(IDS_HDRSYSTEMERROR_STRING);
 	lvc.cchTextMax = lstrlen(lvc.pszText);
-	lvc.cx = static_cast<int>(0.3 * rc.Width());
+	lvc.cx = static_cast<int>(0.2 * rc.Width());
 	m_ctlErrorRulesList.InsertColumn(4, &lvc);
 
 	// result
 	lvc.iSubItem = 3;
 	lvc.pszText = (PTSTR)GetResManager().LoadString(IDS_HDRRESULT_STRING);
 	lvc.cchTextMax = lstrlen(lvc.pszText);
-	lvc.cx = static_cast<int>(0.1 * rc.Width());
+	lvc.cx = static_cast<int>(0.2 * rc.Width());
 	m_ctlErrorRulesList.InsertColumn(5, &lvc);
 }
 
@@ -220,21 +221,21 @@ void RuleEditDlg::InitNotEnoughSpaceColumns()
 	lvc.iSubItem = -1;
 	lvc.pszText = (PTSTR)GetResManager().LoadString(IDS_HDRMASK_STRING);
 	lvc.cchTextMax = lstrlen(lvc.pszText);
-	lvc.cx = static_cast<int>(0.15 * rc.Width());
+	lvc.cx = static_cast<int>(0.4 * rc.Width());
 	m_ctlNotEnoughSpaceRulesList.InsertColumn(1, &lvc);
 
 	// exclude mask
 	lvc.iSubItem = 0;
 	lvc.pszText = (PTSTR)GetResManager().LoadString(IDS_HDREXCLUDEMASK_STRING);
 	lvc.cchTextMax = lstrlen(lvc.pszText);
-	lvc.cx = static_cast<int>(0.15 * rc.Width());
+	lvc.cx = static_cast<int>(0.4 * rc.Width());
 	m_ctlNotEnoughSpaceRulesList.InsertColumn(2, &lvc);
 
 	// result
 	lvc.iSubItem = 1;
 	lvc.pszText = (PTSTR)GetResManager().LoadString(IDS_HDRRESULT_STRING);
 	lvc.cchTextMax = lstrlen(lvc.pszText);
-	lvc.cx = static_cast<int>(0.1 * rc.Width());
+	lvc.cx = static_cast<int>(0.2 * rc.Width());
 	m_ctlNotEnoughSpaceRulesList.InsertColumn(5, &lvc);
 }
 
@@ -319,7 +320,7 @@ void RuleEditDlg::AddAlreadyExistsRule(const FeedbackAlreadyExistsRule& rRule, i
 	lvi.iSubItem = 2;
 
 	TString strSrcFile = GetResManager().LoadString(IDS_SOURCE_FILE_STRING);
-	TString strDstFile = GetResManager().LoadString(IDS_SOURCE_FILE_STRING);
+	TString strDstFile = GetResManager().LoadString(IDS_DESTINATION_FILE_STRING);
 
 	if(rRule.GetUseSizeCompare())
 	{

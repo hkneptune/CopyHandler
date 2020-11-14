@@ -7,25 +7,59 @@
 
 namespace serializer
 {
-	template<size_t BitsetSize>
+	template<size_t BitsetSize, size_t AddedBit>
 	class SerializableObject
 	{
 	public:
-		SerializableObject();
-		SerializableObject(const SerializableObject& rSrc);
-		virtual ~SerializableObject();
+		SerializableObject() = default;
 
-		SerializableObject& operator=(const SerializableObject& rSrc);
+		SerializableObject(const SerializableObject& rSrc) :
+			m_oidObjectID(rSrc.m_oidObjectID),
+			m_setModifications(rSrc.m_setModifications)
+		{
+		}
+
+		virtual ~SerializableObject() = default;
+
+		SerializableObject& operator=(const SerializableObject& rSrc)
+		{
+			if(this != &rSrc)
+			{
+				m_oidObjectID = rSrc.m_oidObjectID;
+				m_setModifications = rSrc.m_setModifications;
+			}
+
+			return *this;
+		}
+
+		serializer::object_id_t GetObjectID() const
+		{
+			return m_oidObjectID;
+		}
+
+		void SetObjectID(serializer::object_id_t oidObjectID)
+		{
+			m_oidObjectID = oidObjectID;
+		}
+
+		void MarkAsAdded()
+		{
+			m_setModifications[AddedBit] = true;
+		}
+
+		void ResetModifications()
+		{
+			m_setModifications.reset();
+		}
+
+		bool IsModified() const
+		{
+			return m_setModifications.any();
+		}
 
 		// serialization interface
 		virtual void Store(const serializer::ISerializerContainerPtr& spContainer) const = 0;
 		virtual void Load(const serializer::ISerializerRowReaderPtr& spRowReader) = 0;
-
-		serializer::object_id_t GetObjectID() const;
-		void SetObjectID(serializer::object_id_t oidObjectID);
-
-		void ResetModifications();
-		bool IsModified() const { return m_setModifications.any(); }
 
 	protected:
 		serializer::object_id_t m_oidObjectID = 0;
@@ -33,48 +67,4 @@ namespace serializer
 		using Bitset = std::bitset<BitsetSize>;
 		mutable Bitset m_setModifications;
 	};
-
-	template<size_t BitsetSize>
-	serializer::SerializableObject<BitsetSize>::SerializableObject()
-	{
-	}
-
-	template<size_t BitsetSize>
-	serializer::SerializableObject<BitsetSize>::SerializableObject(const SerializableObject& rSrc) :
-		m_oidObjectID(rSrc.m_oidObjectID),
-		m_setModifications(rSrc.m_setModifications)
-	{
-	}
-
-	template<size_t BitsetSize>
-	serializer::SerializableObject<BitsetSize>::~SerializableObject()
-	{
-	}
-
-	template<size_t BitsetSize>
-	SerializableObject<BitsetSize>& serializer::SerializableObject<BitsetSize>::operator=(const SerializableObject& rSrc)
-	{
-		m_oidObjectID = rSrc.m_oidObjectID;
-		m_setModifications = rSrc.m_setModifications;
-
-		return *this;
-	}
-
-	template<size_t BitsetSize>
-	void serializer::SerializableObject<BitsetSize>::ResetModifications()
-	{
-		m_setModifications.reset();
-	}
-
-	template<size_t BitsetSize>
-	void serializer::SerializableObject<BitsetSize>::SetObjectID(serializer::object_id_t oidObjectID)
-	{
-		m_oidObjectID = oidObjectID;
-	}
-
-	template<size_t BitsetSize>
-	serializer::object_id_t serializer::SerializableObject<BitsetSize>::GetObjectID() const
-	{
-		return m_oidObjectID;
-	}
 }

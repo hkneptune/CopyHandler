@@ -30,7 +30,7 @@ namespace chengine
 
 #pragma warning(push)
 #pragma warning(disable: 4251)
-	class LIBCHENGINE_API FeedbackOperationEventRule : public serializer::SerializableObject<FeedbackOperationEventRuleEnum::eMod_Last>
+	class LIBCHENGINE_API FeedbackOperationEventRule : public serializer::SerializableObject<FeedbackOperationEventRuleEnum::eMod_Last, FeedbackOperationEventRuleEnum::eMod_Added>
 	{
 	public:
 		FeedbackOperationEventRule();

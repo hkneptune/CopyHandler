@@ -76,6 +76,8 @@ namespace chengine
 		static void InitColumns(serializer::IColumnsDefinition& rColumnDefs);
 		void Load(const serializer::ISerializerRowReaderPtr& spRowReader);
 
+		void MarkAsAdded() { m_setModifications[eMod_Added] = true; }
+
 	private:
 #pragma warning(push)
 #pragma warning(disable: 4251)
