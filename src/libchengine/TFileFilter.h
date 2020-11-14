@@ -25,6 +25,7 @@
 #include "../libstring/TStringPatternArray.h"
 #include "../libserializer/TSharedModificationTracker.h"
 #include "ECompareType.h"
+#include "../libserializer/SerializableObject.h"
 
 namespace chengine
 {
@@ -32,7 +33,46 @@ namespace chengine
 	class TFileInfo;
 	typedef std::shared_ptr<TFileInfo> TFileInfoPtr;
 
-	class LIBCHENGINE_API TFileFilter
+	namespace FileFilterEnum
+	{
+		enum EModifications
+		{
+			eMod_Added,
+			eMod_UseMask,
+			eMod_Mask,
+			eMod_UseExcludeMask,
+			eMod_ExcludeMask,
+			eMod_UseSize1,
+			eMod_SizeCmpType1,
+			eMod_Size1,
+			eMod_UseSize2,
+			eMod_SizeCmpType2,
+			eMod_Size2,
+			eMod_DateType,
+			eMod_UseDateTime1,
+			eMod_DateCmpType1,
+			eMod_UseDate1,
+			eMod_UseTime1,
+			eMod_DateTime1,
+			eMod_UseDateTime2,
+			eMod_DateCmpType2,
+			eMod_UseDate2,
+			eMod_UseTime2,
+			eMod_DateTime2,
+			eMod_UseAttributes,
+			eMod_AttrArchive,
+			eMod_AttrReadOnly,
+			eMod_AttrHidden,
+			eMod_AttrSystem,
+			eMod_AttrDirectory,
+
+			eMod_Last
+		};
+	};
+
+#pragma warning(push)
+#pragma warning(disable: 4251)
+	class LIBCHENGINE_API TFileFilter : public serializer::SerializableObject<FileFilterEnum::eMod_Last>
 	{
 	public:
 		enum EDateType
@@ -155,92 +195,51 @@ namespace chengine
 		void SetDirectory(int iDirectory) { m_iDirectory = iDirectory; }
 
 	private:
-		enum EModifications
-		{
-			eMod_Added,
-			eMod_UseMask,
-			eMod_Mask,
-			eMod_UseExcludeMask,
-			eMod_ExcludeMask,
-			eMod_UseSize1,
-			eMod_SizeCmpType1,
-			eMod_Size1,
-			eMod_UseSize2,
-			eMod_SizeCmpType2,
-			eMod_Size2,
-			eMod_DateType,
-			eMod_UseDateTime1,
-			eMod_DateCmpType1,
-			eMod_UseDate1,
-			eMod_UseTime1,
-			eMod_DateTime1,
-			eMod_UseDateTime2,
-			eMod_DateCmpType2,
-			eMod_UseDate2,
-			eMod_UseTime2,
-			eMod_DateTime2,
-			eMod_UseAttributes,
-			eMod_AttrArchive,
-			eMod_AttrReadOnly,
-			eMod_AttrHidden,
-			eMod_AttrSystem,
-			eMod_AttrDirectory,
-
-			eMod_Last
-		};
-
-		// object identification
-		serializer::object_id_t m_oidObjectID;
-
 		// modification management
-#pragma warning(push)
-#pragma warning(disable: 4251)
-		typedef std::bitset<eMod_Last> Bitset;
-		mutable Bitset m_setModifications;
 
 		// files mask
-		serializer::TSharedModificationTracker<bool, Bitset, eMod_UseMask> m_bUseMask;
-		serializer::TSharedModificationTracker<string::TStringPatternArray, Bitset, eMod_Mask> m_astrMask;
+		serializer::TSharedModificationTracker<bool, Bitset, FileFilterEnum::eMod_UseMask> m_bUseMask;
+		serializer::TSharedModificationTracker<string::TStringPatternArray, Bitset, FileFilterEnum::eMod_Mask> m_astrMask;
 
 		// files mask-
-		serializer::TSharedModificationTracker<bool, Bitset, eMod_UseExcludeMask> m_bUseExcludeMask;
-		serializer::TSharedModificationTracker<string::TStringPatternArray, Bitset, eMod_ExcludeMask> m_astrExcludeMask;
+		serializer::TSharedModificationTracker<bool, Bitset, FileFilterEnum::eMod_UseExcludeMask> m_bUseExcludeMask;
+		serializer::TSharedModificationTracker<string::TStringPatternArray, Bitset, FileFilterEnum::eMod_ExcludeMask> m_astrExcludeMask;
 
 		// size filtering
-		serializer::TSharedModificationTracker<bool, Bitset, eMod_UseSize1> m_bUseSize1;
-		serializer::TSharedModificationTracker<ECompareType, Bitset, eMod_SizeCmpType1> m_eSizeCmpType1;
-		serializer::TSharedModificationTracker<unsigned long long, Bitset, eMod_Size1> m_ullSize1;
+		serializer::TSharedModificationTracker<bool, Bitset, FileFilterEnum::eMod_UseSize1> m_bUseSize1;
+		serializer::TSharedModificationTracker<ECompareType, Bitset, FileFilterEnum::eMod_SizeCmpType1> m_eSizeCmpType1;
+		serializer::TSharedModificationTracker<unsigned long long, Bitset, FileFilterEnum::eMod_Size1> m_ullSize1;
 
-		serializer::TSharedModificationTracker<bool, Bitset, eMod_UseSize2> m_bUseSize2;
-		serializer::TSharedModificationTracker<ECompareType, Bitset, eMod_SizeCmpType2> m_eSizeCmpType2;
-		serializer::TSharedModificationTracker<unsigned long long, Bitset, eMod_Size2> m_ullSize2;
+		serializer::TSharedModificationTracker<bool, Bitset, FileFilterEnum::eMod_UseSize2> m_bUseSize2;
+		serializer::TSharedModificationTracker<ECompareType, Bitset, FileFilterEnum::eMod_SizeCmpType2> m_eSizeCmpType2;
+		serializer::TSharedModificationTracker<unsigned long long, Bitset, FileFilterEnum::eMod_Size2> m_ullSize2;
 
 		// date filtering
-		serializer::TSharedModificationTracker<EDateType, Bitset, eMod_DateType> m_eDateType;	// created/last modified/last accessed
+		serializer::TSharedModificationTracker<EDateType, Bitset, FileFilterEnum::eMod_DateType> m_eDateType;	// created/last modified/last accessed
 
-		serializer::TSharedModificationTracker<bool, Bitset, eMod_UseDateTime1> m_bUseDateTime1;
+		serializer::TSharedModificationTracker<bool, Bitset, FileFilterEnum::eMod_UseDateTime1> m_bUseDateTime1;
 
-		serializer::TSharedModificationTracker<ECompareType, Bitset, eMod_DateCmpType1> m_eDateCmpType1;	// before/after
-		serializer::TSharedModificationTracker<bool, Bitset, eMod_UseDate1> m_bUseDate1;
-		serializer::TSharedModificationTracker<bool, Bitset, eMod_UseTime1> m_bUseTime1;
-		serializer::TSharedModificationTracker<TDateTime, Bitset, eMod_DateTime1> m_tDateTime1;
+		serializer::TSharedModificationTracker<ECompareType, Bitset, FileFilterEnum::eMod_DateCmpType1> m_eDateCmpType1;	// before/after
+		serializer::TSharedModificationTracker<bool, Bitset, FileFilterEnum::eMod_UseDate1> m_bUseDate1;
+		serializer::TSharedModificationTracker<bool, Bitset, FileFilterEnum::eMod_UseTime1> m_bUseTime1;
+		serializer::TSharedModificationTracker<TDateTime, Bitset, FileFilterEnum::eMod_DateTime1> m_tDateTime1;
 
-		serializer::TSharedModificationTracker<bool, Bitset, eMod_UseDateTime2> m_bUseDateTime2;
+		serializer::TSharedModificationTracker<bool, Bitset, FileFilterEnum::eMod_UseDateTime2> m_bUseDateTime2;
 
-		serializer::TSharedModificationTracker<ECompareType, Bitset, eMod_DateCmpType2> m_eDateCmpType2;
-		serializer::TSharedModificationTracker<bool, Bitset, eMod_UseDate2> m_bUseDate2;
-		serializer::TSharedModificationTracker<bool, Bitset, eMod_UseTime2> m_bUseTime2;
-		serializer::TSharedModificationTracker<TDateTime, Bitset, eMod_DateTime2> m_tDateTime2;
+		serializer::TSharedModificationTracker<ECompareType, Bitset, FileFilterEnum::eMod_DateCmpType2> m_eDateCmpType2;
+		serializer::TSharedModificationTracker<bool, Bitset, FileFilterEnum::eMod_UseDate2> m_bUseDate2;
+		serializer::TSharedModificationTracker<bool, Bitset, FileFilterEnum::eMod_UseTime2> m_bUseTime2;
+		serializer::TSharedModificationTracker<TDateTime, Bitset, FileFilterEnum::eMod_DateTime2> m_tDateTime2;
 
 		// attribute filtering
-		serializer::TSharedModificationTracker<bool, Bitset, eMod_UseAttributes> m_bUseAttributes;
-		serializer::TSharedModificationTracker<int, Bitset, eMod_AttrArchive> m_iArchive;
-		serializer::TSharedModificationTracker<int, Bitset, eMod_AttrReadOnly> m_iReadOnly;
-		serializer::TSharedModificationTracker<int, Bitset, eMod_AttrHidden> m_iHidden;
-		serializer::TSharedModificationTracker<int, Bitset, eMod_AttrSystem> m_iSystem;
-		serializer::TSharedModificationTracker<int, Bitset, eMod_AttrDirectory> m_iDirectory;
-#pragma warning(pop)
+		serializer::TSharedModificationTracker<bool, Bitset, FileFilterEnum::eMod_UseAttributes> m_bUseAttributes;
+		serializer::TSharedModificationTracker<int, Bitset, FileFilterEnum::eMod_AttrArchive> m_iArchive;
+		serializer::TSharedModificationTracker<int, Bitset, FileFilterEnum::eMod_AttrReadOnly> m_iReadOnly;
+		serializer::TSharedModificationTracker<int, Bitset, FileFilterEnum::eMod_AttrHidden> m_iHidden;
+		serializer::TSharedModificationTracker<int, Bitset, FileFilterEnum::eMod_AttrSystem> m_iSystem;
+		serializer::TSharedModificationTracker<int, Bitset, FileFilterEnum::eMod_AttrDirectory> m_iDirectory;
 	};
+#pragma warning(pop)
 }
 
 #endif

@@ -19,7 +19,7 @@
 #ifndef __FEEDBACKREPLACEDLG_H__
 #define __FEEDBACKREPLACEDLG_H__
 
-#include "../libchengine/FeedbackAlreadyExistsRuleList.h"
+#include "../libchengine/FeedbackRules.h"
 
 namespace chengine
 {
@@ -31,16 +31,16 @@ class CFeedbackReplaceDlg : public ictranslate::CLanguageDialog
 	DECLARE_DYNAMIC(CFeedbackReplaceDlg)
 
 public:
-	CFeedbackReplaceDlg(const chengine::TFileInfo& spSrcFile, const chengine::TFileInfo& spDstFile, const string::TString& strSuggestedName, CWnd* pParent = nullptr);   // standard constructor
+	CFeedbackReplaceDlg(chengine::FeedbackRules& currentRules, const chengine::TFileInfo& spSrcFile, const chengine::TFileInfo& spDstFile, const string::TString& strSuggestedName, CWnd* pParent = nullptr);   // standard constructor
 	virtual ~CFeedbackReplaceDlg();
 
 	BOOL OnInitDialog() override;
 
-	const chengine::FeedbackAlreadyExistsRuleList& GetRules() const;
+	const chengine::FeedbackRules& GetRules() const;
 	string::TString GetNewName() const { return m_strNewName; }
 
 protected:
-	void DoDataExchange(CDataExchange* pDX) override;    // DDX/DDV support
+	void DoDataExchange(CDataExchange* pDX) override;
 	void OnCancel() override;
 
 	void RefreshFilesInfo();
@@ -89,7 +89,7 @@ private:
 	const chengine::TFileInfo& m_rSrcFile;
 	const chengine::TFileInfo& m_rDstFile;
 
-	chengine::FeedbackAlreadyExistsRuleList m_feedbackRules;	// feedback rules resulting from choices made in this dialog box
+	chengine::FeedbackRules& m_rules;
 	string::TString m_strNewName;
 };
 

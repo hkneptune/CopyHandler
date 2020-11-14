@@ -25,6 +25,7 @@ namespace serializer
 		void SetObjectID(serializer::object_id_t oidObjectID);
 
 		void ResetModifications();
+		bool IsModified() const { return m_setModifications.any(); }
 
 	protected:
 		serializer::object_id_t m_oidObjectID = 0;

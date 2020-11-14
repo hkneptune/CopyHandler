@@ -94,22 +94,27 @@ namespace chengine
 		}
 		if(eResult == eResult_Unknown)
 		{
-			FeedbackAlreadyExistsRuleList newRules;
+			FeedbackRules modRules;
 			TString strNewPath = suggestedPath.ToWString();
 			{
+				{
+					boost::shared_lock<boost::shared_mutex> lock(m_lock);
+					modRules = m_feedbackRules;
+				}
+
 				TScopedRunningTimeTrackerPause scopedTimePause(m_pTimeTracker);
 				TScopedRunningTimeTrackerPause scopedSecondaryTimePause(m_pSecondaryTimeTracker);
-				eResult = m_spFeedbackHandler->FileAlreadyExists(*spSrcFileInfo, rDstFileInfo, strNewPath, newRules);
+				eResult = m_spFeedbackHandler->FileAlreadyExists(*spSrcFileInfo, rDstFileInfo, strNewPath, modRules);
 			}
 			if(eResult != eResult_Unknown)
 			{
 				bAutomatedResponse = false;
-				if(!newRules.IsEmpty())
+
 				{
 					boost::unique_lock<boost::shared_mutex> lock(m_lock);
-					m_feedbackRules.GetAlreadyExistsRules().Merge(newRules);
+					m_feedbackRules = modRules;
 				}
-				else if(eResult == eResult_Rename)
+				if(eResult == eResult_Rename)
 				{
 					spSrcFileInfo->SetDstRelativePath(PathFromWString(strNewPath));
 				}

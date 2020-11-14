@@ -73,10 +73,7 @@ namespace serializer
 
 			// ensure all objects have modification flag stripped to avoid unnecessary writing the same data to db again
 			// NOTE: Load() method above should reset modification flag, but storing it in vector will set it again - hence the separate reset
-			for(T& rItem : m_vEntries)
-			{
-				rItem.ResetModifications();
-			}
+			ResetModifications();
 		}
 
 		virtual void InitColumns(const serializer::ISerializerContainerPtr& spContainer) const = 0;
@@ -162,6 +159,28 @@ namespace serializer
 				m_setRemovedObjects.Add(rEntry.GetObjectID());
 			}
 			m_vEntries.clear();
+		}
+
+		void ResetModifications()
+		{
+			for(T& rEntry : m_vEntries)
+			{
+				rEntry.ResetModifications();
+			}
+			m_setRemovedObjects.Clear();
+		}
+
+		bool IsModified() const
+		{
+			if(!m_setRemovedObjects.IsEmpty())
+				return true;
+
+			for(const T& rEntry : m_vEntries)
+			{
+				if(rEntry.IsModified())
+					return true;
+			}
+			return false;
 		}
 
 	protected:

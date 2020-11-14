@@ -29,8 +29,6 @@ using namespace serializer;
 namespace chengine
 {
 	TFileFilter::TFileFilter() :
-		m_oidObjectID(0),
-		m_setModifications(),
 		m_bUseMask(m_setModifications, false),
 		m_astrMask(m_setModifications),
 		m_bUseExcludeMask(m_setModifications, false),
@@ -59,15 +57,14 @@ namespace chengine
 		m_iSystem(m_setModifications, 2),
 		m_iDirectory(m_setModifications, 2)
 	{
-		m_setModifications[eMod_Added] = true;
+		m_setModifications[FileFilterEnum::eMod_Added] = true;
 
 		m_tDateTime1.Modify().SetCurrentDateTime();
 		m_tDateTime2.Modify().SetCurrentDateTime();
 	}
 
 	TFileFilter::TFileFilter(const TFileFilter& rFilter) :
-		m_oidObjectID(rFilter.m_oidObjectID),
-		m_setModifications(rFilter.m_setModifications),
+		SerializableObject(rFilter),
 		m_bUseMask(rFilter.m_bUseMask, m_setModifications),
 		m_astrMask(rFilter.m_astrMask, m_setModifications),
 		m_bUseExcludeMask(rFilter.m_bUseExcludeMask, m_setModifications),
@@ -182,8 +179,7 @@ namespace chengine
 		if (this == &rFilter)
 			return *this;
 
-		m_oidObjectID = rFilter.m_oidObjectID;
-		m_setModifications = rFilter.m_setModifications;
+		__super::operator=(rFilter);
 
 		SetData(rFilter);
 
@@ -522,64 +518,64 @@ namespace chengine
 
 	void TFileFilter::Store(const ISerializerContainerPtr& spContainer) const
 	{
-		bool bAdded = m_setModifications[eMod_Added];
+		bool bAdded = m_setModifications[FileFilterEnum::eMod_Added];
 		if (m_setModifications.any())
 		{
 			ISerializerRowData& rRow = spContainer->GetRow(m_oidObjectID, bAdded);
 
-			if (bAdded || m_setModifications[eMod_UseMask])
+			if (bAdded || m_setModifications[FileFilterEnum::eMod_UseMask])
 				rRow.SetValue(_T("use_mask"), m_bUseMask);
-			if (bAdded || m_setModifications[eMod_Mask])
+			if (bAdded || m_setModifications[FileFilterEnum::eMod_Mask])
 				rRow.SetValue(_T("mask"), GetCombinedMask());
-			if (bAdded || m_setModifications[eMod_UseExcludeMask])
+			if (bAdded || m_setModifications[FileFilterEnum::eMod_UseExcludeMask])
 				rRow.SetValue(_T("use_exclude_mask"), m_bUseExcludeMask);
-			if (bAdded || m_setModifications[eMod_ExcludeMask])
+			if (bAdded || m_setModifications[FileFilterEnum::eMod_ExcludeMask])
 				rRow.SetValue(_T("exclude_mask"), GetCombinedExcludeMask());
-			if (bAdded || m_setModifications[eMod_UseSize1])
+			if (bAdded || m_setModifications[FileFilterEnum::eMod_UseSize1])
 				rRow.SetValue(_T("use_size_1"), m_bUseSize1);
-			if (bAdded || m_setModifications[eMod_SizeCmpType1])
+			if (bAdded || m_setModifications[FileFilterEnum::eMod_SizeCmpType1])
 				rRow.SetValue(_T("compare_type_1"), m_eSizeCmpType1);
-			if (bAdded || m_setModifications[eMod_Size1])
+			if (bAdded || m_setModifications[FileFilterEnum::eMod_Size1])
 				rRow.SetValue(_T("size_1"), m_ullSize1);
-			if (bAdded || m_setModifications[eMod_UseSize2])
+			if (bAdded || m_setModifications[FileFilterEnum::eMod_UseSize2])
 				rRow.SetValue(_T("use_size_2"), m_bUseSize2);
-			if (bAdded || m_setModifications[eMod_SizeCmpType2])
+			if (bAdded || m_setModifications[FileFilterEnum::eMod_SizeCmpType2])
 				rRow.SetValue(_T("compare_type_2"), m_eSizeCmpType2);
-			if (bAdded || m_setModifications[eMod_Size2])
+			if (bAdded || m_setModifications[FileFilterEnum::eMod_Size2])
 				rRow.SetValue(_T("size_2"), m_ullSize2);
-			if (bAdded || m_setModifications[eMod_DateType])
+			if (bAdded || m_setModifications[FileFilterEnum::eMod_DateType])
 				rRow.SetValue(_T("date_type"), m_eDateType);
-			if (bAdded || m_setModifications[eMod_UseDateTime1])
+			if (bAdded || m_setModifications[FileFilterEnum::eMod_UseDateTime1])
 				rRow.SetValue(_T("use_date_time_1"), m_bUseDateTime1);
-			if (bAdded || m_setModifications[eMod_DateCmpType1])
+			if (bAdded || m_setModifications[FileFilterEnum::eMod_DateCmpType1])
 				rRow.SetValue(_T("date_compare_type_1"), m_eDateCmpType1);
-			if (bAdded || m_setModifications[eMod_UseDate1])
+			if (bAdded || m_setModifications[FileFilterEnum::eMod_UseDate1])
 				rRow.SetValue(_T("use_date_1"), m_bUseDate1);
-			if (bAdded || m_setModifications[eMod_UseTime1])
+			if (bAdded || m_setModifications[FileFilterEnum::eMod_UseTime1])
 				rRow.SetValue(_T("use_time_1"), m_bUseTime1);
-			if (bAdded || m_setModifications[eMod_DateTime1])
+			if (bAdded || m_setModifications[FileFilterEnum::eMod_DateTime1])
 				rRow.SetValue(_T("datetime_1"), (long long)m_tDateTime1.Get().GetAsTimeT());
-			if (bAdded || m_setModifications[eMod_UseDateTime2])
+			if (bAdded || m_setModifications[FileFilterEnum::eMod_UseDateTime2])
 				rRow.SetValue(_T("use_date_time_2"), m_bUseDateTime2);
-			if (bAdded || m_setModifications[eMod_DateCmpType2])
+			if (bAdded || m_setModifications[FileFilterEnum::eMod_DateCmpType2])
 				rRow.SetValue(_T("date_compare_type_2"), m_eDateCmpType2);
-			if (bAdded || m_setModifications[eMod_UseDate2])
+			if (bAdded || m_setModifications[FileFilterEnum::eMod_UseDate2])
 				rRow.SetValue(_T("use_date_2"), m_bUseDate2);
-			if (bAdded || m_setModifications[eMod_UseTime2])
+			if (bAdded || m_setModifications[FileFilterEnum::eMod_UseTime2])
 				rRow.SetValue(_T("use_time_2"), m_bUseTime2);
-			if (bAdded || m_setModifications[eMod_DateTime2])
+			if (bAdded || m_setModifications[FileFilterEnum::eMod_DateTime2])
 				rRow.SetValue(_T("datetime_2"), (long long)m_tDateTime2.Get().GetAsTimeT());
-			if (bAdded || m_setModifications[eMod_UseAttributes])
+			if (bAdded || m_setModifications[FileFilterEnum::eMod_UseAttributes])
 				rRow.SetValue(_T("use_attributes"), m_bUseAttributes);
-			if (bAdded || m_setModifications[eMod_AttrArchive])
+			if (bAdded || m_setModifications[FileFilterEnum::eMod_AttrArchive])
 				rRow.SetValue(_T("attr_archive"), m_iArchive);
-			if (bAdded || m_setModifications[eMod_AttrReadOnly])
+			if (bAdded || m_setModifications[FileFilterEnum::eMod_AttrReadOnly])
 				rRow.SetValue(_T("attr_ro"), m_iReadOnly);
-			if (bAdded || m_setModifications[eMod_AttrHidden])
+			if (bAdded || m_setModifications[FileFilterEnum::eMod_AttrHidden])
 				rRow.SetValue(_T("attr_hidden"), m_iHidden);
-			if (bAdded || m_setModifications[eMod_AttrSystem])
+			if (bAdded || m_setModifications[FileFilterEnum::eMod_AttrSystem])
 				rRow.SetValue(_T("attr_system"), m_iSystem);
-			if (bAdded || m_setModifications[eMod_AttrDirectory])
+			if (bAdded || m_setModifications[FileFilterEnum::eMod_AttrDirectory])
 				rRow.SetValue(_T("attr_directory"), m_iDirectory);
 
 			m_setModifications.reset();

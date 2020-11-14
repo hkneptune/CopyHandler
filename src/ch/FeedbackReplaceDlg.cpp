@@ -16,8 +16,9 @@ using namespace string;
 
 IMPLEMENT_DYNAMIC(CFeedbackReplaceDlg, ictranslate::CLanguageDialog)
 
-CFeedbackReplaceDlg::CFeedbackReplaceDlg(const chengine::TFileInfo& spSrcFile, const chengine::TFileInfo& spDstFile, const TString& strSuggestedName, CWnd* pParent /*=nullptr*/)
+CFeedbackReplaceDlg::CFeedbackReplaceDlg(chengine::FeedbackRules& currentRules, const chengine::TFileInfo& spSrcFile, const chengine::TFileInfo& spDstFile, const TString& strSuggestedName, CWnd* pParent /*=nullptr*/)
 	: ictranslate::CLanguageDialog(IDD_FEEDBACK_REPLACE_DIALOG, pParent),
+	m_rules(currentRules),
 	m_rSrcFile(spSrcFile),
 	m_rDstFile(spDstFile),
 	m_strNewName(strSuggestedName)
@@ -209,16 +210,16 @@ void CFeedbackReplaceDlg::OnBnClickedReplaceButton()
 	switch(m_btnReplace.m_nMenuResult)
 	{
 	case ID_FEEDBACK_REPLACE_ALLEXISTINGFILES:
-		m_feedbackRules = FeedbackPredefinedRules::CreateAlreadyExistsRule(EPredefinedRuleCondition::eCondition_ApplyToAll, eResult_Overwrite);
+		m_rules.GetAlreadyExistsRules().Merge(FeedbackPredefinedRules::CreateAlreadyExistsRule(EPredefinedRuleCondition::eCondition_ApplyToAll, eResult_Overwrite));
 		break;
 	case ID_FEEDBACK_REPLACE_FILESWITHDIFFERENTDATESORSIZES:
-		m_feedbackRules = FeedbackPredefinedRules::CreateAlreadyExistsRule(EPredefinedRuleCondition::eCondition_WhenDifferentDateOrSize, eResult_Overwrite);
+		m_rules.GetAlreadyExistsRules().Merge(FeedbackPredefinedRules::CreateAlreadyExistsRule(EPredefinedRuleCondition::eCondition_WhenDifferentDateOrSize, eResult_Overwrite));
 		break;
 	case ID_FEEDBACK_REPLACE_OLDERFILESWITHNEWERVERSIONS:
-		m_feedbackRules = FeedbackPredefinedRules::CreateAlreadyExistsRule(EPredefinedRuleCondition::eCondition_WhenNewerThanDst, eResult_Overwrite);
+		m_rules.GetAlreadyExistsRules().Merge(FeedbackPredefinedRules::CreateAlreadyExistsRule(EPredefinedRuleCondition::eCondition_WhenNewerThanDst, eResult_Overwrite));
 		break;
 	case ID_FEEDBACK_REPLACE_NEWERFILESWITHOLDERVERSIONS:
-		m_feedbackRules = FeedbackPredefinedRules::CreateAlreadyExistsRule(EPredefinedRuleCondition::eCondition_WhenOlderThanDst, eResult_Overwrite);
+		m_rules.GetAlreadyExistsRules().Merge(FeedbackPredefinedRules::CreateAlreadyExistsRule(EPredefinedRuleCondition::eCondition_WhenOlderThanDst, eResult_Overwrite));
 		break;
 	}
 
@@ -232,19 +233,19 @@ void CFeedbackReplaceDlg::OnBnClickedRenameButton()
 	switch(m_btnRename.m_nMenuResult)
 	{
 	case ID_FEEDBACK_RENAME_WHENDESTIONATIONFILEEXISTS:
-		m_feedbackRules = FeedbackPredefinedRules::CreateAlreadyExistsRule(EPredefinedRuleCondition::eCondition_ApplyToAll, eResult_Rename);
+		m_rules.GetAlreadyExistsRules().Merge(FeedbackPredefinedRules::CreateAlreadyExistsRule(EPredefinedRuleCondition::eCondition_ApplyToAll, eResult_Rename));
 		break;
 	case ID_FEEDBACK_RENAME_WHENDATEORSIZEDIFFERS:
-		m_feedbackRules = FeedbackPredefinedRules::CreateAlreadyExistsRule(EPredefinedRuleCondition::eCondition_WhenDifferentDateOrSize, eResult_Rename);
+		m_rules.GetAlreadyExistsRules().Merge(FeedbackPredefinedRules::CreateAlreadyExistsRule(EPredefinedRuleCondition::eCondition_WhenDifferentDateOrSize, eResult_Rename));
 		break;
 	case ID_FEEDBACK_RENAME_WHENDATEANDSZEARESAME:
-		m_feedbackRules = FeedbackPredefinedRules::CreateAlreadyExistsRule(EPredefinedRuleCondition::eCondition_WhenSameDateAndSize, eResult_Rename);
+		m_rules.GetAlreadyExistsRules().Merge(FeedbackPredefinedRules::CreateAlreadyExistsRule(EPredefinedRuleCondition::eCondition_WhenSameDateAndSize, eResult_Rename));
 		break;
 	case ID_FEEDBACK_RENAME_WHENNEWERTHANDESTINATION:
-		m_feedbackRules = FeedbackPredefinedRules::CreateAlreadyExistsRule(EPredefinedRuleCondition::eCondition_WhenNewerThanDst, eResult_Rename);
+		m_rules.GetAlreadyExistsRules().Merge(FeedbackPredefinedRules::CreateAlreadyExistsRule(EPredefinedRuleCondition::eCondition_WhenNewerThanDst, eResult_Rename));
 		break;
 	case ID_FEEDBACK_RENAME_WHENOLDERTHANDESTINATION:
-		m_feedbackRules = FeedbackPredefinedRules::CreateAlreadyExistsRule(EPredefinedRuleCondition::eCondition_WhenOlderThanDst, eResult_Rename);
+		m_rules.GetAlreadyExistsRules().Merge(FeedbackPredefinedRules::CreateAlreadyExistsRule(EPredefinedRuleCondition::eCondition_WhenOlderThanDst, eResult_Rename));
 		break;
 	default:
 	{
@@ -263,7 +264,7 @@ void CFeedbackReplaceDlg::OnBnClickedCopyRestButton()
 	switch(m_btnResume.m_nMenuResult)
 	{
 	case ID_FEEDBACK_RESUME_WHENFILEBIGGERTHANDESTINATION:
-		m_feedbackRules = FeedbackPredefinedRules::CreateAlreadyExistsRule(EPredefinedRuleCondition::eCondition_WhenBiggerThanDst, eResult_CopyRest);
+		m_rules.GetAlreadyExistsRules().Merge(FeedbackPredefinedRules::CreateAlreadyExistsRule(EPredefinedRuleCondition::eCondition_WhenBiggerThanDst, eResult_CopyRest));
 		break;
 	}
 
@@ -276,16 +277,16 @@ void CFeedbackReplaceDlg::OnBnClickedSkipButton()
 	switch(m_btnSkip.m_nMenuResult)
 	{
 	case ID_FEEDBACK_SKIP_ALLEXISTINGDESTINATIONFILES:
-		m_feedbackRules = FeedbackPredefinedRules::CreateAlreadyExistsRule(EPredefinedRuleCondition::eCondition_ApplyToAll, eResult_Skip);
+		m_rules.GetAlreadyExistsRules().Merge(FeedbackPredefinedRules::CreateAlreadyExistsRule(EPredefinedRuleCondition::eCondition_ApplyToAll, eResult_Skip));
 		break;
 	case ID_FEEDBACK_SKIP_ALLFILESWITHSAMEDATESANDSIZES:
-		m_feedbackRules = FeedbackPredefinedRules::CreateAlreadyExistsRule(EPredefinedRuleCondition::eCondition_WhenSameDateAndSize, eResult_Skip);
+		m_rules.GetAlreadyExistsRules().Merge(FeedbackPredefinedRules::CreateAlreadyExistsRule(EPredefinedRuleCondition::eCondition_WhenSameDateAndSize, eResult_Skip));
 		break;
 	case ID_FEEDBACK_SKIP_FILESTHATAREOLDERTHANDESTINATION:
-		m_feedbackRules = FeedbackPredefinedRules::CreateAlreadyExistsRule(EPredefinedRuleCondition::eCondition_WhenOlderThanDst, eResult_Skip);
+		m_rules.GetAlreadyExistsRules().Merge(FeedbackPredefinedRules::CreateAlreadyExistsRule(EPredefinedRuleCondition::eCondition_WhenOlderThanDst, eResult_Skip));
 		break;
 	case ID_FEEDBACK_SKIP_FILESTHATARENEWERTHANDESTINATION:
-		m_feedbackRules = FeedbackPredefinedRules::CreateAlreadyExistsRule(EPredefinedRuleCondition::eCondition_WhenNewerThanDst, eResult_Skip);
+		m_rules.GetAlreadyExistsRules().Merge(FeedbackPredefinedRules::CreateAlreadyExistsRule(EPredefinedRuleCondition::eCondition_WhenNewerThanDst, eResult_Skip));
 		break;
 	}
 
@@ -310,9 +311,9 @@ void CFeedbackReplaceDlg::OnCancel()
 	EndDialog(chengine::EFeedbackResult::eResult_Cancel);
 }
 
-const chengine::FeedbackAlreadyExistsRuleList& CFeedbackReplaceDlg::GetRules() const
+const chengine::FeedbackRules& CFeedbackReplaceDlg::GetRules() const
 {
-	return m_feedbackRules;
+	return m_rules;
 }
 
 void CFeedbackReplaceDlg::OnGetMinMaxInfo(MINMAXINFO* lpMMI)
