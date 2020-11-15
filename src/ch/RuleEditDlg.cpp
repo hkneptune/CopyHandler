@@ -98,6 +98,8 @@ BOOL RuleEditDlg::OnInitDialog()
 	AddResizableControl(IDOK, 1.0, 1.0, 0.0, 0.0);
 	AddResizableControl(IDCANCEL, 1.0, 1.0, 0.0, 0.0);
 
+	AddResizableControl(IDC_BOTTOM_BAR_STATIC, 0.0, 1.0, 1.0, 0.0);
+
 	InitializeResizableControls();
 
 	// styles
