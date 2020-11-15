@@ -45,7 +45,7 @@ void CFeedbackFileErrorDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_SKIP_BUTTON, m_btnSkip);
 	DDX_Control(pDX, IDC_CUSTOM_RULES_BUTTON, m_btnCustomRules);
 	DDX_Control(pDX, IDC_PAUSE_BUTTON, m_btnPause);
-	DDX_Control(pDX, IDC_CANCEL_BUTTON, m_btnCancel);
+	DDX_Control(pDX, IDCANCEL, m_btnCancel);
 }
 
 BEGIN_MESSAGE_MAP(CFeedbackFileErrorDlg, ictranslate::CLanguageDialog)
@@ -65,27 +65,28 @@ BOOL CFeedbackFileErrorDlg::OnInitDialog()
 	SetIcon(hIcon, FALSE);
 
 	AddResizableControl(IDC_HEADER_STATIC, 0.0, 0.0, 0.0, 0.0);
-	AddResizableControl(IDC_ERROR_DETAILS_STATIC, 0.0, 0.0, 0.0, 0.0);
-	AddResizableControl(IDC_NAMES_STATIC, 0.0, 0.0, 1.0, 0.0);
-	AddResizableControl(IDC_FILENAME_EDIT, 0.0, 0.0, 1.0, 1.0);
-	AddResizableControl(IDC_SECOND_FILENAME_EDIT, 0.0, 1.0, 0.0, 0.0);
-	AddResizableControl(IDC_OPERATION_STATIC, 0.0, 1.0, 0.0, 0.0);
-	AddResizableControl(IDC_OPERATION_EDIT, 0.0, 1.0, 0.0, 0.0);
-	AddResizableControl(IDC_SYSTEM_ERROR_STATIC, 0.0, 1.0, 0.0, 0.0);
-	AddResizableControl(IDC_SYSTEM_ERROR_EDIT, 0.0, 1.0, 0.0, 0.0);
+	AddResizableControl(IDC_ERROR_DETAILS_STATIC, 0.0, 0.0, 1.0, 1.0);
+	AddResizableControl(IDC_SRC_NAME_STATIC, 0.0, 0.0, 0.0, 0.0);
+	AddResizableControl(IDC_FILENAME_EDIT, 0.0, 0.0, 1.0, 0.0);
+	AddResizableControl(IDC_DST_NAME_STATIC, 0.0, 0.0, 0.0, 0.0);
+	AddResizableControl(IDC_SECOND_FILENAME_EDIT, 0.0, 0.0, 1.0, 0.0);
+	AddResizableControl(IDC_OPERATION_STATIC, 0.0, 0.0, 0.0, 0.0);
+	AddResizableControl(IDC_OPERATION_EDIT, 0.0, 0.0, 1.0, 0.0);
+	AddResizableControl(IDC_SYSTEM_ERROR_STATIC, 0.0, 0.0, 0.0, 0.0);
+	AddResizableControl(IDC_SYSTEM_ERROR_EDIT, 0.0, 0.0, 1.0, 1.0);
 
-	AddResizableControl(IDC_RETRY_BUTTON, 0.0, 1.0, 0.0, 0.0);
-	AddResizableControl(IDC_SKIP_BUTTON, 0.0, 1.0, 0.0, 0.0);
-	AddResizableControl(IDC_CUSTOM_RULES_BUTTON, 0.0, 1.0, 0.0, 0.0);
-	AddResizableControl(IDC_PAUSE_BUTTON, 0.0, 1.0, 0.0, 0.0);
-	AddResizableControl(IDCANCEL, 0.0, 1.0, 0.0, 0.0);
+	AddResizableControl(IDC_RETRY_BUTTON, 0.34, 1.0, 0.33, 0.0);
+	AddResizableControl(IDC_SKIP_BUTTON, 0.67, 1.0, 0.33, 0.0);
+	AddResizableControl(IDC_CUSTOM_RULES_BUTTON, 0.0, 1.0, 0.34, 0.0);
+	AddResizableControl(IDC_PAUSE_BUTTON, 0.34, 1.0, 0.33, 0.0);
+	AddResizableControl(IDCANCEL, 0.67, 1.0, 0.33, 0.0);
 
 	InitializeResizableControls();
 
 	// set menus on buttons
 	HMENU hMenu = GetResManager().LoadMenu(MAKEINTRESOURCE(IDR_ERROR_MASS_RETRY_MENU));
 	m_menuMassRetry.Attach(hMenu);
-	m_btnRetry.m_hMenu = m_menuMassSkip.GetSubMenu(0)->GetSafeHmenu();
+	m_btnRetry.m_hMenu = m_menuMassRetry.GetSubMenu(0)->GetSafeHmenu();
 	m_btnRetry.m_bDefaultClick = TRUE;
 
 	hMenu = GetResManager().LoadMenu(MAKEINTRESOURCE(IDR_ERROR_MASS_SKIP_MENU));
@@ -99,7 +100,7 @@ BOOL CFeedbackFileErrorDlg::OnInitDialog()
 	m_ctlOperationType.SetWindowText(strOperationType);
 
 	m_ctlFirstName.SetWindowText(m_strSrcPath);
-	m_ctlSecondName.SetWindowText(m_strDstPath);
+	m_ctlSecondName.SetWindowText(m_strDstPath.IsEmpty() ? CString(L"-") : m_strDstPath);
 
 	// get system error string
 	string::TString strError = chcore::TWin32ErrorFormatter::FormatWin32ErrorCode(m_ulSysError, true);

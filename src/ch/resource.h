@@ -446,9 +446,9 @@
 #define IDC_SOURCE_DATE_STATIC          1417
 #define IDC_DST_DATE_STATIC             1418
 #define IDC_ERROR_DETAILS_STATIC        1423
-#define IDC_NAMES_STATIC                1424
 #define IDC_FILENAME_EDIT               1425
 #define IDC_LOCATION_STATIC             1426
+#define IDC_NAMES_STATIC2               1426
 #define IDC_REQUIRED_SPACE_HDR_STATIC   1427
 #define IDC_AVAILABLE_SPACE_HDR_STATIC  1428
 #define IDC_DETAILS_STATIC              1429
