@@ -106,7 +106,7 @@ BOOL CFeedbackNotEnoughSpaceDlg::OnInitDialog()
 	AddResizableControl(IDC_ICON_STATIC, 0.0, 0.0, 0.0, 0.0);
 
 	AddResizableControl(IDC_LOCATION_STATIC, 0.0, 0.0, 0.0, 0.0);
-	AddResizableControl(IDC_LOCATION_EDIT, 0.0, 0.0, 0.0, 1.0);
+	AddResizableControl(IDC_LOCATION_EDIT, 0.0, 0.0, 1.0, 0.0);
 
 	AddResizableControl(IDC_REQUIRED_SPACE_HDR_STATIC, 0.0, 0.0, 0.0, 0.0);
 	AddResizableControl(IDC_REQUIRED_SPACE_STATIC, 0.0, 0.0, 1.0, 0.0);
