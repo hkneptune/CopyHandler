@@ -558,6 +558,7 @@
     <ClInclude Include="AsyncHttpFile.h" />
     <ClInclude Include="CDragDropComboEx.h" />
     <ClInclude Include="CDragDropListCtrl.h" />
+    <ClInclude Include="ComboDataWrapper.h" />
     <ClInclude Include="DirectoryChooser.h" />
     <ClInclude Include="FeedbackHandler.h" />
     <ClInclude Include="FeedbackHandlerFactory.h" />

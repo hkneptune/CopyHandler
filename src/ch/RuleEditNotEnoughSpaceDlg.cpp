@@ -1,21 +1,21 @@
-/***************************************************************************
-*   Copyright (C) 2001-2020 by Józef Starosczyk                           *
-*   ixen@copyhandler.com                                                  *
-*                                                                         *
-*   This program is free software; you can redistribute it and/or modify  *
-*   it under the terms of the GNU Library General Public License          *
-*   (version 2) as published by the Free Software Foundation;             *
-*                                                                         *
-*   This program is distributed in the hope that it will be useful,       *
-*   but WITHOUT ANY WARRANTY; without even the implied warranty of        *
-*   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
-*   GNU General Public License for more details.                          *
-*                                                                         *
-*   You should have received a copy of the GNU Library General Public     *
-*   License along with this program; if not, write to the                 *
-*   Free Software Foundation, Inc.,                                       *
-*   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
-***************************************************************************/
+// ============================================================================
+//  Copyright (C) 2001-2020 by Jozef Starosczyk
+//  ixen {at} copyhandler [dot] com
+//
+//  This program is free software; you can redistribute it and/or modify
+//  it under the terms of the GNU Library General Public License
+//  (version 2) as published by the Free Software Foundation;
+//
+//  This program is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU General Public License for more details.
+//
+//  You should have received a copy of the GNU Library General Public
+//  License along with this program; if not, write to the
+//  Free Software Foundation, Inc.,
+//  59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+// ============================================================================
 #include "stdafx.h"
 #include "ch.h"
 #include "RuleEditNotEnoughSpaceDlg.h"
@@ -27,12 +27,12 @@
 static char THIS_FILE[] = __FILE__;
 #endif
 
-/////////////////////////////////////////////////////////////////////////////
-// FeedbackRuleEditorDlg dialog
+using namespace chengine;
 
 RuleEditNotEnoughSpaceDlg::RuleEditNotEnoughSpaceDlg(const chengine::FeedbackNotEnoughSpaceRule& rRule) :
 	CLanguageDialog(IDD_RULE_EDIT_NOTENOUGHSPACE_DIALOG),
-	m_rule(rRule)
+	m_rule(rRule),
+	m_comboResponse(m_ctlResponse, eResult_Ignore, eResult_Last)
 {
 }
 
@@ -61,7 +61,8 @@ BOOL RuleEditNotEnoughSpaceDlg::OnInitDialog()
 {
 	CLanguageDialog::OnInitDialog();
 
-	// copy data from TFileFilter to a dialog - mask
+	FillResponseCombo();
+
 	m_bUseIncludeMask = m_rule.GetUseMask();
 
 	m_ctlIncludeMask.SetCurSel(m_ctlIncludeMask.AddString(m_rule.GetCombinedMask().c_str()));
@@ -78,12 +79,8 @@ BOOL RuleEditNotEnoughSpaceDlg::OnInitDialog()
 	}
 
 	// response
-	for(int iIndex = IDS_FEEDBACK_RESPONSE_UNKNOWN; iIndex <= IDS_FEEDBACK_RESPONSE_RENAME; ++iIndex)
-	{
-		const wchar_t* pszData = GetResManager().LoadString(iIndex);
-		m_ctlResponse.AddString(pszData);
-	}
-	m_ctlResponse.SetCurSel(IDS_FEEDBACK_RESPONSE_IGNORE - IDS_FEEDBACK_RESPONSE_UNKNOWN);
+	EFeedbackResult eResult = m_rule.GetResult();
+	m_comboResponse.SelectComboResult(eResult == eResult_Unknown ? eResult_Ignore : eResult);
 
 	UpdateData(FALSE);
 
@@ -92,20 +89,30 @@ BOOL RuleEditNotEnoughSpaceDlg::OnInitDialog()
 	return TRUE;
 }
 
-void RuleEditNotEnoughSpaceDlg::OnLanguageChanged()
+void RuleEditNotEnoughSpaceDlg::FillResponseCombo()
 {
-	// selection
-	int iResponseIndex = m_ctlResponse.GetCurSel();
-
 	m_ctlResponse.ResetContent();
 
-	for(int iIndex = IDS_FEEDBACK_RESPONSE_UNKNOWN; iIndex <= IDS_FEEDBACK_RESPONSE_RENAME; ++iIndex)
+	std::vector<int> vEntries = {
+		IDS_FEEDBACK_RESPONSE_CANCEL,
+		IDS_FEEDBACK_RESPONSE_PAUSE,
+		IDS_FEEDBACK_RESPONSE_RETRY,
+		IDS_FEEDBACK_RESPONSE_IGNORE
+	};
+	for(int entry : vEntries)
 	{
-		const wchar_t* pszData = GetResManager().LoadString(iIndex);
-		m_ctlResponse.AddString(pszData);
+		const wchar_t* pszData = GetResManager().LoadString(entry);
+		int iPos = m_ctlResponse.AddString(pszData);
+		m_ctlResponse.SetItemData(iPos, entry - IDS_FEEDBACK_RESPONSE_UNKNOWN);
 	}
+}
 
-	m_ctlResponse.SetCurSel(iResponseIndex);
+void RuleEditNotEnoughSpaceDlg::OnLanguageChanged()
+{
+	// combo result
+	EFeedbackResult eResult = m_comboResponse.GetSelectedValue();
+	FillResponseCombo();
+	m_comboResponse.SelectComboResult(eResult);
 }
 
 void RuleEditNotEnoughSpaceDlg::EnableControls()
@@ -130,7 +137,7 @@ void RuleEditNotEnoughSpaceDlg::OnOK()
 	m_rule.SetCombinedExcludeMask((PCTSTR)strText);
 
 	// response
-	m_rule.SetResult((chengine::EFeedbackResult)m_ctlResponse.GetCurSel());
+	m_rule.SetResult(m_comboResponse.GetSelectedValue());
 
 	CLanguageDialog::OnOK();
 }

@@ -61,6 +61,9 @@
     <Filter Include="Source Files\GUI\Dialogs\Feedback rule editor">
       <UniqueIdentifier>{8c3e3738-a438-429e-8ad7-0dc13303f711}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\GUI\Utils">
+      <UniqueIdentifier>{706a4df6-9c2d-4ee9-aef5-b0ff6d19d94d}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Common\ipcstructs.h">
@@ -266,6 +269,9 @@
     </ClInclude>
     <ClInclude Include="RuleEditNotEnoughSpaceDlg.h">
       <Filter>Source Files\GUI\Dialogs\Feedback rule editor</Filter>
+    </ClInclude>
+    <ClInclude Include="ComboDataWrapper.h">
+      <Filter>Source Files\GUI\Utils</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

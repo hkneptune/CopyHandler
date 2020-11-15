@@ -1,21 +1,21 @@
-/***************************************************************************
-*   Copyright (C) 2001-2020 by Józef Starosczyk                           *
-*   ixen@copyhandler.com                                                  *
-*                                                                         *
-*   This program is free software; you can redistribute it and/or modify  *
-*   it under the terms of the GNU Library General Public License          *
-*   (version 2) as published by the Free Software Foundation;             *
-*                                                                         *
-*   This program is distributed in the hope that it will be useful,       *
-*   but WITHOUT ANY WARRANTY; without even the implied warranty of        *
-*   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
-*   GNU General Public License for more details.                          *
-*                                                                         *
-*   You should have received a copy of the GNU Library General Public     *
-*   License along with this program; if not, write to the                 *
-*   Free Software Foundation, Inc.,                                       *
-*   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
-***************************************************************************/
+// ============================================================================
+//  Copyright (C) 2001-2020 by Jozef Starosczyk
+//  ixen {at} copyhandler [dot] com
+//
+//  This program is free software; you can redistribute it and/or modify
+//  it under the terms of the GNU Library General Public License
+//  (version 2) as published by the Free Software Foundation;
+//
+//  This program is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU General Public License for more details.
+//
+//  You should have received a copy of the GNU Library General Public
+//  License along with this program; if not, write to the
+//  Free Software Foundation, Inc.,
+//  59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+// ============================================================================
 #include "stdafx.h"
 #include "ch.h"
 #include "RuleEditAlreadyExistsDlg.h"
@@ -27,12 +27,17 @@
 static char THIS_FILE[] = __FILE__;
 #endif
 
+using namespace chengine;
+
 /////////////////////////////////////////////////////////////////////////////
 // FeedbackRuleEditorDlg dialog
 
 RuleEditAlreadyExistsDlg::RuleEditAlreadyExistsDlg(const chengine::FeedbackAlreadyExistsRule& rRule) :
 	CLanguageDialog(IDD_RULE_EDIT_ALREADYEXISTS_DIALOG),
-	m_rule(rRule)
+	m_rule(rRule),
+	m_comboResponse(m_ctlResponse, eResult_Overwrite, eResult_Last),
+	m_comboDateCompare(m_ctlDateCompareType, eCmp_Equal, eCmp_Last),
+	m_comboSizeCompare(m_ctlSizeCompareType, eCmp_Equal, eCmp_Last)
 {
 }
 
@@ -70,18 +75,11 @@ BOOL RuleEditAlreadyExistsDlg::OnInitDialog()
 	CLanguageDialog::OnInitDialog();
 
 	// fill the combos with data
-
-	// strings <, <=, ...
-	for(int iIndex = IDS_LT_STRING; iIndex <= IDS_DT_STRING; iIndex++)
-	{
-		const wchar_t* pszData = GetResManager().LoadString(iIndex);
-		m_ctlSizeCompareType.AddString(pszData);
-		m_ctlDateCompareType.AddString(pszData);
-	}
+	FillCompareCombos();
+	FillResponseCombo();
 
 	// copy data from TFileFilter to a dialog - mask
 	m_bUseIncludeMask = m_rule.GetUseMask();
-
 	m_ctlIncludeMask.SetCurSel(m_ctlIncludeMask.AddString(m_rule.GetCombinedMask().c_str()));
 	for(int i = 0; i < m_astrAddMask.GetSize(); i++)
 	{
@@ -95,21 +93,15 @@ BOOL RuleEditAlreadyExistsDlg::OnInitDialog()
 		m_ctlExcludeMask.AddString(m_astrAddExcludeMask.GetAt(i));
 	}
 
-	// size
-	m_bUseSizeCompareType = m_rule.GetUseSizeCompare();
-	m_ctlSizeCompareType.SetCurSel(m_rule.GetSizeCompareType());
-	
-	// date
+	// size&date
 	m_bUseDateCompareType = m_rule.GetUseDateCompare();
-	m_ctlDateCompareType.SetCurSel(m_rule.GetDateCompareType());
-
+	m_comboDateCompare.SelectComboResult(m_rule.GetDateCompareType());
+	m_bUseSizeCompareType = m_rule.GetUseSizeCompare();
+	m_comboSizeCompare.SelectComboResult(m_rule.GetSizeCompareType());
+	
 	// response
-	for(int iIndex = IDS_FEEDBACK_RESPONSE_UNKNOWN; iIndex <= IDS_FEEDBACK_RESPONSE_RENAME; ++iIndex)
-	{
-		const wchar_t* pszData = GetResManager().LoadString(iIndex);
-		m_ctlResponse.AddString(pszData);
-	}
-	m_ctlResponse.SetCurSel(IDS_FEEDBACK_RESPONSE_OVERWRITE - IDS_FEEDBACK_RESPONSE_UNKNOWN);
+	EFeedbackResult eResult = m_rule.GetResult();
+	m_comboResponse.SelectComboResult(eResult == eResult_Unknown ? eResult_Overwrite : eResult);
 
 	UpdateData(FALSE);
 
@@ -118,34 +110,57 @@ BOOL RuleEditAlreadyExistsDlg::OnInitDialog()
 	return TRUE;
 }
 
-void RuleEditAlreadyExistsDlg::OnLanguageChanged()
+void RuleEditAlreadyExistsDlg::FillCompareCombos()
 {
-	// selection
-	int iSizeCompareTypeIndex = m_ctlSizeCompareType.GetCurSel();
-	int iDateCompareTypeIndex = m_ctlDateCompareType.GetCurSel();
-	int iResponseIndex = m_ctlResponse.GetCurSel();
-
 	m_ctlSizeCompareType.ResetContent();
 	m_ctlDateCompareType.ResetContent();
-	m_ctlResponse.ResetContent();
 
-	// strings <, <=, ...
 	for(int iIndex = IDS_LT_STRING; iIndex <= IDS_DT_STRING; iIndex++)
 	{
 		const wchar_t* pszData = GetResManager().LoadString(iIndex);
-		m_ctlSizeCompareType.AddString(pszData);
-		m_ctlDateCompareType.AddString(pszData);
-	}
+		int iPos = m_ctlSizeCompareType.AddString(pszData);
+		m_ctlSizeCompareType.SetItemData(iPos, iIndex - IDS_LT_STRING);
 
-	for(int iIndex = IDS_FEEDBACK_RESPONSE_UNKNOWN; iIndex <= IDS_FEEDBACK_RESPONSE_RENAME; ++iIndex)
+		iPos = m_ctlDateCompareType.AddString(pszData);
+		m_ctlDateCompareType.SetItemData(iPos, iIndex - IDS_LT_STRING);
+	}
+}
+
+void RuleEditAlreadyExistsDlg::FillResponseCombo()
+{
+	m_ctlResponse.ResetContent();
+
+	std::vector<int> vEntries = {
+		IDS_FEEDBACK_RESPONSE_OVERWRITE,
+		IDS_FEEDBACK_RESPONSE_RESUME,
+		IDS_FEEDBACK_RESPONSE_SKIP,
+		IDS_FEEDBACK_RESPONSE_CANCEL,
+		IDS_FEEDBACK_RESPONSE_PAUSE,
+		IDS_FEEDBACK_RESPONSE_RENAME
+	};
+	for(int entry : vEntries)
 	{
-		const wchar_t* pszData = GetResManager().LoadString(iIndex);
-		m_ctlResponse.AddString(pszData);
+		const wchar_t* pszData = GetResManager().LoadString(entry);
+		int iPos = m_ctlResponse.AddString(pszData);
+		m_ctlResponse.SetItemData(iPos, entry - IDS_FEEDBACK_RESPONSE_UNKNOWN);
 	}
+}
 
-	m_ctlSizeCompareType.SetCurSel(iSizeCompareTypeIndex);
-	m_ctlDateCompareType.SetCurSel(iDateCompareTypeIndex);
-	m_ctlResponse.SetCurSel(iResponseIndex);
+void RuleEditAlreadyExistsDlg::OnLanguageChanged()
+{
+	// combo result
+	EFeedbackResult eResult = m_comboResponse.GetSelectedValue();
+	FillResponseCombo();
+	m_comboResponse.SelectComboResult(eResult);
+
+	// size&date
+	ECompareType eSizeCmp = m_comboSizeCompare.GetSelectedValue();
+	ECompareType eDateCmp = m_comboDateCompare.GetSelectedValue();
+
+	FillCompareCombos();
+
+	m_comboSizeCompare.SelectComboResult(eSizeCmp);
+	m_comboDateCompare.SelectComboResult(eDateCmp);
 }
 
 void RuleEditAlreadyExistsDlg::EnableControls()
@@ -166,7 +181,6 @@ void RuleEditAlreadyExistsDlg::OnOK()
 {
 	UpdateData(TRUE);
 	
-	// TFileFilter --> dialogu - mask
 	CString strText;
 	m_ctlIncludeMask.GetWindowText(strText);
 	m_rule.SetUseMask(((m_bUseIncludeMask != 0) && !strText.IsEmpty()));
@@ -178,14 +192,14 @@ void RuleEditAlreadyExistsDlg::OnOK()
 
 	// size
 	m_rule.SetUseSizeCompare(m_bUseSizeCompareType != 0);
-	m_rule.SetSizeCompareType((chengine::ECompareType)m_ctlSizeCompareType.GetCurSel());
+	m_rule.SetSizeCompareType(m_comboSizeCompare.GetSelectedValue());
 
 	// date
 	m_rule.SetUseDateCompare(m_bUseDateCompareType != 0);
-	m_rule.SetDateCompareType((chengine::ECompareType)m_ctlDateCompareType.GetCurSel());
+	m_rule.SetDateCompareType(m_comboDateCompare.GetSelectedValue());
 
 	// response
-	m_rule.SetResult((chengine::EFeedbackResult)m_ctlResponse.GetCurSel());
+	m_rule.SetResult(m_comboResponse.GetSelectedValue());
 
 	CLanguageDialog::OnOK();
 }

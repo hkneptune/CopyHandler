@@ -19,6 +19,7 @@
 #pragma once
 
 #include "../libchengine/FeedbackAlreadyExistsRule.h"
+#include "ComboDataWrapper.h"
 
 /////////////////////////////////////////////////////////////////////////////
 // FeedbackRuleEditorDlg dialog
@@ -36,6 +37,10 @@ protected:
 	void EnableControls();
 
 	BOOL OnInitDialog() override;
+
+	void FillCompareCombos();
+	void FillResponseCombo();
+
 	void OnOK() override;
 	void DoDataExchange(CDataExchange* pDX) override;
 
@@ -57,4 +62,8 @@ private:
 
 	CStringArray m_astrAddMask;
 	CStringArray m_astrAddExcludeMask;
+
+	ComboDataWrapper<chengine::EFeedbackResult> m_comboResponse;
+	ComboDataWrapper<chengine::ECompareType> m_comboDateCompare;
+	ComboDataWrapper<chengine::ECompareType> m_comboSizeCompare;
 };

@@ -1,21 +1,21 @@
-/***************************************************************************
-*   Copyright (C) 2001-2020 by Józef Starosczyk                           *
-*   ixen@copyhandler.com                                                  *
-*                                                                         *
-*   This program is free software; you can redistribute it and/or modify  *
-*   it under the terms of the GNU Library General Public License          *
-*   (version 2) as published by the Free Software Foundation;             *
-*                                                                         *
-*   This program is distributed in the hope that it will be useful,       *
-*   but WITHOUT ANY WARRANTY; without even the implied warranty of        *
-*   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
-*   GNU General Public License for more details.                          *
-*                                                                         *
-*   You should have received a copy of the GNU Library General Public     *
-*   License along with this program; if not, write to the                 *
-*   Free Software Foundation, Inc.,                                       *
-*   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
-***************************************************************************/
+// ============================================================================
+//  Copyright (C) 2001-2020 by Jozef Starosczyk
+//  ixen {at} copyhandler [dot] com
+//
+//  This program is free software; you can redistribute it and/or modify
+//  it under the terms of the GNU Library General Public License
+//  (version 2) as published by the Free Software Foundation;
+//
+//  This program is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU General Public License for more details.
+//
+//  You should have received a copy of the GNU Library General Public
+//  License along with this program; if not, write to the
+//  Free Software Foundation, Inc.,
+//  59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+// ============================================================================
 #include "stdafx.h"
 #include "ch.h"
 #include "RuleEditErrorDlg.h"
@@ -27,12 +27,13 @@
 static char THIS_FILE[] = __FILE__;
 #endif
 
-/////////////////////////////////////////////////////////////////////////////
-// FeedbackRuleEditorDlg dialog
+using namespace chengine;
 
 RuleEditErrorDlg::RuleEditErrorDlg(const chengine::FeedbackErrorRule& rRule) :
 	CLanguageDialog(IDD_RULE_EDIT_ERROR_DIALOG),
-	m_rule(rRule)
+	m_rule(rRule),
+	m_comboResponse(m_ctlResponse, eResult_Skip, eResult_Last),
+	m_comboOperationType(m_ctlOperationType, EFileError::eCheckForFreeSpace, EFileError::eOperation_Last)
 {
 }
 
@@ -72,11 +73,8 @@ BOOL RuleEditErrorDlg::OnInitDialog()
 	// fill the combos with data
 
 	// strings <, <=, ...
-	for(int iIndex = IDS_OPERATION_DELETEERROR; iIndex <= IDS_OPERATION_RETRIEVEFILEINFO; iIndex++)
-	{
-		const wchar_t* pszData = GetResManager().LoadString(iIndex);
-		m_ctlOperationType.AddString(pszData);
-	}
+	FillOperationCombo();
+	FillResponseCombo();
 
 	// copy data from TFileFilter to a dialog - mask
 	m_bUseIncludeMask = m_rule.GetUseMask();
@@ -102,15 +100,11 @@ BOOL RuleEditErrorDlg::OnInitDialog()
 	
 	// date
 	m_bUseOperationType = m_rule.GetUseErrorType();
-	m_ctlOperationType.SetCurSel(m_rule.GetErrorType());
+	m_comboOperationType.SelectComboResult(m_rule.GetErrorType());
 
-	// response
-	for(int iIndex = IDS_FEEDBACK_RESPONSE_UNKNOWN; iIndex <= IDS_FEEDBACK_RESPONSE_RENAME; ++iIndex)
-	{
-		const wchar_t* pszData = GetResManager().LoadString(iIndex);
-		m_ctlResponse.AddString(pszData);
-	}
-	m_ctlResponse.SetCurSel(IDS_FEEDBACK_RESPONSE_SKIP - IDS_FEEDBACK_RESPONSE_UNKNOWN);
+	// result
+	EFeedbackResult eResult = m_rule.GetResult();
+	m_comboResponse.SelectComboResult(eResult == eResult_Unknown ? eResult_Skip : eResult);
 
 	UpdateData(FALSE);
 
@@ -119,30 +113,47 @@ BOOL RuleEditErrorDlg::OnInitDialog()
 	return TRUE;
 }
 
-void RuleEditErrorDlg::OnLanguageChanged()
+void RuleEditErrorDlg::FillOperationCombo()
 {
-	// selection
-	int iDateCompareTypeIndex = m_ctlOperationType.GetCurSel();
-	int iResponseIndex = m_ctlResponse.GetCurSel();
-
 	m_ctlOperationType.ResetContent();
-	m_ctlResponse.ResetContent();
 
-	// strings <, <=, ...
 	for(int iIndex = IDS_OPERATION_DELETEERROR; iIndex <= IDS_OPERATION_RETRIEVEFILEINFO; iIndex++)
 	{
 		const wchar_t* pszData = GetResManager().LoadString(iIndex);
-		m_ctlOperationType.AddString(pszData);
+		int iPos = m_ctlOperationType.AddString(pszData);
+		m_ctlOperationType.SetItemData(iPos, iIndex - IDS_OPERATION_DELETEERROR);
 	}
+}
 
-	for(int iIndex = IDS_FEEDBACK_RESPONSE_UNKNOWN; iIndex <= IDS_FEEDBACK_RESPONSE_RENAME; ++iIndex)
+void RuleEditErrorDlg::FillResponseCombo()
+{
+	m_ctlResponse.ResetContent();
+
+	std::vector<int> vEntries = {
+		IDS_FEEDBACK_RESPONSE_SKIP,
+		IDS_FEEDBACK_RESPONSE_CANCEL,
+		IDS_FEEDBACK_RESPONSE_PAUSE,
+		IDS_FEEDBACK_RESPONSE_RETRY
+	};
+	for(int entry : vEntries)
 	{
-		const wchar_t* pszData = GetResManager().LoadString(iIndex);
-		m_ctlResponse.AddString(pszData);
+		const wchar_t* pszData = GetResManager().LoadString(entry);
+		int iPos = m_ctlResponse.AddString(pszData);
+		m_ctlResponse.SetItemData(iPos, entry - IDS_FEEDBACK_RESPONSE_UNKNOWN);
 	}
+}
 
-	m_ctlOperationType.SetCurSel(iDateCompareTypeIndex);
-	m_ctlResponse.SetCurSel(iResponseIndex);
+void RuleEditErrorDlg::OnLanguageChanged()
+{
+	EFeedbackResult eResult = m_comboResponse.GetSelectedValue();
+	FillResponseCombo();
+	m_comboResponse.SelectComboResult(eResult);
+
+	EFileError eOperation = m_comboOperationType.GetSelectedValue();
+
+	FillOperationCombo();
+
+	m_comboOperationType.SelectComboResult(eOperation);
 }
 
 void RuleEditErrorDlg::EnableControls()
@@ -163,7 +174,6 @@ void RuleEditErrorDlg::OnOK()
 {
 	UpdateData(TRUE);
 	
-	// TFileFilter --> dialogu - mask
 	CString strText;
 	m_ctlIncludeMask.GetWindowText(strText);
 	m_rule.SetUseMask(((m_bUseIncludeMask != 0) && !strText.IsEmpty()));
@@ -183,10 +193,10 @@ void RuleEditErrorDlg::OnOK()
 
 	// date
 	m_rule.SetUseErrorType(m_bUseOperationType != 0);
-	m_rule.SetErrorType((chengine::EFileError)m_ctlOperationType.GetCurSel());
+	m_rule.SetErrorType(m_comboOperationType.GetSelectedValue());
 
 	// response
-	m_rule.SetResult((chengine::EFeedbackResult)m_ctlResponse.GetCurSel());
+	m_rule.SetResult(m_comboResponse.GetSelectedValue());
 
 	CLanguageDialog::OnOK();
 }

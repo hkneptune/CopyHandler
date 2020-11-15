@@ -9,7 +9,9 @@ namespace chengine
 		eCmp_Equal = 2,
 		eCmp_GreaterOrEqual = 3,
 		eCmp_Greater = 4,
-		eCmp_NotEqual = 5
+		eCmp_NotEqual = 5,
+
+		eCmp_Last
 	};
 
 	template<class T>
