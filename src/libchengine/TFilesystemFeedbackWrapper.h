@@ -38,8 +38,7 @@ namespace chengine
 		TFilesystemFeedbackWrapper& operator=(const TFilesystemFeedbackWrapper&) = delete;
 
 		TSubTaskBase::ESubOperationResult CreateDirectoryFB(const chcore::TSmartPath& pathDirectory);
-		TSubTaskBase::ESubOperationResult CheckForFreeSpaceFB(const chcore::TSmartPath& pathFirstSrc, const chcore::TSmartPath& pathDestination,
-			unsigned long long ullNeededSize);
+		TSubTaskBase::ESubOperationResult CheckForFreeSpaceFB(const chcore::TSmartPath& pathDestination, unsigned long long ullNeededSize);
 
 		TSubTaskBase::ESubOperationResult RemoveDirectoryFB(const TFileInfoPtr& spFileInfo, bool bProtectReadOnlyFiles);
 		TSubTaskBase::ESubOperationResult DeleteFileFB(const TFileInfoPtr& spFileInfo, bool bProtectReadOnlyFiles);

@@ -137,8 +137,8 @@ namespace chengine
 
 		// now it's time to check if there is enough space on destination device
 		unsigned long long ullNeededSize = rFilesCache.CalculateTotalSize() - rFilesCache.CalculatePartialSize(m_spSubTaskStats->GetCurrentIndex());
-		TSmartPath pathSingleSrc = spSrcPaths->GetAt(0)->GetSrcPath();
-		TSubTaskBase::ESubOperationResult eResult = tFilesystemFBWrapper.CheckForFreeSpaceFB(pathSingleSrc, pathDestination, ullNeededSize);
+
+		TSubTaskBase::ESubOperationResult eResult = tFilesystemFBWrapper.CheckForFreeSpaceFB(pathDestination, ullNeededSize);
 		if(eResult != eSubResult_Continue)
 			return eResult;
 

@@ -9,7 +9,7 @@ using namespace serializer;
 
 namespace chengine
 {
-	EFeedbackResult FeedbackNotEnoughSpaceRuleList::Matches(const string::TString& strSrcPath, const string::TString& strDstPath, unsigned long long ullRequiredSize) const
+	EFeedbackResult FeedbackNotEnoughSpaceRuleList::Matches(const string::TString& strDstPath, unsigned long long ullRequiredSize) const
 	{
 		if(m_vEntries.empty())
 			return eResult_Unknown;
@@ -17,7 +17,7 @@ namespace chengine
 		for(const FeedbackNotEnoughSpaceRule& rRule : m_vEntries)
 		{
 			EFeedbackResult eResult = eResult_Unknown;
-			if(rRule.Matches(strSrcPath, strDstPath, ullRequiredSize, eResult))
+			if(rRule.Matches(strDstPath, ullRequiredSize, eResult))
 				return eResult;
 		}
 

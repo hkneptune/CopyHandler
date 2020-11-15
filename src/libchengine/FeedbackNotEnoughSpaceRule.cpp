@@ -79,7 +79,7 @@ namespace chengine
 		m_eResult = rSrc.m_eResult;
 	}
 
-	bool FeedbackNotEnoughSpaceRule::Matches(const string::TString& /*strSrcPath*/, const string::TString& strDstPath, unsigned long long /*ullRequiredSize*/, EFeedbackResult& eResult) const
+	bool FeedbackNotEnoughSpaceRule::Matches(const string::TString& strDstPath, unsigned long long /*ullRequiredSize*/, EFeedbackResult& eResult) const
 	{
 		eResult = eResult_Unknown;
 

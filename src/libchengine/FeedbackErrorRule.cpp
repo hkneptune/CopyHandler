@@ -142,7 +142,7 @@ namespace chengine
 		rColumns.AddColumn(_T("use_error_type"), IColumnsDefinition::eType_bool);
 		rColumns.AddColumn(_T("error_type"), IColumnsDefinition::eType_int);
 		rColumns.AddColumn(_T("use_system_error_no"), IColumnsDefinition::eType_bool);
-		rColumns.AddColumn(_T("system_error_no"), IColumnsDefinition::eType_ulong);
+		rColumns.AddColumn(_T("system_error_no"), IColumnsDefinition::eType_uint);
 		rColumns.AddColumn(_T("result"), IColumnsDefinition::eType_int);
 	}
 

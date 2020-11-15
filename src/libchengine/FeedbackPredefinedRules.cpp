@@ -1,23 +1,22 @@
 #include "stdafx.h"
 #include "FeedbackPredefinedRules.h"
-#include "FeedbackAlreadyExistsRuleList.h"
 
 namespace chengine
 {
-	FeedbackAlreadyExistsRuleList FeedbackPredefinedRules::CreateAlreadyExistsRule(EPredefinedRuleCondition eCondition, EFeedbackResult eResult)
+	FeedbackAlreadyExistsRuleList FeedbackPredefinedRules::CreateAlreadyExistsRule(EAlreadyExistsPredefinedRuleCondition eCondition, EFeedbackResult eResult)
 	{
 		FeedbackAlreadyExistsRuleList ruleList;
 
 		switch(eCondition)
 		{
-		case EPredefinedRuleCondition::eCondition_ApplyToAll:
+		case EAlreadyExistsPredefinedRuleCondition::eCondition_ApplyToAll:
 		{
 			FeedbackAlreadyExistsRule rule;
 			rule.SetResult(eResult);
 			ruleList.Add(rule);
 			break;
 		}
-		case EPredefinedRuleCondition::eCondition_WhenDifferentDateOrSize:
+		case EAlreadyExistsPredefinedRuleCondition::eCondition_WhenDifferentDateOrSize:
 		{
 			FeedbackAlreadyExistsRule rule;
 			rule.SetResult(eResult);
@@ -33,7 +32,7 @@ namespace chengine
 
 			break;
 		}
-		case EPredefinedRuleCondition::eCondition_WhenSameDateAndSize:
+		case EAlreadyExistsPredefinedRuleCondition::eCondition_WhenSameDateAndSize:
 		{
 			FeedbackAlreadyExistsRule rule;
 			rule.SetResult(eResult);
@@ -44,7 +43,7 @@ namespace chengine
 			ruleList.Add(rule);
 			break;
 		}
-		case EPredefinedRuleCondition::eCondition_WhenNewerThanDst:
+		case EAlreadyExistsPredefinedRuleCondition::eCondition_WhenNewerThanDst:
 		{
 			FeedbackAlreadyExistsRule rule;
 			rule.SetResult(eResult);
@@ -53,7 +52,7 @@ namespace chengine
 			ruleList.Add(rule);
 			break;
 		}
-		case EPredefinedRuleCondition::eCondition_WhenOlderThanDst:
+		case EAlreadyExistsPredefinedRuleCondition::eCondition_WhenOlderThanDst:
 		{
 			FeedbackAlreadyExistsRule rule;
 			rule.SetResult(eResult);
@@ -62,7 +61,7 @@ namespace chengine
 			ruleList.Add(rule);
 			break;
 		}
-		case EPredefinedRuleCondition::eCondition_WhenSmallerThanDst:
+		case EAlreadyExistsPredefinedRuleCondition::eCondition_WhenSmallerThanDst:
 		{
 			FeedbackAlreadyExistsRule rule;
 			rule.SetResult(eResult);
@@ -71,12 +70,34 @@ namespace chengine
 			ruleList.Add(rule);
 			break;
 		}
-		case EPredefinedRuleCondition::eCondition_WhenBiggerThanDst:
+		case EAlreadyExistsPredefinedRuleCondition::eCondition_WhenBiggerThanDst:
 		{
 			FeedbackAlreadyExistsRule rule;
 			rule.SetResult(eResult);
 			rule.SetUseSizeCompare(true);
 			rule.SetSizeCompareType(eCmp_Greater);
+			ruleList.Add(rule);
+			break;
+		}
+		default:
+			throw std::runtime_error("Unhandled predefined rule condition");
+		}
+
+		return ruleList;
+	}
+
+	chengine::FeedbackErrorRuleList FeedbackPredefinedRules::CreateErrorRule(EErrorPredefinedRuleCondition eCondition, unsigned int uiSystemError, EFeedbackResult eResult)
+	{
+		FeedbackErrorRuleList ruleList;
+
+		switch(eCondition)
+		{
+		case EErrorPredefinedRuleCondition::eCondition_WhenSameError:
+		{
+			FeedbackErrorRule rule;
+			rule.SetUseSystemErrorNo(true);
+			rule.SetSystemErrorNo(uiSystemError);
+			rule.SetResult(eResult);
 			ruleList.Add(rule);
 			break;
 		}

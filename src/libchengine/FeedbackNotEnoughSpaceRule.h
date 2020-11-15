@@ -43,7 +43,7 @@ namespace chengine
 
 		void SetData(const FeedbackNotEnoughSpaceRule& rSrc);
 
-		bool Matches(const string::TString& strSrcPath, const string::TString& strDstPath, unsigned long long ullRequiredSize, EFeedbackResult& eResult) const;
+		bool Matches(const string::TString& strDstPath, unsigned long long ullRequiredSize, EFeedbackResult& eResult) const;
 
 		void Store(const serializer::ISerializerContainerPtr& spContainer) const override;
 		void Load(const serializer::ISerializerRowReaderPtr& spRowReader) override;

@@ -31,12 +31,11 @@ class RuleEditDlg : public ictranslate::CLanguageDialog
 public:
 	explicit RuleEditDlg(const chengine::FeedbackRules& rRules);
 
-// Overrides
+	chengine::FeedbackRules GetRules() const { return m_rules; }
+
 protected:
 	void DoDataExchange(CDataExchange* pDX) override;    // DDX/DDV support
 
-// Implementation
-protected:
 	void OnLanguageChanged() override;
 
 	// Generated message map functions

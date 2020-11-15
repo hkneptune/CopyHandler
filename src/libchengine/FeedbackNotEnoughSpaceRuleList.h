@@ -13,7 +13,7 @@ namespace chengine
 	class LIBCHENGINE_API FeedbackNotEnoughSpaceRuleList : public serializer::SerializableContainer<FeedbackNotEnoughSpaceRule>
 	{
 	public:
-		EFeedbackResult Matches(const string::TString& strSrcPath, const string::TString& strDstPath, unsigned long long ullRequiredSize) const;
+		EFeedbackResult Matches(const string::TString& strDstPath, unsigned long long ullRequiredSize) const;
 
 		void Merge(const FeedbackNotEnoughSpaceRuleList& rSrc);
 

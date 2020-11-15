@@ -100,7 +100,7 @@ namespace chengine
 		return false;
 	}
 
-	TSubTaskBase::ESubOperationResult TFilesystemFeedbackWrapper::CheckForFreeSpaceFB(const TSmartPath& pathFirstSrc, const TSmartPath& pathDestination, unsigned long long ullNeededSize)
+	TSubTaskBase::ESubOperationResult TFilesystemFeedbackWrapper::CheckForFreeSpaceFB(const TSmartPath& pathDestination, unsigned long long ullNeededSize)
 	{
 		unsigned long long ullAvailableSize = 0, ullTotal = 0;
 		TFeedbackResult frResult(eResult_Unknown, false);
@@ -162,7 +162,7 @@ namespace chengine
 				strFormat.Replace(_T("%availablesize"), boost::lexical_cast<std::wstring>(ullAvailableSize).c_str());
 				LOG_WARNING(m_spLog) << strFormat.c_str();
 
-				frResult = m_spFeedbackManager->NotEnoughSpace(pathFirstSrc.ToWString(), pathDestination.ToWString(), ullNeededSize);
+				frResult = m_spFeedbackManager->NotEnoughSpace(pathDestination.ToWString(), ullNeededSize);
 				switch (frResult.GetResult())
 				{
 				case eResult_Cancel:

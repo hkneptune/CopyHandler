@@ -130,14 +130,14 @@ namespace chengine
 		return { eResult, bAutomatedResponse };
 	}
 
-	chengine::TFeedbackResult FeedbackManager::NotEnoughSpace(const string::TString& strSrcPath, const string::TString& strDstPath, unsigned long long ullRequiredSize)
+	chengine::TFeedbackResult FeedbackManager::NotEnoughSpace(const string::TString& strDstPath, unsigned long long ullRequiredSize)
 	{
 		bool bAutomatedResponse = true;
 		EFeedbackResult eResult = eResult_Unknown;
 
 		{
 			boost::shared_lock<boost::shared_mutex> lock(m_lock);
-			eResult = m_feedbackRules.GetNotEnoughSpaceRules().Matches(strSrcPath, strDstPath, ullRequiredSize);
+			eResult = m_feedbackRules.GetNotEnoughSpaceRules().Matches(strDstPath, ullRequiredSize);
 		}
 		if(eResult == eResult_Unknown)
 		{
@@ -149,7 +149,7 @@ namespace chengine
 			{
 				TScopedRunningTimeTrackerPause scopedTimePause(m_pTimeTracker);
 				TScopedRunningTimeTrackerPause scopedSecondaryTimePause(m_pSecondaryTimeTracker);
-				eResult = m_spFeedbackHandler->NotEnoughSpace(strSrcPath, strDstPath, ullRequiredSize, modRules);
+				eResult = m_spFeedbackHandler->NotEnoughSpace(strDstPath, ullRequiredSize, modRules);
 			}
 			if(eResult != eResult_Unknown)
 			{

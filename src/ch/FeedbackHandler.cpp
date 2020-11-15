@@ -30,9 +30,9 @@ using namespace chcore;
 using namespace chengine;
 using namespace string;
 
-chengine::EFeedbackResult CFeedbackHandler::FileError(const TString& strSrcPath, const TString& strDstPath, EFileError /*eFileError*/, unsigned long ulError, FeedbackRules& rNewRules)
+chengine::EFeedbackResult CFeedbackHandler::FileError(const TString& strSrcPath, const TString& strDstPath, EFileError eOperationType, unsigned long ulError, FeedbackRules& rNewRules)
 {
-	CFeedbackFileErrorDlg dlg(rNewRules, strSrcPath.c_str(), strDstPath.c_str(), ulError);
+	CFeedbackFileErrorDlg dlg(rNewRules, strSrcPath.c_str(), strDstPath.c_str(), eOperationType, ulError);
 	EFeedbackResult eResult = (EFeedbackResult)dlg.DoModal();
 
 	if(dlg.GetRules().IsModified())
@@ -57,9 +57,9 @@ chengine::EFeedbackResult CFeedbackHandler::FileAlreadyExists(const TFileInfo& s
 	return eResult;
 }
 
-chengine::EFeedbackResult CFeedbackHandler::NotEnoughSpace(const TString& strSrcPath, const TString& strDstPath, unsigned long long ullRequiredSize, FeedbackRules& rNewRules)
+chengine::EFeedbackResult CFeedbackHandler::NotEnoughSpace(const TString& strDstPath, unsigned long long ullRequiredSize, FeedbackRules& rNewRules)
 {
-	CFeedbackNotEnoughSpaceDlg dlg(rNewRules, ullRequiredSize, strSrcPath.c_str(), strDstPath.c_str());
+	CFeedbackNotEnoughSpaceDlg dlg(rNewRules, ullRequiredSize, strDstPath.c_str());
 	EFeedbackResult eResult = (EFeedbackResult) dlg.DoModal();
 
 	if(dlg.GetRules().IsModified())
