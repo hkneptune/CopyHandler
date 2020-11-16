@@ -225,7 +225,7 @@ BEGIN
     CONTROL         "Progress1",IDC_TIME_PROGRESS,"msctls_progress32",PBS_SMOOTH,7,48,172,9
 END
 
-IDD_CUSTOM_COPY_DIALOG DIALOGEX 0, 0, 351, 318
+IDD_CUSTOM_COPY_DIALOG DIALOGEX 0, 0, 351, 349
 STYLE DS_SETFONT | DS_CENTER | WS_MINIMIZEBOX | WS_MAXIMIZEBOX | WS_POPUP | WS_VISIBLE | WS_CLIPCHILDREN | WS_CAPTION | WS_SYSMENU | WS_THICKFRAME
 EXSTYLE WS_EX_APPWINDOW
 CAPTION "Copying/moving parameters"
@@ -246,27 +246,32 @@ BEGIN
     CONTROL         "List2",IDC_FILTERS_LIST,"SysListView32",LVS_REPORT | WS_BORDER | WS_TABSTOP,13,190,303,46
     PUSHBUTTON      "+",IDC_ADDFILTER_BUTTON,322,190,22,14
     PUSHBUTTON      "-",IDC_REMOVEFILTER_BUTTON,322,206,22,14
-    CONTROL         "Advanced options",IDC_ADVANCED_CHECK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,242,84,10
+    CONTROL         "Custom rules...",IDC_CUSTOM_RULES_BUTTON,"MfcButton",WS_TABSTOP,273,254,71,14
+    CONTROL         "Advanced options",IDC_ADVANCED_CHECK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,273,84,10
     CONTROL         "Do not create destination directories - copy files loosely to destination folder",IDC_IGNOREFOLDERS_CHECK,
-                    "Button",BS_AUTOCHECKBOX | BS_NOTIFY | WS_TABSTOP,13,255,329,10
+                    "Button",BS_AUTOCHECKBOX | BS_NOTIFY | WS_TABSTOP,13,286,329,10
+    CONTROL         "Create directory structure in destination folder (relatively to root directory)",IDC_FORCEDIRECTORIES_CHECK,
+                    "Button",BS_AUTOCHECKBOX | BS_NOTIFY | WS_TABSTOP,13,297,329,10
     CONTROL         "Do not copy/move contents of files - only create it (empty)",IDC_ONLYSTRUCTURE_CHECK,
-                    "Button",BS_AUTOCHECKBOX | BS_NOTIFY | WS_TABSTOP,13,277,329,10
-    PUSHBUTTON      "&OK",IDOK,239,297,50,14
-    PUSHBUTTON      "&Cancel",IDCANCEL,294,297,50,14
+                    "Button",BS_AUTOCHECKBOX | BS_NOTIFY | WS_TABSTOP,13,308,329,10
+    PUSHBUTTON      "&Export...",IDC_EXPORT_BUTTON,7,328,50,14
+    PUSHBUTTON      "&OK",IDOK,239,328,50,14
+    PUSHBUTTON      "&Cancel",IDCANCEL,294,328,50,14
     LTEXT           "Source files/folders:",IDC_001_STATIC,7,7,337,8
     LTEXT           "Destination folder:",IDC_002_STATIC,7,76,337,8
     LTEXT           "Operation type:",IDC_003_STATIC,13,115,117,8
     LTEXT           "Priority:",IDC_004_STATIC,181,115,120,8
     LTEXT           "Buffer sizes:",IDC_006_STATIC,13,142,244,8
     CONTROL         "",IDC_BAR3_STATIC,"Static",SS_ETCHEDHORZ,76,181,268,1
-    CONTROL         "",IDC_BAR4_STATIC,"Static",SS_ETCHEDHORZ,98,247,246,1
-    CONTROL         "",IDC_BAR5_STATIC,"Static",SS_ETCHEDHORZ,7,291,337,1
+    CONTROL         "",IDC_BAR4_STATIC,"Static",SS_ETCHEDHORZ,98,278,246,1
+    CONTROL         "",IDC_BAR5_STATIC,"Static",SS_ETCHEDHORZ,7,322,337,1
     CONTROL         "",IDC_BAR2_STATIC,"Static",SS_ETCHEDHORZ,107,107,237,1
     CTEXT           "Standard options",IDC_007_STATIC,20,104,80,8
     CONTROL         "",IDC_BAR1_STATIC,"Static",SS_ETCHEDHORZ,7,107,8,1
-    CONTROL         "Create directory structure in destination folder (relatively to root directory)",IDC_FORCEDIRECTORIES_CHECK,
-                    "Button",BS_AUTOCHECKBOX | BS_NOTIFY | WS_TABSTOP,13,266,329,10
-    PUSHBUTTON      "&Export...",IDC_EXPORT_BUTTON,7,297,50,14
+    CONTROL         "",IDC_BAR8_STATIC,"Static",SS_ETCHEDHORZ,108,244,236,1
+    CTEXT           "Feedback rules",IDC_FEEDBACK_RULES_STATIC,21,241,80,8
+    CONTROL         "",IDC_BAR7_STATIC,"Static",SS_ETCHEDHORZ,8,244,7,1
+    EDITTEXT        IDC_FEEDBACK_RULES_SUMMARY_EDIT,13,254,255,14,ES_AUTOHSCROLL | WS_DISABLED
 END
 
 IDD_FILTER_DIALOG DIALOGEX 0, 0, 291, 266
@@ -618,7 +623,7 @@ BEGIN
         LEFTMARGIN, 7
         RIGHTMARGIN, 344
         TOPMARGIN, 7
-        BOTTOMMARGIN, 311
+        BOTTOMMARGIN, 342
     END
 
     IDD_FILTER_DIALOG, DIALOG
@@ -1399,6 +1404,33 @@ BEGIN
     0
 END
 
+IDD_CUSTOM_COPY_DIALOG DLGINIT
+BEGIN
+    IDC_CUSTOM_RULES_BUTTON, 0x37c, 369, 0
+0x4d3c, 0x4346, 0x7542, 0x7474, 0x6e6f, 0x535f, 0x7974, 0x656c, 0x343e, 
+0x2f3c, 0x464d, 0x4243, 0x7475, 0x6f74, 0x5f6e, 0x7453, 0x6c79, 0x3e65, 
+0x4d3c, 0x4346, 0x7542, 0x7474, 0x6e6f, 0x415f, 0x7475, 0x736f, 0x7a69, 
+0x3e65, 0x4146, 0x534c, 0x3c45, 0x4d2f, 0x4346, 0x7542, 0x7474, 0x6e6f, 
+0x415f, 0x7475, 0x736f, 0x7a69, 0x3e65, 0x4d3c, 0x4346, 0x7542, 0x7474, 
+0x6e6f, 0x545f, 0x6f6f, 0x746c, 0x7069, 0x3c3e, 0x4d2f, 0x4346, 0x7542, 
+0x7474, 0x6e6f, 0x545f, 0x6f6f, 0x746c, 0x7069, 0x3c3e, 0x464d, 0x4243, 
+0x7475, 0x6f74, 0x5f6e, 0x7546, 0x6c6c, 0x6554, 0x7478, 0x6f54, 0x6c6f, 
+0x543e, 0x5552, 0x3c45, 0x4d2f, 0x4346, 0x7542, 0x7474, 0x6e6f, 0x465f, 
+0x6c75, 0x546c, 0x7865, 0x5474, 0x6f6f, 0x3e6c, 0x4d3c, 0x4346, 0x7542, 
+0x7474, 0x6e6f, 0x435f, 0x7275, 0x6f73, 0x5472, 0x7079, 0x3e65, 0x3131, 
+0x2f3c, 0x464d, 0x4243, 0x7475, 0x6f74, 0x5f6e, 0x7543, 0x7372, 0x726f, 
+0x7954, 0x6570, 0x3c3e, 0x464d, 0x4243, 0x7475, 0x6f74, 0x5f6e, 0x6d49, 
+0x6761, 0x5465, 0x7079, 0x3e65, 0x3c38, 0x4d2f, 0x4346, 0x7542, 0x7474, 
+0x6e6f, 0x495f, 0x616d, 0x6567, 0x7954, 0x6570, 0x3c3e, 0x464d, 0x4243, 
+0x7475, 0x6f74, 0x5f6e, 0x6d49, 0x6761, 0x4f65, 0x546e, 0x706f, 0x463e, 
+0x4c41, 0x4553, 0x2f3c, 0x464d, 0x4243, 0x7475, 0x6f74, 0x5f6e, 0x6d49, 
+0x6761, 0x4f65, 0x546e, 0x706f, 0x3c3e, 0x464d, 0x4243, 0x7475, 0x6f74, 
+0x5f6e, 0x6d49, 0x6761, 0x4f65, 0x526e, 0x6769, 0x7468, 0x463e, 0x4c41, 
+0x4553, 0x2f3c, 0x464d, 0x4243, 0x7475, 0x6f74, 0x5f6e, 0x6d49, 0x6761, 
+0x4f65, 0x526e, 0x6769, 0x7468, "\076" 
+    0
+END
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -1790,6 +1822,9 @@ STRINGTABLE
 BEGIN
     IDS_OPERATION_CHECKFORFREESPACE "Check for free space"
     IDS_OPERATION_RETRIEVEFILEINFO "Retrieve file information"
+    IDS_RULES_EMPTY_STRING  "No rules defined"
+    IDS_RULES_NON_EMPTY_STRING 
+                            "%exists 'already exists' rules, %error 'error' rules, %space 'not enough space' rules"
 END
 
 STRINGTABLE

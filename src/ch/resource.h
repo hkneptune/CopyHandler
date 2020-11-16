@@ -93,7 +93,7 @@
 #define IDC_TASK_ADVANCED_BUTTON        1017
 #define IDC_PAUSE_BUTTON                1018
 #define IDC_STANDARD_CHECK              1019
-#define IDC_CUSTOM_RULES_BUTTON         1019
+#define IDC_CUSTOM_RULES_BUTTON         1035
 #define IDC_FORCEDIRECTORIES_CHECK      1020
 #define IDC_PAUSE_BUTTON2               1020
 #define IDC_RESUME_BUTTON               1021
@@ -270,6 +270,7 @@
 #define IDC_007_STATIC                  1225
 #define IDC_008_STATIC                  1226
 #define IDC_SUBTASKCOUNT_LABEL_STATIC   1226
+#define IDC_FEEDBACK_RULES_STATIC       1226
 #define IDC_009_STATIC                  1227
 #define IDC_CURRENTOBJECT_LABEL_STATIC  1227
 #define IDC_010_STATIC                  1228
@@ -320,7 +321,9 @@
 #define IDC_BAR4_STATIC                 1252
 #define IDC_BAR5_STATIC                 1253
 #define IDC_HEADER_STATIC               1254
+#define IDC_BAR8_STATIC                 1254
 #define IDC_HOSTLINK_STATIC             1255
+#define IDC_BAR7_STATIC                 1255
 #define IDC_PROGRAM_STATICEX            1263
 #define IDC_FULLVERSION_STATICEX        1264
 #define IDC_HOMEPAGE_STATICEX           1265
@@ -459,6 +462,7 @@
 #define IDC_REQUIRED_SPACE_HDR_STATIC   1427
 #define IDC_AVAILABLE_SPACE_HDR_STATIC  1428
 #define IDC_DETAILS_STATIC              1429
+#define IDC_FEEDBACK_RULES_SUMMARY_EDIT 1431
 #define IDS_APPNAME_STRING              5000
 #define IDS_PRIORITY0_STRING            5001
 #define IDS_PRIORITY1_STRING            5002
@@ -743,6 +747,8 @@
 #define IDS_OPERATION_CREATEERROR       15039
 #define IDS_OPERATION_CHECKFORFREESPACE 15040
 #define IDS_OPERATION_RETRIEVEFILEINFO  15041
+#define IDS_RULES_EMPTY_STRING          15042
+#define IDS_RULES_NON_EMPTY_STRING      15043
 #define IDS_DATECREATED_STRING          18000
 #define IDS_DATELASTWRITE_STRING        18001
 #define IDS_DATEACCESSED_STRING         18002
@@ -839,9 +845,9 @@
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_3D_CONTROLS                     1
-#define _APS_NEXT_RESOURCE_VALUE        239
+#define _APS_NEXT_RESOURCE_VALUE        240
 #define _APS_NEXT_COMMAND_VALUE         32835
-#define _APS_NEXT_CONTROL_VALUE         1430
+#define _APS_NEXT_CONTROL_VALUE         1432
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

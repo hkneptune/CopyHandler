@@ -38,6 +38,7 @@ namespace chengine
 		void StoreInConfig(TConfig& rConfig, PCTSTR pszNodeName) const;
 		bool ReadFromConfig(const TConfig& rConfig, PCTSTR pszNodeName);
 
+		bool IsEmpty() const;
 		void Clear();
 
 		void ResetModifications();

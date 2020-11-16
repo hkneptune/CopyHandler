@@ -143,6 +143,11 @@ chengine::FeedbackOperationEventRuleList& chengine::FeedbackRules::GetOperationE
 	return m_feedbackOperationEventRules;
 }
 
+bool chengine::FeedbackRules::IsEmpty() const
+{
+	return m_feedbackAlreadyExistsRules.IsEmpty() && m_feedbackErrorRules.IsEmpty() && m_feedbackNotEnoughSpaceRules.IsEmpty() && m_feedbackOperationEventRules.IsEmpty();
+}
+
 chengine::FeedbackNotEnoughSpaceRuleList& chengine::FeedbackRules::GetNotEnoughSpaceRules()
 {
 	return m_feedbackNotEnoughSpaceRules;

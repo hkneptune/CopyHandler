@@ -1,21 +1,21 @@
-/***************************************************************************
-*   Copyright (C) 2001-2008 by Józef Starosczyk                           *
-*   ixen@copyhandler.com                                                  *
-*                                                                         *
-*   This program is free software; you can redistribute it and/or modify  *
-*   it under the terms of the GNU Library General Public License          *
-*   (version 2) as published by the Free Software Foundation;             *
-*                                                                         *
-*   This program is distributed in the hope that it will be useful,       *
-*   but WITHOUT ANY WARRANTY; without even the implied warranty of        *
-*   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
-*   GNU General Public License for more details.                          *
-*                                                                         *
-*   You should have received a copy of the GNU Library General Public     *
-*   License along with this program; if not, write to the                 *
-*   Free Software Foundation, Inc.,                                       *
-*   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
-***************************************************************************/
+// ============================================================================
+//  Copyright (C) 2001-2020 by Jozef Starosczyk
+//  ixen {at} copyhandler [dot] com
+//
+//  This program is free software; you can redistribute it and/or modify
+//  it under the terms of the GNU Library General Public License
+//  (version 2) as published by the Free Software Foundation;
+//
+//  This program is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU General Public License for more details.
+//
+//  You should have received a copy of the GNU Library General Public
+//  License along with this program; if not, write to the
+//  Free Software Foundation, Inc.,
+//  59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+// ============================================================================
 #include "stdafx.h"
 #include <boost/shared_array.hpp>
 #include "resource.h"
@@ -29,6 +29,7 @@
 #include "CfgProperties.h"
 #include "../libchengine/TTaskDefinition.h"
 #include "../libchengine/TTaskConfigBufferSizes.h"
+#include "RuleEditDlg.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -36,9 +37,8 @@
 static char THIS_FILE[] = __FILE__;
 #endif
 
-/////////////////////////////////////////////////////////////////////////////
-// CCustomCopyDlg dialog
-
+using namespace chengine;
+using namespace string;
 
 CCustomCopyDlg::CCustomCopyDlg() :
 	ictranslate::CLanguageDialog(IDD_CUSTOM_COPY_DIALOG)
@@ -55,23 +55,22 @@ CCustomCopyDlg::CCustomCopyDlg(const chengine::TTaskDefinition& rTaskDefinition)
 void CCustomCopyDlg::DoDataExchange(CDataExchange* pDX)
 {
 	CLanguageDialog::DoDataExchange(pDX);
-	//{{AFX_DATA_MAP(CCustomCopyDlg)
+
 	DDX_Control(pDX, IDC_DESTPATH_COMBOBOXEX, m_ctlDstPath);
 	DDX_Control(pDX, IDC_FILTERS_LIST, m_ctlFilters);
 	DDX_Control(pDX, IDC_BUFFERSIZES_LIST, m_ctlBufferSizes);
 	DDX_Control(pDX, IDC_OPERATION_COMBO, m_ctlOperation);
 	DDX_Control(pDX, IDC_PRIORITY_COMBO, m_ctlPriority);
 	DDX_Control(pDX, IDC_FILES_LIST, m_ctlFiles);
+	DDX_Control(pDX, IDC_FEEDBACK_RULES_SUMMARY_EDIT, m_ctlFeedbackRules);
 	DDX_Check(pDX, IDC_ONLYSTRUCTURE_CHECK, m_bOnlyCreate);
 	DDX_Check(pDX, IDC_IGNOREFOLDERS_CHECK, m_bIgnoreFolders);
 	DDX_Check(pDX, IDC_FORCEDIRECTORIES_CHECK, m_bForceDirectories);
 	DDX_Check(pDX, IDC_FILTERS_CHECK, m_bFilters);
 	DDX_Check(pDX, IDC_ADVANCED_CHECK, m_bAdvanced);
-	//}}AFX_DATA_MAP
 }
 
-BEGIN_MESSAGE_MAP(CCustomCopyDlg,ictranslate::CLanguageDialog)
-	//{{AFX_MSG_MAP(CCustomCopyDlg)
+BEGIN_MESSAGE_MAP(CCustomCopyDlg, ictranslate::CLanguageDialog)
 	ON_BN_CLICKED(IDC_ADDDIR_BUTTON, OnAddDirectoryButton)
 	ON_BN_CLICKED(IDC_ADDFILE_BUTTON, OnAddFilesButton)
 	ON_BN_CLICKED(IDC_REMOVEFILEFOLDER_BUTTON, OnRemoveButton)
@@ -90,8 +89,8 @@ BEGIN_MESSAGE_MAP(CCustomCopyDlg,ictranslate::CLanguageDialog)
 	ON_BN_CLICKED(IDC_IGNOREFOLDERS_CHECK, OnIgnorefoldersCheck)
 	ON_BN_CLICKED(IDC_FORCEDIRECTORIES_CHECK, OnForcedirectoriesCheck)
 	ON_BN_CLICKED(IDC_EXPORT_BUTTON, OnExportButtonClicked)
+	ON_BN_CLICKED(IDC_CUSTOM_RULES_BUTTON, OnBnCustomRules)
 	ON_WM_SIZE()
-	//}}AFX_MSG_MAP
 END_MESSAGE_MAP()
 
 /////////////////////////////////////////////////////////////////////////////
@@ -134,6 +133,12 @@ BOOL CCustomCopyDlg::OnInitDialog()
 	AddResizableControl(IDC_FILTERS_LIST, 0.0, 0.5, 1.0, 0.5);
 	AddResizableControl(IDC_ADDFILTER_BUTTON, 1.0, 0.5, 0.0, 0.0);
 	AddResizableControl(IDC_REMOVEFILTER_BUTTON, 1.0, 0.5, 0.0, 0.0);
+
+	AddResizableControl(IDC_BAR7_STATIC, 0.0, 1.0, 0.0, 0.0);
+	AddResizableControl(IDC_FEEDBACK_RULES_STATIC, 0.0, 1.0, 0.0, 0.0);
+	AddResizableControl(IDC_BAR8_STATIC, 0.0, 1.0, 1.0, 0.0);
+	AddResizableControl(IDC_FEEDBACK_RULES_SUMMARY_EDIT, 0.0, 1.0, 1.0, 0.0);
+	AddResizableControl(IDC_CUSTOM_RULES_BUTTON, 1.0, 1.0, 0.0, 0.0);
 
 	AddResizableControl(IDC_ADVANCED_CHECK, 0.0, 1.0, 0.0, 0.0);
 	AddResizableControl(IDC_BAR4_STATIC, 0.0, 1.0, 1.0, 0.0);
@@ -283,6 +288,8 @@ BOOL CCustomCopyDlg::OnInitDialog()
 
 	UpdateData(FALSE);
 
+	UpdateFeedbackRulesEdit();
+
 	EnableControls();
 
 	return TRUE;
@@ -375,9 +382,11 @@ void CCustomCopyDlg::OnLanguageChanged()
 		const chengine::TFileFilter& rFilter = afFilters.GetAt(stIndex);
 		AddFilter(rFilter, boost::numeric_cast<int>(stIndex));
 	}
+
+	UpdateFeedbackRulesEdit();
 }
 
-void CCustomCopyDlg::OnAddDirectoryButton() 
+void CCustomCopyDlg::OnAddDirectoryButton()
 {
 	CString strPath;
 	if (BrowseForFolder(GetResManager().LoadString(IDS_BROWSE_STRING), &strPath))
@@ -1002,6 +1011,9 @@ void CCustomCopyDlg::UpdateInternalTaskDefinition()
 	// operation type
 	m_tTaskDefinition.SetOperationType(m_ctlOperation.GetCurSel() == 0 ? chengine::eOperation_Copy : chengine::eOperation_Move);
 
+	// feedback rules
+	m_tTaskDefinition.SetFeedbackRules(m_rules);
+
 	// priority
 	chengine::SetTaskPropValue<chengine::eTO_ThreadPriority>(m_tTaskDefinition.GetConfiguration(), IndexToPriority(m_ctlPriority.GetCurSel()));
 
@@ -1042,4 +1054,40 @@ void CCustomCopyDlg::OnSize(UINT nType, int /*cx*/, int /*cy*/)
 		if(pWnd)
 			UpdateFilesListCtrlHeaderWidth();
 	}
+}
+
+void CCustomCopyDlg::UpdateFeedbackRulesEdit()
+{
+	TString strText;
+	if(m_rules.IsEmpty())
+	{
+		strText = GetResManager().LoadString(IDS_RULES_EMPTY_STRING);
+	}
+	else
+	{
+		size_t stAlreadyExists = m_rules.GetAlreadyExistsRules().GetCount();
+		size_t stError = m_rules.GetErrorRules().GetCount();
+		size_t stNotEnougSpace = m_rules.GetNotEnoughSpaceRules().GetCount();
+
+		ictranslate::CFormat fmt;
+
+		fmt.SetFormat(GetResManager().LoadString(IDS_RULES_NON_EMPTY_STRING));
+		fmt.SetParam(_T("%exists"), stAlreadyExists);
+		fmt.SetParam(_T("%error"), stError);
+		fmt.SetParam(_T("%space"), stNotEnougSpace);
+		strText = fmt.ToString();
+	}
+
+	m_ctlFeedbackRules.SetWindowTextW(strText.c_str());
+}
+
+void CCustomCopyDlg::OnBnCustomRules()
+{
+	RuleEditDlg dlg(m_rules);
+	if(dlg.DoModal() == IDOK)
+	{
+		m_rules = dlg.GetRules();
+	}
+
+	UpdateFeedbackRulesEdit();
 }
