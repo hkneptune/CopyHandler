@@ -55,6 +55,15 @@ protected:
 
 	void OnOK() override;
 
+	void EnableControls();
+	void EnableAlreadyExistsControls();
+	void EnableErrorControls();
+	void EnableNotEnoughSpaceControls();
+
+	afx_msg void OnAlreadyExistsItemChanged(NMHDR* pNMHDR, LRESULT* pResult);
+	afx_msg void OnErrorItemChanged(NMHDR* pNMHDR, LRESULT* pResult);
+	afx_msg void OnNotEnoughSpaceItemChanged(NMHDR* pNMHDR, LRESULT* pResult);
+
 	afx_msg void OnDblclkAlreadyExistsList(NMHDR* pNMHDR, LRESULT* pResult);
 	afx_msg void OnAlreadyExistsChangeButton();
 	afx_msg void OnAlreadyExistsAddButton();
