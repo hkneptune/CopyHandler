@@ -23,6 +23,8 @@
 #include "RuleEditAlreadyExistsDlg.h"
 #include "RuleEditErrorDlg.h"
 #include "RuleEditNotEnoughSpaceDlg.h"
+#include <type_traits>
+#include <functional>
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -32,6 +34,74 @@ static char THIS_FILE[] = __FILE__;
 
 using namespace string;
 using namespace chengine;
+
+namespace
+{
+	template<class RuleList>
+	void OnUpButton(RuleEditDlg* pDlg, CListCtrl& ctlList, RuleList& ruleList, std::function<void(RuleEditDlg*)> reloadList)
+	{
+		POSITION pos = ctlList.GetFirstSelectedItemPosition();
+		if(pos == nullptr)
+			return;
+
+		int iItem = ctlList.GetNextSelectedItem(pos);
+		if(iItem < 1)
+			return;
+
+		// store current item
+		auto rRule = ruleList.GetAt(iItem);
+
+		// remove current item
+		ctlList.DeleteItem(iItem);
+		ruleList.RemoveAt(iItem);
+
+		// re-insert it at the right position
+		ruleList.InsertAt(iItem - 1, rRule);
+		reloadList(pDlg);
+
+		ctlList.SetItemState(iItem - 1, LVIS_SELECTED, LVIS_SELECTED);
+	}
+
+	template<class RuleList>
+	void OnDownButton(RuleEditDlg* pDlg, CListCtrl& ctlList, RuleList& ruleList, std::function<void(RuleEditDlg*)> reloadList)
+	{
+		POSITION pos = ctlList.GetFirstSelectedItemPosition();
+		if(pos == nullptr)
+			return;
+
+		int iItem = ctlList.GetNextSelectedItem(pos);
+		if(iItem < 0 || iItem + 1 >= ctlList.GetItemCount())
+			return;
+
+		// store current item
+		auto rRule = ruleList.GetAt(iItem);
+
+		// remove current item
+		ctlList.DeleteItem(iItem);
+		ruleList.RemoveAt(iItem);
+
+		// re-insert it at the right position
+		ruleList.InsertAt(iItem + 1, rRule);
+		reloadList(pDlg);
+
+		ctlList.SetItemState(iItem + 1, LVIS_SELECTED, LVIS_SELECTED);
+	}
+
+	template<class RuleList>
+	void OnRemoveButton(CListCtrl& ctlList, RuleList& ruleList)
+	{
+		POSITION pos = ctlList.GetFirstSelectedItemPosition();
+		if(pos == nullptr)
+			return;
+
+		int iItem = ctlList.GetNextSelectedItem(pos);
+		if(iItem < 0)
+			return;
+
+		ctlList.DeleteItem(iItem);
+		ruleList.RemoveAt(iItem);
+	}
+}
 
 RuleEditDlg::RuleEditDlg(const FeedbackRules& rRules) :
 	ictranslate::CLanguageDialog(IDD_RULE_EDIT_ALL_DIALOG),
@@ -53,14 +123,20 @@ BEGIN_MESSAGE_MAP(RuleEditDlg, ictranslate::CLanguageDialog)
 	ON_BN_CLICKED(IDC_ALREADY_EXISTS_CHANGE_BUTTON, OnAlreadyExistsChangeButton)
 	ON_BN_CLICKED(IDC_ALREADY_EXISTS_ADD_BUTTON, OnAlreadyExistsAddButton)
 	ON_BN_CLICKED(IDC_ALREADY_EXISTS_REMOVE_BUTTON, OnAlreadyExistsRemoveButton)
+	ON_BN_CLICKED(IDC_ALREADY_EXISTS_UP_BUTTON, OnAlreadyExistsUpButton)
+	ON_BN_CLICKED(IDC_ALREADY_EXISTS_DOWN_BUTTON, OnAlreadyExistsDownButton)
 
 	ON_BN_CLICKED(IDC_FILE_ERROR_CHANGE_BUTTON, OnErrorChangeButton)
 	ON_BN_CLICKED(IDC_FILE_ERROR_ADD_BUTTON, OnErrorAddButton)
 	ON_BN_CLICKED(IDC_FILE_ERROR_REMOVE_BUTTON, OnErrorRemoveButton)
+	ON_BN_CLICKED(IDC_FILE_ERROR_UP_BUTTON, OnErrorUpButton)
+	ON_BN_CLICKED(IDC_FILE_ERROR_DOWN_BUTTON, OnErrorDownButton)
 
 	ON_BN_CLICKED(IDC_NOT_ENOUGH_SPACE_CHANGE_BUTTON, OnNotEnoughSpaceChangeButton)
 	ON_BN_CLICKED(IDC_NOT_ENOUGH_SPACE_ADD_BUTTON, OnNotEnoughSpaceAddButton)
 	ON_BN_CLICKED(IDC_NOT_ENOUGH_SPACE_REMOVE_BUTTON, OnNotEnoughSpaceRemoveButton)
+	ON_BN_CLICKED(IDC_NOT_ENOUGH_SPACE_UP_BUTTON, OnNotEnoughSpaceUpButton)
+	ON_BN_CLICKED(IDC_NOT_ENOUGH_SPACE_DOWN_BUTTON, OnNotEnoughSpaceDownButton)
 
 	ON_NOTIFY(NM_DBLCLK, IDC_FILE_ALREADY_EXISTS_RULES_LIST, OnDblclkAlreadyExistsList)
 	ON_NOTIFY(NM_DBLCLK, IDC_FILE_ERROR_RULES_LIST, OnDblclkErrorList)
@@ -82,18 +158,24 @@ BOOL RuleEditDlg::OnInitDialog()
 	AddResizableControl(IDC_ALREADY_EXISTS_CHANGE_BUTTON, 1.0, 0.34, 0.0, 0.0);
 	AddResizableControl(IDC_ALREADY_EXISTS_ADD_BUTTON, 1.0, 0.34, 0.0, 0.0);
 	AddResizableControl(IDC_ALREADY_EXISTS_REMOVE_BUTTON, 1.0, 0.34, 0.0, 0.0);
+	AddResizableControl(IDC_ALREADY_EXISTS_UP_BUTTON, 0.0, 0.34, 0.0, 0.0);
+	AddResizableControl(IDC_ALREADY_EXISTS_DOWN_BUTTON, 0.0, 0.34, 0.0, 0.0);
 
 	AddResizableControl(IDC_FILE_ERROR_RULES_STATIC, 0.0, 0.34, 1.0, 0.0);
 	AddResizableControl(IDC_FILE_ERROR_RULES_LIST, 0.0, 0.34, 1.0, 0.33);
 	AddResizableControl(IDC_FILE_ERROR_CHANGE_BUTTON, 1.0, 0.67, 0.0, 0.0);
 	AddResizableControl(IDC_FILE_ERROR_ADD_BUTTON, 1.0, 0.67, 0.0, 0.0);
 	AddResizableControl(IDC_FILE_ERROR_REMOVE_BUTTON, 1.0, 0.67, 0.0, 0.0);
+	AddResizableControl(IDC_FILE_ERROR_UP_BUTTON, 0.0, 0.67, 0.0, 0.0);
+	AddResizableControl(IDC_FILE_ERROR_DOWN_BUTTON, 0.0, 0.67, 0.0, 0.0);
 
 	AddResizableControl(IDC_NOT_ENOUGH_SPACE_STATIC, 0.0, 0.67, 1.0, 0.0);
 	AddResizableControl(IDC_NOT_ENOUGH_SPACE_RULES_LIST, 0.0, 0.67, 1.0, 0.33);
 	AddResizableControl(IDC_NOT_ENOUGH_SPACE_CHANGE_BUTTON, 1.0, 1.0, 0.0, 0.0);
 	AddResizableControl(IDC_NOT_ENOUGH_SPACE_ADD_BUTTON, 1.0, 1.0, 0.0, 0.0);
 	AddResizableControl(IDC_NOT_ENOUGH_SPACE_REMOVE_BUTTON, 1.0, 1.0, 0.0, 0.0);
+	AddResizableControl(IDC_NOT_ENOUGH_SPACE_UP_BUTTON, 0.0, 1.0, 0.0, 0.0);
+	AddResizableControl(IDC_NOT_ENOUGH_SPACE_DOWN_BUTTON, 0.0, 1.0, 0.0, 0.0);
 
 	AddResizableControl(IDOK, 1.0, 1.0, 0.0, 0.0);
 	AddResizableControl(IDCANCEL, 1.0, 1.0, 0.0, 0.0);
@@ -111,6 +193,10 @@ BOOL RuleEditDlg::OnInitDialog()
 	InitAlreadyExistsColumns();
 	InitErrorColumns();
 	InitNotEnoughSpaceColumns();
+
+	FillAlreadyExistsList();
+	FillErrorList();
+	FillNotEnoughSpaceList();
 
 	UpdateData(FALSE);
 
@@ -564,21 +650,17 @@ void RuleEditDlg::OnAlreadyExistsAddButton()
 
 void RuleEditDlg::OnAlreadyExistsRemoveButton()
 {
-	FeedbackAlreadyExistsRuleList& rRules = m_rules.GetAlreadyExistsRules();
+	OnRemoveButton(m_ctlAlreadyExistsRulesList, m_rules.GetAlreadyExistsRules());
+}
 
-	while(true)
-	{
-		POSITION pos = m_ctlAlreadyExistsRulesList.GetFirstSelectedItemPosition();
-		if(pos == nullptr)
-			break;
+void RuleEditDlg::OnAlreadyExistsUpButton()
+{
+	OnUpButton(this, m_ctlAlreadyExistsRulesList, m_rules.GetAlreadyExistsRules(), &RuleEditDlg::FillAlreadyExistsList);
+}
 
-		int iItem = m_ctlAlreadyExistsRulesList.GetNextSelectedItem(pos);
-		if(iItem < 0)
-			return;
-
-		m_ctlAlreadyExistsRulesList.DeleteItem(iItem);
-		rRules.RemoveAt(iItem);
-	}
+void RuleEditDlg::OnAlreadyExistsDownButton()
+{
+	OnDownButton(this, m_ctlAlreadyExistsRulesList, m_rules.GetAlreadyExistsRules(), &RuleEditDlg::FillAlreadyExistsList);
 }
 
 void RuleEditDlg::OnDblclkErrorList(NMHDR* /*pNMHDR*/, LRESULT* pResult)
@@ -627,21 +709,17 @@ void RuleEditDlg::OnErrorAddButton()
 
 void RuleEditDlg::OnErrorRemoveButton()
 {
-	FeedbackErrorRuleList& rRules = m_rules.GetErrorRules();
+	OnRemoveButton(m_ctlErrorRulesList, m_rules.GetErrorRules());
+}
 
-	while(true)
-	{
-		POSITION pos = m_ctlErrorRulesList.GetFirstSelectedItemPosition();
-		if(pos == nullptr)
-			break;
+void RuleEditDlg::OnErrorUpButton()
+{
+	OnUpButton(this, m_ctlErrorRulesList, m_rules.GetErrorRules(), &RuleEditDlg::FillErrorList);
+}
 
-		int iItem = m_ctlErrorRulesList.GetNextSelectedItem(pos);
-		if(iItem < 0)
-			return;
-
-		m_ctlErrorRulesList.DeleteItem(iItem);
-		rRules.RemoveAt(iItem);
-	}
+void RuleEditDlg::OnErrorDownButton()
+{
+	OnDownButton(this, m_ctlErrorRulesList, m_rules.GetErrorRules(), &RuleEditDlg::FillErrorList);
 }
 
 void RuleEditDlg::OnDblclkNotEnoughSpaceList(NMHDR* /*pNMHDR*/, LRESULT* pResult)
@@ -690,19 +768,15 @@ void RuleEditDlg::OnNotEnoughSpaceAddButton()
 
 void RuleEditDlg::OnNotEnoughSpaceRemoveButton()
 {
-	FeedbackNotEnoughSpaceRuleList& rRules = m_rules.GetNotEnoughSpaceRules();
+	OnRemoveButton(m_ctlNotEnoughSpaceRulesList, m_rules.GetNotEnoughSpaceRules());
+}
 
-	while(true)
-	{
-		POSITION pos = m_ctlNotEnoughSpaceRulesList.GetFirstSelectedItemPosition();
-		if(pos == nullptr)
-			break;
+void RuleEditDlg::OnNotEnoughSpaceUpButton()
+{
+	OnUpButton(this, m_ctlNotEnoughSpaceRulesList, m_rules.GetNotEnoughSpaceRules(), &RuleEditDlg::FillNotEnoughSpaceList);
+}
 
-		int iItem = m_ctlNotEnoughSpaceRulesList.GetNextSelectedItem(pos);
-		if(iItem < 0)
-			return;
-
-		m_ctlNotEnoughSpaceRulesList.DeleteItem(iItem);
-		rRules.RemoveAt(iItem);
-	}
+void RuleEditDlg::OnNotEnoughSpaceDownButton()
+{
+	OnDownButton(this, m_ctlNotEnoughSpaceRulesList, m_rules.GetNotEnoughSpaceRules(), &RuleEditDlg::FillNotEnoughSpaceList);
 }
