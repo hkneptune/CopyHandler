@@ -29,31 +29,34 @@ namespace chcore
 	public:
 		enum class EPatternType
 		{
-			eType_Wildcard
+			eType_FilenameWildcard,
+			eType_FullPathWildcard,
+			eType_FilenameRegex,
+			eType_FullPathRegex,
 		};
 
 	public:
-		explicit TStringPattern(EPatternType ePatternType = EPatternType::eType_Wildcard);
-		explicit TStringPattern(const string::TString& strPattern, EPatternType ePatternType = EPatternType::eType_Wildcard);
+		TStringPattern();
+		explicit TStringPattern(const string::TString& strPattern);
+		explicit TStringPattern(const string::TString& strPattern, EPatternType ePatternType);
 
-		void SetPattern(const string::TString& strPattern, EPatternType ePatternType = EPatternType::eType_Wildcard);
+		void SetPattern(const string::TString& strPattern, EPatternType ePatternType = EPatternType::eType_FilenameWildcard);
 		bool Matches(const TSmartPath& pathToMatch) const;
 
 		EPatternType GetPatternType() const { return m_ePatternType; }
 		string::TString GetPattern() const { return m_strPattern; }
 
 		// string parsing
-		static TStringPattern CreateFromString(const string::TString& strPattern, EPatternType eDefaultPatternType = EPatternType::eType_Wildcard);
+		static TStringPattern CreateFromString(const string::TString& strPattern);
 
-		void FromString(const string::TString& strPattern, EPatternType eDefaultPatternType = EPatternType::eType_Wildcard);
+		void FromString(const string::TString& strPattern);
 		string::TString ToString() const;
 
 		bool operator==(const TStringPattern& rSrc) const;
 		bool operator!=(const TStringPattern& rSrc) const;
 
 	private:
-		bool MatchMask(LPCTSTR lpszMask, LPCTSTR lpszString) const;
-		bool Scan(LPCTSTR& lpszMask, LPCTSTR& lpszString) const;
+		std::wstring ConvertGlobToRegex() const;
 
 	private:
 		string::TString m_strPattern;

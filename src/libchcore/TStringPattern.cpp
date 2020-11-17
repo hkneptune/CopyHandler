@@ -19,6 +19,8 @@
 #include "stdafx.h"
 #include "TStringPattern.h"
 #include <tchar.h>
+#include <regex>
+#include <boost/algorithm/string/replace.hpp>
 
 using namespace string;
 
@@ -33,31 +35,51 @@ namespace chcore
 		}
 	}
 
-	TStringPattern::TStringPattern(EPatternType ePatternType) :
-		m_ePatternType(ePatternType)
+	TStringPattern::TStringPattern() :
+		m_ePatternType(EPatternType::eType_FilenameWildcard)
 	{
 	}
 
+	TStringPattern::TStringPattern(const TString& strPattern)
+	{
+		FromString(strPattern);
+	}
+	
 	TStringPattern::TStringPattern(const TString& strPattern, EPatternType ePatternType) :
 		m_strPattern(strPattern),
 		m_ePatternType(ePatternType)
 	{
 	}
 
-	TStringPattern TStringPattern::CreateFromString(const TString& strPattern, EPatternType eDefaultPatternType)
+	TStringPattern TStringPattern::CreateFromString(const TString& strPattern)
 	{
 		TStringPattern pattern;
-		pattern.FromString(strPattern, eDefaultPatternType);
+		pattern.FromString(strPattern);
 		return pattern;
 	}
 
-	void TStringPattern::FromString(const TString& strPattern, EPatternType eDefaultPatternType)
+	void TStringPattern::FromString(const TString& strPattern)
 	{
-		m_ePatternType = eDefaultPatternType;
-		if (strPattern.StartsWith(L"WC;"))
+		m_ePatternType = EPatternType::eType_FilenameWildcard;
+		if(strPattern.StartsWith(L"file:"))
 		{
-			m_strPattern = strPattern.Mid(3);
-			m_ePatternType = EPatternType::eType_Wildcard;
+			m_strPattern = strPattern.Mid(5);
+			m_ePatternType = EPatternType::eType_FilenameWildcard;
+		}
+		else if(strPattern.StartsWith(L"path:"))
+		{
+			m_strPattern = strPattern.Mid(5);
+			m_ePatternType = EPatternType::eType_FullPathWildcard;
+		}
+		else if(strPattern.StartsWith(L"rfile:"))
+		{
+			m_strPattern = strPattern.Mid(6);
+			m_ePatternType = EPatternType::eType_FilenameRegex;
+		}
+		else if(strPattern.StartsWith(L"rpath:"))
+		{
+			m_strPattern = strPattern.Mid(6);
+			m_ePatternType = EPatternType::eType_FullPathRegex;
 		}
 		else
 			m_strPattern = strPattern;
@@ -68,8 +90,20 @@ namespace chcore
 		TString strPrefix;
 		switch (m_ePatternType)
 		{
-		case EPatternType::eType_Wildcard:
+		case EPatternType::eType_FilenameWildcard:
 			break;	// wildcard won't have any prefix (it's implicit)
+
+		case EPatternType::eType_FullPathWildcard:
+			strPrefix = L"path:";
+			break;
+
+		case EPatternType::eType_FilenameRegex:
+			strPrefix = L"rfile:";
+			break;
+
+		case EPatternType::eType_FullPathRegex:
+			strPrefix = L"rpath:";
+			break;
 
 		default:
 			throw std::invalid_argument("Pattern type not supported");
@@ -88,71 +122,51 @@ namespace chcore
 		return m_ePatternType == rSrc.m_ePatternType && m_strPattern == rSrc.m_strPattern;
 	}
 
-	bool TStringPattern::MatchMask(LPCTSTR lpszMask, LPCTSTR lpszString) const
-	{
-		bool bMatch = true;
-
-		//iterate and delete '?' and '*' one by one
-		while (*lpszMask != _T('\0') && bMatch && *lpszString != _T('\0'))
-		{
-			if (*lpszMask == _T('?')) lpszString++;
-			else if (*lpszMask == _T('*'))
-			{
-				bMatch = Scan(lpszMask, lpszString);
-				lpszMask--;
-			}
-			else
-			{
-				bMatch = _tcicmp(*lpszMask, *lpszString);
-				lpszString++;
-			}
-			lpszMask++;
-		}
-		while (*lpszMask == _T('*') && bMatch)
-			lpszMask++;
-
-		return bMatch && *lpszString == _T('\0') && *lpszMask == _T('\0');
-	}
-
-	// scan '?' and '*'
-	bool TStringPattern::Scan(LPCTSTR& lpszMask, LPCTSTR& lpszString) const
-	{
-		// remove the '?' and '*'
-		for (lpszMask++; *lpszString != _T('\0') && (*lpszMask == _T('?') || *lpszMask == _T('*')); lpszMask++)
-			if (*lpszMask == _T('?')) lpszString++;
-		while (*lpszMask == _T('*')) lpszMask++;
-
-		// if lpszString is empty and lpszMask has more characters or,
-		// lpszMask is empty, return 
-		if (*lpszString == _T('\0') && *lpszMask != _T('\0'))
-			return false;
-		if (*lpszString == _T('\0') && *lpszMask == _T('\0'))
-			return true;
-		// else search substring
-		LPCTSTR wdsCopy = lpszMask;
-		LPCTSTR lpszStringCopy = lpszString;
-		bool bMatch = true;
-		do
-		{
-			if (!MatchMask(lpszMask, lpszString)) lpszStringCopy++;
-			lpszMask = wdsCopy;
-			lpszString = lpszStringCopy;
-			while (!(_tcicmp(*lpszMask, *lpszString)) && (*lpszString != '\0')) lpszString++;
-			wdsCopy = lpszMask;
-			lpszStringCopy = lpszString;
-		} while ((*lpszString != _T('\0')) ? !MatchMask(lpszMask, lpszString) : (bMatch = false) != false);
-
-		if (*lpszString == _T('\0') && *lpszMask == _T('\0')) return true;
-
-		return bMatch;
-	}
-
 	bool TStringPattern::Matches(const TSmartPath& pathToMatch) const
 	{
 		switch(m_ePatternType)
 		{
-		case EPatternType::eType_Wildcard:
-			return MatchMask(m_strPattern.c_str(), pathToMatch.GetFileName().ToString());
+		case EPatternType::eType_FilenameWildcard:
+		{
+			if(m_strPattern == L"*" || m_strPattern == L"*.*")
+				return true;
+
+			std::wstring strPattern = ConvertGlobToRegex();
+
+			std::wstring strText(pathToMatch.GetFileName().ToString());
+			std::wregex pattern(strPattern, std::regex_constants::icase | std::regex_constants::ECMAScript);
+
+			return std::regex_match(strText, pattern);
+		}
+
+		case EPatternType::eType_FullPathWildcard:
+		{
+			if(m_strPattern == L"*" || m_strPattern == L"*.*")
+				return true;
+
+			std::wstring strPattern = ConvertGlobToRegex();
+			std::wstring strText(pathToMatch.ToString());
+			std::wregex pattern(strPattern, std::regex_constants::icase | std::regex_constants::ECMAScript);
+
+			return std::regex_match(strText, pattern);
+		}
+
+		case EPatternType::eType_FilenameRegex:
+		{
+			std::wstring strText(pathToMatch.GetFileName().ToString());
+			std::wregex pattern(m_strPattern.c_str(), std::regex_constants::icase | std::regex_constants::ECMAScript);
+
+			return std::regex_match(strText, pattern);
+		}
+
+		case EPatternType::eType_FullPathRegex:
+		{
+			std::wstring strText(pathToMatch.ToString());
+			std::wregex pattern(m_strPattern.c_str(), std::regex_constants::icase | std::regex_constants::ECMAScript);
+
+			return std::regex_match(strText, pattern);
+		}
+
 		default:
 			throw std::invalid_argument("Unsupported pattern type");
 		}
@@ -162,5 +176,28 @@ namespace chcore
 	{
 		m_ePatternType = ePatternType;
 		m_strPattern = strPattern;
+	}
+
+	std::wstring TStringPattern::ConvertGlobToRegex() const
+	{
+		std::wstring strPattern = m_strPattern.c_str();
+
+		boost::replace_all(strPattern, L"\\", L"\\\\");
+		boost::replace_all(strPattern, L"^", L"\\^");
+		boost::replace_all(strPattern, L".", L"\\.");
+		boost::replace_all(strPattern, L"$", L"\\$");
+		boost::replace_all(strPattern, L"|", L"\\|");
+		boost::replace_all(strPattern, L"(", L"\\(");
+		boost::replace_all(strPattern, L")", L"\\)");
+		boost::replace_all(strPattern, L"{", L"\\{");
+		boost::replace_all(strPattern, L"{", L"\\}");
+		boost::replace_all(strPattern, L"[", L"\\[");
+		boost::replace_all(strPattern, L"]", L"\\]");
+		boost::replace_all(strPattern, L"+", L"\\+");
+		boost::replace_all(strPattern, L"/", L"\\/");
+		boost::replace_all(strPattern, L"*", L".*");
+		boost::replace_all(strPattern, L"?", L".");
+
+		return strPattern;
 	}
 }

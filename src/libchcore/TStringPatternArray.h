@@ -44,8 +44,8 @@ namespace chcore
 		bool MatchesAll(const TSmartPath& pathToMatch) const;
 
 		// string parsing
-		void FromString(const string::TString& strPatterns, TStringPattern::EPatternType eDefaultPatternType = TStringPattern::EPatternType::eType_Wildcard);
-		void FromStringArray(const string::TStringArray& strPatterns, TStringPattern::EPatternType eDefaultPatternType = TStringPattern::EPatternType::eType_Wildcard);
+		void FromString(const string::TString& strPatterns);
+		void FromStringArray(const string::TStringArray& strPatterns);
 		string::TString ToString() const;
 
 		// serialization

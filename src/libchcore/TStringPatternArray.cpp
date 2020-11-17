@@ -46,11 +46,11 @@ namespace chcore
 		return true;
 	}
 
-	void TStringPatternArray::FromString(const TString& strPatterns, TStringPattern::EPatternType eDefaultPatternType)
+	void TStringPatternArray::FromString(const TString& strPatterns)
 	{
 		TStringArray arrPatterns;
 		strPatterns.Split(_T("|"), arrPatterns);
-		FromStringArray(arrPatterns, eDefaultPatternType);
+		FromStringArray(arrPatterns);
 	}
 
 	void TStringPatternArray::FromSerializedStringArray(const TStringArray& arrSerializedPatterns)
@@ -63,11 +63,11 @@ namespace chcore
 		}
 	}
 
-	void TStringPatternArray::FromStringArray(const TStringArray& arrPatterns, TStringPattern::EPatternType eDefaultPatternType)
+	void TStringPatternArray::FromStringArray(const TStringArray& arrPatterns)
 	{
 		for (size_t stIndex = 0; stIndex < arrPatterns.GetCount(); ++stIndex)
 		{
-			Add(TStringPattern::CreateFromString(arrPatterns.GetAt(stIndex), eDefaultPatternType));
+			Add(TStringPattern::CreateFromString(arrPatterns.GetAt(stIndex)));
 		}
 	}
 
