@@ -322,14 +322,14 @@ namespace chengine
 		// check by mask
 		if (m_bUseMask)
 		{
-			if (!m_astrMask.Get().MatchesAny(spInfo->GetFullFilePath().GetFileName().ToString()))
+			if (!m_astrMask.Get().MatchesAny(spInfo->GetFullFilePath()))
 				return false;
 		}
 
 		// excluding mask
 		if (m_bUseExcludeMask)
 		{
-			if (m_astrExcludeMask.Get().MatchesAny(spInfo->GetFullFilePath().GetFileName().ToString()))
+			if (m_astrExcludeMask.Get().MatchesAny(spInfo->GetFullFilePath()))
 				return false;
 		}
 

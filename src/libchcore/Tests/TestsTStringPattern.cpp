@@ -55,28 +55,28 @@ TEST(TestsTStringPattern, Matches_Positive_StarDotBat)
 {
 	TStringPattern patternEmpty(L"*.bat", TStringPattern::EPatternType::eType_Wildcard);
 
-	EXPECT_TRUE(patternEmpty.Matches(L"autorun.bat"));
+	EXPECT_TRUE(patternEmpty.Matches(PathFromString(L"autorun.bat")));
 }
 
 TEST(TestsTStringPattern, Matches_Negative_StarDotBat)
 {
 	TStringPattern patternEmpty(L"*.bat", TStringPattern::EPatternType::eType_Wildcard);
 
-	EXPECT_FALSE(patternEmpty.Matches(L"autorun.batx"));
+	EXPECT_FALSE(patternEmpty.Matches(PathFromString(L"autorun.batx")));
 }
 
 TEST(TestsTStringPattern, Matches_Positive_StarDotStar)
 {
 	TStringPattern patternEmpty(L"*.*", TStringPattern::EPatternType::eType_Wildcard);
 
-	EXPECT_TRUE(patternEmpty.Matches(L"autorun.bat"));
+	EXPECT_TRUE(patternEmpty.Matches(PathFromString(L"autorun.bat")));
 }
 
 TEST(TestsTStringPattern, Matches_Negative_StarDotStar)
 {
 	TStringPattern patternEmpty(L"*.*", TStringPattern::EPatternType::eType_Wildcard);
 
-	EXPECT_FALSE(patternEmpty.Matches(L"autorun"));
+	EXPECT_FALSE(patternEmpty.Matches(PathFromString(L"autorun")));
 }
 
 ///////////////////////////////////////////////////////////
@@ -86,14 +86,14 @@ TEST(TestsTStringPattern, Matches_Positive_MultiStar)
 {
 	TStringPattern patternEmpty(L"ad*bo*", TStringPattern::EPatternType::eType_Wildcard);
 
-	EXPECT_TRUE(patternEmpty.Matches(L"addon-boo.bat"));
+	EXPECT_TRUE(patternEmpty.Matches(PathFromString(L"addon-boo.bat")));
 }
 
 TEST(TestsTStringPattern, Matches_Negative_MultiStar)
 {
 	TStringPattern patternEmpty(L"ad*bo*", TStringPattern::EPatternType::eType_Wildcard);
 
-	EXPECT_FALSE(patternEmpty.Matches(L"addon-doo.bat"));
+	EXPECT_FALSE(patternEmpty.Matches(PathFromString(L"addon-doo.bat")));
 }
 
 ////////////////////////////////////////////////////////////
@@ -103,12 +103,12 @@ TEST(TestsTStringPattern, Matches_Positive_QuestionMultiPos)
 {
 	TStringPattern patternEmpty(L"a??b?r", TStringPattern::EPatternType::eType_Wildcard);
 
-	EXPECT_TRUE(patternEmpty.Matches(L"arbbar"));
+	EXPECT_TRUE(patternEmpty.Matches(PathFromString(L"arbbar")));
 }
 
 TEST(TestsTStringPattern, Matches_Negative_QuestionMultiPos)
 {
 	TStringPattern patternEmpty(L"a??b?r", TStringPattern::EPatternType::eType_Wildcard);
 
-	EXPECT_FALSE(patternEmpty.Matches(L"arbxar"));
+	EXPECT_FALSE(patternEmpty.Matches(PathFromString(L"arbxar")));
 }

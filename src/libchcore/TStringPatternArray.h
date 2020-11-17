@@ -40,8 +40,8 @@ namespace chcore
 	{
 	public:
 		// pattern api
-		bool MatchesAny(const string::TString& strTextToMatch) const;
-		bool MatchesAll(const string::TString& strTextToMatch) const;
+		bool MatchesAny(const TSmartPath& pathToMatch) const;
+		bool MatchesAll(const TSmartPath& pathToMatch) const;
 
 		// string parsing
 		void FromString(const string::TString& strPatterns, TStringPattern::EPatternType eDefaultPatternType = TStringPattern::EPatternType::eType_Wildcard);

@@ -24,22 +24,22 @@ using namespace string;
 
 namespace chcore
 {
-	bool TStringPatternArray::MatchesAny(const TString& strTextToMatch) const
+	bool TStringPatternArray::MatchesAny(const TSmartPath& pathToMatch) const
 	{
 		for (const TStringPattern& pattern : m_vItems)
 		{
-			if (pattern.Matches(strTextToMatch))
+			if (pattern.Matches(pathToMatch))
 				return true;
 		}
 
 		return false;
 	}
 
-	bool TStringPatternArray::MatchesAll(const TString& strTextToMatch) const
+	bool TStringPatternArray::MatchesAll(const TSmartPath& pathToMatch) const
 	{
 		for (const TStringPattern& pattern : m_vItems)
 		{
-			if (!pattern.Matches(strTextToMatch))
+			if (!pattern.Matches(pathToMatch))
 				return false;
 		}
 

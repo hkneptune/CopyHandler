@@ -86,12 +86,12 @@ namespace chengine
 		TSmartPath path = PathFromWString(strDstPath);
 		if(m_bUseMask)
 		{
-			if(!m_spaMask.Get().MatchesAny(path.GetFileName().ToString()))
+			if(!m_spaMask.Get().MatchesAny(path))
 				return false;
 		}
 		if(m_bUseExcludeMask)
 		{
-			if(m_spaExcludeMask.Get().MatchesAny(path.GetFileName().ToString()))
+			if(m_spaExcludeMask.Get().MatchesAny(path))
 				return false;
 		}
 

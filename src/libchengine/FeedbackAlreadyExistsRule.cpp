@@ -105,12 +105,12 @@ namespace chengine
 
 		if(m_bUseMask)
 		{
-			if(!m_spaMask.Get().MatchesAny(rDstFile.GetFullFilePath().GetFileName().ToString()))
+			if(!m_spaMask.Get().MatchesAny(rDstFile.GetFullFilePath()))
 				return false;
 		}
 		if(m_bUseExcludeMask)
 		{
-			if(m_spaExcludeMask.Get().MatchesAny(rDstFile.GetFullFilePath().GetFileName().ToString()))
+			if(m_spaExcludeMask.Get().MatchesAny(rDstFile.GetFullFilePath()))
 				return false;
 		}
 		if(m_bUseDateCompare)

@@ -86,7 +86,7 @@ TEST(TestsTStringPatternArray, MatchesAny_Positive)
 	arrPatterns.Add(TStringPattern(L"*.bat", TStringPattern::EPatternType::eType_Wildcard));
 	arrPatterns.Add(TStringPattern(L"*.exe", TStringPattern::EPatternType::eType_Wildcard));
 
-	EXPECT_TRUE(arrPatterns.MatchesAny(L"autostart.bat"));
+	EXPECT_TRUE(arrPatterns.MatchesAny(PathFromString(L"autostart.bat")));
 }
 
 TEST(TestsTStringPatternArray, MatchesAny_Negative)
@@ -96,7 +96,7 @@ TEST(TestsTStringPatternArray, MatchesAny_Negative)
 	arrPatterns.Add(TStringPattern(L"*.bat", TStringPattern::EPatternType::eType_Wildcard));
 	arrPatterns.Add(TStringPattern(L"*.exe", TStringPattern::EPatternType::eType_Wildcard));
 
-	EXPECT_FALSE(arrPatterns.MatchesAny(L"autostart.com"));
+	EXPECT_FALSE(arrPatterns.MatchesAny(PathFromString(L"autostart.com")));
 }
 
 /////////////////////////////////////////////////
@@ -108,7 +108,7 @@ TEST(TestsTStringPatternArray, MatchesAll_Positive)
 	arrPatterns.Add(TStringPattern(L"*.bat", TStringPattern::EPatternType::eType_Wildcard));
 	arrPatterns.Add(TStringPattern(L"autostart.*", TStringPattern::EPatternType::eType_Wildcard));
 
-	EXPECT_TRUE(arrPatterns.MatchesAll(L"autostart.bat"));
+	EXPECT_TRUE(arrPatterns.MatchesAll(PathFromString(L"autostart.bat")));
 }
 
 TEST(TestsTStringPatternArray, MatchesAll_Negative)
@@ -118,7 +118,7 @@ TEST(TestsTStringPatternArray, MatchesAll_Negative)
 	arrPatterns.Add(TStringPattern(L"*.bat", TStringPattern::EPatternType::eType_Wildcard));
 	arrPatterns.Add(TStringPattern(L"autostart.*", TStringPattern::EPatternType::eType_Wildcard));
 
-	EXPECT_FALSE(arrPatterns.MatchesAll(L"autostart.exe"));
+	EXPECT_FALSE(arrPatterns.MatchesAll(PathFromString(L"autostart.exe")));
 }
 
 /////////////////////////////////////////////////

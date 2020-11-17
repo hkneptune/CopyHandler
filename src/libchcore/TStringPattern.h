@@ -20,6 +20,7 @@
 
 #include "../libstring/TString.h"
 #include "libchcore.h"
+#include "TPath.h"
 
 namespace chcore
 {
@@ -36,7 +37,7 @@ namespace chcore
 		explicit TStringPattern(const string::TString& strPattern, EPatternType ePatternType = EPatternType::eType_Wildcard);
 
 		void SetPattern(const string::TString& strPattern, EPatternType ePatternType = EPatternType::eType_Wildcard);
-		bool Matches(const string::TString& strTextToMatch) const;
+		bool Matches(const TSmartPath& pathToMatch) const;
 
 		EPatternType GetPatternType() const { return m_ePatternType; }
 		string::TString GetPattern() const { return m_strPattern; }
