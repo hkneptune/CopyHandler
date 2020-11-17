@@ -2,7 +2,7 @@
 
 #include "libchengine.h"
 #include "../libserializer/SerializableObject.h"
-#include "../libstring/TStringPatternArray.h"
+#include "../libchcore/TStringPatternArray.h"
 #include "ECompareType.h"
 #include "EFeedbackResult.h"
 #include "../libserializer/SerializerDataTypes.h"
@@ -88,9 +88,9 @@ namespace chengine
 
 	private:
 		serializer::TSharedModificationTracker<bool, Bitset, FeedbackErrorRuleEnum::eMod_UseMask> m_bUseMask;
-		serializer::TSharedModificationTracker<string::TStringPatternArray, Bitset, FeedbackErrorRuleEnum::eMod_Mask> m_spaMask;
+		serializer::TSharedModificationTracker<chcore::TStringPatternArray, Bitset, FeedbackErrorRuleEnum::eMod_Mask> m_spaMask;
 		serializer::TSharedModificationTracker<bool, Bitset, FeedbackErrorRuleEnum::eMod_UseExcludeMask> m_bUseExcludeMask;
-		serializer::TSharedModificationTracker<string::TStringPatternArray, Bitset, FeedbackErrorRuleEnum::eMod_ExcludeMask> m_spaExcludeMask;
+		serializer::TSharedModificationTracker<chcore::TStringPatternArray, Bitset, FeedbackErrorRuleEnum::eMod_ExcludeMask> m_spaExcludeMask;
 
 		serializer::TSharedModificationTracker<bool, Bitset, FeedbackErrorRuleEnum::eMod_UseErrorType> m_bUseErrorType;
 		serializer::TSharedModificationTracker<EFileError, Bitset, FeedbackErrorRuleEnum::eMod_ErrorType> m_eErrorType;

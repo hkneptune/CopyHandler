@@ -2,7 +2,7 @@
 
 #include "libchengine.h"
 #include "../libserializer/SerializableObject.h"
-#include "../libstring/TStringPatternArray.h"
+#include "../libchcore/TStringPatternArray.h"
 #include "ECompareType.h"
 #include "EFeedbackResult.h"
 #include "../libserializer/SerializerDataTypes.h"
@@ -74,9 +74,9 @@ namespace chengine
 
 	private:
 		serializer::TSharedModificationTracker<bool, Bitset, FeedbackNotEnoughSpaceRuleEnum::eMod_UseMask> m_bUseMask;
-		serializer::TSharedModificationTracker<string::TStringPatternArray, Bitset, FeedbackNotEnoughSpaceRuleEnum::eMod_Mask> m_spaMask;
+		serializer::TSharedModificationTracker<chcore::TStringPatternArray, Bitset, FeedbackNotEnoughSpaceRuleEnum::eMod_Mask> m_spaMask;
 		serializer::TSharedModificationTracker<bool, Bitset, FeedbackNotEnoughSpaceRuleEnum::eMod_UseExcludeMask> m_bUseExcludeMask;
-		serializer::TSharedModificationTracker<string::TStringPatternArray, Bitset, FeedbackNotEnoughSpaceRuleEnum::eMod_ExcludeMask> m_spaExcludeMask;
+		serializer::TSharedModificationTracker<chcore::TStringPatternArray, Bitset, FeedbackNotEnoughSpaceRuleEnum::eMod_ExcludeMask> m_spaExcludeMask;
 
 		serializer::TSharedModificationTracker<EFeedbackResult, Bitset, FeedbackNotEnoughSpaceRuleEnum::eMod_Result> m_eResult;
 	};

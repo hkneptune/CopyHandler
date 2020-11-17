@@ -3,7 +3,7 @@
 #include "gmock/gmock.h"
 #include "../TStringPattern.h"
 
-using namespace string;
+using namespace chcore;
 
 TEST(TestsTStringPattern, DefaultConstruction)
 {

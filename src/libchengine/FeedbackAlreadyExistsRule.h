@@ -2,7 +2,7 @@
 
 #include "libchengine.h"
 #include "../libserializer/SerializableObject.h"
-#include "../libstring/TStringPatternArray.h"
+#include "../libchcore/TStringPatternArray.h"
 #include "ECompareType.h"
 #include "EFeedbackResult.h"
 #include "../libserializer/SerializerDataTypes.h"
@@ -89,9 +89,9 @@ namespace chengine
 
 	private:
 		serializer::TSharedModificationTracker<bool, Bitset, FeedbackAlreadyExistsRuleEnum::eMod_UseMask> m_bUseMask;
-		serializer::TSharedModificationTracker<string::TStringPatternArray, Bitset, FeedbackAlreadyExistsRuleEnum::eMod_Mask> m_spaMask;
+		serializer::TSharedModificationTracker<chcore::TStringPatternArray, Bitset, FeedbackAlreadyExistsRuleEnum::eMod_Mask> m_spaMask;
 		serializer::TSharedModificationTracker<bool, Bitset, FeedbackAlreadyExistsRuleEnum::eMod_UseExcludeMask> m_bUseExcludeMask;
-		serializer::TSharedModificationTracker<string::TStringPatternArray, Bitset, FeedbackAlreadyExistsRuleEnum::eMod_ExcludeMask> m_spaExcludeMask;
+		serializer::TSharedModificationTracker<chcore::TStringPatternArray, Bitset, FeedbackAlreadyExistsRuleEnum::eMod_ExcludeMask> m_spaExcludeMask;
 
 		serializer::TSharedModificationTracker<bool, Bitset, FeedbackAlreadyExistsRuleEnum::eMod_UseDateCompare> m_bUseDateCompare;
 		serializer::TSharedModificationTracker<ECompareType, Bitset, FeedbackAlreadyExistsRuleEnum::eMod_DateCompare> m_cmpLastModified;

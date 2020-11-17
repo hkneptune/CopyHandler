@@ -2,7 +2,7 @@
 
 #include "libchengine.h"
 #include "../libserializer/SerializableObject.h"
-#include "../libstring/TStringPatternArray.h"
+#include "../libchcore/TStringPatternArray.h"
 #include "ECompareType.h"
 #include "EFeedbackResult.h"
 #include "../libserializer/SerializerDataTypes.h"

@@ -5,6 +5,7 @@
 
 using namespace serializer;
 using namespace string;
+using namespace chcore;
 
 namespace chengine
 {

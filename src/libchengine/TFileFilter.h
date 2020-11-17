@@ -1,28 +1,27 @@
-/***************************************************************************
- *   Copyright (C) 2001-2008 by Jozef Starosczyk                           *
- *   ixen@copyhandler.com                                                  *
- *                                                                         *
- *   This program is free software; you can redistribute it and/or modify  *
- *   it under the terms of the GNU Library General Public License          *
- *   (version 2) as published by the Free Software Foundation;             *
- *                                                                         *
- *   This program is distributed in the hope that it will be useful,       *
- *   but WITHOUT ANY WARRANTY; without even the implied warranty of        *
- *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
- *   GNU General Public License for more details.                          *
- *                                                                         *
- *   You should have received a copy of the GNU Library General Public     *
- *   License along with this program; if not, write to the                 *
- *   Free Software Foundation, Inc.,                                       *
- *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
- ***************************************************************************/
-#ifndef __TFILEFILTER_H__
-#define __TFILEFILTER_H__
+// ============================================================================
+//  Copyright (C) 2001-2020 by Jozef Starosczyk
+//  ixen {at} copyhandler [dot] com
+//
+//  This program is free software; you can redistribute it and/or modify
+//  it under the terms of the GNU Library General Public License
+//  (version 2) as published by the Free Software Foundation;
+//
+//  This program is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU General Public License for more details.
+//
+//  You should have received a copy of the GNU Library General Public
+//  License along with this program; if not, write to the
+//  Free Software Foundation, Inc.,
+//  59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+// ============================================================================
+#pragma once
 
 #include <atltime.h>
 #include "TDateTime.h"
 #include <bitset>
-#include "../libstring/TStringPatternArray.h"
+#include "../libchcore/TStringPatternArray.h"
 #include "../libserializer/TSharedModificationTracker.h"
 #include "ECompareType.h"
 #include "../libserializer/SerializableObject.h"
@@ -199,11 +198,11 @@ namespace chengine
 
 		// files mask
 		serializer::TSharedModificationTracker<bool, Bitset, FileFilterEnum::eMod_UseMask> m_bUseMask;
-		serializer::TSharedModificationTracker<string::TStringPatternArray, Bitset, FileFilterEnum::eMod_Mask> m_astrMask;
+		serializer::TSharedModificationTracker<chcore::TStringPatternArray, Bitset, FileFilterEnum::eMod_Mask> m_astrMask;
 
 		// files mask-
 		serializer::TSharedModificationTracker<bool, Bitset, FileFilterEnum::eMod_UseExcludeMask> m_bUseExcludeMask;
-		serializer::TSharedModificationTracker<string::TStringPatternArray, Bitset, FileFilterEnum::eMod_ExcludeMask> m_astrExcludeMask;
+		serializer::TSharedModificationTracker<chcore::TStringPatternArray, Bitset, FileFilterEnum::eMod_ExcludeMask> m_astrExcludeMask;
 
 		// size filtering
 		serializer::TSharedModificationTracker<bool, Bitset, FileFilterEnum::eMod_UseSize1> m_bUseSize1;
@@ -241,5 +240,3 @@ namespace chengine
 	};
 #pragma warning(pop)
 }
-
-#endif

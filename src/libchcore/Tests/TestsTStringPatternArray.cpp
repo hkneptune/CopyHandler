@@ -2,9 +2,10 @@
 #include "gtest/gtest.h"
 #include "gmock/gmock.h"
 #include "../TStringPatternArray.h"
-#include "../TStringArray.h"
+#include "../../libstring/TStringArray.h"
 
 using namespace string;
+using namespace chcore;
 
 TEST(TestsTStringPatternArray, DefaultConstruction)
 {

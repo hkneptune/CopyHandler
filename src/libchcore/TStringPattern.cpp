@@ -1,9 +1,10 @@
 #include "stdafx.h"
 #include "TStringPattern.h"
 #include <tchar.h>
-#include "TStringException.h"
 
-namespace string
+using namespace string;
+
+namespace chcore
 {
 	namespace
 	{
@@ -53,7 +54,7 @@ namespace string
 			break;	// wildcard won't have any prefix (it's implicit)
 
 		default:
-			throw TStringException("Pattern type not supported");
+			throw std::invalid_argument("Pattern type not supported");
 		}
 
 		return TString(strPrefix + m_strPattern);

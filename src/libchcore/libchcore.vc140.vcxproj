@@ -519,6 +519,8 @@ goto end
     <ClInclude Include="TCoreException.h" />
     <ClInclude Include="TPath.h" />
     <ClInclude Include="TSharedMemory.h" />
+    <ClInclude Include="TStringPattern.h" />
+    <ClInclude Include="TStringPatternArray.h" />
     <ClInclude Include="TTimestampProviderTickCount.h" />
     <ClInclude Include="TWin32ErrorFormatter.h" />
     <ClInclude Include="TWorkerThreadController.h" />
@@ -591,6 +593,18 @@ goto end
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
+    <ClCompile Include="Tests\TestsTStringPattern.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="Tests\TestsTStringPatternArray.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
     <ClCompile Include="Tests\TestsTTimestampProviderTickCount.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
@@ -611,6 +625,8 @@ goto end
     <ClCompile Include="TCoreException.cpp" />
     <ClCompile Include="TPath.cpp" />
     <ClCompile Include="TSharedMemory.cpp" />
+    <ClCompile Include="TStringPattern.cpp" />
+    <ClCompile Include="TStringPatternArray.cpp" />
     <ClCompile Include="TTimestampProviderTickCount.cpp" />
     <ClCompile Include="TWin32ErrorFormatter.cpp" />
     <ClCompile Include="TWorkerThreadController.cpp" />
