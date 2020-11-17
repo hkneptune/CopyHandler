@@ -570,6 +570,8 @@ namespace string
 		size_t stFindPos = 0;
 		while ((stFindPos = Find(pszWhat, stStartPos)) != npos)
 		{
+			stThisLen = GetLength();
+
 			// Sample string "ABCdddb" (len:6), searching for "dd" (len 2) to replace with "x" (len 1)
 			// found string pos is: [stFindPos, stFindPos + stWhatLen)  -- sample ref: [3, 3 + 2)
 			// we need to
@@ -672,7 +674,7 @@ namespace string
 		{
 			size_t stNewLen = stLen;//ROUNDUP(stLen, CHUNK_INCSIZE);
 
-			wchar_t* pszNewBuffer = new wchar_t[stNewLen];
+			wchar_t* pszNewBuffer = new wchar_t[stNewLen] { };
 			if (m_pszData && m_pszData[0] != L'\0')
 				_tcsncpy_s(pszNewBuffer, stNewLen, m_pszData, GetLength() + 1);
 			else
