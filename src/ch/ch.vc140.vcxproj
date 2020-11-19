@@ -562,6 +562,7 @@
     <ClInclude Include="DirectoryChooser.h" />
     <ClInclude Include="FeedbackHandler.h" />
     <ClInclude Include="FeedbackHandlerFactory.h" />
+    <ClInclude Include="FilterTypesMenuWrapper.h" />
     <ClInclude Include="RuleEditAlreadyExistsDlg.h" />
     <ClInclude Include="RuleEditDlg.h" />
     <ClInclude Include="RuleEditErrorDlg.h" />
@@ -643,6 +644,7 @@
     <ClCompile Include="DirectoryChooser.cpp" />
     <ClCompile Include="FeedbackHandler.cpp" />
     <ClCompile Include="FeedbackHandlerFactory.cpp" />
+    <ClCompile Include="FilterTypesMenuWrapper.cpp" />
     <ClCompile Include="RuleEditAlreadyExistsDlg.cpp" />
     <ClCompile Include="RuleEditDlg.cpp" />
     <ClCompile Include="RuleEditErrorDlg.cpp" />

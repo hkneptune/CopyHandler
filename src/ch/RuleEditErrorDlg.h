@@ -20,6 +20,7 @@
 
 #include "../libchengine/FeedbackErrorRule.h"
 #include "ComboDataWrapper.h"
+#include "FilterTypesMenuWrapper.h"
 
 /////////////////////////////////////////////////////////////////////////////
 // FeedbackRuleEditorDlg dialog
@@ -43,6 +44,10 @@ protected:
 	void FillResponseCombo();
 	void OnOK() override;
 	void DoDataExchange(CDataExchange* pDX) override;
+	BOOL OnCommand(WPARAM wParam, LPARAM lParam) override;
+
+	afx_msg void OnIncludeMaskButton();
+	afx_msg void OnExcludeMaskButton();
 
 	DECLARE_MESSAGE_MAP()
 
@@ -65,4 +70,6 @@ private:
 
 	ComboDataWrapper<chengine::EFeedbackResult> m_comboResponse;
 	ComboDataWrapper<chengine::EFileError> m_comboOperationType;
+
+	FilterTypesMenuWrapper m_filterTypesWrapper;
 };

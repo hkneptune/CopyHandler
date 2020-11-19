@@ -190,21 +190,8 @@ BOOL CFilterDlg::OnInitDialog()
 	m_iHidden=m_ffFilter.GetHidden();
 	m_iSystem=m_ffFilter.GetSystem();
 	m_iDirectory=m_ffFilter.GetDirectory();
-	
-	HMENU hMenu = GetResManager().LoadMenu(MAKEINTRESOURCE(IDR_FILTER_TYPE_MENU));
-	m_menuFilterType.Attach(hMenu);
 
-	CMenu* pPopup = m_menuFilterType.GetSubMenu(0);
-	for(int iIndex = 0; iIndex < pPopup->GetMenuItemCount(); ++iIndex)
-	{
-		int iCmd = pPopup->GetMenuItemID(iIndex);
-		if(iCmd > 0)
-		{
-			CString strText;
-			pPopup->GetMenuString(iIndex, strText, MF_BYPOSITION);
-			m_mapFilterEntries.insert({ iCmd, (PCTSTR)strText });
-		}
-	}
+	m_filterTypesWrapper.Init();
 
 	UpdateData(FALSE);
 
@@ -408,27 +395,8 @@ BOOL CFilterDlg::OnCommand(WPARAM wParam, LPARAM lParam)
 	{
 		if(LOWORD(wParam) >= ID_POPUP_FILTER_FILE_WILDCARD && LOWORD(wParam) <= ID_POPUP_FILTER_SEPARATOR_CHAR)
 		{
-			CComboBox& rCombo = m_bTracksIncludeButton ? m_ctlIncludeMask : m_ctlExcludeMask;
-
-			auto iterFnd = m_mapFilterEntries.find(LOWORD(wParam));
-			if(iterFnd != m_mapFilterEntries.end())
-			{
-				string::TString strEntry = iterFnd->second.c_str();
-				string::TStringArray arrStrings;
-				strEntry.Split(L"\t", arrStrings);
-
-				if(arrStrings.GetCount() > 1)
-				{
-					CString strText;
-					rCombo.GetWindowText(strText);
-
-					CString strParsed = arrStrings.GetAt(0).c_str();
-					if(!strText.IsEmpty() && strText.Right(1) != L";" && strParsed != L";")
-						strText += L";";
-
-					rCombo.SetWindowText(strText + strParsed);
-				}
-			}
+			CComboBox& rCombo = m_filterTypesWrapper.IsTrackingIncludeMask() ? m_ctlIncludeMask : m_ctlExcludeMask;
+			m_filterTypesWrapper.OnCommand(LOWORD(wParam), rCombo);
 		}
 	}
 	return ictranslate::CLanguageDialog::OnCommand(wParam, lParam);
@@ -487,24 +455,12 @@ void CFilterDlg::OnExcludemaskCheck()
 
 void CFilterDlg::OnIncludeMaskButton()
 {
-	m_bTracksIncludeButton = true;
-
-	// set point in which to set menu
-	CRect rect;
-	GetDlgItem(IDC_INCLUDE_MASK_BUTTON)->GetWindowRect(&rect);
-
-	m_menuFilterType.GetSubMenu(0)->TrackPopupMenu(TPM_LEFTALIGN | TPM_RIGHTBUTTON, rect.right + 1, rect.top, this);
+	m_filterTypesWrapper.StartTracking(true, *this, IDC_INCLUDE_MASK_BUTTON);
 }
 
 void CFilterDlg::OnExcludeMaskButton()
 {
-	m_bTracksIncludeButton = false;
-
-	// set point in which to set menu
-	CRect rect;
-	GetDlgItem(IDC_EXCLUDE_MASK_BUTTON)->GetWindowRect(&rect);
-
-	m_menuFilterType.GetSubMenu(0)->TrackPopupMenu(TPM_LEFTALIGN | TPM_RIGHTBUTTON, rect.right + 1, rect.top, this);
+	m_filterTypesWrapper.StartTracking(false, *this, IDC_EXCLUDE_MASK_BUTTON);
 }
 
 void CFilterDlg::OnDatetimechangeTime1Datetimepicker(NMHDR* /*pNMHDR*/, LRESULT* pResult) 

@@ -20,6 +20,7 @@
 
 #include "../libchengine/FeedbackAlreadyExistsRule.h"
 #include "ComboDataWrapper.h"
+#include "FilterTypesMenuWrapper.h"
 
 /////////////////////////////////////////////////////////////////////////////
 // FeedbackRuleEditorDlg dialog
@@ -37,12 +38,16 @@ protected:
 	void EnableControls();
 
 	BOOL OnInitDialog() override;
+	BOOL OnCommand(WPARAM wParam, LPARAM lParam) override;
 
 	void FillCompareCombos();
 	void FillResponseCombo();
 
 	void OnOK() override;
 	void DoDataExchange(CDataExchange* pDX) override;
+
+	afx_msg void OnIncludeMaskButton();
+	afx_msg void OnExcludeMaskButton();
 
 	DECLARE_MESSAGE_MAP()
 
@@ -66,4 +71,6 @@ private:
 	ComboDataWrapper<chengine::EFeedbackResult> m_comboResponse;
 	ComboDataWrapper<chengine::ECompareType> m_comboDateCompare;
 	ComboDataWrapper<chengine::ECompareType> m_comboSizeCompare;
+
+	FilterTypesMenuWrapper m_filterTypesWrapper;
 };

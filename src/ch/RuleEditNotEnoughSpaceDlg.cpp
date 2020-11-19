@@ -52,6 +52,8 @@ void RuleEditNotEnoughSpaceDlg::DoDataExchange(CDataExchange* pDX)
 BEGIN_MESSAGE_MAP(RuleEditNotEnoughSpaceDlg,ictranslate::CLanguageDialog)
 	ON_BN_CLICKED(IDC_INCLUDE_MASK_CHECK, EnableControls)
 	ON_BN_CLICKED(IDC_EXCLUDE_MASK_CHECK, EnableControls)
+	ON_BN_CLICKED(IDC_INCLUDE_MASK_BUTTON, OnIncludeMaskButton)
+	ON_BN_CLICKED(IDC_EXCLUDE_MASK_BUTTON, OnExcludeMaskButton)
 END_MESSAGE_MAP()
 
 /////////////////////////////////////////////////////////////////////////////
@@ -82,6 +84,8 @@ BOOL RuleEditNotEnoughSpaceDlg::OnInitDialog()
 	EFeedbackResult eResult = m_rule.GetResult();
 	m_comboResponse.SelectComboResult(eResult == eResult_Unknown ? eResult_Ignore : eResult);
 
+	m_filterTypesWrapper.Init();
+
 	UpdateData(FALSE);
 
 	EnableControls();
@@ -107,6 +111,16 @@ void RuleEditNotEnoughSpaceDlg::FillResponseCombo()
 	}
 }
 
+void RuleEditNotEnoughSpaceDlg::OnIncludeMaskButton()
+{
+	m_filterTypesWrapper.StartTracking(true, *this, IDC_INCLUDE_MASK_BUTTON);
+}
+
+void RuleEditNotEnoughSpaceDlg::OnExcludeMaskButton()
+{
+	m_filterTypesWrapper.StartTracking(false, *this, IDC_EXCLUDE_MASK_BUTTON);
+}
+
 void RuleEditNotEnoughSpaceDlg::OnLanguageChanged()
 {
 	// combo result
@@ -121,6 +135,8 @@ void RuleEditNotEnoughSpaceDlg::EnableControls()
 	// mask
 	m_ctlIncludeMask.EnableWindow(m_bUseIncludeMask);
 	m_ctlExcludeMask.EnableWindow(m_bUseExcludeMask);
+	GetDlgItem(IDC_INCLUDE_MASK_BUTTON)->EnableWindow(m_bUseIncludeMask);
+	GetDlgItem(IDC_EXCLUDE_MASK_BUTTON)->EnableWindow(m_bUseExcludeMask);
 }
 
 void RuleEditNotEnoughSpaceDlg::OnOK() 
@@ -140,4 +156,17 @@ void RuleEditNotEnoughSpaceDlg::OnOK()
 	m_rule.SetResult(m_comboResponse.GetSelectedValue());
 
 	CLanguageDialog::OnOK();
+}
+
+BOOL RuleEditNotEnoughSpaceDlg::OnCommand(WPARAM wParam, LPARAM lParam)
+{
+	if(HIWORD(wParam) == 0)
+	{
+		if(LOWORD(wParam) >= ID_POPUP_FILTER_FILE_WILDCARD && LOWORD(wParam) <= ID_POPUP_FILTER_SEPARATOR_CHAR)
+		{
+			CComboBox& rCombo = m_filterTypesWrapper.IsTrackingIncludeMask() ? m_ctlIncludeMask : m_ctlExcludeMask;
+			m_filterTypesWrapper.OnCommand(LOWORD(wParam), rCombo);
+		}
+	}
+	return ictranslate::CLanguageDialog::OnCommand(wParam, lParam);
 }

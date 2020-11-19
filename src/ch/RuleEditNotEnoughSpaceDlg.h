@@ -20,6 +20,7 @@
 
 #include "../libchengine/FeedbackNotEnoughSpaceRule.h"
 #include "ComboDataWrapper.h"
+#include "FilterTypesMenuWrapper.h"
 
 /////////////////////////////////////////////////////////////////////////////
 // FeedbackRuleEditorDlg dialog
@@ -39,8 +40,12 @@ protected:
 	BOOL OnInitDialog() override;
 	void OnOK() override;
 	void DoDataExchange(CDataExchange* pDX) override;
+	BOOL OnCommand(WPARAM wParam, LPARAM lParam) override;
 
 	void FillResponseCombo();
+
+	afx_msg void OnIncludeMaskButton();
+	afx_msg void OnExcludeMaskButton();
 
 	DECLARE_MESSAGE_MAP()
 
@@ -58,4 +63,6 @@ private:
 	CStringArray m_astrAddExcludeMask;
 
 	ComboDataWrapper<chengine::EFeedbackResult> m_comboResponse;
+
+	FilterTypesMenuWrapper m_filterTypesWrapper;
 };

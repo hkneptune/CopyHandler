@@ -56,11 +56,23 @@ void RuleEditErrorDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_RESPONSE_COMBO, m_ctlResponse);
 }
 
+void RuleEditErrorDlg::OnIncludeMaskButton()
+{
+	m_filterTypesWrapper.StartTracking(true, *this, IDC_INCLUDE_MASK_BUTTON);
+}
+
+void RuleEditErrorDlg::OnExcludeMaskButton()
+{
+	m_filterTypesWrapper.StartTracking(false, *this, IDC_EXCLUDE_MASK_BUTTON);
+}
+
 BEGIN_MESSAGE_MAP(RuleEditErrorDlg,ictranslate::CLanguageDialog)
 	ON_BN_CLICKED(IDC_INCLUDE_MASK_CHECK, EnableControls)
 	ON_BN_CLICKED(IDC_EXCLUDE_MASK_CHECK, EnableControls)
 	ON_BN_CLICKED(IDC_FILTER_BY_OPERATION_CHECK, EnableControls)
 	ON_BN_CLICKED(IDC_FILTER_BY_SYSTEMERROR_CHECK, EnableControls)
+	ON_BN_CLICKED(IDC_INCLUDE_MASK_BUTTON, OnIncludeMaskButton)
+	ON_BN_CLICKED(IDC_EXCLUDE_MASK_BUTTON, OnExcludeMaskButton)
 END_MESSAGE_MAP()
 
 /////////////////////////////////////////////////////////////////////////////
@@ -105,6 +117,8 @@ BOOL RuleEditErrorDlg::OnInitDialog()
 	// result
 	EFeedbackResult eResult = m_rule.GetResult();
 	m_comboResponse.SelectComboResult(eResult == eResult_Unknown ? eResult_Skip : eResult);
+
+	m_filterTypesWrapper.Init();
 
 	UpdateData(FALSE);
 
@@ -162,6 +176,8 @@ void RuleEditErrorDlg::EnableControls()
 	// mask
 	m_ctlIncludeMask.EnableWindow(m_bUseIncludeMask);
 	m_ctlExcludeMask.EnableWindow(m_bUseExcludeMask);
+	GetDlgItem(IDC_INCLUDE_MASK_BUTTON)->EnableWindow(m_bUseIncludeMask);
+	GetDlgItem(IDC_EXCLUDE_MASK_BUTTON)->EnableWindow(m_bUseExcludeMask);
 
 	// size
 	m_ctlSystemError.EnableWindow(m_bUseSystemError);
@@ -199,4 +215,17 @@ void RuleEditErrorDlg::OnOK()
 	m_rule.SetResult(m_comboResponse.GetSelectedValue());
 
 	CLanguageDialog::OnOK();
+}
+
+BOOL RuleEditErrorDlg::OnCommand(WPARAM wParam, LPARAM lParam)
+{
+	if(HIWORD(wParam) == 0)
+	{
+		if(LOWORD(wParam) >= ID_POPUP_FILTER_FILE_WILDCARD && LOWORD(wParam) <= ID_POPUP_FILTER_SEPARATOR_CHAR)
+		{
+			CComboBox& rCombo = m_filterTypesWrapper.IsTrackingIncludeMask() ? m_ctlIncludeMask : m_ctlExcludeMask;
+			m_filterTypesWrapper.OnCommand(LOWORD(wParam), rCombo);
+		}
+	}
+	return ictranslate::CLanguageDialog::OnCommand(wParam, lParam);
 }

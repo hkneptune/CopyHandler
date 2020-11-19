@@ -19,6 +19,7 @@
 #pragma once
 
 #include "../libchengine/TFileFilter.h"
+#include "FilterTypesMenuWrapper.h"
 
 /////////////////////////////////////////////////////////////////////////////
 // CFilterDlg dialog
@@ -80,9 +81,7 @@ private:
 	CMFCButton m_btnIncludeMask;
 	CMFCButton m_btnExcludeMask;
 
-	bool m_bTracksIncludeButton = false;
-	CMenu m_menuFilterType;
-	std::map<int, std::wstring> m_mapFilterEntries;
+	FilterTypesMenuWrapper m_filterTypesWrapper;
 
 	int		m_iArchive;
 	BOOL	m_bAttributes;
