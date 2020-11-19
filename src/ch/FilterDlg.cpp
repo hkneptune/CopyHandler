@@ -1,25 +1,26 @@
-/***************************************************************************
-*   Copyright (C) 2001-2008 by Józef Starosczyk                           *
-*   ixen@copyhandler.com                                                  *
-*                                                                         *
-*   This program is free software; you can redistribute it and/or modify  *
-*   it under the terms of the GNU Library General Public License          *
-*   (version 2) as published by the Free Software Foundation;             *
-*                                                                         *
-*   This program is distributed in the hope that it will be useful,       *
-*   but WITHOUT ANY WARRANTY; without even the implied warranty of        *
-*   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
-*   GNU General Public License for more details.                          *
-*                                                                         *
-*   You should have received a copy of the GNU Library General Public     *
-*   License along with this program; if not, write to the                 *
-*   Free Software Foundation, Inc.,                                       *
-*   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
-***************************************************************************/
+// ============================================================================
+//  Copyright (C) 2001-2020 by Jozef Starosczyk
+//  ixen {at} copyhandler [dot] com
+//
+//  This program is free software; you can redistribute it and/or modify
+//  it under the terms of the GNU Library General Public License
+//  (version 2) as published by the Free Software Foundation;
+//
+//  This program is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU General Public License for more details.
+//
+//  You should have received a copy of the GNU Library General Public
+//  License along with this program; if not, write to the
+//  Free Software Foundation, Inc.,
+//  59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+// ============================================================================
 #include "stdafx.h"
 #include "ch.h"
 #include "FilterDlg.h"
 #include "resource.h"
+#include "../libstring/TStringArray.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -31,31 +32,28 @@ static char THIS_FILE[] = __FILE__;
 // CFilterDlg dialog
 
 CFilterDlg::CFilterDlg()
-	:CLanguageDialog(IDD_FILTER_DIALOG)
+	:CLanguageDialog(IDD_FILTER_DIALOG),
+	m_iArchive(FALSE),
+	m_bAttributes(FALSE),
+	m_bDate1(FALSE),
+	m_bDate2(FALSE),
+	m_iDirectory(FALSE),
+	m_bFilter(FALSE),
+	m_iHidden(FALSE),
+	m_iReadOnly(FALSE),
+	m_bSize(FALSE),
+	m_uiSize1(0),
+	m_bSize2(FALSE),
+	m_uiSize2(0),
+	m_iSystem(FALSE),
+	m_bExclude(FALSE)
 {
-	//{{AFX_DATA_INIT(CFilterDlg)
-	m_iArchive = FALSE;
-	m_bAttributes = FALSE;
-	m_bDate1 = FALSE;
-	m_bDate2 = FALSE;
-	m_iDirectory = FALSE;
-	m_bFilter = FALSE;
-	m_iHidden = FALSE;
-	m_iReadOnly = FALSE;
-	m_bSize = FALSE;
-	m_uiSize1 = 0;
-	m_bSize2 = FALSE;
-	m_uiSize2 = 0;
-	m_iSystem = FALSE;
-	m_bExclude = FALSE;
-	//}}AFX_DATA_INIT
 }
-
 
 void CFilterDlg::DoDataExchange(CDataExchange* pDX)
 {
 	CLanguageDialog::DoDataExchange(pDX);
-	//{{AFX_DATA_MAP(CFilterDlg)
+
 	DDX_Control(pDX, IDC_FILTEREXCLUDE_COMBO, m_ctlExcludeMask);
 	DDX_Control(pDX, IDC_SIZE2_SPIN, m_ctlSpin2);
 	DDX_Control(pDX, IDC_SIZE1_SPIN, m_ctlSpin1);
@@ -65,12 +63,14 @@ void CFilterDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_SIZETYPE1_COMBO, m_ctlSizeType1);
 	DDX_Control(pDX, IDC_SIZE2MULTI_COMBO, m_ctlSize2Multi);
 	DDX_Control(pDX, IDC_SIZE1MULTI_COMBO, m_ctlSize1Multi);
-	DDX_Control(pDX, IDC_FILTER_COMBO, m_ctlFilter);
+	DDX_Control(pDX, IDC_FILTER_COMBO, m_ctlIncludeMask);
 	DDX_Control(pDX, IDC_DATETYPE_COMBO, m_ctlDateType);
 	DDX_Control(pDX, IDC_DATE2TYPE_COMBO, m_ctlDateType2);
 	DDX_Control(pDX, IDC_DATE2_DATETIMEPICKER, m_ctlDate2);
 	DDX_Control(pDX, IDC_DATE1TYPE_COMBO, m_ctlDateType1);
 	DDX_Control(pDX, IDC_DATE1_DATETIMEPICKER, m_ctlDate1);
+	DDX_Control(pDX, IDC_INCLUDE_MASK_BUTTON, m_btnIncludeMask);
+	DDX_Control(pDX, IDC_EXCLUDE_MASK_BUTTON, m_btnExcludeMask);
 	DDX_Check(pDX, IDC_ARCHIVE_CHECK, m_iArchive);
 	DDX_Check(pDX, IDC_ATTRIBUTES_CHECK, m_bAttributes);
 	DDX_Check(pDX, IDC_DATE_CHECK, m_bDate1);
@@ -85,7 +85,6 @@ void CFilterDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Text(pDX, IDC_SIZE2_EDIT, m_uiSize2);
 	DDX_Check(pDX, IDC_SYSTEM_CHECK, m_iSystem);
 	DDX_Check(pDX, IDC_EXCLUDEMASK_CHECK, m_bExclude);
-	//}}AFX_DATA_MAP
 }
 
 
@@ -97,6 +96,9 @@ BEGIN_MESSAGE_MAP(CFilterDlg,ictranslate::CLanguageDialog)
 	ON_BN_CLICKED(IDC_FILTER_CHECK, OnFilterCheck)
 	ON_BN_CLICKED(IDC_SIZE_CHECK, OnSizeCheck)
 	ON_BN_CLICKED(IDC_SIZE2_CHECK, OnSize2Check)
+	ON_BN_CLICKED(IDC_EXCLUDEMASK_CHECK, OnExcludemaskCheck)
+	ON_BN_CLICKED(IDC_INCLUDE_MASK_BUTTON, OnIncludeMaskButton)
+	ON_BN_CLICKED(IDC_EXCLUDE_MASK_BUTTON, OnExcludeMaskButton)
 	ON_BN_CLICKED(IDC_EXCLUDEMASK_CHECK, OnExcludemaskCheck)
 	ON_NOTIFY(DTN_DATETIMECHANGE, IDC_TIME1_DATETIMEPICKER, OnDatetimechangeTime1Datetimepicker)
 	ON_NOTIFY(DTN_DATETIMECHANGE, IDC_DATE1_DATETIMEPICKER, OnDatetimechangeDate1Datetimepicker)
@@ -137,10 +139,10 @@ BOOL CFilterDlg::OnInitDialog()
 	// copy data from TFileFilter to a dialog - mask
 	m_bFilter = m_ffFilter.GetUseMask();
 
-	m_ctlFilter.SetCurSel(m_ctlFilter.AddString(m_ffFilter.GetCombinedMask().c_str()));
+	m_ctlIncludeMask.SetCurSel(m_ctlIncludeMask.AddString(m_ffFilter.GetCombinedMask().c_str()));
 	for (int i=0;i<m_astrAddMask.GetSize();i++)
 	{
-		m_ctlFilter.AddString(m_astrAddMask.GetAt(i));
+		m_ctlIncludeMask.AddString(m_astrAddMask.GetAt(i));
 	}
 
 	m_bExclude = m_ffFilter.GetUseExcludeMask();
@@ -189,6 +191,21 @@ BOOL CFilterDlg::OnInitDialog()
 	m_iSystem=m_ffFilter.GetSystem();
 	m_iDirectory=m_ffFilter.GetDirectory();
 	
+	HMENU hMenu = GetResManager().LoadMenu(MAKEINTRESOURCE(IDR_FILTER_TYPE_MENU));
+	m_menuFilterType.Attach(hMenu);
+
+	CMenu* pPopup = m_menuFilterType.GetSubMenu(0);
+	for(int iIndex = 0; iIndex < pPopup->GetMenuItemCount(); ++iIndex)
+	{
+		int iCmd = pPopup->GetMenuItemID(iIndex);
+		if(iCmd > 0)
+		{
+			CString strText;
+			pPopup->GetMenuString(iIndex, strText, MF_BYPOSITION);
+			m_mapFilterEntries.insert({ iCmd, (PCTSTR)strText });
+		}
+	}
+
 	UpdateData(FALSE);
 
 	EnableControls();
@@ -294,9 +311,11 @@ void CFilterDlg::EnableControls()
 {
 	UpdateData(TRUE);
 	// mask
-	m_ctlFilter.EnableWindow(m_bFilter);
+	m_ctlIncludeMask.EnableWindow(m_bFilter);
+	m_btnIncludeMask.EnableWindow(m_bFilter);
 
 	m_ctlExcludeMask.EnableWindow(m_bExclude);
+	m_btnExcludeMask.EnableWindow(m_bExclude);
 
 	// size
 	m_ctlSizeType1.EnableWindow(m_bSize);
@@ -335,7 +354,7 @@ void CFilterDlg::OnOK()
 	
 	// TFileFilter --> dialogu - mask
 	CString strText;
-	m_ctlFilter.GetWindowText(strText);
+	m_ctlIncludeMask.GetWindowText(strText);
 	m_ffFilter.SetUseMask(((m_bFilter != 0) && !strText.IsEmpty()));
 	m_ffFilter.SetCombinedMask((PCTSTR)strText);
 
@@ -381,6 +400,38 @@ void CFilterDlg::OnOK()
 	m_ffFilter.SetDirectory(m_iDirectory);
 
 	CLanguageDialog::OnOK();
+}
+
+BOOL CFilterDlg::OnCommand(WPARAM wParam, LPARAM lParam)
+{
+	if(HIWORD(wParam) == 0)
+	{
+		if(LOWORD(wParam) >= ID_POPUP_FILTER_FILE_WILDCARD && LOWORD(wParam) <= ID_POPUP_FILTER_SEPARATOR_CHAR)
+		{
+			CComboBox& rCombo = m_bTracksIncludeButton ? m_ctlIncludeMask : m_ctlExcludeMask;
+
+			auto iterFnd = m_mapFilterEntries.find(LOWORD(wParam));
+			if(iterFnd != m_mapFilterEntries.end())
+			{
+				string::TString strEntry = iterFnd->second.c_str();
+				string::TStringArray arrStrings;
+				strEntry.Split(L"\t", arrStrings);
+
+				if(arrStrings.GetCount() > 1)
+				{
+					CString strText;
+					rCombo.GetWindowText(strText);
+
+					CString strParsed = arrStrings.GetAt(0).c_str();
+					if(!strText.IsEmpty() && strText.Right(1) != L";" && strParsed != L";")
+						strText += L";";
+
+					rCombo.SetWindowText(strText + strParsed);
+				}
+			}
+		}
+	}
+	return ictranslate::CLanguageDialog::OnCommand(wParam, lParam);
 }
 
 int CFilterDlg::GetMultiplier(int iIndex)
@@ -432,6 +483,28 @@ void CFilterDlg::OnSize2Check()
 void CFilterDlg::OnExcludemaskCheck() 
 {
 	EnableControls();
+}
+
+void CFilterDlg::OnIncludeMaskButton()
+{
+	m_bTracksIncludeButton = true;
+
+	// set point in which to set menu
+	CRect rect;
+	GetDlgItem(IDC_INCLUDE_MASK_BUTTON)->GetWindowRect(&rect);
+
+	m_menuFilterType.GetSubMenu(0)->TrackPopupMenu(TPM_LEFTALIGN | TPM_RIGHTBUTTON, rect.right + 1, rect.top, this);
+}
+
+void CFilterDlg::OnExcludeMaskButton()
+{
+	m_bTracksIncludeButton = false;
+
+	// set point in which to set menu
+	CRect rect;
+	GetDlgItem(IDC_EXCLUDE_MASK_BUTTON)->GetWindowRect(&rect);
+
+	m_menuFilterType.GetSubMenu(0)->TrackPopupMenu(TPM_LEFTALIGN | TPM_RIGHTBUTTON, rect.right + 1, rect.top, this);
 }
 
 void CFilterDlg::OnDatetimechangeTime1Datetimepicker(NMHDR* /*pNMHDR*/, LRESULT* pResult) 

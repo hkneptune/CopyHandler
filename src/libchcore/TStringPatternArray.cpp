@@ -49,7 +49,7 @@ namespace chcore
 	void TStringPatternArray::FromString(const TString& strPatterns)
 	{
 		TStringArray arrPatterns;
-		strPatterns.Split(_T("|"), arrPatterns);
+		strPatterns.Split(_T(";"), arrPatterns);
 		FromStringArray(arrPatterns);
 	}
 
@@ -80,7 +80,7 @@ namespace chcore
 			strMask = GetAt(0).ToString();
 			for (size_t stIndex = 1; stIndex < stCount; stIndex++)
 			{
-				strMask += _T("|") + GetAt(stIndex).ToString();
+				strMask += _T(";") + GetAt(stIndex).ToString();
 			}
 		}
 
