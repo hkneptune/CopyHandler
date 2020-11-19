@@ -154,7 +154,7 @@ namespace chcore
 		case EPatternType::eType_FilenameRegex:
 		{
 			std::wstring strText(pathToMatch.GetFileName().ToString());
-			std::wregex pattern(m_strPattern.c_str(), std::regex_constants::icase | std::regex_constants::ECMAScript);
+			std::wregex pattern(m_strPattern.c_str(), std::regex::icase | std::regex::ECMAScript | std::regex::collate);
 
 			return std::regex_match(strText, pattern);
 		}
@@ -162,7 +162,7 @@ namespace chcore
 		case EPatternType::eType_FullPathRegex:
 		{
 			std::wstring strText(pathToMatch.ToString());
-			std::wregex pattern(m_strPattern.c_str(), std::regex_constants::icase | std::regex_constants::ECMAScript);
+			std::wregex pattern(m_strPattern.c_str(), std::regex::icase | std::regex::ECMAScript | std::regex::collate);
 
 			return std::regex_match(strText, pattern);
 		}
