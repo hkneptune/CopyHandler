@@ -273,7 +273,9 @@
     <ClInclude Include="ComboDataWrapper.h">
       <Filter>Source Files\GUI\Utils</Filter>
     </ClInclude>
-    <ClInclude Include="FilterTypesMenuWrapper.h" />
+    <ClInclude Include="FilterTypesMenuWrapper.h">
+      <Filter>Source Files\GUI\Utils</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\common\TShellExtMenuConfig.cpp">
@@ -469,7 +471,7 @@
       <Filter>Source Files\GUI\Dialogs\Feedback rule editor</Filter>
     </ClCompile>
     <ClCompile Include="FilterTypesMenuWrapper.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\GUI\Utils</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

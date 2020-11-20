@@ -18,6 +18,8 @@
 // ============================================================================
 #pragma once
 
+#include "../libchcore/TStringPatternArray.h"
+
 class FilterTypesMenuWrapper
 {
 public:
@@ -27,6 +29,8 @@ public:
 	bool IsTrackingIncludeMask() const { return m_bTracksIncludeButton; }
 
 	void OnCommand(int iCommandID, CComboBox& rCombo);
+
+	static bool ValidateFilter(const chcore::TStringPatternArray& strFilter);
 
 private:
 	bool m_bTracksIncludeButton = false;

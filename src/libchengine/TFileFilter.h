@@ -120,6 +120,9 @@ namespace chengine
 		string::TString GetCombinedExcludeMask() const;
 		void SetCombinedExcludeMask(const string::TString& pMask);
 
+		const chcore::TStringPatternArray& GetIncludeMask() const { return m_astrMask; }
+		const chcore::TStringPatternArray& GetExcludeMask() const { return m_astrExcludeMask; }
+
 		bool GetUseSize1() const;
 		void SetUseSize1(bool bUseSize1);
 

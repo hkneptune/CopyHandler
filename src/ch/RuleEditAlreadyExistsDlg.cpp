@@ -217,6 +217,18 @@ void RuleEditAlreadyExistsDlg::OnOK()
 	// response
 	m_rule.SetResult(m_comboResponse.GetSelectedValue());
 
+	if(!FilterTypesMenuWrapper::ValidateFilter(m_rule.GetIncludeMask()))
+	{
+		m_ctlIncludeMask.SetFocus();
+		return;
+	}
+
+	if(!FilterTypesMenuWrapper::ValidateFilter(m_rule.GetExcludeMask()))
+	{
+		m_ctlExcludeMask.SetFocus();
+		return;
+	}
+
 	CLanguageDialog::OnOK();
 }
 

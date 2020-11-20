@@ -21,6 +21,7 @@
 #include "FilterDlg.h"
 #include "resource.h"
 #include "../libstring/TStringArray.h"
+#include <regex>
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -338,8 +339,7 @@ void CFilterDlg::EnableControls()
 void CFilterDlg::OnOK() 
 {
 	UpdateData(TRUE);
-	
-	// TFileFilter --> dialogu - mask
+
 	CString strText;
 	m_ctlIncludeMask.GetWindowText(strText);
 	m_ffFilter.SetUseMask(((m_bFilter != 0) && !strText.IsEmpty()));
@@ -385,6 +385,18 @@ void CFilterDlg::OnOK()
 	m_ffFilter.SetHidden(m_iHidden);
 	m_ffFilter.SetSystem(m_iSystem);
 	m_ffFilter.SetDirectory(m_iDirectory);
+
+	if(!FilterTypesMenuWrapper::ValidateFilter(m_ffFilter.GetIncludeMask()))
+	{
+		m_ctlIncludeMask.SetFocus();
+		return;
+	}
+
+	if(!FilterTypesMenuWrapper::ValidateFilter(m_ffFilter.GetExcludeMask()))
+	{
+		m_ctlExcludeMask.SetFocus();
+		return;
+	}
 
 	CLanguageDialog::OnOK();
 }

@@ -3,6 +3,7 @@
 #include "ch.h"
 #include "resource.h"
 #include "../libstring/TStringArray.h"
+#include <regex>
 
 void FilterTypesMenuWrapper::Init()
 {
@@ -52,4 +53,30 @@ void FilterTypesMenuWrapper::OnCommand(int iCommandID, CComboBox& rCombo)
 			rCombo.SetWindowText(strText + strParsed);
 		}
 	}
+}
+
+bool FilterTypesMenuWrapper::ValidateFilter(const chcore::TStringPatternArray& arrPattern)
+{
+	CStringA strMsg;
+	try
+	{
+		arrPattern.MatchesAny(chcore::PathFromString(L""));
+	}
+	catch(const std::regex_error& e)
+	{
+		strMsg = e.what();
+	}
+
+	if(!strMsg.IsEmpty())
+	{
+		CString strFmt;
+		strFmt.Format(L"%S", (PCSTR)strMsg);
+
+		ictranslate::CFormat fmt(GetResManager().LoadString(IDS_INVALID_FILTER));
+		fmt.SetParam(_T("%err"), strFmt);
+		AfxMessageBox(fmt.ToString());
+		return false;
+	}
+
+	return true;
 }

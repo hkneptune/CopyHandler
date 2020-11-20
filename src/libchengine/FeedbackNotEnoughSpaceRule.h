@@ -69,6 +69,9 @@ namespace chengine
 		string::TString GetCombinedExcludeMask() const;
 		void SetCombinedExcludeMask(const string::TString& strMask);
 
+		const chcore::TStringPatternArray& GetIncludeMask() const { return m_spaMask; }
+		const chcore::TStringPatternArray& GetExcludeMask() const { return m_spaExcludeMask; }
+
 		EFeedbackResult GetResult() const;
 		void SetResult(EFeedbackResult eResult);
 
