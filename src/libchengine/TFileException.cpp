@@ -30,14 +30,14 @@ namespace chengine
 
 	void TFileException::GetErrorInfo(wchar_t* pszBuffer, size_t stMaxBuffer) const
 	{
-		_snwprintf_s(pszBuffer, stMaxBuffer, _TRUNCATE, _T("%s (error code: %d, win32 error code: %lu, path: %s)"), m_pszMsg, m_eErrorCode, m_dwNativeErrorCode, m_path.ToString());
+		_snwprintf_s(pszBuffer, stMaxBuffer, _TRUNCATE, _T("%s (error code: %d, win32 error code: %lu, path: %s)"), m_strMsg.c_str(), m_eErrorCode, m_dwNativeErrorCode, m_path.ToString());
 		pszBuffer[stMaxBuffer - 1] = _T('\0');
 	}
 
 	void TFileException::GetDetailedErrorInfo(wchar_t* pszBuffer, size_t stMaxBuffer) const
 	{
 		_snwprintf_s(pszBuffer, stMaxBuffer, _TRUNCATE, _T("%s\r\nError code: %d\r\nWin32 error code: %lu\r\nFile: %s\r\nSource file: %s\r\nFunction: %s\r\nLine no: %lu"),
-			m_pszMsg, m_eErrorCode, m_dwNativeErrorCode, m_path.ToString(), m_pszFile, m_pszFunction, (unsigned long)m_stLineNumber);
+			m_strMsg.c_str(), m_eErrorCode, m_dwNativeErrorCode, m_path.ToString(), m_pszFile, m_pszFunction, (unsigned long)m_stLineNumber);
 		pszBuffer[stMaxBuffer - 1] = _T('\0');
 	}
 }

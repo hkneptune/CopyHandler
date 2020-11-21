@@ -21,20 +21,14 @@
 #include <tchar.h>
 #include <regex>
 #include <boost/algorithm/string/replace.hpp>
+#include <atlbase.h>
+#include <atlconv.h>
+#include "TCoreException.h"
 
 using namespace string;
 
 namespace chcore
 {
-	namespace
-	{
-		bool _tcicmp(TCHAR c1, TCHAR c2)
-		{
-			TCHAR ch1[2] = { c1, 0 }, ch2[2] = { c2, 0 };
-			return (_tcsicmp(ch1, ch2) == 0);
-		}
-	}
-
 	TStringPattern::TStringPattern() :
 		m_ePatternType(EPatternType::eType_FilenameWildcard)
 	{
@@ -124,51 +118,63 @@ namespace chcore
 
 	bool TStringPattern::Matches(const TSmartPath& pathToMatch) const
 	{
-		switch(m_ePatternType)
+		try
 		{
-		case EPatternType::eType_FilenameWildcard:
-		{
-			if(m_strPattern == L"*" || m_strPattern == L"*.*")
-				return true;
+			switch(m_ePatternType)
+			{
+			case EPatternType::eType_FilenameWildcard:
+			{
+				if(m_strPattern == L"*" || m_strPattern == L"*.*")
+					return true;
 
-			std::wstring strPattern = ConvertGlobToRegex();
+				std::wstring strPattern = ConvertGlobToRegex();
 
-			std::wstring strText(pathToMatch.GetFileName().ToString());
-			std::wregex pattern(strPattern, std::regex_constants::icase | std::regex_constants::ECMAScript);
+				std::wstring strText(pathToMatch.GetFileName().ToString());
+				std::wregex pattern(strPattern, std::regex_constants::icase | std::regex_constants::ECMAScript);
 
-			return std::regex_match(strText, pattern);
+				return std::regex_match(strText, pattern);
+			}
+
+			case EPatternType::eType_FullPathWildcard:
+			{
+				if(m_strPattern == L"*" || m_strPattern == L"*.*")
+					return true;
+
+				std::wstring strPattern = ConvertGlobToRegex();
+				std::wstring strText(pathToMatch.ToString());
+				std::wregex pattern(strPattern, std::regex_constants::icase | std::regex_constants::ECMAScript);
+
+				return std::regex_match(strText, pattern);
+			}
+
+			case EPatternType::eType_FilenameRegex:
+			{
+				std::wstring strText(pathToMatch.GetFileName().ToString());
+				std::wregex pattern(m_strPattern.c_str(), std::regex::icase | std::regex::ECMAScript | std::regex::collate);
+
+				return std::regex_match(strText, pattern);
+			}
+
+			case EPatternType::eType_FullPathRegex:
+			{
+				std::wstring strText(pathToMatch.ToString());
+				std::wregex pattern(m_strPattern.c_str(), std::regex::icase | std::regex::ECMAScript | std::regex::collate);
+
+				return std::regex_match(strText, pattern);
+			}
+
+			default:
+				throw std::invalid_argument("Unsupported pattern type");
+			}
 		}
-
-		case EPatternType::eType_FullPathWildcard:
+		catch(const std::regex_error& e)
 		{
-			if(m_strPattern == L"*" || m_strPattern == L"*.*")
-				return true;
+			TString strErr = L"Regular expression processing error.\nExpression: " + m_strPattern + L"\nError: ";
+			ATL::CA2W ca2w(e.what());
 
-			std::wstring strPattern = ConvertGlobToRegex();
-			std::wstring strText(pathToMatch.ToString());
-			std::wregex pattern(strPattern, std::regex_constants::icase | std::regex_constants::ECMAScript);
+			strErr += ca2w;
 
-			return std::regex_match(strText, pattern);
-		}
-
-		case EPatternType::eType_FilenameRegex:
-		{
-			std::wstring strText(pathToMatch.GetFileName().ToString());
-			std::wregex pattern(m_strPattern.c_str(), std::regex::icase | std::regex::ECMAScript | std::regex::collate);
-
-			return std::regex_match(strText, pattern);
-		}
-
-		case EPatternType::eType_FullPathRegex:
-		{
-			std::wstring strText(pathToMatch.ToString());
-			std::wregex pattern(m_strPattern.c_str(), std::regex::icase | std::regex::ECMAScript | std::regex::collate);
-
-			return std::regex_match(strText, pattern);
-		}
-
-		default:
-			throw std::invalid_argument("Unsupported pattern type");
+			throw TCoreException(eErr_InvalidData, strErr.c_str(), LOCATION);
 		}
 	}
 
