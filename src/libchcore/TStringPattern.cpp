@@ -174,7 +174,7 @@ namespace chcore
 
 			strErr += ca2w;
 
-			throw TCoreException(eErr_InvalidData, strErr.c_str(), LOCATION);
+			throw TCoreException(eErr_InvalidRegex, strErr.c_str(), LOCATION);
 		}
 	}
 
