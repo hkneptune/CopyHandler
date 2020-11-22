@@ -27,6 +27,7 @@
 #include <boost/lexical_cast.hpp>
 #include "TTaskDefinition.h"
 #include "../libchcore/TCoreException.h"
+#include "EOperationTypesMapper.h"
 
 #define CURRENT_TASK_VERSION 1
 
@@ -184,11 +185,12 @@ namespace chengine
 			m_pathDestinationPath.AppendSeparatorIfDoesNotExist();
 
 		// type of the operation
-		int iOperation = eOperation_None;
-		if (!rDataSrc.GetValue(_T("TaskDefinition.OperationType"), iOperation))
+		TString strOperation = L"copy";
+		if(!GetConfigValue(rDataSrc, _T("TaskDefinition.OperationType"), strOperation))
 			throw TCoreException(eErr_MissingXmlData, L"Missing TaskDefinition.OperationType", LOCATION);
 
-		m_tOperationPlan.SetOperationType((EOperationType)iOperation);
+		EOperationType eOperation = UnmapEnum<EOperationType>(strOperation);
+		m_tOperationPlan.SetOperationType(eOperation);
 
 		// and version of the task
 		if (!GetConfigValue(rDataSrc, _T("TaskDefinition.Version"), m_ullTaskVersion))
@@ -247,8 +249,7 @@ namespace chengine
 		SetConfigValue(rConfig, _T("TaskDefinition.Filters"), m_afFilters);
 		SetConfigValue(rConfig, _T("TaskDefinition.DestinationPath"), m_pathDestinationPath);
 
-		int iOperation = m_tOperationPlan.GetOperationType();
-		SetConfigValue(rConfig, _T("TaskDefinition.OperationType"), iOperation);
+		SetConfigValue(rConfig, _T("TaskDefinition.OperationType"), MapEnum(m_tOperationPlan.GetOperationType()));
 
 		SetConfigValue(rConfig, _T("TaskDefinition.Version"), m_ullTaskVersion);
 

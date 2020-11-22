@@ -134,6 +134,9 @@
     <ClInclude Include="SerializableContainer.h">
       <Filter>Source Files\Serialization</Filter>
     </ClInclude>
+    <ClInclude Include="DataMapper.h">
+      <Filter>Source Files\Tools</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">

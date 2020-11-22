@@ -499,6 +499,7 @@ goto end
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="DataMapper.h" />
     <ClInclude Include="IColumnsDefinition.h" />
     <ClInclude Include="ISerializer.h" />
     <ClInclude Include="ISerializerContainer.h" />

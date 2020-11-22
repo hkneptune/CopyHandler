@@ -3,6 +3,8 @@
 #include "../libstring/TString.h"
 #include "../libstring/TStringArray.h"
 #include "../libchcore/TPath.h"
+#include "EOperationEventMapper.h"
+#include "EFeedbackResultMapper.h"
 
 using namespace serializer;
 using namespace string;
@@ -124,20 +126,16 @@ namespace chengine
 	void FeedbackOperationEventRule::StoreInConfig(TConfig& rConfig) const
 	{
 		SetConfigValue(rConfig, _T("OperationEvent.Use"), m_bUseOperationEvent.Get());
-		SetConfigValue(rConfig, _T("OperationEvent.Value"), m_eOperationEvent.Get());
+		SetConfigValue(rConfig, _T("OperationEvent.Value"), MapEnum(m_eOperationEvent.Get()));
 
 		SetConfigValue(rConfig, _T("Result"), m_eResult.Get());
 	}
 
 	void FeedbackOperationEventRule::ReadFromConfig(const TConfig& rConfig)
 	{
-		if(!GetConfigValue(rConfig, _T("OperationEvent.Use"), m_bUseOperationEvent.Modify()))
-			m_bUseOperationEvent = false;
-		if(!GetConfigValue(rConfig, _T("OperationEvent.Value"), *(int*)m_eOperationEvent.Modify()))
-			m_eOperationEvent = eOperationEvent_Finished;
-
-		if(!GetConfigValue(rConfig, _T("Result"), *(int*)m_eResult.Modify()))
-			m_eResult = eResult_Unknown;
+		m_bUseOperationEvent = GetConfigValueDef(rConfig, _T("OperationEvent.Use"), false);
+		m_eOperationEvent = UnmapEnum<EOperationEvent>(GetConfigValueDef(rConfig, _T("OperationEvent.Value"), TString(L"finished")));
+		m_eResult = UnmapEnum<EFeedbackResult>(GetConfigValueDef(rConfig, _T("Result"), TString(L"unknown")));
 	}
 
 	bool FeedbackOperationEventRule::HaveSameCondition(const FeedbackOperationEventRule& rSrc) const

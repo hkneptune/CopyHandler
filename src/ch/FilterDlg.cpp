@@ -360,7 +360,7 @@ void CFilterDlg::OnOK()
 	m_ffFilter.SetSize2(static_cast<unsigned __int64>(m_uiSize2)*static_cast<unsigned __int64>(GetMultiplier(m_ctlSize2Multi.GetCurSel())));
 
 	// date
-	m_ffFilter.SetDateType((chengine::TFileFilter::EDateType)m_ctlDateType.GetCurSel());
+	m_ffFilter.SetDateType((chengine::EDateType)m_ctlDateType.GetCurSel());
 
 	m_ffFilter.SetDateCmpType1((chengine::ECompareType)m_ctlDateType1.GetCurSel());
 	m_ffFilter.SetDateCmpType2((chengine::ECompareType)m_ctlDateType2.GetCurSel());

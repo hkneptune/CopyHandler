@@ -21,6 +21,8 @@
 #include "TFileInfo.h"
 #include "TConfig.h"
 #include "../libstring/TStringArray.h"
+#include "ECompareTypeMapper.h"
+#include "EDateTypeMapper.h"
 
 using namespace chcore;
 using namespace string;
@@ -219,21 +221,21 @@ namespace chengine
 		SetConfigValue(rConfig, _T("ExcludeMask.MaskList.Mask"), m_astrExcludeMask.Get().ToSerializedStringArray());
 
 		SetConfigValue(rConfig, _T("SizeA.Use"), m_bUseSize1.Get());
-		SetConfigValue(rConfig, _T("SizeA.FilteringType"), m_eSizeCmpType1.Get());
+		SetConfigValue(rConfig, _T("SizeA.FilteringType"), MapEnum(m_eSizeCmpType1.Get()));
 		SetConfigValue(rConfig, _T("SizeA.Value"), m_ullSize1.Get());
 		SetConfigValue(rConfig, _T("SizeB.Use"), m_bUseSize2.Get());
-		SetConfigValue(rConfig, _T("SizeB.FilteringType"), m_eSizeCmpType2.Get());
+		SetConfigValue(rConfig, _T("SizeB.FilteringType"), MapEnum(m_eSizeCmpType2.Get()));
 		SetConfigValue(rConfig, _T("SizeB.Value"), m_ullSize2.Get());
 
 		SetConfigValue(rConfig, _T("DateA.Use"), m_bUseDateTime1.Get());
 		SetConfigValue(rConfig, _T("DateA.Type"), m_eDateType.Get());	// created/last modified/last accessed
-		SetConfigValue(rConfig, _T("DateA.FilteringType"), m_eDateCmpType1.Get());	// before/after
+		SetConfigValue(rConfig, _T("DateA.FilteringType"), MapEnum(m_eDateCmpType1.Get()));	// before/after
 		SetConfigValue(rConfig, _T("DateA.EnableDatePart"), m_bUseDate1.Get());
 		SetConfigValue(rConfig, _T("DateA.EnableTimePart"), m_bUseTime1.Get());
 		SetConfigValue(rConfig, _T("DateA.DateTimeValue"), m_tDateTime1.Get());
 
 		SetConfigValue(rConfig, _T("DateB.Type"), m_bUseDateTime2.Get());
-		SetConfigValue(rConfig, _T("DateB.FilteringType"), m_eDateCmpType2.Get());
+		SetConfigValue(rConfig, _T("DateB.FilteringType"), MapEnum(m_eDateCmpType2.Get()));
 		SetConfigValue(rConfig, _T("DateB.EnableDatePart"), m_bUseDate2.Get());
 		SetConfigValue(rConfig, _T("DateB.EnableTimePart"), m_bUseTime2.Get());
 		SetConfigValue(rConfig, _T("DateB.DateTimeValue"), m_tDateTime2.Get());
@@ -248,73 +250,56 @@ namespace chengine
 
 	void TFileFilter::ReadFromConfig(const TConfig& rConfig)
 	{
-		if (!GetConfigValue(rConfig, _T("IncludeMask.Use"), m_bUseMask.Modify()))
-			m_bUseMask = false;
+		m_bUseMask = GetConfigValueDef(rConfig, _T("IncludeMask.Use"), false);
 
 		TStringArray arrMask;
 		m_astrMask.Modify().Clear();
 		GetConfigValue(rConfig, _T("IncludeMask.MaskList.Mask"), arrMask);
 		m_astrMask.Modify().FromSerializedStringArray(arrMask);
 
-		if (!GetConfigValue(rConfig, _T("ExcludeMask.Use"), m_bUseExcludeMask.Modify()))
-			m_bUseExcludeMask = false;
+		m_bUseExcludeMask = GetConfigValueDef(rConfig, _T("ExcludeMask.Use"), false);
 
 		m_astrExcludeMask.Modify().Clear();
 		GetConfigValue(rConfig, _T("ExcludeMask.MaskList.Mask"), arrMask);
 		m_astrExcludeMask.Modify().FromSerializedStringArray(arrMask);
 
-		if (!GetConfigValue(rConfig, _T("SizeA.Use"), m_bUseSize1.Modify()))
-			m_bUseSize1 = false;
-		if (!GetConfigValue(rConfig, _T("SizeA.FilteringType"), *(int*)m_eSizeCmpType1.Modify()))
-			m_eSizeCmpType1 = eCmp_Equal;
-		if (!GetConfigValue(rConfig, _T("SizeA.Value"), m_ullSize1.Modify()))
-			m_ullSize1 = 0;
-		if (!GetConfigValue(rConfig, _T("SizeB.Use"), m_bUseSize2.Modify()))
-			m_bUseSize2 = false;
-		if (!GetConfigValue(rConfig, _T("SizeB.FilteringType"), *(int*)m_eSizeCmpType2.Modify()))
-			m_eSizeCmpType2 = eCmp_Equal;
-		if (!GetConfigValue(rConfig, _T("SizeB.Value"), m_ullSize2.Modify()))
-			m_ullSize2 = 0;
+		m_bUseSize1 = GetConfigValueDef(rConfig, _T("SizeA.Use"), false);
+		m_eSizeCmpType1 = UnmapEnum<ECompareType>(GetConfigValueDef(rConfig, _T("SizeA.FilteringType"), TString(L"eq")));
 
-		if (!GetConfigValue(rConfig, _T("DateA.Use"), m_bUseDateTime1.Modify()))
-			m_bUseDateTime1 = false;
+		m_ullSize1 = GetConfigValueDef(rConfig, _T("SizeA.Value"), 0);
 
-		if (!GetConfigValue(rConfig, _T("DateA.Type"), *(int*)m_eDateType.Modify()))	// created/last modified/last accessed
-			m_eDateType = eDateType_Created;
-		if (!GetConfigValue(rConfig, _T("DateA.FilteringType"), *(int*)m_eDateCmpType1.Modify()))	// before/after
-			m_eDateCmpType1 = eCmp_Equal;
-		if (!GetConfigValue(rConfig, _T("DateA.EnableDatePart"), m_bUseDate1.Modify()))
-			m_bUseDate1 = false;
-		if (!GetConfigValue(rConfig, _T("DateA.EnableTimePart"), m_bUseTime1.Modify()))
-			m_bUseTime1 = false;
+		m_bUseSize2 = GetConfigValueDef(rConfig, _T("SizeB.Use"), false);
+
+		m_eSizeCmpType2 = UnmapEnum<ECompareType>(GetConfigValueDef(rConfig, _T("SizeB.FilteringType"), TString(L"eq")));
+		m_ullSize2 = GetConfigValueDef(rConfig, _T("SizeB.Value"), 0);
+
+		m_bUseDateTime1 = GetConfigValueDef(rConfig, _T("DateA.Use"), false);
+
+		m_eDateType = UnmapEnum<EDateType>(GetConfigValueDef(rConfig, _T("DateA.Type"), TString(L"created")));
+
+		m_eDateCmpType1 = UnmapEnum<ECompareType>(GetConfigValueDef(rConfig, _T("DateA.FilteringType"), TString(L"eq")));
+
+		m_bUseDate1 = GetConfigValueDef(rConfig, _T("DateA.EnableDatePart"), false);
+		m_bUseTime1 = GetConfigValueDef(rConfig, _T("DateA.EnableTimePart"), false);
 
 		if (!GetConfigValue(rConfig, _T("DateA.DateTimeValue"), m_tDateTime1.Modify()))
 			m_tDateTime1.Modify().Clear();
 
-		if (!GetConfigValue(rConfig, _T("DateB.Type"), m_bUseDateTime2.Modify()))
-			m_bUseDateTime2 = false;
-		if (!GetConfigValue(rConfig, _T("DateB.FilteringType"), *(int*)m_eDateCmpType2.Modify()))
-			m_eDateCmpType2 = eCmp_Equal;
-		if (!GetConfigValue(rConfig, _T("DateB.EnableDatePart"), m_bUseDate2.Modify()))
-			m_bUseDate2 = false;
+		m_bUseDateTime2 = GetConfigValueDef(rConfig, _T("DateB.Type"), false);
+		m_eDateCmpType2 = UnmapEnum<ECompareType>(GetConfigValueDef(rConfig, _T("DateB.FilteringType"), TString(L"eq")));
+
+		m_bUseDate2 = GetConfigValueDef(rConfig, _T("DateB.EnableDatePart"), false);
 
 		if (!GetConfigValue(rConfig, _T("DateB.DateTimeValue"), m_tDateTime2.Modify()))
 			m_tDateTime2.Modify().Clear();
-		if (!GetConfigValue(rConfig, _T("DateB.EnableTimePart"), m_bUseTime2.Modify()))
-			m_bUseTime2 = false;
+		m_bUseTime2 = GetConfigValueDef(rConfig, _T("DateB.EnableTimePart"), false);
 
-		if (!GetConfigValue(rConfig, _T("Attributes.Use"), m_bUseAttributes.Modify()))
-			m_bUseAttributes = false;
-		if (!GetConfigValue(rConfig, _T("Attributes.Archive"), m_iArchive.Modify()))
-			m_iArchive = 0;
-		if (!GetConfigValue(rConfig, _T("Attributes.ReadOnly"), m_iReadOnly.Modify()))
-			m_iReadOnly = 0;
-		if (!GetConfigValue(rConfig, _T("Attributes.Hidden"), m_iHidden.Modify()))
-			m_iHidden = 0;
-		if (!GetConfigValue(rConfig, _T("Attributes.System"), m_iSystem.Modify()))
-			m_iSystem = 0;
-		if (!GetConfigValue(rConfig, _T("Attributes.Directory"), m_iDirectory.Modify()))
-			m_iDirectory = 0;
+		m_bUseAttributes = GetConfigValueDef(rConfig, _T("Attributes.Use"), false);
+		m_iArchive = GetConfigValueDef(rConfig, _T("Attributes.Archive"), 0);
+		m_iReadOnly = GetConfigValueDef(rConfig, _T("Attributes.ReadOnly"), 0);
+		m_iHidden = GetConfigValueDef(rConfig, _T("Attributes.Hidden"), 0);
+		m_iSystem = GetConfigValueDef(rConfig, _T("Attributes.System"), 0);
+		m_iDirectory = GetConfigValueDef(rConfig, _T("Attributes.Directory"), 0);
 	}
 
 	bool TFileFilter::Match(const TFileInfoPtr& spInfo) const
@@ -761,12 +746,12 @@ namespace chengine
 		m_ullSize2 = ullSize2;
 	}
 
-	TFileFilter::EDateType TFileFilter::GetDateType() const
+	EDateType TFileFilter::GetDateType() const
 	{
 		return m_eDateType;
 	}
 
-	void TFileFilter::SetDateType(TFileFilter::EDateType eDateType)
+	void TFileFilter::SetDateType(EDateType eDateType)
 	{
 		m_eDateType = eDateType;
 	}

@@ -3,6 +3,7 @@
 #include "../libstring/TString.h"
 #include "../libstring/TStringArray.h"
 #include "../libchcore/TPath.h"
+#include "EFeedbackResultMapper.h"
 
 using namespace serializer;
 using namespace string;
@@ -160,28 +161,25 @@ namespace chengine
 		SetConfigValue(rConfig, _T("ExcludeMask.Use"), m_bUseExcludeMask.Get());
 		SetConfigValue(rConfig, _T("ExcludeMask.MaskList.Mask"), m_spaExcludeMask.Get().ToSerializedStringArray());
 
-		SetConfigValue(rConfig, _T("Result"), m_eResult.Get());
+		SetConfigValue(rConfig, _T("Result"), MapEnum(m_eResult.Get()));
 	}
 
 	void FeedbackNotEnoughSpaceRule::ReadFromConfig(const TConfig& rConfig)
 	{
-		if(!GetConfigValue(rConfig, _T("IncludeMask.Use"), m_bUseMask.Modify()))
-			m_bUseMask = false;
+		m_bUseMask = GetConfigValueDef(rConfig, _T("IncludeMask.Use"), false);
 
 		TStringArray arrMask;
 		m_spaMask.Modify().Clear();
 		GetConfigValue(rConfig, _T("IncludeMask.MaskList.Mask"), arrMask);
 		m_spaMask.Modify().FromSerializedStringArray(arrMask);
 
-		if(!GetConfigValue(rConfig, _T("ExcludeMask.Use"), m_bUseExcludeMask.Modify()))
-			m_bUseExcludeMask = false;
+		m_bUseExcludeMask = GetConfigValueDef(rConfig, _T("ExcludeMask.Use"), false);
 
 		m_spaExcludeMask.Modify().Clear();
 		GetConfigValue(rConfig, _T("ExcludeMask.MaskList.Mask"), arrMask);
 		m_spaExcludeMask.Modify().FromSerializedStringArray(arrMask);
 
-		if(!GetConfigValue(rConfig, _T("Result"), *(int*)m_eResult.Modify()))
-			m_eResult = eResult_Unknown;
+		m_eResult = UnmapEnum<EFeedbackResult>(GetConfigValueDef(rConfig, _T("Result"), TString(L"unknown")));
 	}
 
 	bool FeedbackNotEnoughSpaceRule::HaveSameCondition(const FeedbackNotEnoughSpaceRule& rSrc) const

@@ -2,6 +2,8 @@
 #include "FeedbackAlreadyExistsRule.h"
 #include "../libstring/TString.h"
 #include "../libstring/TStringArray.h"
+#include "ECompareTypeMapper.h"
+#include "EFeedbackResultMapper.h"
 
 using namespace serializer;
 using namespace string;
@@ -211,43 +213,36 @@ namespace chengine
 		SetConfigValue(rConfig, _T("ExcludeMask.MaskList.Mask"), m_spaExcludeMask.Get().ToSerializedStringArray());
 
 		SetConfigValue(rConfig, _T("DateCompare.Use"), m_bUseDateCompare.Get());
-		SetConfigValue(rConfig, _T("DateCompare.CompareType"), m_cmpLastModified.Get());
+		SetConfigValue(rConfig, _T("DateCompare.CompareType"), MapEnum(m_cmpLastModified.Get()));
 
-		SetConfigValue(rConfig, _T("SizeCompare.Use"), m_bUseDateCompare.Get());
-		SetConfigValue(rConfig, _T("SizeCompare.CompareType"), m_cmpLastModified.Get());
+		SetConfigValue(rConfig, _T("SizeCompare.Use"), m_bUseSizeCompare.Get());
+		SetConfigValue(rConfig, _T("SizeCompare.CompareType"), MapEnum(m_cmpSize.Get()));
 
-		SetConfigValue(rConfig, _T("Result"), m_eResult.Get());
+		SetConfigValue(rConfig, _T("Result"), MapEnum(m_eResult.Get()));
 	}
 
 	void FeedbackAlreadyExistsRule::ReadFromConfig(const TConfig& rConfig)
 	{
-		if(!GetConfigValue(rConfig, _T("IncludeMask.Use"), m_bUseMask.Modify()))
-			m_bUseMask = false;
+		m_bUseMask = GetConfigValueDef(rConfig, _T("IncludeMask.Use"), false);
 
 		TStringArray arrMask;
 		m_spaMask.Modify().Clear();
 		GetConfigValue(rConfig, _T("IncludeMask.MaskList.Mask"), arrMask);
 		m_spaMask.Modify().FromSerializedStringArray(arrMask);
 
-		if(!GetConfigValue(rConfig, _T("ExcludeMask.Use"), m_bUseExcludeMask.Modify()))
-			m_bUseExcludeMask = false;
+		m_bUseExcludeMask = GetConfigValueDef(rConfig, _T("ExcludeMask.Use"), false);
 
 		m_spaExcludeMask.Modify().Clear();
 		GetConfigValue(rConfig, _T("ExcludeMask.MaskList.Mask"), arrMask);
 		m_spaExcludeMask.Modify().FromSerializedStringArray(arrMask);
 
-		if(!GetConfigValue(rConfig, _T("DateCompare.Use"), m_bUseDateCompare.Modify()))
-			m_bUseDateCompare = false;
-		if(!GetConfigValue(rConfig, _T("DateCompare.CompareType"), *(int*)m_cmpLastModified.Modify()))
-			m_cmpLastModified = eCmp_Equal;
+		m_bUseDateCompare = GetConfigValueDef(rConfig, _T("DateCompare.Use"), false);
+		m_cmpLastModified = UnmapEnum<ECompareType>(GetConfigValueDef(rConfig, _T("DateCompare.CompareType"), TString(L"equal")));
 
-		if(!GetConfigValue(rConfig, _T("SizeCompare.Use"), m_bUseSizeCompare.Modify()))
-			m_bUseSizeCompare = false;
-		if(!GetConfigValue(rConfig, _T("SizeCompare.CompareType"), *(int*)m_cmpSize.Modify()))
-			m_cmpSize = eCmp_Equal;
+		m_bUseSizeCompare = GetConfigValueDef(rConfig, _T("SizeCompare.Use"), false);
+		m_cmpSize = UnmapEnum<ECompareType>(GetConfigValueDef(rConfig, _T("SizeCompare.CompareType"), TString(L"equal")));
 
-		if(!GetConfigValue(rConfig, _T("Result"), *(int*)m_eResult.Modify()))
-			m_eResult = eResult_Unknown;
+		m_eResult = UnmapEnum<EFeedbackResult>(GetConfigValueDef(rConfig, _T("Result"), TString(L"unknown")));
 	}
 
 	bool FeedbackAlreadyExistsRule::HaveSameCondition(const FeedbackAlreadyExistsRule& rSrc) const

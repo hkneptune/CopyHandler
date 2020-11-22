@@ -426,6 +426,27 @@
     <ClInclude Include="FeedbackRules.h">
       <Filter>Source Files\Feedback</Filter>
     </ClInclude>
+    <ClInclude Include="ECompareTypeMapper.h">
+      <Filter>Source Files\Tools</Filter>
+    </ClInclude>
+    <ClInclude Include="EOperationTypesMapper.h">
+      <Filter>Source Files\Tools</Filter>
+    </ClInclude>
+    <ClInclude Include="EFeedbackResultMapper.h">
+      <Filter>Source Files\Tools</Filter>
+    </ClInclude>
+    <ClInclude Include="EFileErrorMapper.h">
+      <Filter>Source Files\Feedback\Error</Filter>
+    </ClInclude>
+    <ClInclude Include="EDateType.h">
+      <Filter>Source Files\Tools</Filter>
+    </ClInclude>
+    <ClInclude Include="EDateTypeMapper.h">
+      <Filter>Source Files\Tools</Filter>
+    </ClInclude>
+    <ClInclude Include="EOperationEventMapper.h">
+      <Filter>Source Files\Feedback\OperationEvent</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="TSubTaskArray.cpp">
@@ -730,6 +751,24 @@
     </ClCompile>
     <ClCompile Include="FeedbackRules.cpp">
       <Filter>Source Files\Feedback</Filter>
+    </ClCompile>
+    <ClCompile Include="ECompareTypeMapper.cpp">
+      <Filter>Source Files\Tools</Filter>
+    </ClCompile>
+    <ClCompile Include="EOperationTypesMapper.cpp">
+      <Filter>Source Files\Tools</Filter>
+    </ClCompile>
+    <ClCompile Include="EFeedbackResultMapper.cpp">
+      <Filter>Source Files\Tools</Filter>
+    </ClCompile>
+    <ClCompile Include="EFileErrorMapper.cpp">
+      <Filter>Source Files\Feedback\Error</Filter>
+    </ClCompile>
+    <ClCompile Include="EDateTypeMapper.cpp">
+      <Filter>Source Files\Tools</Filter>
+    </ClCompile>
+    <ClCompile Include="EOperationEventMapper.cpp">
+      <Filter>Source Files\Feedback\OperationEvent</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -25,6 +25,7 @@
 #include "../libserializer/TSharedModificationTracker.h"
 #include "ECompareType.h"
 #include "../libserializer/SerializableObject.h"
+#include "EDateType.h"
 
 namespace chengine
 {
@@ -73,14 +74,6 @@ namespace chengine
 #pragma warning(disable: 4251)
 	class LIBCHENGINE_API TFileFilter : public serializer::SerializableObject<FileFilterEnum::eMod_Last, FileFilterEnum::eMod_Added>
 	{
-	public:
-		enum EDateType
-		{
-			eDateType_Created = 0,
-			eDateType_Modified = 1,
-			eDateType_LastAccessed = 2
-		};
-
 	public:
 		TFileFilter();
 		TFileFilter(const TFileFilter& rFilter);
@@ -142,8 +135,8 @@ namespace chengine
 		void SetSize2(unsigned long long ullSize2);
 
 		// dates
-		TFileFilter::EDateType GetDateType() const;
-		void SetDateType(TFileFilter::EDateType eDateType);
+		EDateType GetDateType() const;
+		void SetDateType(EDateType eDateType);
 
 		// date 1
 		bool GetUseDateTime1() const;
