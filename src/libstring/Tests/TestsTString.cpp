@@ -549,6 +549,15 @@ TEST(TStringTests, Replace_WithPtrToString)
 	EXPECT_EQ(strValue, _T("Some song"));
 }
 
+TEST(TStringTests, Replace_MultipleTimes)
+{
+	TString strValue(_T("Soome stering"));
+	strValue.Replace(_T("o"), _T("xyz"));
+	strValue.Replace(_T("e"), _T("abc"));
+
+	EXPECT_EQ(strValue, _T("Sxyzxyzmabc stabcring"));
+}
+
 TEST(TStringTests, Replace_EmptyStringWithPtrToString)
 {
 	TString strValue;

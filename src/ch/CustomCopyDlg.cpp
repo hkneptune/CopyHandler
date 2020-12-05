@@ -1,21 +1,21 @@
-/***************************************************************************
-*   Copyright (C) 2001-2008 by Józef Starosczyk                           *
-*   ixen@copyhandler.com                                                  *
-*                                                                         *
-*   This program is free software; you can redistribute it and/or modify  *
-*   it under the terms of the GNU Library General Public License          *
-*   (version 2) as published by the Free Software Foundation;             *
-*                                                                         *
-*   This program is distributed in the hope that it will be useful,       *
-*   but WITHOUT ANY WARRANTY; without even the implied warranty of        *
-*   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
-*   GNU General Public License for more details.                          *
-*                                                                         *
-*   You should have received a copy of the GNU Library General Public     *
-*   License along with this program; if not, write to the                 *
-*   Free Software Foundation, Inc.,                                       *
-*   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
-***************************************************************************/
+// ============================================================================
+//  Copyright (C) 2001-2020 by Jozef Starosczyk
+//  ixen {at} copyhandler [dot] com
+//
+//  This program is free software; you can redistribute it and/or modify
+//  it under the terms of the GNU Library General Public License
+//  (version 2) as published by the Free Software Foundation;
+//
+//  This program is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU General Public License for more details.
+//
+//  You should have received a copy of the GNU Library General Public
+//  License along with this program; if not, write to the
+//  Free Software Foundation, Inc.,
+//  59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+// ============================================================================
 #include "stdafx.h"
 #include <boost/shared_array.hpp>
 #include "resource.h"
@@ -29,6 +29,7 @@
 #include "CfgProperties.h"
 #include "../libchengine/TTaskDefinition.h"
 #include "../libchengine/TTaskConfigBufferSizes.h"
+#include "RuleEditDlg.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -36,9 +37,8 @@
 static char THIS_FILE[] = __FILE__;
 #endif
 
-/////////////////////////////////////////////////////////////////////////////
-// CCustomCopyDlg dialog
-
+using namespace chengine;
+using namespace string;
 
 CCustomCopyDlg::CCustomCopyDlg() :
 	ictranslate::CLanguageDialog(IDD_CUSTOM_COPY_DIALOG)
@@ -55,23 +55,21 @@ CCustomCopyDlg::CCustomCopyDlg(const chengine::TTaskDefinition& rTaskDefinition)
 void CCustomCopyDlg::DoDataExchange(CDataExchange* pDX)
 {
 	CLanguageDialog::DoDataExchange(pDX);
-	//{{AFX_DATA_MAP(CCustomCopyDlg)
+
 	DDX_Control(pDX, IDC_DESTPATH_COMBOBOXEX, m_ctlDstPath);
 	DDX_Control(pDX, IDC_FILTERS_LIST, m_ctlFilters);
 	DDX_Control(pDX, IDC_BUFFERSIZES_LIST, m_ctlBufferSizes);
 	DDX_Control(pDX, IDC_OPERATION_COMBO, m_ctlOperation);
 	DDX_Control(pDX, IDC_PRIORITY_COMBO, m_ctlPriority);
 	DDX_Control(pDX, IDC_FILES_LIST, m_ctlFiles);
+	DDX_Control(pDX, IDC_FEEDBACK_RULES_SUMMARY_EDIT, m_ctlFeedbackRules);
 	DDX_Check(pDX, IDC_ONLYSTRUCTURE_CHECK, m_bOnlyCreate);
 	DDX_Check(pDX, IDC_IGNOREFOLDERS_CHECK, m_bIgnoreFolders);
 	DDX_Check(pDX, IDC_FORCEDIRECTORIES_CHECK, m_bForceDirectories);
-	DDX_Check(pDX, IDC_FILTERS_CHECK, m_bFilters);
-	DDX_Check(pDX, IDC_ADVANCED_CHECK, m_bAdvanced);
-	//}}AFX_DATA_MAP
+	DDX_Check(pDX, IDC_DONT_CREATE_EMPTY_DIRECTORIES_CHECK, m_bExcludeEmptyDirectories);
 }
 
-BEGIN_MESSAGE_MAP(CCustomCopyDlg,ictranslate::CLanguageDialog)
-	//{{AFX_MSG_MAP(CCustomCopyDlg)
+BEGIN_MESSAGE_MAP(CCustomCopyDlg, ictranslate::CLanguageDialog)
 	ON_BN_CLICKED(IDC_ADDDIR_BUTTON, OnAddDirectoryButton)
 	ON_BN_CLICKED(IDC_ADDFILE_BUTTON, OnAddFilesButton)
 	ON_BN_CLICKED(IDC_REMOVEFILEFOLDER_BUTTON, OnRemoveButton)
@@ -80,18 +78,16 @@ BEGIN_MESSAGE_MAP(CCustomCopyDlg,ictranslate::CLanguageDialog)
 	ON_BN_CLICKED(IDC_ADDFILTER_BUTTON, OnAddfilterButton)
 	ON_BN_CLICKED(IDC_REMOVEFILTER_BUTTON, OnRemovefilterButton)
 	ON_WM_DESTROY()
-	ON_BN_CLICKED(IDC_FILTERS_CHECK, OnFiltersCheck)
-	ON_BN_CLICKED(IDC_STANDARD_CHECK, OnStandardCheck)
-	ON_BN_CLICKED(IDC_ADVANCED_CHECK, OnAdvancedCheck)
 	ON_NOTIFY(NM_DBLCLK, IDC_FILTERS_LIST, OnDblclkFiltersList)
 	ON_LBN_DBLCLK(IDC_BUFFERSIZES_LIST, OnDblclkBuffersizesList)
 	ON_CBN_EDITCHANGE(IDC_DESTPATH_COMBOBOXEX, OnEditchangeDestpathComboboxex)
 	ON_BN_CLICKED(IDC_IMPORT_BUTTON, OnImportButton)
 	ON_BN_CLICKED(IDC_IGNOREFOLDERS_CHECK, OnIgnorefoldersCheck)
 	ON_BN_CLICKED(IDC_FORCEDIRECTORIES_CHECK, OnForcedirectoriesCheck)
+	ON_BN_CLICKED(IDC_DONT_CREATE_EMPTY_DIRECTORIES_CHECK, OnExcludeEmptyDirectories)
 	ON_BN_CLICKED(IDC_EXPORT_BUTTON, OnExportButtonClicked)
+	ON_BN_CLICKED(IDC_CUSTOM_RULES_BUTTON, OnBnCustomRules)
 	ON_WM_SIZE()
-	//}}AFX_MSG_MAP
 END_MESSAGE_MAP()
 
 /////////////////////////////////////////////////////////////////////////////
@@ -104,45 +100,54 @@ BOOL CCustomCopyDlg::OnInitDialog()
 	HICON hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
 	SetIcon(hIcon, FALSE);
 
-	AddResizableControl(IDC_001_STATIC, 0.0, 0.0, 1.0, 0.0);
+	AddResizableControl(IDC_HDR_SOURCE_FILES_STATIC, 0.0, 0.0, 1.0, 0.0);
 	AddResizableControl(IDC_FILES_LIST, 0.0, 0.0, 1.0, 0.5);
 	AddResizableControl(IDC_ADDFILE_BUTTON, 1.0, 0.0, 0.0, 0.0);
 	AddResizableControl(IDC_ADDDIR_BUTTON, 1.0, 0.0, 0.0, 0.0);
 	AddResizableControl(IDC_REMOVEFILEFOLDER_BUTTON, 1.0, 0.0, 0.0, 0.0);
 	AddResizableControl(IDC_IMPORT_BUTTON, 1.0, 0.0, 0.0, 0.0);
 
-	AddResizableControl(IDC_002_STATIC, 0.0, 0.5, 1.0, 0.0);
+	AddResizableControl(IDC_HDR_DESTIONATION_PATH_STATIC, 0.0, 0.5, 1.0, 0.0);
 	AddResizableControl(IDC_DESTPATH_COMBOBOXEX, 0.0, 0.5, 1.0, 0.0);
 	AddResizableControl(IDC_DESTBROWSE_BUTTON, 1.0, 0.5, 0.0, 0.0);
 
-	AddResizableControl(IDC_BAR1_STATIC, 0.0, 0.5, 0.5, 0.0);
-	AddResizableControl(IDC_007_STATIC, 0.5, 0.5, 0.0, 0.0);
-	AddResizableControl(IDC_BAR2_STATIC, 0.5, 0.5, 0.5, 0.0);
+	AddResizableControl(IDC_LEFT_STANDARD_OPTIONS_STATIC, 0.0, 0.5, 0.5, 0.0);
+	AddResizableControl(IDC_HDR_STANDARD_OPTIONS_STATIC, 0.5, 0.5, 0.0, 0.0);
+	AddResizableControl(IDC_RIGHT_STANDARD_OPTIONS_STATIC, 0.5, 0.5, 0.5, 0.0);
 	
-	AddResizableControl(IDC_003_STATIC, 0.0, 0.5, 0.5, 0.0);
-	AddResizableControl(IDC_004_STATIC, 0.5, 0.5, 0.5, 0.0);
+	AddResizableControl(IDC_HDR_OPERATION_TYPE_STATIC, 0.0, 0.5, 0.5, 0.0);
+	AddResizableControl(IDC_HDR_PRIORITY_STATIC, 0.5, 0.5, 0.5, 0.0);
 
 	AddResizableControl(IDC_OPERATION_COMBO, 0.0, 0.5, 0.5, 0.0);
 	AddResizableControl(IDC_PRIORITY_COMBO, 0.5, 0.5, 0.5, 0.0);
 
-	AddResizableControl(IDC_006_STATIC, 0.0, 0.5, 1.0, 0.0);
+	AddResizableControl(IDC_HDR_BUFFER_SIZES_STATIC, 0.0, 0.5, 1.0, 0.0);
 	AddResizableControl(IDC_BUFFERSIZES_LIST, 0.0, 0.5, 1.0, 0.0);
 	AddResizableControl(IDC_BUFFERSIZES_BUTTON, 1.0, 0.5, 0.0, 0.0);
 
-	AddResizableControl(IDC_FILTERS_CHECK, 0.0, 0.5, 0.0, 0.0);
-	AddResizableControl(IDC_BAR3_STATIC, 0.0, 0.5, 1.0, 0.0);
+	AddResizableControl(IDC_LEFT_FILTERS_STATIC, 0.0, 0.5, 0.0, 0.0);
+	AddResizableControl(IDC_HDR_FILTERS_STATIC, 0.0, 0.5, 0.0, 0.0);
+	AddResizableControl(IDC_RIGHT_FILTERS_STATIC, 0.0, 0.5, 1.0, 0.0);
 	AddResizableControl(IDC_FILTERS_LIST, 0.0, 0.5, 1.0, 0.5);
 	AddResizableControl(IDC_ADDFILTER_BUTTON, 1.0, 0.5, 0.0, 0.0);
 	AddResizableControl(IDC_REMOVEFILTER_BUTTON, 1.0, 0.5, 0.0, 0.0);
 
-	AddResizableControl(IDC_ADVANCED_CHECK, 0.0, 1.0, 0.0, 0.0);
-	AddResizableControl(IDC_BAR4_STATIC, 0.0, 1.0, 1.0, 0.0);
+	AddResizableControl(IDC_LEFT_FEEDBACK_RULES_STATIC, 0.0, 1.0, 0.0, 0.0);
+	AddResizableControl(IDC_HDR_FEEDBACK_RULES_STATIC, 0.0, 1.0, 0.0, 0.0);
+	AddResizableControl(IDC_RIGHT_FEEDBACK_RULES_STATIC, 0.0, 1.0, 1.0, 0.0);
+	AddResizableControl(IDC_FEEDBACK_RULES_SUMMARY_EDIT, 0.0, 1.0, 1.0, 0.0);
+	AddResizableControl(IDC_CUSTOM_RULES_BUTTON, 1.0, 1.0, 0.0, 0.0);
+
+	AddResizableControl(IDC_LEFT_ADVANCED_OPTIONS_STATIC, 0.0, 1.0, 0.0, 0.0);
+	AddResizableControl(IDC_HDR_ADVANCED_OPTIONS_STATIC, 0.0, 1.0, 0.0, 0.0);
+	AddResizableControl(IDC_RIGHT_ADVANCED_OPTIONS_STATIC, 0.0, 1.0, 1.0, 0.0);
 
 	AddResizableControl(IDC_IGNOREFOLDERS_CHECK, 0.0, 1.0, 1.0, 0.0);
 	AddResizableControl(IDC_ONLYSTRUCTURE_CHECK, 0.0, 1.0, 1.0, 0.0);
 	AddResizableControl(IDC_FORCEDIRECTORIES_CHECK, 0.0, 1.0, 1.0, 0.0);
+	AddResizableControl(IDC_DONT_CREATE_EMPTY_DIRECTORIES_CHECK, 0.0, 1.0, 1.0, 0.0);
 
-	AddResizableControl(IDC_BAR5_STATIC, 0.0, 1.0, 1.0, 0.0);
+	AddResizableControl(IDC_BOTTOM_BAR_STATIC, 0.0, 1.0, 1.0, 0.0);
 	AddResizableControl(IDOK, 1.0, 1.0, 0.0, 0.0);
 	AddResizableControl(IDCANCEL, 1.0, 1.0, 0.0, 0.0);
 	AddResizableControl(IDC_EXPORT_BUTTON, 0.0, 1.0, 0.0, 0.0);
@@ -273,15 +278,15 @@ BOOL CCustomCopyDlg::OnInitDialog()
 	lvc.cx=static_cast<int>(0.1*rc.Width());
 	m_ctlFilters.InsertColumn(6, &lvc);
 
-	m_bFilters = !m_tTaskDefinition.GetFilters().IsEmpty();
-
 	// other custom flags
 	m_bIgnoreFolders = chengine::GetTaskPropValue<chengine::eTO_IgnoreDirectories>(m_tTaskDefinition.GetConfiguration());
 	m_bForceDirectories = chengine::GetTaskPropValue<chengine::eTO_CreateDirectoriesRelativeToRoot>(m_tTaskDefinition.GetConfiguration());
+	m_bExcludeEmptyDirectories = chengine::GetTaskPropValue<chengine::eTO_ExcludeEmptyDirectories>(m_tTaskDefinition.GetConfiguration());
 	m_bOnlyCreate = chengine::GetTaskPropValue<chengine::eTO_CreateEmptyFiles>(m_tTaskDefinition.GetConfiguration());
-	m_bAdvanced = (m_bIgnoreFolders | m_bForceDirectories | m_bOnlyCreate);
 
 	UpdateData(FALSE);
+
+	UpdateFeedbackRulesEdit();
 
 	EnableControls();
 
@@ -375,9 +380,11 @@ void CCustomCopyDlg::OnLanguageChanged()
 		const chengine::TFileFilter& rFilter = afFilters.GetAt(stIndex);
 		AddFilter(rFilter, boost::numeric_cast<int>(stIndex));
 	}
+
+	UpdateFeedbackRulesEdit();
 }
 
-void CCustomCopyDlg::OnAddDirectoryButton() 
+void CCustomCopyDlg::OnAddDirectoryButton()
 {
 	CString strPath;
 	if (BrowseForFolder(GetResManager().LoadString(IDS_BROWSE_STRING), &strPath))
@@ -716,28 +723,9 @@ void CCustomCopyDlg::EnableControls()
 {
 	UpdateData(TRUE);
 
-	m_ctlFilters.EnableWindow(m_bFilters);
-	GetDlgItem(IDC_ADDFILTER_BUTTON)->EnableWindow(m_bFilters);
-	GetDlgItem(IDC_REMOVEFILTER_BUTTON)->EnableWindow(m_bFilters);
-	
-	GetDlgItem(IDC_IGNOREFOLDERS_CHECK)->EnableWindow(m_bAdvanced && !m_bForceDirectories);
-	GetDlgItem(IDC_FORCEDIRECTORIES_CHECK)->EnableWindow(m_bAdvanced && !m_bIgnoreFolders);
-	GetDlgItem(IDC_ONLYSTRUCTURE_CHECK)->EnableWindow(m_bAdvanced);
-}
-
-void CCustomCopyDlg::OnFiltersCheck() 
-{
-	EnableControls();
-}
-
-void CCustomCopyDlg::OnStandardCheck() 
-{
-	EnableControls();
-}
-
-void CCustomCopyDlg::OnAdvancedCheck() 
-{
-	EnableControls();
+	GetDlgItem(IDC_IGNOREFOLDERS_CHECK)->EnableWindow(!m_bForceDirectories && !m_bExcludeEmptyDirectories);
+	GetDlgItem(IDC_FORCEDIRECTORIES_CHECK)->EnableWindow(!m_bIgnoreFolders);
+	GetDlgItem(IDC_DONT_CREATE_EMPTY_DIRECTORIES_CHECK)->EnableWindow(!m_bIgnoreFolders);
 }
 
 void CCustomCopyDlg::OnDblclkFiltersList(NMHDR* /*pNMHDR*/, LRESULT* pResult) 
@@ -938,6 +926,23 @@ void CCustomCopyDlg::OnForcedirectoriesCheck()
 	UpdateData(TRUE);
 
 	GetDlgItem(IDC_IGNOREFOLDERS_CHECK)->EnableWindow(!m_bForceDirectories);
+	if(m_bForceDirectories)
+	{
+		m_bIgnoreFolders = FALSE;
+		UpdateData(FALSE);
+	}
+}
+
+void CCustomCopyDlg::OnExcludeEmptyDirectories()
+{
+	UpdateData(TRUE);
+
+	GetDlgItem(IDC_IGNOREFOLDERS_CHECK)->EnableWindow(!m_bExcludeEmptyDirectories);
+	if(m_bExcludeEmptyDirectories)
+	{
+		m_bIgnoreFolders = FALSE;
+		UpdateData(FALSE);
+	}
 }
 
 void CCustomCopyDlg::OnIgnorefoldersCheck()
@@ -945,6 +950,14 @@ void CCustomCopyDlg::OnIgnorefoldersCheck()
 	UpdateData(TRUE);
 
 	GetDlgItem(IDC_FORCEDIRECTORIES_CHECK)->EnableWindow(!m_bIgnoreFolders);
+	GetDlgItem(IDC_DONT_CREATE_EMPTY_DIRECTORIES_CHECK)->EnableWindow(!m_bIgnoreFolders);
+
+	if(m_bIgnoreFolders)
+	{
+		m_bForceDirectories = FALSE;
+		m_bExcludeEmptyDirectories = FALSE;
+		UpdateData(FALSE);
+	}
 }
 
 void CCustomCopyDlg::OnExportButtonClicked()
@@ -1002,12 +1015,16 @@ void CCustomCopyDlg::UpdateInternalTaskDefinition()
 	// operation type
 	m_tTaskDefinition.SetOperationType(m_ctlOperation.GetCurSel() == 0 ? chengine::eOperation_Copy : chengine::eOperation_Move);
 
+	// feedback rules
+	m_tTaskDefinition.SetFeedbackRules(m_rules);
+
 	// priority
 	chengine::SetTaskPropValue<chengine::eTO_ThreadPriority>(m_tTaskDefinition.GetConfiguration(), IndexToPriority(m_ctlPriority.GetCurSel()));
 
 	chengine::SetTaskPropValue<chengine::eTO_IgnoreDirectories>(m_tTaskDefinition.GetConfiguration(), (m_bIgnoreFolders != 0));
 	chengine::SetTaskPropValue<chengine::eTO_CreateDirectoriesRelativeToRoot>(m_tTaskDefinition.GetConfiguration(), (m_bForceDirectories != 0));
 	chengine::SetTaskPropValue<chengine::eTO_CreateEmptyFiles>(m_tTaskDefinition.GetConfiguration(), (m_bOnlyCreate != 0));
+	chengine::SetTaskPropValue<chengine::eTO_ExcludeEmptyDirectories>(m_tTaskDefinition.GetConfiguration(), (m_bExcludeEmptyDirectories != 0));
 }
 
 bool CCustomCopyDlg::HasBasicTaskData()
@@ -1042,4 +1059,40 @@ void CCustomCopyDlg::OnSize(UINT nType, int /*cx*/, int /*cy*/)
 		if(pWnd)
 			UpdateFilesListCtrlHeaderWidth();
 	}
+}
+
+void CCustomCopyDlg::UpdateFeedbackRulesEdit()
+{
+	TString strText;
+	if(m_rules.IsEmpty())
+	{
+		strText = GetResManager().LoadString(IDS_RULES_EMPTY_STRING);
+	}
+	else
+	{
+		size_t stAlreadyExists = m_rules.GetAlreadyExistsRules().GetCount();
+		size_t stError = m_rules.GetErrorRules().GetCount();
+		size_t stNotEnougSpace = m_rules.GetNotEnoughSpaceRules().GetCount();
+
+		ictranslate::CFormat fmt;
+
+		fmt.SetFormat(GetResManager().LoadString(IDS_RULES_NON_EMPTY_STRING));
+		fmt.SetParam(_T("%exists"), stAlreadyExists);
+		fmt.SetParam(_T("%error"), stError);
+		fmt.SetParam(_T("%space"), stNotEnougSpace);
+		strText = fmt.ToString();
+	}
+
+	m_ctlFeedbackRules.SetWindowTextW(strText.c_str());
+}
+
+void CCustomCopyDlg::OnBnCustomRules()
+{
+	RuleEditDlg dlg(m_rules);
+	if(dlg.DoModal() == IDOK)
+	{
+		m_rules = dlg.GetRules();
+	}
+
+	UpdateFeedbackRulesEdit();
 }

@@ -58,6 +58,12 @@
     <Filter Include="Source Files\GUI\Dialogs\Feedback">
       <UniqueIdentifier>{7a5ae1dd-a331-406c-a572-4997184a5725}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\GUI\Dialogs\Feedback rule editor">
+      <UniqueIdentifier>{8c3e3738-a438-429e-8ad7-0dc13303f711}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\GUI\Utils">
+      <UniqueIdentifier>{706a4df6-9c2d-4ee9-aef5-b0ff6d19d94d}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Common\ipcstructs.h">
@@ -103,9 +109,6 @@
       <Filter>Source Files\Main</Filter>
     </ClInclude>
     <ClInclude Include="MainWnd.h">
-      <Filter>Source Files\GUI</Filter>
-    </ClInclude>
-    <ClInclude Include="MemDC.h">
       <Filter>Source Files\GUI</Filter>
     </ClInclude>
     <ClInclude Include="Theme Helpers.h">
@@ -254,6 +257,24 @@
     </ClInclude>
     <ClInclude Include="resource.h">
       <Filter>Resource Files</Filter>
+    </ClInclude>
+    <ClInclude Include="RuleEditAlreadyExistsDlg.h">
+      <Filter>Source Files\GUI\Dialogs\Feedback rule editor</Filter>
+    </ClInclude>
+    <ClInclude Include="RuleEditDlg.h">
+      <Filter>Source Files\GUI\Dialogs\Feedback rule editor</Filter>
+    </ClInclude>
+    <ClInclude Include="RuleEditErrorDlg.h">
+      <Filter>Source Files\GUI\Dialogs\Feedback rule editor</Filter>
+    </ClInclude>
+    <ClInclude Include="RuleEditNotEnoughSpaceDlg.h">
+      <Filter>Source Files\GUI\Dialogs\Feedback rule editor</Filter>
+    </ClInclude>
+    <ClInclude Include="ComboDataWrapper.h">
+      <Filter>Source Files\GUI\Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="FilterTypesMenuWrapper.h">
+      <Filter>Source Files\GUI\Utils</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -436,6 +457,21 @@
     </ClCompile>
     <ClCompile Include="AppAutorun.cpp">
       <Filter>Source Files\Tools</Filter>
+    </ClCompile>
+    <ClCompile Include="RuleEditAlreadyExistsDlg.cpp">
+      <Filter>Source Files\GUI\Dialogs\Feedback rule editor</Filter>
+    </ClCompile>
+    <ClCompile Include="RuleEditDlg.cpp">
+      <Filter>Source Files\GUI\Dialogs\Feedback rule editor</Filter>
+    </ClCompile>
+    <ClCompile Include="RuleEditErrorDlg.cpp">
+      <Filter>Source Files\GUI\Dialogs\Feedback rule editor</Filter>
+    </ClCompile>
+    <ClCompile Include="RuleEditNotEnoughSpaceDlg.cpp">
+      <Filter>Source Files\GUI\Dialogs\Feedback rule editor</Filter>
+    </ClCompile>
+    <ClCompile Include="FilterTypesMenuWrapper.cpp">
+      <Filter>Source Files\GUI\Utils</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

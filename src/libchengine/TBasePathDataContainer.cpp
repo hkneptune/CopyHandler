@@ -83,6 +83,7 @@ namespace chengine
 
 			spPathData->Load(spRowReader);
 
+			m_oidLastObjectID = std::max(m_oidLastObjectID, spPathData->GetObjectID());
 			m_vEntries.push_back(spPathData);
 		}
 	}
@@ -91,6 +92,7 @@ namespace chengine
 	{
 		boost::unique_lock<boost::shared_mutex> lock(m_lock);
 		spEntry->SetObjectID(++m_oidLastObjectID);
+		spEntry->MarkAsAdded();
 		m_vEntries.push_back(spEntry);
 	}
 

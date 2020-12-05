@@ -154,7 +154,7 @@ namespace chengine
 		}
 	}
 
-	TSubTaskBase::ESubOperationResult TSubTasksArray::Execute(const IFeedbackHandlerPtr& spFeedbackHandler, bool bRunOnlyEstimationSubTasks)
+	TSubTaskBase::ESubOperationResult TSubTasksArray::Execute(bool bRunOnlyEstimationSubTasks)
 	{
 		TSubTaskBase::ESubOperationResult eResult = TSubTaskBase::eSubResult_Continue;
 
@@ -175,7 +175,7 @@ namespace chengine
 				break;
 			}
 
-			eResult = spCurrentSubTask->Exec(spFeedbackHandler);
+			eResult = spCurrentSubTask->Exec();
 			if (eResult != TSubTaskBase::eSubResult_Continue)
 				break;
 

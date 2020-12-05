@@ -18,7 +18,6 @@
 ***************************************************************************/
 #include "stdafx.h"
 #include "ThemedButton.h"
-#include "MemDC.h"
 #include "Theme helpers.h"
 
 #ifdef _DEBUG
@@ -64,7 +63,7 @@ END_MESSAGE_MAP()
 void CThemedButton::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct) 
 {
 	CDC* pDC=CDC::FromHandle(lpDrawItemStruct->hDC);
-	CMemDC memdc(pDC, &lpDrawItemStruct->rcItem);
+	CMemDC memdc(*pDC, &lpDrawItemStruct->rcItem);
 	
 	bool bPushed=(lpDrawItemStruct->itemState & ODS_SELECTED);
 	CRect rcItem=lpDrawItemStruct->rcItem;
@@ -75,13 +74,13 @@ void CThemedButton::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
 	{
 		HTHEME ht=uxTheme.OpenThemeData(lpDrawItemStruct->hwndItem, L"TOOLBAR");
 		
-		uxTheme.DrawThemeParentBackground(lpDrawItemStruct->hwndItem, memdc.GetSafeHdc(), &rcItem);
-		uxTheme.DrawThemeBackground(ht, memdc.GetSafeHdc(), TP_BUTTON, bPushed ? TS_PRESSED : (m_bHovering ? TS_HOT : TS_NORMAL), &rcItem, nullptr);
+		uxTheme.DrawThemeParentBackground(lpDrawItemStruct->hwndItem, memdc.GetDC().GetSafeHdc(), &rcItem);
+		uxTheme.DrawThemeBackground(ht, memdc.GetDC().GetSafeHdc(), TP_BUTTON, bPushed ? TS_PRESSED : (m_bHovering ? TS_HOT : TS_NORMAL), &rcItem, nullptr);
 		
 		uxTheme.CloseThemeData(ht);
 	}
 	else
-		DrawFrameControl(memdc.GetSafeHdc(), &rcItem, DFC_BUTTON, DFCS_ADJUSTRECT | DFCS_BUTTONPUSH | (bPushed ? DFCS_PUSHED : 0));
+		DrawFrameControl(memdc.GetDC().GetSafeHdc(), &rcItem, DFC_BUTTON, DFCS_ADJUSTRECT | DFCS_BUTTONPUSH | (bPushed ? DFCS_PUSHED : 0));
 
 	ASSERT(m_pilList);	// make sure the image list exist
 	if(m_pilList)
@@ -91,7 +90,7 @@ void CThemedButton::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
 
 		CRect rcBtn;
 		GetClientRect(&rcBtn);
-		m_pilList->Draw(&memdc, m_iIndex, CPoint( ((rcBtn.Width()-cx)/2)+(bPushed ? 1 : 0), (rcBtn.Height()-cy)/2+(bPushed ? 1 : 0)), ILD_TRANSPARENT);
+		m_pilList->Draw(&memdc.GetDC(), m_iIndex, CPoint( ((rcBtn.Width()-cx)/2)+(bPushed ? 1 : 0), (rcBtn.Height()-cy)/2+(bPushed ? 1 : 0)), ILD_TRANSPARENT);
 	}
 }
 

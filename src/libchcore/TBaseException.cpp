@@ -24,7 +24,7 @@ namespace chcore
 {
 	TBaseException::TBaseException(EGeneralErrors eErrorCode, const wchar_t* pszMsg, const wchar_t* pszFile, size_t stLineNumber, const wchar_t* pszFunction) :
 		m_eErrorCode(eErrorCode),
-		m_pszMsg(pszMsg),
+		m_strMsg(pszMsg ? pszMsg : L""),
 		m_pszFile(pszFile),
 		m_pszFunction(pszFunction),
 		m_stLineNumber(stLineNumber)
@@ -39,14 +39,14 @@ namespace chcore
 	void TBaseException::GetErrorInfo(wchar_t* pszBuffer, size_t stMaxBuffer) const
 	{
 		_snwprintf_s(pszBuffer, stMaxBuffer, _TRUNCATE, _T("%s (error code: %d)"),
-			m_pszMsg, m_eErrorCode);
+			m_strMsg.c_str(), m_eErrorCode);
 		pszBuffer[stMaxBuffer - 1] = _T('\0');
 	}
 
 	void TBaseException::GetDetailedErrorInfo(wchar_t* pszBuffer, size_t stMaxBuffer) const
 	{
 		_snwprintf_s(pszBuffer, stMaxBuffer, _TRUNCATE, _T("%s\r\nError code: %d\r\nFile: %s\r\nFunction: %s\r\nLine no: %lu"),
-			m_pszMsg, m_eErrorCode, m_pszFile, m_pszFunction, (unsigned long)m_stLineNumber);
+			m_strMsg.c_str(), m_eErrorCode, m_pszFile, m_pszFunction, (unsigned long)m_stLineNumber);
 		pszBuffer[stMaxBuffer - 1] = _T('\0');
 	}
 }

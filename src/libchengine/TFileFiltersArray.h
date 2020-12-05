@@ -21,6 +21,7 @@
 
 #include "TFileFilter.h"
 #include "../libserializer/TRemovedObjects.h"
+#include "../libserializer/SerializableContainer.h"
 
 namespace chengine
 {
@@ -28,39 +29,19 @@ namespace chengine
 	class TFileInfo;
 	typedef std::shared_ptr<TFileInfo> TFileInfoPtr;
 
-	class LIBCHENGINE_API TFileFiltersArray
+#pragma warning(push)
+#pragma warning(disable: 4251)
+	class LIBCHENGINE_API TFileFiltersArray :  public serializer::SerializableContainer<TFileFilter>
 	{
 	public:
-		TFileFiltersArray();
-		~TFileFiltersArray();
-
 		bool Match(const TFileInfoPtr& spInfo) const;
 
 		void StoreInConfig(TConfig& rConfig, PCTSTR pszNodeName) const;
 		bool ReadFromConfig(const TConfig& rConfig, PCTSTR pszNodeName);
 
-		void Store(const serializer::ISerializerContainerPtr& spContainer) const;
-		void Load(const serializer::ISerializerContainerPtr& spContainer);
-
-		void InitColumns(const serializer::ISerializerContainerPtr& spContainer) const;
-
-		bool IsEmpty() const;
-
-		void Add(const TFileFilter& rFilter);
-		bool SetAt(size_t stIndex, const TFileFilter& rNewFilter);
-		const TFileFilter& GetAt(size_t stIndex) const;
-		bool RemoveAt(size_t stIndex);
-		size_t GetCount() const;
-
-		void Clear();
-
-	private:
-#pragma warning(push)
-#pragma warning(disable: 4251)
-		std::vector<TFileFilter> m_vFilters;
-#pragma warning(pop)
-		mutable serializer::TRemovedObjects m_setRemovedObjects;
+		void InitColumns(const serializer::ISerializerContainerPtr& spContainer) const override;
 	};
+#pragma warning(pop)
 }
 
 CONFIG_MEMBER_SERIALIZATION(TFileFiltersArray)

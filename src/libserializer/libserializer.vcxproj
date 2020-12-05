@@ -499,6 +499,7 @@ goto end
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="DataMapper.h" />
     <ClInclude Include="IColumnsDefinition.h" />
     <ClInclude Include="ISerializer.h" />
     <ClInclude Include="ISerializerContainer.h" />
@@ -507,6 +508,8 @@ goto end
     <ClInclude Include="ISerializerRowReader.h" />
     <ClInclude Include="ISQLiteSerializerSchema.h" />
     <ClInclude Include="resource.h" />
+    <ClInclude Include="SerializableContainer.h" />
+    <ClInclude Include="SerializableObject.h" />
     <ClInclude Include="SerializerDataTypes.h" />
     <ClInclude Include="TFakeFileSerializer.h" />
     <ClInclude Include="TModificationTracker.h" />

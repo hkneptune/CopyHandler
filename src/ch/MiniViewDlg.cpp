@@ -20,7 +20,6 @@
 #include "MiniViewDlg.h"
 #include "ch.h"
 #include <assert.h>
-#include "MemDC.h"
 #include "CfgProperties.h"
 #include "resource.h"
 #include "../libchengine/TTaskManager.h"
@@ -606,10 +605,10 @@ void CMiniViewDlg::OnNcPaint()
 	ncdc.LineTo(rcWindow.right, rcWindow.bottom);
 
 	// memdc
-	CMemDC dc(&ncdc, &rcWindow);
+	CMemDC dc(ncdc, &rcWindow);
 
 	COLORREF crLeft=GetSysColor(m_bActive ? COLOR_ACTIVECAPTION : COLOR_INACTIVECAPTION);
-	dc.FillSolidRect(&rcWindow, crLeft);
+	dc.GetDC().FillSolidRect(&rcWindow, crLeft);
 
 	// caption text
 	CString strWindow;
@@ -626,11 +625,11 @@ void CMiniViewDlg::OnNcPaint()
 	
 	CFont font;
 	font.CreateFontIndirect(&ncm.lfSmCaptionFont);
-	dc.SelectObject(&font);
+	dc.GetDC().SelectObject(&font);
 	
-	dc.SetTextColor(GetSysColor(COLOR_CAPTIONTEXT));
-	dc.SetBkMode(TRANSPARENT);
-	dc.DrawText(strWindow, &rcWindow, DT_END_ELLIPSIS | DT_VCENTER | DT_LEFT | DT_NOCLIP | DT_SINGLELINE);
+	dc.GetDC().SetTextColor(GetSysColor(COLOR_CAPTIONTEXT));
+	dc.GetDC().SetBkMode(TRANSPARENT);
+	dc.GetDC().DrawText(strWindow, &rcWindow, DT_END_ELLIPSIS | DT_VCENTER | DT_LEFT | DT_NOCLIP | DT_SINGLELINE);
 	// button drawing
 	GetClientRect(&rcWindow);
 	
@@ -651,7 +650,7 @@ void CMiniViewDlg::OnNcPaint()
 		m_bdButtons[i].rcButton.right=m_bdButtons[i].rcButton.left+iWidth;
 		m_bdButtons[i].rcButton.bottom=m_bdButtons[i].rcButton.top+iHeight;
 		
-		m_bdButtons[i].pfnCallbackFunc(this, MSG_DRAWBUTTON, &m_bdButtons[i], &dc);
+		m_bdButtons[i].pfnCallbackFunc(this, MSG_DRAWBUTTON, &m_bdButtons[i], &dc.GetDC());
 	}
 }
 

@@ -32,7 +32,7 @@ namespace chengine
 	TSubTaskContext::TSubTaskContext(TConfig& rConfig, const TBasePathDataContainerPtr& spBasePaths,
 		const TFileFiltersArray& rFilters,
 		TTaskConfigTracker& rCfgTracker, const logger::TLogFileDataPtr& spLogFileData,
-		TWorkerThreadController& rThreadController, const IFilesystemPtr& spFilesystem) :
+		TWorkerThreadController& rThreadController, const IFilesystemPtr& spFilesystem, const FeedbackManagerPtr& spFeedbackManager) :
 		m_rConfig(rConfig),
 		m_eOperationType(eOperation_None),
 		m_spBasePaths(spBasePaths),
@@ -41,12 +41,15 @@ namespace chengine
 		m_rCfgTracker(rCfgTracker),
 		m_spFilesystem(spFilesystem),
 		m_spLogFileData(spLogFileData),
-		m_rThreadController(rThreadController)
+		m_rThreadController(rThreadController),
+		m_spFeedbackManager(spFeedbackManager)
 	{
 		if (!spFilesystem)
 			throw TCoreException(eErr_InvalidArgument, L"spFilesystem", LOCATION);
-		if (!spLogFileData)
+		if(!spLogFileData)
 			throw TCoreException(eErr_InvalidArgument, L"spLogFileData", LOCATION);
+		if(!spFeedbackManager)
+			throw TCoreException(eErr_InvalidArgument, L"spFeedbackManager", LOCATION);
 	}
 
 	TSubTaskContext::~TSubTaskContext()

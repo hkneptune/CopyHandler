@@ -1044,6 +1044,11 @@ CString CStatusDlg::GetStatusString(const chengine::TTaskStatsSnapshotPtr& spTas
 		strStatusText += _T("/");
 		strStatusText += GetResManager().LoadString(IDS_STATUS_WITHOUT_CONTENTS_STRING);
 	}
+	if(spTaskStats->GetExcludeEmptyDirectories())
+	{
+		strStatusText += _T("/");
+		strStatusText += GetResManager().LoadString(IDS_STATUS_EXCLUDE_EMPTY_DIRECTORIES_STRING);
+	}
 
 	return strStatusText;
 }

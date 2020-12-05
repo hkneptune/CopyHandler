@@ -41,6 +41,7 @@ namespace chengine
 		m_iThreadPriority(0),
 		m_strDestinationPath(),
 		m_filters(),
+		m_feedbackRules(),
 		m_eTaskState(eTaskState_None),
 		m_strTaskID(),
 		m_eOperationType(eOperation_None),
@@ -67,11 +68,13 @@ namespace chengine
 		m_iThreadPriority = 0;
 		m_strDestinationPath.Clear();
 		m_filters.Clear();
+		m_feedbackRules.Clear();
 		m_eTaskState = eTaskState_None;
 		m_strTaskID.Clear();
 		m_eOperationType = eOperation_None;
 		m_bIgnoreDirectories = false;
 		m_bCreateEmptyFiles = false;
+		m_bExcludeEmptyDirectories = false;
 		m_ullCurrentBufferSize = 0;
 		m_bCacheFilled = false;
 		m_ullProcessedCount = 0;

@@ -28,6 +28,8 @@
 #include "TFileInfoArray.h"
 #include "IFilesystem.h"
 #include "../liblogger/TLogFileData.h"
+#include "FeedbackAlreadyExistsRuleList.h"
+#include "FeedbackManager.h"
 
 namespace chcore
 {
@@ -49,7 +51,8 @@ namespace chengine
 		TSubTaskContext(TConfig& rConfig, const TBasePathDataContainerPtr& spBasePaths,
 			const TFileFiltersArray& rFilters,
 			TTaskConfigTracker& rCfgTracker, const logger::TLogFileDataPtr& spLogFileData,
-		                chcore::TWorkerThreadController& rThreadController, const IFilesystemPtr& spFilesystem);
+			chcore::TWorkerThreadController& rThreadController, const IFilesystemPtr& spFilesystem,
+			const FeedbackManagerPtr& spFeedbackManager);
 		TSubTaskContext(const TSubTaskContext& rSrc) = delete;
 		~TSubTaskContext();
 
@@ -64,6 +67,7 @@ namespace chengine
 		TBasePathDataContainerPtr GetBasePaths() const;
 
 		const TFileFiltersArray& GetFilters() const;
+
 		TFileInfoArray& GetFilesCache();
 		const TFileInfoArray& GetFilesCache() const;
 
@@ -79,6 +83,9 @@ namespace chengine
 		const chcore::TWorkerThreadController& GetThreadController() const;
 
 		IFilesystemPtr GetLocalFilesystem() const;
+
+		FeedbackManagerPtr GetFeedbackManager() const { return m_spFeedbackManager; }
+		void SetFeedbackManager(const FeedbackManagerPtr& spFeedbackManager) { m_spFeedbackManager = spFeedbackManager; }
 
 	private:
 		TConfig& m_rConfig;
@@ -106,6 +113,8 @@ namespace chengine
 #pragma warning(disable: 4251)
 		IFilesystemPtr m_spFilesystem;
 		logger::TLogFileDataPtr m_spLogFileData;
+
+		FeedbackManagerPtr m_spFeedbackManager;
 #pragma warning(pop)
 
 		// thread control

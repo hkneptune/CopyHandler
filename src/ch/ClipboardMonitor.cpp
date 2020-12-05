@@ -106,18 +106,15 @@ DWORD WINAPI CClipboardMonitor::ClipboardMonitorProc(LPVOID pParam)
 			// operation type
 			chengine::EOperationType eOperation = chengine::eOperation_Copy;
 
-			if(IsClipboardFormatAvailable(nFormat))
+			if(IsClipboardFormatAvailable(nFormat) && (handle = GetClipboardData(nFormat)) != nullptr)
 			{
-				handle=GetClipboardData(nFormat);
-				LPVOID addr=GlobalLock(handle);
+				LPVOID addr = GlobalLock(handle);
 
-				DWORD dwData=((DWORD*)addr)[0];
-				if(dwData & DROPEFFECT_COPY)
+				DWORD dwData = ((DWORD*)addr)[0];
+				if (dwData & DROPEFFECT_COPY)
 					eOperation = chengine::eOperation_Copy;	// copy
-				else if(dwData & DROPEFFECT_MOVE)
+				else if (dwData & DROPEFFECT_MOVE)
 					eOperation = chengine::eOperation_Move;	// move
-
-				GlobalUnlock(handle);
 			}
 			else
 				eOperation = chengine::eOperation_Copy;	// default - copy

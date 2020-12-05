@@ -38,12 +38,6 @@
     <ClInclude Include="TStringException.h">
       <Filter>Source Files\Tools</Filter>
     </ClInclude>
-    <ClInclude Include="TStringPattern.h">
-      <Filter>Source Files\Tools</Filter>
-    </ClInclude>
-    <ClInclude Include="TStringPatternArray.h">
-      <Filter>Source Files\Tools</Filter>
-    </ClInclude>
     <ClInclude Include="resource.h" />
   </ItemGroup>
   <ItemGroup>
@@ -69,18 +63,6 @@
       <Filter>Tests</Filter>
     </ClCompile>
     <ClCompile Include="..\..\tests\tests_shared\TestsExports.cpp">
-      <Filter>Tests</Filter>
-    </ClCompile>
-    <ClCompile Include="TStringPattern.cpp">
-      <Filter>Source Files\Tools</Filter>
-    </ClCompile>
-    <ClCompile Include="TStringPatternArray.cpp">
-      <Filter>Source Files\Tools</Filter>
-    </ClCompile>
-    <ClCompile Include="Tests\TestsTStringPatternArray.cpp">
-      <Filter>Tests</Filter>
-    </ClCompile>
-    <ClCompile Include="Tests\TestsTStringPattern.cpp">
       <Filter>Tests</Filter>
     </ClCompile>
     <ClCompile Include="Tests\TestsTStringSet.cpp">

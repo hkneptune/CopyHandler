@@ -251,8 +251,10 @@ namespace chengine
 			return eTO_CreateEmptyFiles;
 		if (strOption == TaskPropData<eTO_CreateDirectoriesRelativeToRoot>::GetPropertyName())
 			return eTO_CreateDirectoriesRelativeToRoot;
-		if (strOption == TaskPropData<eTO_IgnoreDirectories>::GetPropertyName())
+		if(strOption == TaskPropData<eTO_IgnoreDirectories>::GetPropertyName())
 			return eTO_IgnoreDirectories;
+		if(strOption == TaskPropData<eTO_ExcludeEmptyDirectories>::GetPropertyName())
+			return eTO_ExcludeEmptyDirectories;
 		if (strOption == TaskPropData<eTO_AlternateFilenameFormatString_First>::GetPropertyName())
 			return eTO_AlternateFilenameFormatString_AfterFirst;
 		if (strOption == TaskPropData<eTO_AlternateFilenameFormatString_AfterFirst>::GetPropertyName())
@@ -262,6 +264,6 @@ namespace chengine
 		throw TCoreException(eErr_UnhandledCase, L"Option name not supported", LOCATION);
 
 		// add new elements before this one
-		static_assert(eTO_Last == 27, "Function not updated to accommodate new enum options");
+		static_assert(eTO_Last == 28, "Function not updated to accommodate new enum options");
 	}
 }

@@ -51,7 +51,10 @@ namespace chcore
 		EGeneralErrors m_eErrorCode;
 
 		// where it happened?
-		const wchar_t* m_pszMsg;
+#pragma warning(push)
+#pragma warning(disable: 4251)
+		std::wstring m_strMsg;
+#pragma warning(pop)
 
 		const wchar_t* m_pszFile;
 		const wchar_t* m_pszFunction;

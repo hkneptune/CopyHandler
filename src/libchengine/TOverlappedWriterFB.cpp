@@ -29,11 +29,11 @@
 namespace chengine
 {
 	TOverlappedWriterFB::TOverlappedWriterFB(const IFilesystemPtr& spFilesystem,
-		const IFeedbackHandlerPtr& spFeedbackHandler,
+		const FeedbackManagerPtr& spFeedbackManager,
 		TWorkerThreadController& rThreadController,
 		const TSubTaskStatsInfoPtr& spStats,
 		const TFileInfoPtr& spSrcFileInfo,
-		const TSmartPath& pathDst,
+		const TDestinationPathProvider& rDstPathProvider,
 		const logger::TLogFileDataPtr& spLogFileData,
 		const TOrderedBufferQueuePtr& spBuffersToWrite,
 		const TOverlappedProcessorRangePtr& spRange,
@@ -43,6 +43,7 @@ namespace chengine
 		bool bNoBuffering,
 		bool bProtectReadOnlyFiles,
 		bool bUpdateFileAttributesAndTimes) :
+
 		m_counterOnTheFly(),
 		m_spWriter(std::make_shared<TOverlappedWriter>(spLogFileData, spBuffersToWrite, spRange, spEmptyBuffers, stMaxOtfBuffers, m_counterOnTheFly.GetSharedCount())),
 		m_spStats(spStats),
@@ -54,11 +55,17 @@ namespace chengine
 		m_eventWritingFinished(true, false),
 		m_eventLocalKill(true, false),
 		m_rThreadController(rThreadController),
-		m_spLog(logger::MakeLogger(spLogFileData, L"File-Writer"))
+		m_spLog(logger::MakeLogger(spLogFileData, L"File-Writer")),
+		m_spFilesystem(spFilesystem),
+		m_rDstPathProvider(rDstPathProvider),
+		m_spFeedbackManager(spFeedbackManager),
+		m_spLogFileData(spLogFileData),
+		m_bNoBuffering(bNoBuffering),
+		m_bProtectReadOnlyFiles(bProtectReadOnlyFiles)
 	{
 		if(!spFilesystem)
 			throw TCoreException(eErr_InvalidArgument, L"spFilesystem is NULL", LOCATION);
-		if(!spFeedbackHandler)
+		if(!spFeedbackManager)
 			throw TCoreException(eErr_InvalidArgument, L"spFeedbackHandler is NULL", LOCATION);
 		if(!spStats)
 			throw TCoreException(eErr_InvalidArgument, L"spStats is NULL", LOCATION);
@@ -72,9 +79,6 @@ namespace chengine
 			throw TCoreException(eErr_InvalidArgument, L"spLogFileData is NULL", LOCATION);
 		if(!spBuffersToWrite)
 			throw TCoreException(eErr_InvalidArgument, L"spBuffersToWrite is NULL", LOCATION);
-
-		IFilesystemFilePtr fileDst = spFilesystem->CreateFileObject(IFilesystemFile::eMode_Write, pathDst, bNoBuffering, bProtectReadOnlyFiles);
-		m_spDstFile = std::make_shared<TFilesystemFileFeedbackWrapper>(fileDst, spFeedbackHandler, spLogFileData, rThreadController, spFilesystem);
 	}
 
 	TOverlappedWriterFB::~TOverlappedWriterFB()
@@ -219,50 +223,73 @@ namespace chengine
 
 	TSubTaskBase::ESubOperationResult TOverlappedWriterFB::Start()
 	{
-		// open destination file, handle the failures and possibly existence of the destination file
 		unsigned long long ullProcessedSize = m_spStats->GetCurrentItemProcessedSize();
 		unsigned long long ullSeekTo = ullProcessedSize;
-
 		bool bDstFileFreshlyCreated = false;
-		TSubTaskBase::ESubOperationResult eResult = m_spDstFile->IsFreshlyCreated(bDstFileFreshlyCreated);
-		if(eResult != TSubTaskBase::eSubResult_Continue)
-			return eResult;
+		TSubTaskBase::ESubOperationResult eResult = TSubTaskBase::eSubResult_Continue;
 
-		file_size_t fsDstFileSize = 0;
-		eResult = m_spDstFile->GetFileSize(fsDstFileSize);
-		if(eResult != TSubTaskBase::eSubResult_Continue)
-			return eResult;
-
-		// try to resume if possible
-		bool bCanSilentResume = false;
-		if(m_spStats->CanCurrentItemSilentResume())
+		bool bRetryAfterRename = false;
+		do
 		{
-			if(fsDstFileSize == ullProcessedSize && fsDstFileSize <= m_spSrcFileInfo->GetLength64())
-			{
-				ullSeekTo = fsDstFileSize;
-				bCanSilentResume = true;
-			}
-			else if(fsDstFileSize > ullProcessedSize && fsDstFileSize - ullProcessedSize == IFilesystemFile::MaxSectorSize && 
-				m_spSrcFileInfo->GetLength64() > ullProcessedSize && m_spSrcFileInfo->GetLength64() < fsDstFileSize)
-			{
-				// special case - resuming file that was not finalized completely last time
-				ullSeekTo = ullProcessedSize;
-				bCanSilentResume = true;
-			}
-		}
+			bRetryAfterRename = false;
 
-		if(!bCanSilentResume && !bDstFileFreshlyCreated && fsDstFileSize > 0)
-		{
-			bool bShouldAppend = false;
-			eResult = m_spDstFile->HandleFileAlreadyExistsFB(m_spSrcFileInfo, bShouldAppend);
+			TSmartPath pathFullDst = m_rDstPathProvider.CalculateDestinationPath(m_spSrcFileInfo);
+
+			IFilesystemFilePtr fileDst = m_spFilesystem->CreateFileObject(IFilesystemFile::eMode_Write, pathFullDst, m_bNoBuffering, m_bProtectReadOnlyFiles);
+			m_spDstFile = std::make_shared<TFilesystemFileFeedbackWrapper>(fileDst, m_spFeedbackManager, m_spLogFileData, m_rThreadController, m_spFilesystem);
+
+			// open destination file, handle the failures and possibly existence of the destination file
+			bDstFileFreshlyCreated = false;
+			eResult = m_spDstFile->IsFreshlyCreated(bDstFileFreshlyCreated);
 			if(eResult != TSubTaskBase::eSubResult_Continue)
 				return eResult;
 
-			if(bShouldAppend)
-				ullSeekTo = std::min(fsDstFileSize, m_spSrcFileInfo->GetLength64());
-			else
-				ullSeekTo = 0;
+			file_size_t fsDstFileSize = 0;
+			eResult = m_spDstFile->GetFileSize(fsDstFileSize);
+			if(eResult != TSubTaskBase::eSubResult_Continue)
+				return eResult;
+
+			// try to resume if possible
+			bool bCanSilentResume = false;
+			if(m_spStats->CanCurrentItemSilentResume())
+			{
+				if(fsDstFileSize == ullProcessedSize && fsDstFileSize <= m_spSrcFileInfo->GetLength64())
+				{
+					ullSeekTo = fsDstFileSize;
+					bCanSilentResume = true;
+				}
+				else if(fsDstFileSize > ullProcessedSize && fsDstFileSize - ullProcessedSize == IFilesystemFile::MaxSectorSize &&
+					m_spSrcFileInfo->GetLength64() > ullProcessedSize && m_spSrcFileInfo->GetLength64() < fsDstFileSize)
+				{
+					// special case - resuming file that was not finalized completely last time
+					ullSeekTo = ullProcessedSize;
+					bCanSilentResume = true;
+				}
+			}
+
+			if(!bCanSilentResume && !bDstFileFreshlyCreated && fsDstFileSize > 0)
+			{
+				bool bShouldAppend = false;
+				bool bShouldRename = false;
+
+				eResult = m_spDstFile->HandleFileAlreadyExistsFB(m_spSrcFileInfo, m_rDstPathProvider, bShouldAppend, bShouldRename);
+				if(eResult != TSubTaskBase::eSubResult_Continue)
+					return eResult;
+
+				if(bShouldRename)
+				{
+					bRetryAfterRename = true;
+					ullSeekTo = 0;
+					m_spDstFile->Close();
+					m_spDstFile.reset();
+				}
+				if(bShouldAppend)
+					ullSeekTo = std::min(fsDstFileSize, m_spSrcFileInfo->GetLength64());
+				else
+					ullSeekTo = 0;
+			}
 		}
+		while(bRetryAfterRename);
 
 		if(m_bOnlyCreate)
 		{

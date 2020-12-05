@@ -23,13 +23,21 @@
 namespace chengine
 {
 	TScopedRunningTimeTrackerPause::TScopedRunningTimeTrackerPause(TScopedRunningTimeTracker& rRunningTimeTracker) :
-		m_rRunningTimeTracker(rRunningTimeTracker)
+		m_pRunningTimeTracker(&rRunningTimeTracker)
 	{
-		m_rRunningTimeTracker.PauseTimeTracking();
+		m_pRunningTimeTracker->PauseTimeTracking();
+	}
+
+	TScopedRunningTimeTrackerPause::TScopedRunningTimeTrackerPause(TScopedRunningTimeTracker* pRunningTimeTracker) :
+		m_pRunningTimeTracker(pRunningTimeTracker)
+	{
+		if(m_pRunningTimeTracker)
+			m_pRunningTimeTracker->PauseTimeTracking();
 	}
 
 	TScopedRunningTimeTrackerPause::~TScopedRunningTimeTrackerPause()
 	{
-		m_rRunningTimeTracker.UnPauseTimeTracking();
+		if(m_pRunningTimeTracker)
+			m_pRunningTimeTracker->UnPauseTimeTracking();
 	}
 }

@@ -61,6 +61,7 @@
 
 #include "libictranslate.h"
 #include "ResourceManager.h"
+#include <afxdialogex.h>
 
 namespace ictranslate
 {
@@ -176,7 +177,7 @@ namespace ictranslate
 #define LDF_NODIALOGSIZE 0x01
 #define LDF_NODIALOGFONT 0x02
 
-	class LIBICTRANSLATE_API CLanguageDialog : public CDialog
+	class LIBICTRANSLATE_API CLanguageDialog : public CDialogEx
 	{
 	public:
 		// Construction/destruction

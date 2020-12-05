@@ -47,7 +47,20 @@ namespace chengine
 	{
 		boost::unique_lock<boost::shared_mutex> lock(m_lock);
 		spFileInfo->SetObjectID(++m_oidLastObjectID);
+		spFileInfo->MarkAsAdded();
 		m_vFiles.push_back(spFileInfo);
+	}
+
+	void TFileInfoArray::RemoveLast()
+	{
+		boost::unique_lock<boost::shared_mutex> lock(m_lock);
+		if(!m_vFiles.empty())
+		{
+			TFileInfoPtr spFileInfo = m_vFiles.back();
+			m_vFiles.pop_back();
+			if(!spFileInfo->IsAdded())
+				m_setRemovedObjects.Add(spFileInfo->GetObjectID());
+		}
 	}
 
 	file_count_t TFileInfoArray::GetCount() const
@@ -72,7 +85,8 @@ namespace chengine
 		m_bComplete = false;
 		for(const TFileInfoPtr& spFileInfo : m_vFiles)
 		{
-			m_setRemovedObjects.Add(spFileInfo->GetObjectID());
+			if(!spFileInfo->IsAdded())
+				m_setRemovedObjects.Add(spFileInfo->GetObjectID());
 		}
 		m_vFiles.clear();
 	}

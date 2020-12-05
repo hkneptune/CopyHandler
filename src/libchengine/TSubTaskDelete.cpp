@@ -31,9 +31,9 @@
 #include "TFileInfo.h"
 #include "TTaskLocalStats.h"
 #include "TScopedRunningTimeTracker.h"
-#include "TFeedbackHandlerWrapper.h"
 #include "TBufferSizes.h"
 #include "TFilesystemFeedbackWrapper.h"
+#include <boost/scope_exit.hpp>
 
 using namespace chcore;
 using namespace string;
@@ -75,17 +75,25 @@ namespace chengine
 		m_tSubTaskStats.SetCurrentPath(spFileInfo->GetFullFilePath().ToString());
 	}
 
-	TSubTaskBase::ESubOperationResult TSubTaskDelete::Exec(const IFeedbackHandlerPtr& spFeedback)
+	TSubTaskBase::ESubOperationResult TSubTaskDelete::Exec()
 	{
 		TScopedRunningTimeTracker guard(m_tSubTaskStats);
-		TFeedbackHandlerWrapperPtr spFeedbackHandler(std::make_shared<TFeedbackHandlerWrapper>(spFeedback, guard));
+		FeedbackManagerPtr spFeedbackManager = GetContext().GetFeedbackManager();
+		spFeedbackManager->SetSecondaryTimeTracker(&guard);
+
+#pragma warning(push)
+#pragma warning(disable: 4459)
+		BOOST_SCOPE_EXIT(&spFeedbackManager) {
+			spFeedbackManager->SetSecondaryTimeTracker(nullptr);
+		} BOOST_SCOPE_EXIT_END
+#pragma warning(pop)
 
 		// log
 		TFileInfoArray& rFilesCache = GetContext().GetFilesCache();
 		TWorkerThreadController& rThreadController = GetContext().GetThreadController();
 		IFilesystemPtr spFilesystem = GetContext().GetLocalFilesystem();
 
-		TFilesystemFeedbackWrapper tFilesystemFBWrapper(spFeedbackHandler, spFilesystem, GetContext().GetLogFileData(), rThreadController);
+		TFilesystemFeedbackWrapper tFilesystemFBWrapper(spFeedbackManager, spFilesystem, GetContext().GetLogFileData(), rThreadController);
 
 		// log
 		LOG_INFO(m_spLog) << _T("Deleting files (DeleteFiles)...");

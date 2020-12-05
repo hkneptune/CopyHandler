@@ -28,8 +28,8 @@ using namespace string;
 
 namespace chengine
 {
-	TFilesystemFeedbackWrapper::TFilesystemFeedbackWrapper(const IFeedbackHandlerPtr& spFeedbackHandler, const IFilesystemPtr& spFilesystem, const logger::TLogFileDataPtr& spLogFileData, TWorkerThreadController& rThreadController) :
-		m_spFeedbackHandler(spFeedbackHandler),
+	TFilesystemFeedbackWrapper::TFilesystemFeedbackWrapper(const FeedbackManagerPtr& spFeedbackManager, const IFilesystemPtr& spFilesystem, const logger::TLogFileDataPtr& spLogFileData, TWorkerThreadController& rThreadController) :
+		m_spFeedbackManager(spFeedbackManager),
 		m_spFilesystem(spFilesystem),
 		m_spLog(logger::MakeLogger(spLogFileData, L"Filesystem")),
 		m_rThreadController(rThreadController)
@@ -64,7 +64,7 @@ namespace chengine
 			strFormat.Replace(_T("%path"), pathDirectory.ToString());
 			LOG_ERROR(m_spLog) << strFormat.c_str();
 
-			TFeedbackResult frResult = m_spFeedbackHandler->FileError(pathDirectory.ToWString(), TString(), EFileError::eCreateError, dwLastError);
+			TFeedbackResult frResult = m_spFeedbackManager->FileError(pathDirectory.ToWString(), TString(), EFileError::eCreateError, dwLastError);
 			switch (frResult.GetResult())
 			{
 			case eResult_Cancel:
@@ -95,12 +95,12 @@ namespace chengine
 
 	bool TFilesystemFeedbackWrapper::WasKillRequested(const TFeedbackResult& rFeedbackResult) const
 	{
-		if(m_rThreadController.KillRequested(rFeedbackResult.IsAutomatedReply() ? m_spFeedbackHandler->GetRetryInterval() : 0))
+		if(m_rThreadController.KillRequested(rFeedbackResult.IsAutomatedReply() ? m_spFeedbackManager->GetRetryInterval() : 0))
 			return true;
 		return false;
 	}
 
-	TSubTaskBase::ESubOperationResult TFilesystemFeedbackWrapper::CheckForFreeSpaceFB(const TSmartPath& pathFirstSrc, const TSmartPath& pathDestination, unsigned long long ullNeededSize)
+	TSubTaskBase::ESubOperationResult TFilesystemFeedbackWrapper::CheckForFreeSpaceFB(const TSmartPath& pathDestination, unsigned long long ullNeededSize)
 	{
 		unsigned long long ullAvailableSize = 0, ullTotal = 0;
 		TFeedbackResult frResult(eResult_Unknown, false);
@@ -133,7 +133,7 @@ namespace chengine
 				strFormat.Replace(_T("%path"), pathDestination.ToString());
 				LOG_ERROR(m_spLog) << strFormat.c_str();
 
-				frResult = m_spFeedbackHandler->FileError(pathDestination.ToWString(), TString(), EFileError::eCheckForFreeSpace, dwLastError);
+				frResult = m_spFeedbackManager->FileError(pathDestination.ToWString(), TString(), EFileError::eCheckForFreeSpace, dwLastError);
 				switch (frResult.GetResult())
 				{
 				case eResult_Cancel:
@@ -162,7 +162,7 @@ namespace chengine
 				strFormat.Replace(_T("%availablesize"), boost::lexical_cast<std::wstring>(ullAvailableSize).c_str());
 				LOG_WARNING(m_spLog) << strFormat.c_str();
 
-				frResult = m_spFeedbackHandler->NotEnoughSpace(pathFirstSrc.ToWString(), pathDestination.ToWString(), ullNeededSize);
+				frResult = m_spFeedbackManager->NotEnoughSpace(pathDestination.ToWString(), ullNeededSize);
 				switch (frResult.GetResult())
 				{
 				case eResult_Cancel:
@@ -222,7 +222,7 @@ namespace chengine
 			strFormat.Replace(_T("%path"), spFileInfo->GetFullFilePath().ToString());
 			LOG_ERROR(m_spLog) << strFormat.c_str();
 
-			TFeedbackResult frResult = m_spFeedbackHandler->FileError(spFileInfo->GetFullFilePath().ToWString(), TString(), EFileError::eDeleteError, dwLastError);
+			TFeedbackResult frResult = m_spFeedbackManager->FileError(spFileInfo->GetFullFilePath().ToWString(), TString(), EFileError::eDeleteError, dwLastError);
 			switch (frResult.GetResult())
 			{
 			case eResult_Cancel:
@@ -281,7 +281,7 @@ namespace chengine
 			strFormat.Replace(_T("%path"), spFileInfo->GetFullFilePath().ToString());
 			LOG_ERROR(m_spLog) << strFormat.c_str();
 
-			TFeedbackResult frResult = m_spFeedbackHandler->FileError(spFileInfo->GetFullFilePath().ToWString(), TString(), EFileError::eDeleteError, dwLastError);
+			TFeedbackResult frResult = m_spFeedbackManager->FileError(spFileInfo->GetFullFilePath().ToWString(), TString(), EFileError::eDeleteError, dwLastError);
 			switch (frResult.GetResult())
 			{
 			case eResult_Cancel:
@@ -343,7 +343,7 @@ namespace chengine
 			strFormat.Replace(_T("%dstpath"), pathDestination.ToString());
 			LOG_ERROR(m_spLog) << strFormat.c_str();
 
-			TFeedbackResult frResult = m_spFeedbackHandler->FileError(pathSrc.ToWString(), pathDestination.ToWString(), EFileError::eFastMoveError, dwLastError);
+			TFeedbackResult frResult = m_spFeedbackManager->FileError(pathSrc.ToWString(), pathDestination.ToWString(), EFileError::eFastMoveError, dwLastError);
 			switch (frResult.GetResult())
 			{
 			case eResult_Cancel:
@@ -389,7 +389,7 @@ namespace chengine
 				dwLastError = e.GetNativeError();
 			}
 
-			TFeedbackResult frResult = m_spFeedbackHandler->FileError(pathCurrent.ToWString(), TString(), EFileError::eRetrieveFileInfo, dwLastError);
+			TFeedbackResult frResult = m_spFeedbackManager->FileError(pathCurrent.ToWString(), TString(), EFileError::eRetrieveFileInfo, dwLastError);
 			switch (frResult.GetResult())
 			{
 			case eResult_Cancel:
@@ -436,7 +436,7 @@ namespace chengine
 				dwLastError = e.GetNativeError();
 			}
 
-			TFeedbackResult frResult = m_spFeedbackHandler->FileError(pathFileDir.ToWString(), TString(), EFileError::eRetrieveFileInfo, dwLastError);
+			TFeedbackResult frResult = m_spFeedbackManager->FileError(pathFileDir.ToWString(), TString(), EFileError::eRetrieveFileInfo, dwLastError);
 			switch(frResult.GetResult())
 			{
 			case eResult_Cancel:

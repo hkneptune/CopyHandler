@@ -1,6 +1,6 @@
 // ============================================================================
-//  Copyright (C) 2001-2015 by Jozef Starosczyk
-//  ixen@copyhandler.com
+//  Copyright (C) 2001-2020 by Jozef Starosczyk
+//  ixen {at} copyhandler [dot] com
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU Library General Public License
@@ -18,38 +18,39 @@
 // ============================================================================
 #include "stdafx.h"
 #include "TStringPatternArray.h"
-#include "TStringArray.h"
-#include "TStringException.h"
+#include "../libstring/TStringArray.h"
 
-namespace string
+using namespace string;
+
+namespace chcore
 {
-	bool TStringPatternArray::MatchesAny(const TString& strTextToMatch) const
+	bool TStringPatternArray::MatchesAny(const TSmartPath& pathToMatch) const
 	{
 		for (const TStringPattern& pattern : m_vItems)
 		{
-			if (pattern.Matches(strTextToMatch))
+			if (pattern.Matches(pathToMatch))
 				return true;
 		}
 
 		return false;
 	}
 
-	bool TStringPatternArray::MatchesAll(const TString& strTextToMatch) const
+	bool TStringPatternArray::MatchesAll(const TSmartPath& pathToMatch) const
 	{
 		for (const TStringPattern& pattern : m_vItems)
 		{
-			if (!pattern.Matches(strTextToMatch))
+			if (!pattern.Matches(pathToMatch))
 				return false;
 		}
 
 		return true;
 	}
 
-	void TStringPatternArray::FromString(const TString& strPatterns, TStringPattern::EPatternType eDefaultPatternType)
+	void TStringPatternArray::FromString(const TString& strPatterns)
 	{
 		TStringArray arrPatterns;
-		strPatterns.Split(_T("|"), arrPatterns);
-		FromStringArray(arrPatterns, eDefaultPatternType);
+		strPatterns.Split(_T(";"), arrPatterns);
+		FromStringArray(arrPatterns);
 	}
 
 	void TStringPatternArray::FromSerializedStringArray(const TStringArray& arrSerializedPatterns)
@@ -62,11 +63,11 @@ namespace string
 		}
 	}
 
-	void TStringPatternArray::FromStringArray(const TStringArray& arrPatterns, TStringPattern::EPatternType eDefaultPatternType)
+	void TStringPatternArray::FromStringArray(const TStringArray& arrPatterns)
 	{
 		for (size_t stIndex = 0; stIndex < arrPatterns.GetCount(); ++stIndex)
 		{
-			Add(TStringPattern::CreateFromString(arrPatterns.GetAt(stIndex), eDefaultPatternType));
+			Add(TStringPattern::CreateFromString(arrPatterns.GetAt(stIndex)));
 		}
 	}
 
@@ -79,7 +80,7 @@ namespace string
 			strMask = GetAt(0).ToString();
 			for (size_t stIndex = 1; stIndex < stCount; stIndex++)
 			{
-				strMask += _T("|") + GetAt(stIndex).ToString();
+				strMask += _T(";") + GetAt(stIndex).ToString();
 			}
 		}
 

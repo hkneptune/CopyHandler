@@ -33,7 +33,6 @@
 #include "TFileInfo.h"
 #include "TFileInfoArray.h"
 #include "TScopedRunningTimeTracker.h"
-#include "TFeedbackHandlerWrapper.h"
 #include "TOverlappedMemoryPool.h"
 #include "TTaskConfigBufferSizes.h"
 #include "TFilesystemFeedbackWrapper.h"
@@ -42,6 +41,7 @@
 #include "TThreadedQueueRunner.h"
 #include "TOverlappedThreadPool.h"
 #include "../libchcore/RoundingFunctions.h"
+#include <boost/scope_exit.hpp>
 
 using namespace chcore;
 using namespace string;
@@ -57,7 +57,7 @@ namespace chengine
 		}
 
 		TFileInfoPtr spSrcFile;		// CFileInfo - src file
-		TSmartPath pathDstFile;			// dest path with filename
+		TDestinationPathProvider* pDstPathProvider = nullptr;
 
 		TBufferSizes tBufferSizes;
 		TOverlappedMemoryPoolPtr spMemoryPool;		// buffer handling
@@ -98,10 +98,18 @@ namespace chengine
 		m_spSubTaskStats->SetCurrentPath(spFileInfo->GetFullFilePath().ToString());
 	}
 
-	TSubTaskBase::ESubOperationResult TSubTaskCopyMove::Exec(const IFeedbackHandlerPtr& spFeedback)
+	TSubTaskBase::ESubOperationResult TSubTaskCopyMove::Exec()
 	{
 		TScopedRunningTimeTracker guard(*m_spSubTaskStats);
-		TFeedbackHandlerWrapperPtr spFeedbackHandler(std::make_shared<TFeedbackHandlerWrapper>(spFeedback, guard));
+		FeedbackManagerPtr spFeedbackManager = GetContext().GetFeedbackManager();
+		spFeedbackManager->SetSecondaryTimeTracker(&guard);
+
+#pragma warning(push)
+#pragma warning(disable: 4459)
+		BOOST_SCOPE_EXIT(&spFeedbackManager) {
+			spFeedbackManager->SetSecondaryTimeTracker(nullptr);
+		} BOOST_SCOPE_EXIT_END
+#pragma warning(pop)
 
 		TFileInfoArray& rFilesCache = GetContext().GetFilesCache();
 		TTaskConfigTracker& rCfgTracker = GetContext().GetCfgTracker();
@@ -111,7 +119,7 @@ namespace chengine
 		IFilesystemPtr spFilesystem = GetContext().GetLocalFilesystem();
 		TBasePathDataContainerPtr spSrcPaths = GetContext().GetBasePaths();
 
-		TFilesystemFeedbackWrapper tFilesystemFBWrapper(spFeedbackHandler, spFilesystem, GetContext().GetLogFileData(), rThreadController);
+		TFilesystemFeedbackWrapper tFilesystemFBWrapper(spFeedbackManager, spFilesystem, GetContext().GetLogFileData(), rThreadController);
 
 		// log
 		LOG_INFO(m_spLog) << _T("Processing files/folders (ProcessFiles)");
@@ -129,8 +137,8 @@ namespace chengine
 
 		// now it's time to check if there is enough space on destination device
 		unsigned long long ullNeededSize = rFilesCache.CalculateTotalSize() - rFilesCache.CalculatePartialSize(m_spSubTaskStats->GetCurrentIndex());
-		TSmartPath pathSingleSrc = spSrcPaths->GetAt(0)->GetSrcPath();
-		TSubTaskBase::ESubOperationResult eResult = tFilesystemFBWrapper.CheckForFreeSpaceFB(pathSingleSrc, pathDestination, ullNeededSize);
+
+		TSubTaskBase::ESubOperationResult eResult = tFilesystemFBWrapper.CheckForFreeSpaceFB(pathDestination, ullNeededSize);
 		if(eResult != eSubResult_Continue)
 			return eResult;
 
@@ -204,16 +212,14 @@ namespace chengine
 				continue;
 			}
 
-			// set dest path with filename
-			ccp.pathDstFile = tDstPathProvider.CalculateDestinationPath(spFileInfo);
-
 			// are the files/folders lie on the same partition ?
 			bool bMove = GetContext().GetOperationType() == eOperation_Move;
 
 			// if folder - create it
 			if(spFileInfo->IsDirectory())
 			{
-				eResult = tFilesystemFBWrapper.CreateDirectoryFB(ccp.pathDstFile);
+				TSmartPath pathDstFile = tDstPathProvider.CalculateDestinationPath(spFileInfo);
+				eResult = tFilesystemFBWrapper.CreateDirectoryFB(pathDstFile);
 				if(eResult == eSubResult_SkipFile)
 				{
 					spFileInfo->MarkAsProcessed(false);
@@ -226,11 +232,11 @@ namespace chengine
 			}
 			else
 			{
-				// start copying/moving file
+				ccp.pDstPathProvider = &tDstPathProvider;
 				ccp.spSrcFile = spFileInfo;
 
 				// copy data
-				eResult = CustomCopyFileFB(spFeedbackHandler, threadPool, &ccp);
+				eResult = CustomCopyFileFB(spFeedbackManager, threadPool, &ccp);
 				if (eResult == eSubResult_SkipFile)
 				{
 					spFileInfo->MarkAsProcessed(false);
@@ -338,7 +344,7 @@ namespace chengine
 		}
 	}
 
-	TSubTaskBase::ESubOperationResult TSubTaskCopyMove::CustomCopyFileFB(const IFeedbackHandlerPtr& spFeedbackHandler,
+	TSubTaskBase::ESubOperationResult TSubTaskCopyMove::CustomCopyFileFB(const FeedbackManagerPtr& spFeedbackManager,
 		TOverlappedThreadPool& rThreadPool,
 		CUSTOM_COPY_PARAMS* pData)
 	{
@@ -368,11 +374,11 @@ namespace chengine
 		unsigned long long ullNextReadPos = m_spSubTaskStats->GetCurrentItemProcessedSize();
 
 		TOverlappedReaderWriterFB tReaderWriter(spFilesystem,
-			spFeedbackHandler,
+			spFeedbackManager,
 			rThreadController,
 			rThreadPool,
 			pData->spSrcFile,
-			pData->pathDstFile,
+			*pData->pDstPathProvider,
 			m_spSubTaskStats,
 			m_spLog->GetLogFileData(),
 			pData->spMemoryPool,

@@ -62,6 +62,9 @@ namespace serializer
 
 			if(tVersion.GetVersion() == 5)
 				Migrate_005_006(spDatabase, tVersion);
+				
+			if(tVersion.GetVersion() == 6)
+				Migrate_006_007(spDatabase, tVersion);
 		}
 
 		tTransaction.Commit();
@@ -76,7 +79,7 @@ namespace serializer
 		tStatement.Prepare(_T("CREATE TABLE base_paths(id BIGINT UNIQUE, src_path varchar(32768) NOT NULL, skip_processing boolean NOT NULL, dst_path varchar(32768) NOT NULL)"));
 		tStatement.Step();
 
-		tStatement.Prepare(_T("CREATE TABLE scanned_files(id BIGINT UNIQUE, rel_path varchar(32768) NOT NULL, base_path_id BIGINT NOT NULL, attr INT NOT NULL, size BIGINT NOT NULL, time_created BIGINT NOT NULL, time_last_write BIGINT NOT NULL, time_last_access BIGINT NOT NULL, flags INT NOT NULL)"));
+		tStatement.Prepare(_T("CREATE TABLE scanned_files(id BIGINT UNIQUE, rel_path varchar(32768) NOT NULL, dst_rel_path varchar(32768) NOT NULL DEFAULT '', base_path_id BIGINT NOT NULL, attr INT NOT NULL, size BIGINT NOT NULL, time_created BIGINT NOT NULL, time_last_write BIGINT NOT NULL, time_last_access BIGINT NOT NULL, flags INT NOT NULL)"));
 		tStatement.Step();
 
 		tStatement.Prepare(_T("CREATE TABLE task_config(id BIGINT UNIQUE, name varchar(256) NOT NULL, node_order INT NOT NULL, value varchar(32768) NOT NULL)"));
@@ -122,11 +125,32 @@ namespace serializer
 			_T("buffer_index INT NOT NULL, current_path varchar(32768) NOT NULL, ci_silent_resume boolean NOT NULL)"));
 		tStatement.Step();
 
-		tStatement.Prepare(_T("CREATE TABLE feedback(id BIGINT UNIQUE, file_error INT NOT NULL, file_already_exists INT NOT NULL, not_enough_space INT NOT NULL, operation_finished INT NOT NULL, operation_error INT NOT NULL)"));
+		tStatement.Prepare(_T("CREATE TABLE feedback_already_exists(id BIGINT UNIQUE, use_mask INT NOT NULL, mask varchar(32768) NOT NULL, ")
+			_T("use_exclude_mask INT NOT NULL, exclude_mask varchar(32768) NOT NULL, ")
+			_T("use_date_compare INT NOT NULL, date_compare_type INT NOT NULL, ")
+			_T("use_size_compare INT NOT NULL, size_compare_type INT NOT NULL, ")
+			_T("result INT NOT NULL)"));
+		tStatement.Step();
+
+		tStatement.Prepare(_T("CREATE TABLE feedback_error(id BIGINT UNIQUE, use_mask INT NOT NULL, mask varchar(32768) NOT NULL, ")
+			_T("use_exclude_mask INT NOT NULL, exclude_mask varchar(32768) NOT NULL, ")
+			_T("use_error_type INT NOT NULL, error_type INT NOT NULL, ")
+			_T("use_system_error_no INT NOT NULL, system_error_no INT NOT NULL, ")
+			_T("result INT NOT NULL)"));
+		tStatement.Step();
+
+		tStatement.Prepare(_T("CREATE TABLE feedback_not_enough_space(id BIGINT UNIQUE, use_mask INT NOT NULL, mask varchar(32768) NOT NULL, ")
+			_T("use_exclude_mask INT NOT NULL, exclude_mask varchar(32768) NOT NULL, ")
+			_T("result INT NOT NULL)"));
+		tStatement.Step();
+
+		tStatement.Prepare(_T("CREATE TABLE feedback_operation_event(id BIGINT UNIQUE,")
+			_T("use_operation_event INT NOT NULL, operation_event INT NOT NULL, ")
+			_T("result INT NOT NULL)"));
 		tStatement.Step();
 
 		// and finally set the database version to current one
-		tVersion.SetVersion(5);
+		tVersion.SetVersion(7);
 	}
 
 	void TSQLiteTaskSchema::Migrate_001_002(const sqlite::TSQLiteDatabasePtr& spDatabase, TSerializerVersion &tVersion)
@@ -257,5 +281,45 @@ namespace serializer
 		tStatement.Step();
 
 		tVersion.SetVersion(6);
+	}
+
+	void TSQLiteTaskSchema::Migrate_006_007(const sqlite::TSQLiteDatabasePtr& spDatabase, TSerializerVersion& tVersion)
+	{
+		sqlite::TSQLiteStatement tStatement(spDatabase);
+
+		// remove old feedback table (with no migration)
+		tStatement.Prepare(_T("DROP TABLE feedback"));
+		tStatement.Step();
+
+		// create new feedback tables
+		tStatement.Prepare(_T("CREATE TABLE feedback_already_exists(id BIGINT UNIQUE, use_mask INT NOT NULL, mask varchar(32768) NOT NULL, ")
+			_T("use_exclude_mask INT NOT NULL, exclude_mask varchar(32768) NOT NULL, ")
+			_T("use_date_compare INT NOT NULL, date_compare_type INT NOT NULL, ")
+			_T("use_size_compare INT NOT NULL, size_compare_type INT NOT NULL, ")
+			_T("result INT NOT NULL)"));
+		tStatement.Step();
+
+		tStatement.Prepare(_T("CREATE TABLE feedback_error(id BIGINT UNIQUE, use_mask INT NOT NULL, mask varchar(32768) NOT NULL, ")
+			_T("use_exclude_mask INT NOT NULL, exclude_mask varchar(32768) NOT NULL, ")
+			_T("use_error_type INT NOT NULL, error_type INT NOT NULL, ")
+			_T("use_system_error_no INT NOT NULL, system_error_no INT NOT NULL, ")
+			_T("result INT NOT NULL)"));
+		tStatement.Step();
+
+		tStatement.Prepare(_T("CREATE TABLE feedback_not_enough_space(id BIGINT UNIQUE, use_mask INT NOT NULL, mask varchar(32768) NOT NULL, ")
+			_T("use_exclude_mask INT NOT NULL, exclude_mask varchar(32768) NOT NULL, ")
+			_T("result INT NOT NULL)"));
+		tStatement.Step();
+
+		tStatement.Prepare(_T("CREATE TABLE feedback_operation_event(id BIGINT UNIQUE,")
+			_T("use_operation_event INT NOT NULL, operation_event INT NOT NULL, ")
+			_T("result INT NOT NULL)"));
+		tStatement.Step();
+
+		// adjust scanned_paths to include destination path
+		tStatement.Prepare(_T("ALTER TABLE scanned_files ADD COLUMN dst_rel_path varchar(32768) NOT NULL DEFAULT ''"));
+		tStatement.Step();
+
+		tVersion.SetVersion(7);
 	}
 }

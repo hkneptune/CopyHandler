@@ -32,7 +32,7 @@ namespace chengine
 	{
 	public:
 		TOverlappedReaderFB(const IFilesystemPtr& spFilesystem,
-			const IFeedbackHandlerPtr& spFeedbackHandler,
+			const FeedbackManagerPtr& spFeedbackManager,
 		    chcore::TWorkerThreadController& rThreadController,
 			const TSubTaskStatsInfoPtr& spStats,
 			const TFileInfoPtr& spSrcFileInfo,

@@ -54,6 +54,7 @@ namespace chcore
 		eErr_MutexAlreadyLocked = 1011,
 
 		// string errors (1500+)
+		eErr_InvalidRegex = 1500,
 
 		// Task definition errors (2000+)
 		eErr_UnsupportedVersion = 2000,

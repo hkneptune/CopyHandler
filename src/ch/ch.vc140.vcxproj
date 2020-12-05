@@ -558,9 +558,15 @@
     <ClInclude Include="AsyncHttpFile.h" />
     <ClInclude Include="CDragDropComboEx.h" />
     <ClInclude Include="CDragDropListCtrl.h" />
+    <ClInclude Include="ComboDataWrapper.h" />
     <ClInclude Include="DirectoryChooser.h" />
     <ClInclude Include="FeedbackHandler.h" />
     <ClInclude Include="FeedbackHandlerFactory.h" />
+    <ClInclude Include="FilterTypesMenuWrapper.h" />
+    <ClInclude Include="RuleEditAlreadyExistsDlg.h" />
+    <ClInclude Include="RuleEditDlg.h" />
+    <ClInclude Include="RuleEditErrorDlg.h" />
+    <ClInclude Include="RuleEditNotEnoughSpaceDlg.h" />
     <ClInclude Include="structs.h" />
     <ClInclude Include="AppHelper.h" />
     <ClInclude Include="CfgProperties.h" />
@@ -580,7 +586,6 @@
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="TCommandLineParser.h" />
     <ClInclude Include="MainWnd.h" />
-    <ClInclude Include="MemDC.h" />
     <ClInclude Include="Theme Helpers.h" />
     <ClInclude Include="TrayIcon.h" />
     <ClInclude Include="DirTreeCtrl.h" />
@@ -639,6 +644,11 @@
     <ClCompile Include="DirectoryChooser.cpp" />
     <ClCompile Include="FeedbackHandler.cpp" />
     <ClCompile Include="FeedbackHandlerFactory.cpp" />
+    <ClCompile Include="FilterTypesMenuWrapper.cpp" />
+    <ClCompile Include="RuleEditAlreadyExistsDlg.cpp" />
+    <ClCompile Include="RuleEditDlg.cpp" />
+    <ClCompile Include="RuleEditErrorDlg.cpp" />
+    <ClCompile Include="RuleEditNotEnoughSpaceDlg.cpp" />
     <ClCompile Include="structs.cpp" />
     <ClCompile Include="AppHelper.cpp" />
     <ClCompile Include="ClipboardMonitor.cpp" />

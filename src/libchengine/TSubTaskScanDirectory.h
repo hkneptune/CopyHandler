@@ -43,7 +43,7 @@ namespace chengine
 		void Reset() override;
 
 		void InitBeforeExec() override;
-		ESubOperationResult Exec(const IFeedbackHandlerPtr& spFeedbackHandler) override;
+		ESubOperationResult Exec() override;
 		ESubOperationType GetSubOperationType() const override { return eSubOperation_Scanning; }
 
 		void Store(const serializer::ISerializerPtr& spSerializer) const override;
@@ -52,8 +52,8 @@ namespace chengine
 		void GetStatsSnapshot(TSubTaskStatsSnapshotPtr& spStats) const override;
 
 	private:
-		int ScanDirectory(chcore::TSmartPath pathDirName, const TBasePathDataPtr& spBasePathData,
-			bool bRecurse, bool bIncludeDirs, const TFileFiltersArray& afFilters);
+		size_t ScanDirectory(chcore::TSmartPath pathDirName, const TBasePathDataPtr& spBasePathData,
+			bool bIncludeDirs, const TFileFiltersArray& afFilters, bool bExcludeEmptyDirs);
 		void InitColumns(const serializer::ISerializerContainerPtr& spContainer) const;
 
 	private:

@@ -24,6 +24,7 @@
 #include "TOverlappedMemoryPool.h"
 #include "TOverlappedReaderFB.h"
 #include "TOverlappedWriterFB.h"
+#include "FeedbackManager.h"
 
 namespace chengine
 {
@@ -33,11 +34,11 @@ namespace chengine
 	{
 	public:
 		explicit TOverlappedReaderWriterFB(const IFilesystemPtr& spFilesystem,
-			const IFeedbackHandlerPtr& spFeedbackHandler,
+			const FeedbackManagerPtr& spFeedbackManager,
 			TWorkerThreadController& rThreadController,
 			TOverlappedThreadPool& rThreadPool,
 			const TFileInfoPtr& spSrcFileInfo,
-			const TSmartPath& pathDst,
+			const TDestinationPathProvider& rDstPathProvider,
 			const TSubTaskStatsInfoPtr& spStats,
 			const logger::TLogFileDataPtr& spLogFileData,
 			const TOverlappedMemoryPoolPtr& spBuffers,

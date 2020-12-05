@@ -72,6 +72,10 @@ namespace chengine
 		chcore::TSmartPath GetFullFilePath() const;		// returns full path
 		void SetFilePath(const chcore::TSmartPath& tPath);
 
+		// dst file path
+		const chcore::TSmartPath& GetDstRelativePath() const { return m_pathRelativeDstFile; }
+		void SetDstRelativePath(const chcore::TSmartPath& tPath) { m_pathRelativeDstFile = tPath; }
+
 		// file size
 		ULONGLONG GetLength64() const;
 		void SetLength64(ULONGLONG uhSize);
@@ -102,12 +106,16 @@ namespace chengine
 		static void InitColumns(serializer::IColumnsDefinition& rColumns);
 		void Load(const serializer::ISerializerRowReaderPtr& spRowReader, const TBasePathDataContainerPtr& spSrcContainer);
 
+		void MarkAsAdded() { m_setModifications[eMod_Added] = true; }
+		bool IsAdded() const { return m_setModifications[eMod_Added]; }
+
 	private:
 		enum EModifications
 		{
 			eMod_None = 0,
 			eMod_Added,
 			eMod_Path,
+			eMod_DstRelativePath,
 			eMod_BasePath,
 			eMod_Attributes,
 			eMod_FileSize,
@@ -128,6 +136,7 @@ namespace chengine
 		serializer::object_id_t m_oidObjectID;
 
 		serializer::TSharedModificationTracker<chcore::TSmartPath, Bitset, eMod_Path> m_pathFile;
+		serializer::TSharedModificationTracker<chcore::TSmartPath, Bitset, eMod_DstRelativePath> m_pathRelativeDstFile;
 		serializer::TSharedModificationTracker<TBasePathDataPtr, Bitset, eMod_BasePath> m_spBasePathData;
 		serializer::TSharedModificationTracker<DWORD, Bitset, eMod_Attributes> m_dwAttributes;	// attributes
 		serializer::TSharedModificationTracker<ULONGLONG, Bitset, eMod_FileSize> m_uhFileSize;

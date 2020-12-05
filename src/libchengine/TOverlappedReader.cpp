@@ -19,6 +19,7 @@
 #include "stdafx.h"
 #include "TOverlappedReader.h"
 #include "TOverlappedDataBuffer.h"
+#include <boost/bind/bind.hpp>
 
 using namespace chcore;
 
@@ -34,6 +35,8 @@ namespace chengine
 		m_spFullBuffers(std::make_shared<TOrderedBufferQueue>(spEmptyBuffers, spDataRange ? spDataRange->GetResumePosition() : 0)),
 		m_tInputBuffers(spEmptyBuffers, spDataRange ? spDataRange->GetResumePosition() : 0, dwChunkSize, stMaxOtfBuffers, stMaxReadAheadBuffers, spOtfBuffersCount, m_spFullBuffers->GetSharedCount())
 	{
+		using namespace boost::placeholders;
+
 		if(!spLogFileData)
 			throw TCoreException(eErr_InvalidArgument, L"spLogFileData is NULL", LOCATION);
 		if(!spEmptyBuffers)

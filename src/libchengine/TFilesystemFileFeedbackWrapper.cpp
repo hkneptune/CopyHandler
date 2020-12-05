@@ -30,15 +30,15 @@ using namespace string;
 namespace chengine
 {
 	TFilesystemFileFeedbackWrapper::TFilesystemFileFeedbackWrapper(const IFilesystemFilePtr& spFile, 
-		const IFeedbackHandlerPtr& spFeedbackHandler, const logger::TLogFileDataPtr& spLogFileData,
+		const FeedbackManagerPtr& spFeedbackManager, const logger::TLogFileDataPtr& spLogFileData,
 		TWorkerThreadController& rThreadController, const IFilesystemPtr& spFilesystem) :
 		m_spFile(spFile),
-		m_spFeedbackHandler(spFeedbackHandler),
+		m_spFeedbackManager(spFeedbackManager),
 		m_spFilesystem(spFilesystem),
 		m_spLog(std::make_unique<logger::TLogger>(spLogFileData, L"Filesystem-File")),
 		m_rThreadController(rThreadController)
 	{
-		if (!spFeedbackHandler)
+		if (!spFeedbackManager)
 			throw TCoreException(eErr_InvalidArgument, L"spFeedbackHandler is NULL", LOCATION);
 		if (!spFile)
 			throw TCoreException(eErr_InvalidArgument, L"spFile is NULL", LOCATION);
@@ -46,16 +46,24 @@ namespace chengine
 			throw TCoreException(eErr_InvalidArgument, L"spFilesystem is NULL", LOCATION);
 	}
 
-	TSubTaskBase::ESubOperationResult TFilesystemFileFeedbackWrapper::HandleFileAlreadyExistsFB(const TFileInfoPtr& spSrcFileInfo, bool& bShouldAppend)
+	TSubTaskBase::ESubOperationResult TFilesystemFileFeedbackWrapper::HandleFileAlreadyExistsFB(const TFileInfoPtr& spSrcFileInfo, const TDestinationPathProvider& rDstPathProvider, bool& bShouldAppend, bool& bShouldRename)
 	{
 		bShouldAppend = false;
+		bShouldRename = false;
 
 		// read info about the existing destination file,
 		TFileInfo tDstFileInfo;
 		m_spFile->GetFileInfo(tDstFileInfo);
 
+		// calculate suggested destination filename
+		TSmartPath pathOriginalPlannedDestination = tDstFileInfo.GetFullFilePath();
+		pathOriginalPlannedDestination.DeleteFileName();
+		pathOriginalPlannedDestination += spSrcFileInfo->GetFullFilePath().GetFileName();
+
+		TSmartPath suggestedPath = rDstPathProvider.CalculateSuggestedDestinationPath(pathOriginalPlannedDestination);
+
 		// src and dst files are the same
-		TFeedbackResult frResult = m_spFeedbackHandler->FileAlreadyExists(*spSrcFileInfo, tDstFileInfo);
+		TFeedbackResult frResult = m_spFeedbackManager->FileAlreadyExists(spSrcFileInfo, tDstFileInfo, suggestedPath);
 		switch(frResult.GetResult())
 		{
 		case eResult_Overwrite:
@@ -80,6 +88,10 @@ namespace chengine
 		}
 		case eResult_Pause:
 			return TSubTaskBase::eSubResult_PauseRequest;
+
+		case eResult_Rename:
+			bShouldRename = true;
+			return TSubTaskBase::eSubResult_Continue;
 
 		default:
 			BOOST_ASSERT(FALSE);		// unknown result
@@ -109,7 +121,7 @@ namespace chengine
 			strFormat.Replace(_T("%path"), m_spFile->GetFilePath().ToString());
 			LOG_ERROR(m_spLog) << strFormat.c_str();
 
-			TFeedbackResult frResult = m_spFeedbackHandler->FileError(m_spFile->GetFilePath().ToWString(), TString(), EFileError::eResizeError, dwLastError);
+			TFeedbackResult frResult = m_spFeedbackManager->FileError(m_spFile->GetFilePath().ToWString(), TString(), EFileError::eResizeError, dwLastError);
 			switch (frResult.GetResult())
 			{
 			case eResult_Cancel:
@@ -161,7 +173,7 @@ namespace chengine
 			strFormat.Replace(_T("%path"), m_spFile->GetFilePath().ToString());
 			LOG_ERROR(m_spLog) << strFormat.c_str();
 
-			TFeedbackResult frResult = m_spFeedbackHandler->FileError(m_spFile->GetFilePath().ToWString(), TString(), EFileError::eReadError, dwLastError);
+			TFeedbackResult frResult = m_spFeedbackManager->FileError(m_spFile->GetFilePath().ToWString(), TString(), EFileError::eReadError, dwLastError);
 			switch (frResult.GetResult())
 			{
 			case eResult_Cancel:
@@ -213,7 +225,7 @@ namespace chengine
 			strFormat.Replace(_T("%path"), m_spFile->GetFilePath().ToString());
 			LOG_ERROR(m_spLog) << strFormat.c_str();
 
-			TFeedbackResult frResult = m_spFeedbackHandler->FileError(m_spFile->GetFilePath().ToWString(), TString(), EFileError::eWriteError, dwLastError);
+			TFeedbackResult frResult = m_spFeedbackManager->FileError(m_spFile->GetFilePath().ToWString(), TString(), EFileError::eWriteError, dwLastError);
 			switch (frResult.GetResult())
 			{
 			case eResult_Cancel:
@@ -264,7 +276,7 @@ namespace chengine
 			strFormat.Replace(_T("%path"), m_spFile->GetFilePath().ToString());
 			LOG_ERROR(m_spLog) << strFormat.c_str();
 
-			TFeedbackResult frResult = m_spFeedbackHandler->FileError(m_spFile->GetFilePath().ToWString(), TString(), EFileError::eFinalizeError, dwLastError);
+			TFeedbackResult frResult = m_spFeedbackManager->FileError(m_spFile->GetFilePath().ToWString(), TString(), EFileError::eFinalizeError, dwLastError);
 			switch (frResult.GetResult())
 			{
 			case eResult_Cancel:
@@ -323,7 +335,7 @@ namespace chengine
 		strFormat.Replace(_T("%path"), m_spFile->GetFilePath().ToString());
 		LOG_ERROR(m_spLog) << strFormat.c_str();
 
-		TFeedbackResult frResult = m_spFeedbackHandler->FileError(m_spFile->GetFilePath().ToWString(), TString(), EFileError::eReadError, dwLastError);
+		TFeedbackResult frResult = m_spFeedbackManager->FileError(m_spFile->GetFilePath().ToWString(), TString(), EFileError::eReadError, dwLastError);
 		switch(frResult.GetResult())
 		{
 		case eResult_Cancel:
@@ -355,7 +367,7 @@ namespace chengine
 		strFormat.Replace(_T("%path"), m_spFile->GetFilePath().ToString());
 		LOG_ERROR(m_spLog) << strFormat.c_str();
 
-		TFeedbackResult frResult = m_spFeedbackHandler->FileError(m_spFile->GetFilePath().ToWString(), TString(), EFileError::eWriteError, dwLastError);
+		TFeedbackResult frResult = m_spFeedbackManager->FileError(m_spFile->GetFilePath().ToWString(), TString(), EFileError::eWriteError, dwLastError);
 		switch(frResult.GetResult())
 		{
 		case eResult_Cancel:
@@ -398,7 +410,7 @@ namespace chengine
 			strFormat.Replace(_T("%path"), m_spFile->GetFilePath().ToString());
 			LOG_ERROR(m_spLog) << strFormat.c_str();
 
-			TFeedbackResult frResult = m_spFeedbackHandler->FileError(m_spFile->GetFilePath().ToWString(), TString(), EFileError::eCreateError, dwLastError);
+			TFeedbackResult frResult = m_spFeedbackManager->FileError(m_spFile->GetFilePath().ToWString(), TString(), EFileError::eCreateError, dwLastError);
 			switch(frResult.GetResult())
 			{
 			case eResult_Cancel:
@@ -457,7 +469,7 @@ namespace chengine
 			if(bSilent)
 				return TSubTaskBase::eSubResult_Error;
 
-			TFeedbackResult frResult = m_spFeedbackHandler->FileError(m_spFile->GetFilePath().ToWString(), TString(), EFileError::eRetrieveFileInfo, dwLastError);
+			TFeedbackResult frResult = m_spFeedbackManager->FileError(m_spFile->GetFilePath().ToWString(), TString(), EFileError::eRetrieveFileInfo, dwLastError);
 			switch(frResult.GetResult())
 			{
 			case eResult_Cancel:
@@ -513,7 +525,7 @@ namespace chengine
 			strFormat.Replace(_T("%path"), m_spFile->GetFilePath().ToString());
 			LOG_ERROR(m_spLog) << strFormat.c_str();
 
-			TFeedbackResult frResult = m_spFeedbackHandler->FileError(m_spFile->GetFilePath().ToWString(), TString(), EFileError::eRetrieveFileInfo, dwLastError);
+			TFeedbackResult frResult = m_spFeedbackManager->FileError(m_spFile->GetFilePath().ToWString(), TString(), EFileError::eRetrieveFileInfo, dwLastError);
 			switch(frResult.GetResult())
 			{
 			case eResult_Cancel:
@@ -544,7 +556,7 @@ namespace chengine
 
 	bool TFilesystemFileFeedbackWrapper::WasKillRequested(const TFeedbackResult& rFeedbackResult) const
 	{
-		if(m_rThreadController.KillRequested(rFeedbackResult.IsAutomatedReply() ? m_spFeedbackHandler->GetRetryInterval() : 0))
+		if(m_rThreadController.KillRequested(rFeedbackResult.IsAutomatedReply() ? m_spFeedbackManager->GetRetryInterval() : 0))
 			return true;
 		return false;
 	}

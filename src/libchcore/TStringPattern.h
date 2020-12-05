@@ -1,6 +1,6 @@
 // ============================================================================
-//  Copyright (C) 2001-2015 by Jozef Starosczyk
-//  ixen@copyhandler.com
+//  Copyright (C) 2001-2020 by Jozef Starosczyk
+//  ixen {at} copyhandler [dot] com
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU Library General Public License
@@ -16,48 +16,50 @@
 //  Free Software Foundation, Inc.,
 //  59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // ============================================================================
-#ifndef __TSTRINGPATTERN_H__
-#define __TSTRINGPATTERN_H__
+#pragma once
 
-#include "TString.h"
+#include "../libstring/TString.h"
+#include "libchcore.h"
+#include "TPath.h"
 
-namespace string
+namespace chcore
 {
-	class LIBSTRING_API TStringPattern
+	class LIBCHCORE_API TStringPattern
 	{
 	public:
 		enum class EPatternType
 		{
-			eType_Wildcard
+			eType_FilenameWildcard,
+			eType_FullPathWildcard,
+			eType_FilenameRegex,
+			eType_FullPathRegex,
 		};
 
 	public:
-		explicit TStringPattern(EPatternType ePatternType = EPatternType::eType_Wildcard);
-		explicit TStringPattern(const TString& strPattern, EPatternType ePatternType = EPatternType::eType_Wildcard);
+		TStringPattern();
+		explicit TStringPattern(const string::TString& strPattern);
+		explicit TStringPattern(const string::TString& strPattern, EPatternType ePatternType);
 
-		void SetPattern(const TString& strPattern, EPatternType ePatternType = EPatternType::eType_Wildcard);
-		bool Matches(const TString& strTextToMatch) const;
+		void SetPattern(const string::TString& strPattern, EPatternType ePatternType = EPatternType::eType_FilenameWildcard);
+		bool Matches(const TSmartPath& pathToMatch) const;
 
 		EPatternType GetPatternType() const { return m_ePatternType; }
-		TString GetPattern() const { return m_strPattern; }
+		string::TString GetPattern() const { return m_strPattern; }
 
 		// string parsing
-		static TStringPattern CreateFromString(const TString& strPattern, EPatternType eDefaultPatternType = EPatternType::eType_Wildcard);
+		static TStringPattern CreateFromString(const string::TString& strPattern);
 
-		void FromString(const TString& strPattern, EPatternType eDefaultPatternType = EPatternType::eType_Wildcard);
-		TString ToString() const;
+		void FromString(const string::TString& strPattern);
+		string::TString ToString() const;
 
 		bool operator==(const TStringPattern& rSrc) const;
 		bool operator!=(const TStringPattern& rSrc) const;
 
 	private:
-		bool MatchMask(LPCTSTR lpszMask, LPCTSTR lpszString) const;
-		bool Scan(LPCTSTR& lpszMask, LPCTSTR& lpszString) const;
+		std::wstring ConvertGlobToRegex() const;
 
 	private:
-		TString m_strPattern;
+		string::TString m_strPattern;
 		EPatternType m_ePatternType;
 	};
 }
-
-#endif

@@ -19,7 +19,6 @@
 #ifndef __TASK_H__
 #define __TASK_H__
 
-#include "IFeedbackHandler.h"
 #include "TTaskDefinition.h"
 #include "TTaskConfigTracker.h"
 #include "TBasePathData.h"
@@ -33,6 +32,7 @@
 #include "IFilesystem.h"
 #include "../liblogger/TLogger.h"
 #include "../libchcore/TWorkerThreadController.h"
+#include "FeedbackManager.h"
 
 namespace chengine
 {
@@ -136,7 +136,8 @@ namespace chengine
 #pragma warning(disable: 4251)
 		serializer::ISerializerPtr m_spSerializer;
 		std::mutex m_mutexSerializer;
-		IFeedbackHandlerPtr m_spInternalFeedbackHandler;
+
+		FeedbackManagerPtr m_spFeedbackManager;
 #pragma warning(pop)
 
 		// base data
@@ -151,9 +152,8 @@ namespace chengine
 		// Global task settings
 		TConfig m_tConfiguration;
 
-		TSubTasksArray m_tSubTasksArray;
-
 		TSubTaskContext m_tSubTaskContext;
+		TSubTasksArray m_tSubTasksArray;
 
 		TTaskConfigTracker m_cfgTracker;
 

@@ -40,6 +40,15 @@
 #include "../libchengine/TConfigSerializers.h"
 #include "../libictranslate/ResourceManager.h"
 
+#define min std::min
+#define max std::max
+
+#include <afxvisualmanager.h>
+#include <afxvisualmanagerwindows.h>
+
+#undef min
+#undef max
+
 #ifdef _DEBUG
 #define new DEBUG_NEW
 #endif
@@ -367,6 +376,10 @@ BOOL CCopyHandlerApp::InitInstance()
 		MsgBox(IDS_ERROR_INITIALIZING_RICH_EDIT_CONTROL, MB_OK | MB_ICONERROR);
 		return FALSE;
 	}
+
+	AfxEnableControlContainer();
+
+	CMFCVisualManager::SetDefaultManager(RUNTIME_CLASS(CMFCVisualManagerWindows));
 
 	// ================================= Shell extension ========================================
 	LOG_INFO(m_spLog) << _T("Checking shell extension compatibility");

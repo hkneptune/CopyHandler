@@ -27,6 +27,7 @@
 #include <boost/lexical_cast.hpp>
 #include "TTaskDefinition.h"
 #include "../libchcore/TCoreException.h"
+#include "EOperationTypesMapper.h"
 
 #define CURRENT_TASK_VERSION 1
 
@@ -173,6 +174,7 @@ namespace chengine
 			throw TCoreException(eErr_MissingXmlData, L"Missing TaskDefinition.SourcePaths.Path", LOCATION);
 
 		GetConfigValue(rDataSrc, _T("TaskDefinition.Filters"), m_afFilters);
+		GetConfigValue(rDataSrc, _T("TaskDefinition.Feedback"), m_feedbackRules);
 
 		// destination path
 		if (!GetConfigValue(rDataSrc, _T("TaskDefinition.DestinationPath"), m_pathDestinationPath) || (!bAllowEmptyDstPath && m_pathDestinationPath.IsEmpty()))
@@ -183,11 +185,12 @@ namespace chengine
 			m_pathDestinationPath.AppendSeparatorIfDoesNotExist();
 
 		// type of the operation
-		int iOperation = eOperation_None;
-		if (!rDataSrc.GetValue(_T("TaskDefinition.OperationType"), iOperation))
+		TString strOperation = L"copy";
+		if(!GetConfigValue(rDataSrc, _T("TaskDefinition.OperationType"), strOperation))
 			throw TCoreException(eErr_MissingXmlData, L"Missing TaskDefinition.OperationType", LOCATION);
 
-		m_tOperationPlan.SetOperationType((EOperationType)iOperation);
+		EOperationType eOperation = UnmapEnum<EOperationType>(strOperation);
+		m_tOperationPlan.SetOperationType(eOperation);
 
 		// and version of the task
 		if (!GetConfigValue(rDataSrc, _T("TaskDefinition.Version"), m_ullTaskVersion))
@@ -246,14 +249,14 @@ namespace chengine
 		SetConfigValue(rConfig, _T("TaskDefinition.Filters"), m_afFilters);
 		SetConfigValue(rConfig, _T("TaskDefinition.DestinationPath"), m_pathDestinationPath);
 
-		int iOperation = m_tOperationPlan.GetOperationType();
-		SetConfigValue(rConfig, _T("TaskDefinition.OperationType"), iOperation);
+		SetConfigValue(rConfig, _T("TaskDefinition.OperationType"), MapEnum(m_tOperationPlan.GetOperationType()));
 
 		SetConfigValue(rConfig, _T("TaskDefinition.Version"), m_ullTaskVersion);
 
+		SetConfigValue(rConfig, _T("TaskDefinition.Feedback"), m_feedbackRules);
+
 		rConfig.PutSubConfig(_T("TaskDefinition.TaskSettings"), m_tConfiguration);
 	}
-
 
 	const TFileFiltersArray& TTaskDefinition::GetFilters() const
 	{
@@ -268,5 +271,20 @@ namespace chengine
 	void TTaskDefinition::SetFilters(const TFileFiltersArray& rFilters)
 	{
 		m_afFilters = rFilters;
+	}
+
+	const FeedbackRules& TTaskDefinition::GetFeedbackRules() const
+	{
+		return m_feedbackRules;
+	}
+
+	FeedbackRules& TTaskDefinition::GetFeedbackRules()
+	{
+		return m_feedbackRules;
+	}
+
+	void TTaskDefinition::SetFeedbackRules(const FeedbackRules& rFeedbackRules)
+	{
+		m_feedbackRules = rFeedbackRules;
 	}
 }

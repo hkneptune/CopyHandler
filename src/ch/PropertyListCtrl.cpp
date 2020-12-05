@@ -20,7 +20,6 @@
 #include "ch.h"
 #include "PropertyListCtrl.h"
 #include "dialogs.h"
-#include "memdc.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -67,36 +66,35 @@ void CComboButton::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct )
 {
 	CDC*	prDC			= CDC::FromHandle(lpDrawItemStruct->hDC);
 	CRect 	ButtonRect  = lpDrawItemStruct->rcItem;
-	CMemDC dc(prDC, ButtonRect);
-	CMemDC *pDC=&dc;
+	CMemDC dc(*prDC, ButtonRect);
 
 	// Fill the Background
-	CBrush* pOldBrush = (CBrush*)pDC->SelectObject( m_pBkBrush );
-	CPen* pOldPen = (CPen*)pDC->SelectObject(m_pBkPen);
-	pDC->Rectangle(ButtonRect);
+	CBrush* pOldBrush = (CBrush*)dc.GetDC().SelectObject( m_pBkBrush );
+	CPen* pOldPen = (CPen*)dc.GetDC().SelectObject(m_pBkPen);
+	dc.GetDC().Rectangle(ButtonRect);
 
 	// Draw the Correct Border
 	if(lpDrawItemStruct->itemState & ODS_SELECTED)
 	{
-		pDC->DrawEdge(ButtonRect, EDGE_SUNKEN, BF_RECT);
+		dc.GetDC().DrawEdge(ButtonRect, EDGE_SUNKEN, BF_RECT);
 		ButtonRect.left++;
 		ButtonRect.right++;
 		ButtonRect.bottom++;
 		ButtonRect.top++;
 	}
 	else
-		pDC->DrawEdge(ButtonRect, EDGE_RAISED, BF_RECT);
+		dc.GetDC().DrawEdge(ButtonRect, EDGE_RAISED, BF_RECT);
 	
 	// Draw the Triangle
 	ButtonRect.left		+= 3;
 	ButtonRect.right	-= 4;
 	ButtonRect.top		+= 5;
 	ButtonRect.bottom	-= 5;
-	DrawTriangle(pDC, ButtonRect);
+	DrawTriangle(&dc.GetDC(), ButtonRect);
 
 	// Return what was used
-	pDC->SelectObject( pOldPen );
-	pDC->SelectObject( pOldBrush );
+	dc.GetDC().SelectObject( pOldPen );
+	dc.GetDC().SelectObject( pOldBrush );
 }
 
 void CComboButton::DrawTriangle(CDC* pDC, CRect Rect)

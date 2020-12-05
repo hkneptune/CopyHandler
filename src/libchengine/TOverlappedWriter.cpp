@@ -19,6 +19,7 @@
 #include "stdafx.h"
 #include "TOverlappedWriter.h"
 #include "TOverlappedDataBuffer.h"
+#include <boost/bind/bind.hpp>
 
 using namespace chcore;
 
@@ -31,6 +32,8 @@ namespace chengine
 		m_tBuffersToWrite(spBuffersToWrite, stMaxOtfBuffers, spOtfBuffersCount),
 		m_tFinishedBuffers(spEmptyBuffers, spRange != nullptr ? spRange->GetResumePosition() : 0)
 	{
+		using namespace boost::placeholders;
+
 		if(!spLogFileData)
 			throw TCoreException(eErr_InvalidArgument, L"spLogFileData is NULL", LOCATION);
 		if(!spBuffersToWrite)

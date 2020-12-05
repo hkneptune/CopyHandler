@@ -1,24 +1,25 @@
-/***************************************************************************
-*   Copyright (C) 2001-2008 by Józef Starosczyk                           *
-*   ixen@copyhandler.com                                                  *
-*                                                                         *
-*   This program is free software; you can redistribute it and/or modify  *
-*   it under the terms of the GNU Library General Public License          *
-*   (version 2) as published by the Free Software Foundation;             *
-*                                                                         *
-*   This program is distributed in the hope that it will be useful,       *
-*   but WITHOUT ANY WARRANTY; without even the implied warranty of        *
-*   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
-*   GNU General Public License for more details.                          *
-*                                                                         *
-*   You should have received a copy of the GNU Library General Public     *
-*   License along with this program; if not, write to the                 *
-*   Free Software Foundation, Inc.,                                       *
-*   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
-***************************************************************************/
-#ifndef __FILTERDLG_H__
-#define __FILTERDLG_H__
+// ============================================================================
+//  Copyright (C) 2001-2020 by Jozef Starosczyk
+//  ixen {at} copyhandler [dot] com
+//
+//  This program is free software; you can redistribute it and/or modify
+//  it under the terms of the GNU Library General Public License
+//  (version 2) as published by the Free Software Foundation;
+//
+//  This program is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU General Public License for more details.
+//
+//  You should have received a copy of the GNU Library General Public
+//  License along with this program; if not, write to the
+//  Free Software Foundation, Inc.,
+//  59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+// ============================================================================
+#pragma once
+
 #include "../libchengine/TFileFilter.h"
+#include "FilterTypesMenuWrapper.h"
 
 /////////////////////////////////////////////////////////////////////////////
 // CFilterDlg dialog
@@ -29,8 +30,40 @@ class CFilterDlg : public ictranslate::CLanguageDialog
 public:
 	CFilterDlg();   // standard constructor
 
-// Dialog Data
-	//{{AFX_DATA(CFilterDlg)
+protected:
+	void OnLanguageChanged() override;
+	int GetMultiplier(int iIndex);
+	void EnableControls();
+	void SetSize1(unsigned __int64 ullSize);
+	void SetSize2(unsigned __int64 ullSize);
+
+	void DoDataExchange(CDataExchange* pDX) override;
+
+	BOOL OnInitDialog() override;
+	void OnOK() override;
+	BOOL OnCommand(WPARAM wParam, LPARAM lParam) override;
+
+	afx_msg void OnAttributesCheck();
+	afx_msg void OnDateCheck();
+	afx_msg void OnDate2Check();
+	afx_msg void OnFilterCheck();
+	afx_msg void OnSizeCheck();
+	afx_msg void OnSize2Check();
+	afx_msg void OnExcludemaskCheck();
+	afx_msg void OnIncludeMaskButton();
+	afx_msg void OnExcludeMaskButton();
+	afx_msg void OnDatetimechangeTime1Datetimepicker(NMHDR* pNMHDR, LRESULT* pResult);
+	afx_msg void OnDatetimechangeDate1Datetimepicker(NMHDR* pNMHDR, LRESULT* pResult);
+
+	DECLARE_MESSAGE_MAP()
+
+public:
+	CStringArray m_astrAddMask;
+	CStringArray m_astrAddExcludeMask;
+	chengine::TFileFilter m_ffFilter;
+
+private:
+	CComboBox	m_ctlIncludeMask;
 	CComboBox	m_ctlExcludeMask;
 	CSpinButtonCtrl	m_ctlSpin2;
 	CSpinButtonCtrl	m_ctlSpin1;
@@ -40,12 +73,16 @@ public:
 	CComboBox	m_ctlSizeType1;
 	CComboBox	m_ctlSize2Multi;
 	CComboBox	m_ctlSize1Multi;
-	CComboBox	m_ctlFilter;
 	CComboBox	m_ctlDateType;
 	CComboBox	m_ctlDateType2;
 	CDateTimeCtrl	m_ctlDate2;
 	CComboBox	m_ctlDateType1;
 	CDateTimeCtrl	m_ctlDate1;
+	CMFCButton m_btnIncludeMask;
+	CMFCButton m_btnExcludeMask;
+
+	FilterTypesMenuWrapper m_filterTypesWrapper;
+
 	int		m_iArchive;
 	BOOL	m_bAttributes;
 	BOOL	m_bDate1;
@@ -60,47 +97,4 @@ public:
 	UINT	m_uiSize2;
 	int		m_iSystem;
 	BOOL	m_bExclude;
-	//}}AFX_DATA
-
-
-// Overrides
-	// ClassWizard generated virtual function overrides
-	//{{AFX_VIRTUAL(CFilterDlg)
-	protected:
-	void DoDataExchange(CDataExchange* pDX) override;    // DDX/DDV support
-	//}}AFX_VIRTUAL
-
-	// Implementation
-public:
-	void SetSize2(unsigned __int64 ullSize);
-	chengine::TFileFilter m_ffFilter;
-	CStringArray m_astrAddMask;
-	CStringArray m_astrAddExcludeMask;
-
-protected:
-	void OnLanguageChanged() override;
-	int GetMultiplier(int iIndex);
-	void EnableControls();
-	void SetSize1(unsigned __int64 ullSize);
-
-	// Generated message map functions
-	//{{AFX_MSG(CFilterDlg)
-	BOOL OnInitDialog() override;
-	void OnOK() override;
-	afx_msg void OnAttributesCheck();
-	afx_msg void OnDateCheck();
-	afx_msg void OnDate2Check();
-	afx_msg void OnFilterCheck();
-	afx_msg void OnSizeCheck();
-	afx_msg void OnSize2Check();
-	afx_msg void OnExcludemaskCheck();
-	afx_msg void OnDatetimechangeTime1Datetimepicker(NMHDR* pNMHDR, LRESULT* pResult);
-	afx_msg void OnDatetimechangeDate1Datetimepicker(NMHDR* pNMHDR, LRESULT* pResult);
-	//}}AFX_MSG
-	DECLARE_MESSAGE_MAP()
 };
-
-//{{AFX_INSERT_LOCATION}}
-// Microsoft Visual C++ will insert additional declarations immediately before the previous line.
-
-#endif

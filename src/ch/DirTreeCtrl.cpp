@@ -18,7 +18,6 @@
 ***************************************************************************/
 #include "stdafx.h"
 #include "DirTreeCtrl.h"
-#include "memdc.h"
 #include "shlobj.h"
 
 #ifdef _DEBUG
@@ -940,9 +939,9 @@ BOOL CDirTreeCtrl::OnEraseBkgnd(CDC* /*pDC*/)
 void CDirTreeCtrl::OnPaint() 
 {
 	CPaintDC dc(this); // device context for painting
-	CMemDC memdc(&dc, &dc.m_ps.rcPaint);
+	CMemDC memdc(dc, &dc.m_ps.rcPaint);
 	
-	DefWindowProc(WM_PAINT, (WPARAM)memdc.GetSafeHdc(), 0);
+	DefWindowProc(WM_PAINT, (WPARAM)memdc.GetDC().GetSafeHdc(), 0);
 }
 
 void CDirTreeCtrl::SetIgnoreShellDialogs(bool bFlag)
