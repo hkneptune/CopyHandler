@@ -64,15 +64,13 @@ protected:
 	afx_msg void OnAddfilterButton();
 	afx_msg void OnRemovefilterButton();
 	afx_msg void OnDestroy();
-	afx_msg void OnFiltersCheck();
-	afx_msg void OnStandardCheck();
-	afx_msg void OnAdvancedCheck();
 	afx_msg void OnDblclkFiltersList(NMHDR* pNMHDR, LRESULT* pResult);
 	afx_msg void OnDblclkBuffersizesList();
 	afx_msg void OnEditchangeDestpathComboboxex();
 	afx_msg void OnImportButton();
 	afx_msg void OnIgnorefoldersCheck();
 	afx_msg void OnForcedirectoriesCheck();
+	afx_msg void OnExcludeEmptyDirectories();
 	afx_msg void OnExportButtonClicked();
 	afx_msg void OnBnCustomRules();
 	afx_msg void OnSize(UINT nType, int cx, int cy);
@@ -97,6 +95,5 @@ public:
 	BOOL	m_bOnlyCreate = FALSE;
 	BOOL	m_bIgnoreFolders = FALSE;
 	BOOL	m_bForceDirectories = FALSE;
-	BOOL	m_bFilters = FALSE;
-	BOOL	m_bAdvanced = FALSE;
+	BOOL	m_bExcludeEmptyDirectories = FALSE;
 };

@@ -57,6 +57,7 @@ namespace chengine
 		eTO_CreateEmptyFiles,
 		eTO_CreateDirectoriesRelativeToRoot,
 		eTO_IgnoreDirectories,
+		eTO_ExcludeEmptyDirectories,
 
 		eTO_AlternateFilenameFormatString_First,
 		eTO_AlternateFilenameFormatString_AfterFirst,
@@ -140,7 +141,8 @@ namespace chengine
 	TASK_PROPERTY(eTO_CreateEmptyFiles, bool, _T("Operation.CreateEmptyFiles"), false);
 	TASK_PROPERTY(eTO_CreateDirectoriesRelativeToRoot, bool, _T("Operation.CreateDirectoriesRelativeToRoot"), false);
 	TASK_PROPERTY(eTO_IgnoreDirectories, bool, _T("Operation.IgnoreDirectories"), false);
-
+	TASK_PROPERTY(eTO_ExcludeEmptyDirectories, bool, _T("Operation.ExcludeEmptyDirectories"), false);
+	
 	// Naming settings
 	TASK_PROPERTY(eTO_AlternateFilenameFormatString_First, string::TString, _T("Naming.AlternateFilenameFormatFirst"), _T("%name - copy%ext"));
 	TASK_PROPERTY(eTO_AlternateFilenameFormatString_AfterFirst, string::TString, _T("Naming.AlternateFilenameFormatAfterFirst"), _T("%name - copy (%count)%ext"));

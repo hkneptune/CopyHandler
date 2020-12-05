@@ -66,8 +66,7 @@ void CCustomCopyDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Check(pDX, IDC_ONLYSTRUCTURE_CHECK, m_bOnlyCreate);
 	DDX_Check(pDX, IDC_IGNOREFOLDERS_CHECK, m_bIgnoreFolders);
 	DDX_Check(pDX, IDC_FORCEDIRECTORIES_CHECK, m_bForceDirectories);
-	DDX_Check(pDX, IDC_FILTERS_CHECK, m_bFilters);
-	DDX_Check(pDX, IDC_ADVANCED_CHECK, m_bAdvanced);
+	DDX_Check(pDX, IDC_DONT_CREATE_EMPTY_DIRECTORIES_CHECK, m_bExcludeEmptyDirectories);
 }
 
 BEGIN_MESSAGE_MAP(CCustomCopyDlg, ictranslate::CLanguageDialog)
@@ -79,15 +78,13 @@ BEGIN_MESSAGE_MAP(CCustomCopyDlg, ictranslate::CLanguageDialog)
 	ON_BN_CLICKED(IDC_ADDFILTER_BUTTON, OnAddfilterButton)
 	ON_BN_CLICKED(IDC_REMOVEFILTER_BUTTON, OnRemovefilterButton)
 	ON_WM_DESTROY()
-	ON_BN_CLICKED(IDC_FILTERS_CHECK, OnFiltersCheck)
-	ON_BN_CLICKED(IDC_STANDARD_CHECK, OnStandardCheck)
-	ON_BN_CLICKED(IDC_ADVANCED_CHECK, OnAdvancedCheck)
 	ON_NOTIFY(NM_DBLCLK, IDC_FILTERS_LIST, OnDblclkFiltersList)
 	ON_LBN_DBLCLK(IDC_BUFFERSIZES_LIST, OnDblclkBuffersizesList)
 	ON_CBN_EDITCHANGE(IDC_DESTPATH_COMBOBOXEX, OnEditchangeDestpathComboboxex)
 	ON_BN_CLICKED(IDC_IMPORT_BUTTON, OnImportButton)
 	ON_BN_CLICKED(IDC_IGNOREFOLDERS_CHECK, OnIgnorefoldersCheck)
 	ON_BN_CLICKED(IDC_FORCEDIRECTORIES_CHECK, OnForcedirectoriesCheck)
+	ON_BN_CLICKED(IDC_DONT_CREATE_EMPTY_DIRECTORIES_CHECK, OnExcludeEmptyDirectories)
 	ON_BN_CLICKED(IDC_EXPORT_BUTTON, OnExportButtonClicked)
 	ON_BN_CLICKED(IDC_CUSTOM_RULES_BUTTON, OnBnCustomRules)
 	ON_WM_SIZE()
@@ -103,51 +100,54 @@ BOOL CCustomCopyDlg::OnInitDialog()
 	HICON hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
 	SetIcon(hIcon, FALSE);
 
-	AddResizableControl(IDC_001_STATIC, 0.0, 0.0, 1.0, 0.0);
+	AddResizableControl(IDC_HDR_SOURCE_FILES_STATIC, 0.0, 0.0, 1.0, 0.0);
 	AddResizableControl(IDC_FILES_LIST, 0.0, 0.0, 1.0, 0.5);
 	AddResizableControl(IDC_ADDFILE_BUTTON, 1.0, 0.0, 0.0, 0.0);
 	AddResizableControl(IDC_ADDDIR_BUTTON, 1.0, 0.0, 0.0, 0.0);
 	AddResizableControl(IDC_REMOVEFILEFOLDER_BUTTON, 1.0, 0.0, 0.0, 0.0);
 	AddResizableControl(IDC_IMPORT_BUTTON, 1.0, 0.0, 0.0, 0.0);
 
-	AddResizableControl(IDC_002_STATIC, 0.0, 0.5, 1.0, 0.0);
+	AddResizableControl(IDC_HDR_DESTIONATION_PATH_STATIC, 0.0, 0.5, 1.0, 0.0);
 	AddResizableControl(IDC_DESTPATH_COMBOBOXEX, 0.0, 0.5, 1.0, 0.0);
 	AddResizableControl(IDC_DESTBROWSE_BUTTON, 1.0, 0.5, 0.0, 0.0);
 
-	AddResizableControl(IDC_BAR1_STATIC, 0.0, 0.5, 0.5, 0.0);
-	AddResizableControl(IDC_007_STATIC, 0.5, 0.5, 0.0, 0.0);
-	AddResizableControl(IDC_BAR2_STATIC, 0.5, 0.5, 0.5, 0.0);
+	AddResizableControl(IDC_LEFT_STANDARD_OPTIONS_STATIC, 0.0, 0.5, 0.5, 0.0);
+	AddResizableControl(IDC_HDR_STANDARD_OPTIONS_STATIC, 0.5, 0.5, 0.0, 0.0);
+	AddResizableControl(IDC_RIGHT_STANDARD_OPTIONS_STATIC, 0.5, 0.5, 0.5, 0.0);
 	
-	AddResizableControl(IDC_003_STATIC, 0.0, 0.5, 0.5, 0.0);
-	AddResizableControl(IDC_004_STATIC, 0.5, 0.5, 0.5, 0.0);
+	AddResizableControl(IDC_HDR_OPERATION_TYPE_STATIC, 0.0, 0.5, 0.5, 0.0);
+	AddResizableControl(IDC_HDR_PRIORITY_STATIC, 0.5, 0.5, 0.5, 0.0);
 
 	AddResizableControl(IDC_OPERATION_COMBO, 0.0, 0.5, 0.5, 0.0);
 	AddResizableControl(IDC_PRIORITY_COMBO, 0.5, 0.5, 0.5, 0.0);
 
-	AddResizableControl(IDC_006_STATIC, 0.0, 0.5, 1.0, 0.0);
+	AddResizableControl(IDC_HDR_BUFFER_SIZES_STATIC, 0.0, 0.5, 1.0, 0.0);
 	AddResizableControl(IDC_BUFFERSIZES_LIST, 0.0, 0.5, 1.0, 0.0);
 	AddResizableControl(IDC_BUFFERSIZES_BUTTON, 1.0, 0.5, 0.0, 0.0);
 
-	AddResizableControl(IDC_FILTERS_CHECK, 0.0, 0.5, 0.0, 0.0);
-	AddResizableControl(IDC_BAR3_STATIC, 0.0, 0.5, 1.0, 0.0);
+	AddResizableControl(IDC_LEFT_FILTERS_STATIC, 0.0, 0.5, 0.0, 0.0);
+	AddResizableControl(IDC_HDR_FILTERS_STATIC, 0.0, 0.5, 0.0, 0.0);
+	AddResizableControl(IDC_RIGHT_FILTERS_STATIC, 0.0, 0.5, 1.0, 0.0);
 	AddResizableControl(IDC_FILTERS_LIST, 0.0, 0.5, 1.0, 0.5);
 	AddResizableControl(IDC_ADDFILTER_BUTTON, 1.0, 0.5, 0.0, 0.0);
 	AddResizableControl(IDC_REMOVEFILTER_BUTTON, 1.0, 0.5, 0.0, 0.0);
 
-	AddResizableControl(IDC_BAR7_STATIC, 0.0, 1.0, 0.0, 0.0);
-	AddResizableControl(IDC_FEEDBACK_RULES_STATIC, 0.0, 1.0, 0.0, 0.0);
-	AddResizableControl(IDC_BAR8_STATIC, 0.0, 1.0, 1.0, 0.0);
+	AddResizableControl(IDC_LEFT_FEEDBACK_RULES_STATIC, 0.0, 1.0, 0.0, 0.0);
+	AddResizableControl(IDC_HDR_FEEDBACK_RULES_STATIC, 0.0, 1.0, 0.0, 0.0);
+	AddResizableControl(IDC_RIGHT_FEEDBACK_RULES_STATIC, 0.0, 1.0, 1.0, 0.0);
 	AddResizableControl(IDC_FEEDBACK_RULES_SUMMARY_EDIT, 0.0, 1.0, 1.0, 0.0);
 	AddResizableControl(IDC_CUSTOM_RULES_BUTTON, 1.0, 1.0, 0.0, 0.0);
 
-	AddResizableControl(IDC_ADVANCED_CHECK, 0.0, 1.0, 0.0, 0.0);
-	AddResizableControl(IDC_BAR4_STATIC, 0.0, 1.0, 1.0, 0.0);
+	AddResizableControl(IDC_LEFT_ADVANCED_OPTIONS_STATIC, 0.0, 1.0, 0.0, 0.0);
+	AddResizableControl(IDC_HDR_ADVANCED_OPTIONS_STATIC, 0.0, 1.0, 0.0, 0.0);
+	AddResizableControl(IDC_RIGHT_ADVANCED_OPTIONS_STATIC, 0.0, 1.0, 1.0, 0.0);
 
 	AddResizableControl(IDC_IGNOREFOLDERS_CHECK, 0.0, 1.0, 1.0, 0.0);
 	AddResizableControl(IDC_ONLYSTRUCTURE_CHECK, 0.0, 1.0, 1.0, 0.0);
 	AddResizableControl(IDC_FORCEDIRECTORIES_CHECK, 0.0, 1.0, 1.0, 0.0);
+	AddResizableControl(IDC_DONT_CREATE_EMPTY_DIRECTORIES_CHECK, 0.0, 1.0, 1.0, 0.0);
 
-	AddResizableControl(IDC_BAR5_STATIC, 0.0, 1.0, 1.0, 0.0);
+	AddResizableControl(IDC_BOTTOM_BAR_STATIC, 0.0, 1.0, 1.0, 0.0);
 	AddResizableControl(IDOK, 1.0, 1.0, 0.0, 0.0);
 	AddResizableControl(IDCANCEL, 1.0, 1.0, 0.0, 0.0);
 	AddResizableControl(IDC_EXPORT_BUTTON, 0.0, 1.0, 0.0, 0.0);
@@ -278,13 +278,11 @@ BOOL CCustomCopyDlg::OnInitDialog()
 	lvc.cx=static_cast<int>(0.1*rc.Width());
 	m_ctlFilters.InsertColumn(6, &lvc);
 
-	m_bFilters = !m_tTaskDefinition.GetFilters().IsEmpty();
-
 	// other custom flags
 	m_bIgnoreFolders = chengine::GetTaskPropValue<chengine::eTO_IgnoreDirectories>(m_tTaskDefinition.GetConfiguration());
 	m_bForceDirectories = chengine::GetTaskPropValue<chengine::eTO_CreateDirectoriesRelativeToRoot>(m_tTaskDefinition.GetConfiguration());
+	m_bExcludeEmptyDirectories = chengine::GetTaskPropValue<chengine::eTO_ExcludeEmptyDirectories>(m_tTaskDefinition.GetConfiguration());
 	m_bOnlyCreate = chengine::GetTaskPropValue<chengine::eTO_CreateEmptyFiles>(m_tTaskDefinition.GetConfiguration());
-	m_bAdvanced = (m_bIgnoreFolders | m_bForceDirectories | m_bOnlyCreate);
 
 	UpdateData(FALSE);
 
@@ -725,28 +723,9 @@ void CCustomCopyDlg::EnableControls()
 {
 	UpdateData(TRUE);
 
-	m_ctlFilters.EnableWindow(m_bFilters);
-	GetDlgItem(IDC_ADDFILTER_BUTTON)->EnableWindow(m_bFilters);
-	GetDlgItem(IDC_REMOVEFILTER_BUTTON)->EnableWindow(m_bFilters);
-	
-	GetDlgItem(IDC_IGNOREFOLDERS_CHECK)->EnableWindow(m_bAdvanced && !m_bForceDirectories);
-	GetDlgItem(IDC_FORCEDIRECTORIES_CHECK)->EnableWindow(m_bAdvanced && !m_bIgnoreFolders);
-	GetDlgItem(IDC_ONLYSTRUCTURE_CHECK)->EnableWindow(m_bAdvanced);
-}
-
-void CCustomCopyDlg::OnFiltersCheck() 
-{
-	EnableControls();
-}
-
-void CCustomCopyDlg::OnStandardCheck() 
-{
-	EnableControls();
-}
-
-void CCustomCopyDlg::OnAdvancedCheck() 
-{
-	EnableControls();
+	GetDlgItem(IDC_IGNOREFOLDERS_CHECK)->EnableWindow(!m_bForceDirectories && !m_bExcludeEmptyDirectories);
+	GetDlgItem(IDC_FORCEDIRECTORIES_CHECK)->EnableWindow(!m_bIgnoreFolders);
+	GetDlgItem(IDC_DONT_CREATE_EMPTY_DIRECTORIES_CHECK)->EnableWindow(!m_bIgnoreFolders);
 }
 
 void CCustomCopyDlg::OnDblclkFiltersList(NMHDR* /*pNMHDR*/, LRESULT* pResult) 
@@ -947,6 +926,23 @@ void CCustomCopyDlg::OnForcedirectoriesCheck()
 	UpdateData(TRUE);
 
 	GetDlgItem(IDC_IGNOREFOLDERS_CHECK)->EnableWindow(!m_bForceDirectories);
+	if(m_bForceDirectories)
+	{
+		m_bIgnoreFolders = FALSE;
+		UpdateData(FALSE);
+	}
+}
+
+void CCustomCopyDlg::OnExcludeEmptyDirectories()
+{
+	UpdateData(TRUE);
+
+	GetDlgItem(IDC_IGNOREFOLDERS_CHECK)->EnableWindow(!m_bExcludeEmptyDirectories);
+	if(m_bExcludeEmptyDirectories)
+	{
+		m_bIgnoreFolders = FALSE;
+		UpdateData(FALSE);
+	}
 }
 
 void CCustomCopyDlg::OnIgnorefoldersCheck()
@@ -954,6 +950,14 @@ void CCustomCopyDlg::OnIgnorefoldersCheck()
 	UpdateData(TRUE);
 
 	GetDlgItem(IDC_FORCEDIRECTORIES_CHECK)->EnableWindow(!m_bIgnoreFolders);
+	GetDlgItem(IDC_DONT_CREATE_EMPTY_DIRECTORIES_CHECK)->EnableWindow(!m_bIgnoreFolders);
+
+	if(m_bIgnoreFolders)
+	{
+		m_bForceDirectories = FALSE;
+		m_bExcludeEmptyDirectories = FALSE;
+		UpdateData(FALSE);
+	}
 }
 
 void CCustomCopyDlg::OnExportButtonClicked()
@@ -1020,6 +1024,7 @@ void CCustomCopyDlg::UpdateInternalTaskDefinition()
 	chengine::SetTaskPropValue<chengine::eTO_IgnoreDirectories>(m_tTaskDefinition.GetConfiguration(), (m_bIgnoreFolders != 0));
 	chengine::SetTaskPropValue<chengine::eTO_CreateDirectoriesRelativeToRoot>(m_tTaskDefinition.GetConfiguration(), (m_bForceDirectories != 0));
 	chengine::SetTaskPropValue<chengine::eTO_CreateEmptyFiles>(m_tTaskDefinition.GetConfiguration(), (m_bOnlyCreate != 0));
+	chengine::SetTaskPropValue<chengine::eTO_ExcludeEmptyDirectories>(m_tTaskDefinition.GetConfiguration(), (m_bExcludeEmptyDirectories != 0));
 }
 
 bool CCustomCopyDlg::HasBasicTaskData()

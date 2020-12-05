@@ -34,9 +34,9 @@ namespace chengine
 			return true;
 
 		// if only one of the filters matches - return true
-		for(std::vector<TFileFilter>::const_iterator iterFilter = m_vEntries.begin(); iterFilter != m_vEntries.end(); ++iterFilter)
+		for(const auto& entry : m_vEntries)
 		{
-			if((*iterFilter).Match(spInfo))
+			if(entry.Match(spInfo))
 				return true;
 		}
 

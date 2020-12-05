@@ -403,6 +403,7 @@ namespace chengine
 
 		spSnapshot->SetIgnoreDirectories(GetTaskPropValue<eTO_IgnoreDirectories>(m_tConfiguration));
 		spSnapshot->SetCreateEmptyFiles(GetTaskPropValue<eTO_CreateEmptyFiles>(m_tConfiguration));
+		spSnapshot->SetExcludeEmptyDirectories(GetTaskPropValue<eTO_ExcludeEmptyDirectories>(m_tConfiguration));
 		spSnapshot->SetBufferCount(GetTaskPropValue<eTO_BufferQueueDepth>(m_tConfiguration));
 
 		TSubTaskStatsSnapshotPtr spCurrentSubTask = spSnapshot->GetSubTasksStats().GetCurrentSubTaskSnapshot();

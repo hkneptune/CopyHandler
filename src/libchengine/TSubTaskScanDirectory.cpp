@@ -119,6 +119,7 @@ namespace chengine
 
 		bool bIgnoreDirs = GetTaskPropValue<eTO_IgnoreDirectories>(rConfig);
 		bool bForceDirectories = GetTaskPropValue<eTO_CreateDirectoriesRelativeToRoot>(rConfig);
+		bool bExcludeEmptyDirectories = GetTaskPropValue<eTO_ExcludeEmptyDirectories>(rConfig);
 
 		// add everything
 		TString strFormat;
@@ -176,7 +177,7 @@ namespace chengine
 				strFormat.Replace(_T("%path"), spFileInfo->GetFullFilePath().ToString());
 				LOG_INFO(m_spLog) << strFormat.c_str();
 
-				ScanDirectory(spFileInfo->GetFullFilePath(), spBasePath, true, !bIgnoreDirs || bForceDirectories, rafFilters);
+				ScanDirectory(spFileInfo->GetFullFilePath(), spBasePath, !bIgnoreDirs || bForceDirectories, rafFilters, bExcludeEmptyDirectories);
 
 				// check for kill need
 				if (rThreadController.KillRequested())
@@ -218,8 +219,8 @@ namespace chengine
 		m_tSubTaskStats.GetSnapshot(spStats);
 	}
 
-	int TSubTaskScanDirectories::ScanDirectory(TSmartPath pathDirName, const TBasePathDataPtr& spBasePathData,
-		bool bRecurse, bool bIncludeDirs, const TFileFiltersArray& afFilters)
+	size_t TSubTaskScanDirectories::ScanDirectory(TSmartPath pathDirName, const TBasePathDataPtr& spBasePathData,
+		bool bIncludeDirs, const TFileFiltersArray& afFilters, bool bExcludeEmptyDirs)
 	{
 		TFileInfoArray& rFilesCache = GetContext().GetFilesCache();
 		TWorkerThreadController& rThreadController = GetContext().GetThreadController();
@@ -229,37 +230,46 @@ namespace chengine
 		IFilesystemFindPtr spFinder = spFilesystem->CreateFinderObject(pathDirName, PathFromString(_T("*")));
 		TFileInfoPtr spFileInfo(std::make_shared<TFileInfo>());
 
+		size_t stFilesCount = 0;
 		while (spFinder->FindNext(spFileInfo))
 		{
 			if (rThreadController.KillRequested())
 				break;
 
-			if (!spFileInfo->IsDirectory())
+			if (spFileInfo->IsDirectory())
+			{
+				TSmartPath pathCurrent = spFileInfo->GetFullFilePath();
+				if(bIncludeDirs)
+				{
+					spFileInfo->SetParentObject(spBasePathData);
+					rFilesCache.Add(spFileInfo);
+					spFileInfo = std::make_shared<TFileInfo>();
+				}
+
+				size_t stInnerFilesCount = ScanDirectory(pathCurrent, spBasePathData, bIncludeDirs, afFilters, bExcludeEmptyDirs);
+				if(bExcludeEmptyDirs && stInnerFilesCount == 0)
+				{
+					// if we want to exclude empty directories, now's a good time to get rid of freshly added directory
+					rFilesCache.RemoveLast();
+				}
+				stFilesCount += stInnerFilesCount;
+			}
+			else
 			{
 				if (afFilters.Match(spFileInfo))
 				{
 					spFileInfo->SetParentObject(spBasePathData);
 					rFilesCache.Add(spFileInfo);
 					spFileInfo = std::make_shared<TFileInfo>();
-				}
-			}
-			else
-			{
-				TSmartPath pathCurrent = spFileInfo->GetFullFilePath();
-				if (bIncludeDirs)
-				{
-					spFileInfo->SetParentObject(spBasePathData);
-					rFilesCache.Add(spFileInfo);
-					spFileInfo = std::make_shared<TFileInfo>();
-				}
 
-				if (bRecurse)
-					ScanDirectory(pathCurrent, spBasePathData, bRecurse, bIncludeDirs, afFilters);
+					++stFilesCount;
+				}
 			}
 		}
 
-		return 0;
+		return stFilesCount;
 	}
+
 	void TSubTaskScanDirectories::Store(const ISerializerPtr& spSerializer) const
 	{
 		ISerializerContainerPtr spContainer = spSerializer->GetContainer(_T("subtask_scan"));

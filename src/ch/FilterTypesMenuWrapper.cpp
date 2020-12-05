@@ -72,7 +72,7 @@ bool FilterTypesMenuWrapper::ValidateFilter(const chcore::TStringPatternArray& a
 		CString strFmt;
 		strFmt.Format(L"%S", (PCSTR)strMsg);
 
-		ictranslate::CFormat fmt(GetResManager().LoadString(IDS_INVALID_FILTER));
+		ictranslate::CFormat fmt(GetResManager().LoadString(IDS_INVALID_FILTER_STRING));
 		fmt.SetParam(_T("%err"), strFmt);
 		AfxMessageBox(fmt.ToString());
 		return false;

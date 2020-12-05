@@ -74,6 +74,7 @@ namespace chengine
 		m_eOperationType = eOperation_None;
 		m_bIgnoreDirectories = false;
 		m_bCreateEmptyFiles = false;
+		m_bExcludeEmptyDirectories = false;
 		m_ullCurrentBufferSize = 0;
 		m_bCacheFilled = false;
 		m_ullProcessedCount = 0;

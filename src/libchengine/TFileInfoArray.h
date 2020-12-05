@@ -39,6 +39,7 @@ namespace chengine
 
 		// Adds a new object info to this container
 		void Add(const TFileInfoPtr& spFileInfo);
+		void RemoveLast();
 
 		/// Retrieves count of elements in this object
 		file_count_t GetCount() const;

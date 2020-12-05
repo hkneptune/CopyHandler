@@ -107,6 +107,7 @@ namespace chengine
 		void Load(const serializer::ISerializerRowReaderPtr& spRowReader, const TBasePathDataContainerPtr& spSrcContainer);
 
 		void MarkAsAdded() { m_setModifications[eMod_Added] = true; }
+		bool IsAdded() const { return m_setModifications[eMod_Added]; }
 
 	private:
 		enum EModifications

@@ -99,6 +99,9 @@ namespace chengine
 		bool GetCreateEmptyFiles() const { return m_bCreateEmptyFiles; }
 		void SetCreateEmptyFiles(bool val) { m_bCreateEmptyFiles = val; }
 
+		bool GetExcludeEmptyDirectories() const { return m_bExcludeEmptyDirectories; }
+		void SetExcludeEmptyDirectories(bool val) { m_bExcludeEmptyDirectories = val; }
+
 		void SetCurrentBufferSize(unsigned long long ullSize) { m_ullCurrentBufferSize = ullSize; }
 		unsigned long long GetCurrentBufferSize() const { return m_ullCurrentBufferSize; }
 
@@ -133,6 +136,7 @@ namespace chengine
 		EOperationType m_eOperationType;
 		bool m_bIgnoreDirectories;
 		bool m_bCreateEmptyFiles;
+		bool m_bExcludeEmptyDirectories = false;
 
 		unsigned long long m_ullCurrentBufferSize;
 		unsigned int m_uiBufferCount;
