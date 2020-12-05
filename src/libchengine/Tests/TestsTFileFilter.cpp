@@ -28,7 +28,7 @@ TEST(TestsTFileFilter, DefaultConstruction)
 	EXPECT_EQ(0, filter.GetSize2());
 
 	// dates
-	EXPECT_EQ(TFileFilter::eDateType_Created, filter.GetDateType());
+	EXPECT_EQ(eDateType_Created, filter.GetDateType());
 
 	// date 1
 	EXPECT_EQ(false, filter.GetUseDateTime1());
