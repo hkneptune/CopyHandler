@@ -36,7 +36,7 @@ public:
 			return m_defaultValue;
 
 		DWORD_PTR dwData = m_rCombo.GetItemData(iSel);
-		if(dwData < m_lastValue)
+		if((T)dwData < m_lastValue)
 			return (T)dwData;
 
 		return m_defaultValue;
@@ -47,7 +47,7 @@ public:
 		for(int iIndex = 0; iIndex < m_rCombo.GetCount(); ++iIndex)
 		{
 			DWORD_PTR dwData = m_rCombo.GetItemData(iIndex);
-			if(dwData == value)
+			if((T)dwData == value)
 			{
 				m_rCombo.SetCurSel(iIndex);
 				return;
