@@ -65,32 +65,35 @@ BOOL CComboButton::Create( CRect Rect, CWnd* pParent, UINT uID)
 void CComboButton::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct )
 {
 	CDC*	prDC			= CDC::FromHandle(lpDrawItemStruct->hDC);
-	CRect 	ButtonRect  = lpDrawItemStruct->rcItem;
-	CMemDC dc(*prDC, ButtonRect);
+	CRect 	buttonRect  = lpDrawItemStruct->rcItem;
+	if(buttonRect.IsRectEmpty())
+		return;
+
+	CMemDC dc(*prDC, buttonRect);
 
 	// Fill the Background
 	CBrush* pOldBrush = (CBrush*)dc.GetDC().SelectObject( m_pBkBrush );
 	CPen* pOldPen = (CPen*)dc.GetDC().SelectObject(m_pBkPen);
-	dc.GetDC().Rectangle(ButtonRect);
+	dc.GetDC().Rectangle(buttonRect);
 
 	// Draw the Correct Border
 	if(lpDrawItemStruct->itemState & ODS_SELECTED)
 	{
-		dc.GetDC().DrawEdge(ButtonRect, EDGE_SUNKEN, BF_RECT);
-		ButtonRect.left++;
-		ButtonRect.right++;
-		ButtonRect.bottom++;
-		ButtonRect.top++;
+		dc.GetDC().DrawEdge(buttonRect, EDGE_SUNKEN, BF_RECT);
+		buttonRect.left++;
+		buttonRect.right++;
+		buttonRect.bottom++;
+		buttonRect.top++;
 	}
 	else
-		dc.GetDC().DrawEdge(ButtonRect, EDGE_RAISED, BF_RECT);
+		dc.GetDC().DrawEdge(buttonRect, EDGE_RAISED, BF_RECT);
 	
 	// Draw the Triangle
-	ButtonRect.left		+= 3;
-	ButtonRect.right	-= 4;
-	ButtonRect.top		+= 5;
-	ButtonRect.bottom	-= 5;
-	DrawTriangle(&dc.GetDC(), ButtonRect);
+	buttonRect.left		+= 3;
+	buttonRect.right	-= 4;
+	buttonRect.top		+= 5;
+	buttonRect.bottom	-= 5;
+	DrawTriangle(&dc.GetDC(), buttonRect);
 
 	// Return what was used
 	dc.GetDC().SelectObject( pOldPen );
