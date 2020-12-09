@@ -14,6 +14,7 @@ GUI:
 
 Other:
 * Task definition xml files now uses human-readable attribute values instead of numeric ones
+* Fixed problem with tray icon being sometimes hidden by system due to tooltip changes
 
 Breaking changes:
 * Multiple filters are now separated with semicolon instead of vertical line
