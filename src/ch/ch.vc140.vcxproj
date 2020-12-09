@@ -563,6 +563,7 @@
     <ClInclude Include="FeedbackHandler.h" />
     <ClInclude Include="FeedbackHandlerFactory.h" />
     <ClInclude Include="FilterTypesMenuWrapper.h" />
+    <ClInclude Include="GuiOptions.h" />
     <ClInclude Include="RuleEditAlreadyExistsDlg.h" />
     <ClInclude Include="RuleEditDlg.h" />
     <ClInclude Include="RuleEditErrorDlg.h" />
@@ -573,6 +574,7 @@
     <ClInclude Include="ClipboardMonitor.h" />
     <ClInclude Include="shortcuts.h" />
     <ClInclude Include="StringHelpers.h" />
+    <ClInclude Include="TaskContextMenu.h" />
     <ClInclude Include="TExplorerTaskBarProgress.h" />
     <ClInclude Include="TMsgBox.h" />
     <ClInclude Include="TPathProcessor.h" />
@@ -645,6 +647,7 @@
     <ClCompile Include="FeedbackHandler.cpp" />
     <ClCompile Include="FeedbackHandlerFactory.cpp" />
     <ClCompile Include="FilterTypesMenuWrapper.cpp" />
+    <ClCompile Include="GuiOptions.cpp" />
     <ClCompile Include="RuleEditAlreadyExistsDlg.cpp" />
     <ClCompile Include="RuleEditDlg.cpp" />
     <ClCompile Include="RuleEditErrorDlg.cpp" />
@@ -654,6 +657,7 @@
     <ClCompile Include="ClipboardMonitor.cpp" />
     <ClCompile Include="shortcuts.cpp" />
     <ClCompile Include="StringHelpers.cpp" />
+    <ClCompile Include="TaskContextMenu.cpp" />
     <ClCompile Include="TExplorerTaskBarProgress.cpp" />
     <ClCompile Include="TMsgBox.cpp" />
     <ClCompile Include="TPathProcessor.cpp" />

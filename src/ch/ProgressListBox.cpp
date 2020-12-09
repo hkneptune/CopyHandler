@@ -1,21 +1,21 @@
-/***************************************************************************
-*   Copyright (C) 2001-2008 by Józef Starosczyk                           *
-*   ixen@copyhandler.com                                                  *
-*                                                                         *
-*   This program is free software; you can redistribute it and/or modify  *
-*   it under the terms of the GNU Library General Public License          *
-*   (version 2) as published by the Free Software Foundation;             *
-*                                                                         *
-*   This program is distributed in the hope that it will be useful,       *
-*   but WITHOUT ANY WARRANTY; without even the implied warranty of        *
-*   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
-*   GNU General Public License for more details.                          *
-*                                                                         *
-*   You should have received a copy of the GNU Library General Public     *
-*   License along with this program; if not, write to the                 *
-*   Free Software Foundation, Inc.,                                       *
-*   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
-***************************************************************************/
+// ============================================================================
+//  Copyright (C) 2001-2020 by Jozef Starosczyk
+//  ixen {at} copyhandler [dot] com
+//
+//  This program is free software; you can redistribute it and/or modify
+//  it under the terms of the GNU Library General Public License
+//  (version 2) as published by the Free Software Foundation;
+//
+//  This program is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU General Public License for more details.
+//
+//  You should have received a copy of the GNU Library General Public
+//  License along with this program; if not, write to the
+//  Free Software Foundation, Inc.,
+//  59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+// ============================================================================
 #include "stdafx.h"
 #include "ProgressListBox.h"
 
@@ -25,15 +25,10 @@
 static char THIS_FILE[] = __FILE__;
 #endif
 
-//#define USE_SMOOTH_PROGRESS
-
-/////////////////////////////////////////////////////////////////////////////
-// CProgressListBox
+using namespace chengine;
 
 CProgressListBox::CProgressListBox()
 {
-	m_bShowCaptions=true;
-	m_bSmoothProgress=false;
 }
 
 CProgressListBox::~CProgressListBox()
@@ -46,11 +41,11 @@ CProgressListBox::~CProgressListBox()
 
 
 BEGIN_MESSAGE_MAP(CProgressListBox, CListBox)
-	//{{AFX_MSG_MAP(CProgressListBox)
 	ON_WM_PAINT()
 	ON_WM_ERASEBKGND()
 	ON_CONTROL_REFLECT(LBN_KILLFOCUS, OnKillfocus)
-	//}}AFX_MSG_MAP
+	ON_WM_RBUTTONDOWN()
+	ON_WM_RBUTTONUP()
 END_MESSAGE_MAP()
 
 /////////////////////////////////////////////////////////////////////////////
@@ -78,45 +73,58 @@ void CProgressListBox::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
 	}
 
 	// draw text
-	if (m_bShowCaptions)
+	if(m_bShowCaptions)
 	{
-		CRect rcText(lpDrawItemStruct->rcItem.left, lpDrawItemStruct->rcItem.top+2,
-			lpDrawItemStruct->rcItem.right, lpDrawItemStruct->rcItem.bottom-(9+2));
+		CRect rcText(
+			lpDrawItemStruct->rcItem.left,
+			lpDrawItemStruct->rcItem.top + m_iTopMargin,
+			lpDrawItemStruct->rcItem.right,
+			lpDrawItemStruct->rcItem.bottom - (m_iProgressHeight + m_iMidMargin + m_iBottomMargin));
 		pDC->SetTextColor(GetSysColor(COLOR_BTNTEXT));
 		pDC->DrawText(pItem->m_strText, &rcText,
 			DT_PATH_ELLIPSIS | DT_LEFT | DT_VCENTER | DT_SINGLELINE | DT_NOPREFIX);
 	}
 
 	// frame sizes
-	int iEdgeWidth=1/*GetSystemMetrics(SM_CXEDGE)*/;
-	int iEdgeHeight=1/*GetSystemMetrics(SM_CYEDGE)*/;
+	int iEdgeWidth = 1/*GetSystemMetrics(SM_CXEDGE)*/;
+	int iEdgeHeight = 1/*GetSystemMetrics(SM_CYEDGE)*/;
 
 	// progress like drawing
-	int iBoxWidth=static_cast<int>(static_cast<double>(((9+2)-2*iEdgeWidth))*(2.0/3.0))+1;
-	CRect rcProgress(lpDrawItemStruct->rcItem.left, lpDrawItemStruct->rcItem.bottom-(9+2), 
-		lpDrawItemStruct->rcItem.left+2*iEdgeWidth+((lpDrawItemStruct->rcItem.right-lpDrawItemStruct->rcItem.left-2*iEdgeWidth)/iBoxWidth)*iBoxWidth,
-		lpDrawItemStruct->rcItem.bottom);
+	int iBoxWidth = static_cast<int>(static_cast<double>(((9 + 2) - 2 * iEdgeWidth)) * (2.0 / 3.0)) + 1;
+	CRect rcProgress(
+		lpDrawItemStruct->rcItem.left,
+		lpDrawItemStruct->rcItem.bottom - m_iProgressHeight - m_iBottomMargin,
+		lpDrawItemStruct->rcItem.left + 2 * iEdgeWidth + ((lpDrawItemStruct->rcItem.right - lpDrawItemStruct->rcItem.left - 2 * iEdgeWidth) / iBoxWidth) * iBoxWidth,
+		lpDrawItemStruct->rcItem.bottom - m_iBottomMargin);
 
 	// edge
 	pDC->Draw3dRect(&rcProgress, GetSysColor(COLOR_3DSHADOW), GetSysColor(COLOR_3DHIGHLIGHT));
 
-	if (!m_bSmoothProgress)
+	if(!m_bSmoothProgress)
 	{
 		// boxes within edge
-		double dCount=static_cast<int>(static_cast<double>(((rcProgress.Width()-2*iEdgeHeight)/iBoxWidth))
-			*(static_cast<double>(pItem->m_uiPos)/static_cast<double>(pItem->m_uiRange)));
-		int iBoxCount=((dCount-static_cast<int>(dCount)) > 0.2) ? static_cast<int>(dCount)+1 : static_cast<int>(dCount);
+		double dCount = static_cast<int>(static_cast<double>(((rcProgress.Width() - 2 * iEdgeHeight) / iBoxWidth))
+			* (static_cast<double>(pItem->m_uiPos) / static_cast<double>(pItem->m_uiRange)));
+		int iBoxCount = ((dCount - static_cast<int>(dCount)) > 0.2) ? static_cast<int>(dCount) + 1 : static_cast<int>(dCount);
 
-		for (int i=0;i<iBoxCount;i++)
-			pDC->FillSolidRect(lpDrawItemStruct->rcItem.left+i*iBoxWidth+iEdgeWidth+1,
-			lpDrawItemStruct->rcItem.bottom-(9+2)+iEdgeHeight+1,
-			iBoxWidth-2, rcProgress.Height()-2*iEdgeHeight-2, pItem->m_crColor);
+		for(int i = 0; i < iBoxCount; i++)
+		{
+			pDC->FillSolidRect(
+				lpDrawItemStruct->rcItem.left + i * iBoxWidth + iEdgeWidth + m_iProgressContentXMargin / 2,
+				lpDrawItemStruct->rcItem.bottom - m_iProgressHeight - m_iBottomMargin + iEdgeHeight + m_iProgressContentYMargin / 2,
+				iBoxWidth - m_iProgressContentXMargin,
+				rcProgress.Height() - 2 * iEdgeHeight - m_iProgressContentYMargin,
+				pItem->m_crColor);
+		}
 	}
 	else
 	{
-		pDC->FillSolidRect(lpDrawItemStruct->rcItem.left+iEdgeWidth+1, lpDrawItemStruct->rcItem.bottom-(9+2)+iEdgeHeight+1,
-			static_cast<int>((rcProgress.Width()-2*iEdgeHeight-3)*(static_cast<double>(pItem->m_uiPos)/static_cast<double>(pItem->m_uiRange))),
-			rcProgress.Height()-2*iEdgeHeight-2, pItem->m_crColor);
+		pDC->FillSolidRect(
+			lpDrawItemStruct->rcItem.left + iEdgeWidth + m_iProgressContentXMargin / 2,
+			lpDrawItemStruct->rcItem.bottom - m_iProgressHeight -m_iBottomMargin + iEdgeHeight + m_iProgressContentYMargin / 2,
+			static_cast<int>((rcProgress.Width() - 2 * iEdgeHeight - 3) * (static_cast<double>(pItem->m_uiPos) / static_cast<double>(pItem->m_uiRange))),
+			rcProgress.Height() - 2 * iEdgeHeight - m_iProgressContentYMargin,
+			pItem->m_crColor);
 	}
 }
 
@@ -129,19 +137,8 @@ void CProgressListBox::SetShowCaptions(bool bShow)
 {
 	if (bShow != m_bShowCaptions)
 	{
-		m_bShowCaptions=bShow;
-		if (bShow)
-		{
-			CClientDC dc(this);
-			dc.SelectObject(GetFont());
-			TEXTMETRIC tm;
-			dc.GetTextMetrics(&tm);
-			int iHeight=MulDiv(tm.tmHeight+tm.tmExternalLeading, dc.GetDeviceCaps(LOGPIXELSY), tm.tmDigitizedAspectY);
-
-			SetItemHeight(0, 9+2+2+iHeight);
-		}
-		else
-			SetItemHeight(0, 9+2+2);
+		m_bShowCaptions = bShow;
+		Init();
 
 		RecalcHeight();
 	}
@@ -158,14 +155,35 @@ void CProgressListBox::RecalcHeight()
 	this->SetWindowPos(nullptr, 0, 0, rcCtl.Width(), iCtlHeight, SWP_NOZORDER | SWP_NOMOVE);
 }
 
+chengine::taskid_t CProgressListBox::GetSelectedTaskId() const
+{
+	int iSel = GetCurSel();
+	if(iSel == LB_ERR || (size_t)iSel >= m_vItems.size())
+		return NoTaskID;
+
+	return m_vItems.at(iSel)->m_tTaskID;
+}
+
 void CProgressListBox::Init()
 {
-	// set new height of an item
 	CClientDC dc(this);
+	dc.SelectObject(GetFont());
 	TEXTMETRIC tm;
 	dc.GetTextMetrics(&tm);
-	int iHeight=MulDiv(tm.tmHeight+tm.tmExternalLeading, dc.GetDeviceCaps(LOGPIXELSY), tm.tmDigitizedAspectY);
-	SetItemHeight(0, m_bShowCaptions ? iHeight+2+9+2 : 2+9+2);
+	int iHeight = MulDiv(tm.tmHeight + tm.tmExternalLeading, dc.GetDeviceCaps(LOGPIXELSY), tm.tmDigitizedAspectY);
+
+	m_iProgressHeight = std::max(9, int(iHeight * 0.6));
+	m_iTopMargin = std::max(2, int(iHeight / 6));
+	m_iMidMargin = std::max(2, int(iHeight / 8));
+	m_iBottomMargin = std::max(2, int(iHeight / 6));;
+	m_iProgressContentXMargin = m_iProgressContentYMargin = std::max(1, m_iProgressHeight / 9);
+
+	if(m_bShowCaptions)
+	{
+		SetItemHeight(0, m_iProgressHeight + m_iTopMargin + m_iMidMargin + m_iBottomMargin + iHeight);
+	}
+	else
+		SetItemHeight(0, m_iProgressHeight + m_iTopMargin + m_iMidMargin + m_iBottomMargin);
 }
 
 _PROGRESSITEM_* CProgressListBox::GetItemAddress(int iIndex)
@@ -214,10 +232,13 @@ void CProgressListBox::OnPaint()
 	CRect rcClip;
 	dc.GetClipBox(&rcClip);
 
-	CMemDC memDC(dc, &rcClip);
-	memDC.GetDC().FillSolidRect(&rcClip, GetSysColor(COLOR_3DFACE));
+	if(!rcClip.IsRectEmpty())
+	{
+		CMemDC memDC(dc, &rcClip);
+		memDC.GetDC().FillSolidRect(&rcClip, GetSysColor(COLOR_3DFACE));
 
-	DefWindowProc(WM_PAINT, reinterpret_cast<WPARAM>(memDC.GetDC().m_hDC), 0);
+		DefWindowProc(WM_PAINT, reinterpret_cast<WPARAM>(memDC.GetDC().m_hDC), 0);
+	}
 }
 
 BOOL CProgressListBox::OnEraseBkgnd(CDC*) 
@@ -237,6 +258,27 @@ int CProgressListBox::SetCurrentSelection(int nSelect)
 void CProgressListBox::OnKillfocus() 
 {
 	SetCurrentSelection(-1);
+}
+
+void CProgressListBox::OnRButtonDown(UINT /*nFlags*/, CPoint point)
+{
+	BOOL bOutside = FALSE;
+	UINT uiIndex = ItemFromPoint(point, bOutside);
+	if(!bOutside && uiIndex < m_vItems.size())
+		SetCurrentSelection(uiIndex);
+}
+
+void CProgressListBox::OnRButtonUp(UINT /*nFlags*/, CPoint point)
+{
+	chengine::taskid_t taskId = GetSelectedTaskId();
+	CWnd* pWnd = GetParent();
+	if(pWnd)
+	{
+		ClientToScreen(&point);
+
+		TASK_CLICK_NOTIFICATION notify = { point, taskId };
+		pWnd->SendMessage(WM_TASK_RCLICK, 0, (LPARAM)&notify);
+	}
 }
 
 void CProgressListBox::SetSmoothProgress(bool bSmoothProgress)

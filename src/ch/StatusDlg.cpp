@@ -27,12 +27,15 @@
 #include "CfgProperties.h"
 #include "../libchengine/TTaskManager.h"
 #include "../libchengine/TLocalFilesystem.h"
+#include "GuiOptions.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
 #undef THIS_FILE
 static char THIS_FILE[] = __FILE__;
 #endif
+
+using namespace chengine;
 
 bool CStatusDlg::m_bLock=false;
 
@@ -80,6 +83,7 @@ BEGIN_MESSAGE_MAP(CStatusDlg,ictranslate::CLanguageDialog)
 	ON_BN_CLICKED(IDC_REMOVE_FINISHED_BUTTON, OnRemoveFinishedButton)
 	ON_NOTIFY(LVN_KEYDOWN, IDC_STATUS_LIST, OnKeydownStatusList)
 	ON_NOTIFY(LVN_CHANGEDSELECTION, IDC_STATUS_LIST, OnSelectionChanged)
+	ON_NOTIFY(NM_RCLICK, IDC_STATUS_LIST, OnStatusListRClick)
 	ON_BN_CLICKED(IDC_SHOW_LOG_BUTTON, OnShowLogButton)
 	ON_BN_CLICKED(IDC_STICK_BUTTON, OnStickButton)
 	ON_BN_CLICKED(IDC_RESUME_BUTTON, OnResumeButton)
@@ -151,10 +155,11 @@ BOOL CStatusDlg::OnInitDialog()
 	m_ctlTaskCountProgress.SetRange32(0, 100);
 	m_ctlProgressAll.SetRange32(0, 100);
 
+	// load menu
+	m_menuContext.Load();
+
 	// change the size of a dialog
 	StickDialogToScreenEdge();
-//	ApplyButtonsState();
-//	EnableControls(false);
 
 	// refresh data
 	RefreshStatus();
@@ -322,59 +327,14 @@ void CStatusDlg::ApplyButtonsState()
 	chengine::TTaskPtr spSelectedTask = GetSelectedItemPointer();
 
 	// set status of buttons pause/resume/cancel
-	if (spSelectedTask != nullptr)
-	{
-		if(spSelectedTask->GetTaskState() == chengine::eTaskState_LoadError)
-		{
-			GetDlgItem(IDC_SHOW_LOG_BUTTON)->EnableWindow(true);
-			GetDlgItem(IDC_PAUSE_BUTTON)->EnableWindow(false);
-			GetDlgItem(IDC_RESUME_BUTTON)->EnableWindow(false);
-			GetDlgItem(IDC_RESTART_BUTTON)->EnableWindow(false);
-			GetDlgItem(IDC_CANCEL_BUTTON)->EnableWindow(false);
-			GetDlgItem(IDC_DELETE_BUTTON)->EnableWindow(true);
-		}
-		else
-		{
-			GetDlgItem(IDC_RESTART_BUTTON)->EnableWindow(true);
-			GetDlgItem(IDC_SHOW_LOG_BUTTON)->EnableWindow(true);
-			GetDlgItem(IDC_DELETE_BUTTON)->EnableWindow(true);
+	ETaskCurrentState eState = spSelectedTask != nullptr ? spSelectedTask->GetTaskState() : eTaskState_None;
 
-			if (spSelectedTask->GetTaskState() == chengine::eTaskState_Finished || spSelectedTask->GetTaskState() == chengine::eTaskState_Cancelled)
-			{
-				GetDlgItem(IDC_CANCEL_BUTTON)->EnableWindow(false);
-				GetDlgItem(IDC_PAUSE_BUTTON)->EnableWindow(false);
-				GetDlgItem(IDC_RESUME_BUTTON)->EnableWindow(false);
-			}
-			else
-			{
-				// pause/resume
-				if (spSelectedTask->GetTaskState() == chengine::eTaskState_Paused)
-				{
-					GetDlgItem(IDC_PAUSE_BUTTON)->EnableWindow(false);
-					GetDlgItem(IDC_RESUME_BUTTON)->EnableWindow(true);
-				}
-				else
-				{
-					GetDlgItem(IDC_PAUSE_BUTTON)->EnableWindow(true);
-					if (spSelectedTask->GetTaskState() == chengine::eTaskState_Waiting)
-						GetDlgItem(IDC_RESUME_BUTTON)->EnableWindow(true);
-					else
-						GetDlgItem(IDC_RESUME_BUTTON)->EnableWindow(false);
-				}
-
-				GetDlgItem(IDC_CANCEL_BUTTON)->EnableWindow(true);
-			}
-		}
-	}
-	else
-	{
-		GetDlgItem(IDC_SHOW_LOG_BUTTON)->EnableWindow(false);
-		GetDlgItem(IDC_PAUSE_BUTTON)->EnableWindow(false);
-		GetDlgItem(IDC_RESUME_BUTTON)->EnableWindow(false);
-		GetDlgItem(IDC_RESTART_BUTTON)->EnableWindow(false);
-		GetDlgItem(IDC_CANCEL_BUTTON)->EnableWindow(false);
-		GetDlgItem(IDC_DELETE_BUTTON)->EnableWindow(false);
-	}
+	GetDlgItem(IDC_SHOW_LOG_BUTTON)->EnableWindow(GuiOptions::IsShowLogAvailable(eState));
+	GetDlgItem(IDC_PAUSE_BUTTON)->EnableWindow(GuiOptions::IsPauseAvailable(eState));
+	GetDlgItem(IDC_RESUME_BUTTON)->EnableWindow(GuiOptions::IsResumeAvailable(eState));
+	GetDlgItem(IDC_RESTART_BUTTON)->EnableWindow(GuiOptions::IsRestartAvailable(eState));
+	GetDlgItem(IDC_CANCEL_BUTTON)->EnableWindow(GuiOptions::IsCancelAvailable(eState));
+	GetDlgItem(IDC_DELETE_BUTTON)->EnableWindow(GuiOptions::IsDeleteAvailable(eState));
 }
 
 void CStatusDlg::OnSetPriorityButton() 
@@ -467,16 +427,18 @@ BOOL CStatusDlg::OnCommand(WPARAM wParam, LPARAM lParam)
 		}
 		else if(LOWORD(wParam) == ID_POPUP_RESET_APPLY_TO_ALL)
 		{
-			// processing priority
-			chengine::TTaskPtr spSelectedTask = GetSelectedItemPointer();
-
-			if(spSelectedTask == nullptr)
-				return ictranslate::CLanguageDialog::OnCommand(wParam, lParam);
-
-			spSelectedTask->RestoreFeedbackDefaults();
+			OnResetUserFeedback();
 		}
 	}
 	return ictranslate::CLanguageDialog::OnCommand(wParam, lParam);
+}
+
+void CStatusDlg::OnResetUserFeedback()
+{
+	chengine::TTaskPtr spSelectedTask = GetSelectedItemPointer();
+
+	if(spSelectedTask)
+		spSelectedTask->RestoreFeedbackDefaults();
 }
 
 void CStatusDlg::OnPauseButton() 
@@ -719,6 +681,62 @@ void CStatusDlg::OnSelectionChanged(NMHDR* /*pNMHDR*/, LRESULT* /*pResult*/)
 {
 	TRACE("Received LVN_CHANGEDSELECTION\n");
 	RefreshStatus();
+}
+
+void CStatusDlg::OnStatusListRClick(NMHDR* pNMHDR, LRESULT* /*pResult*/)
+{
+	NMITEMACTIVATE* pData = (NMITEMACTIVATE*)pNMHDR;
+	if(!pData)
+		return;
+
+	ETaskCurrentState eState = eTaskState_None;
+
+	TTaskPtr spTask = GetSelectedItemPointer();
+	if(spTask)
+		eState = spTask->GetTaskState();
+	spTask.reset();
+
+	CPoint pt = pData->ptAction;
+	m_ctlStatusList.ClientToScreen(&pt);
+
+	int iMenuItem = m_menuContext.TrackPopupMenu(eState, TPM_LEFTALIGN | TPM_TOPALIGN | TPM_RIGHTBUTTON | TPM_RETURNCMD, pt.x, pt.y, this);
+	switch(iMenuItem)
+	{
+	case ID_TASK_MENU_PAUSE:
+		OnPauseButton();
+		break;
+	case ID_TASK_MENU_RESUME:
+		OnResumeButton();
+		break;
+	case ID_TASK_MENU_RESTART:
+		OnRestartButton();
+		break;
+	case ID_TASK_MENU_CANCEL:
+		OnCancelButton();
+		break;
+	case ID_TASK_MENU_REMOVE:
+		OnDeleteButton();
+		break;
+	case ID_TASK_MENU_RESET_FEEDBACK:
+		OnResetUserFeedback();
+		break;
+
+	case ID_TASK_MENU_PAUSE_ALL:
+		m_pTasks->TasksPauseProcessing();
+		break;
+	case ID_TASK_MENU_RESUME_ALL:
+		m_pTasks->TasksResumeProcessing();
+		break;
+	case ID_TASK_MENU_RESTART_ALL:
+		m_pTasks->TasksRestartProcessing();
+		break;
+	case ID_TASK_MENU_CANCEL_ALL:
+		m_pTasks->TasksCancelProcessing();
+		break;
+	case ID_TASK_MENU_REMOVE_INACTIVE:
+		m_pTasks->RemoveAllFinished();
+		break;
+	}
 }
 
 void CStatusDlg::OnCancel() 

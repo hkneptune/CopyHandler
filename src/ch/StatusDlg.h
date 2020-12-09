@@ -24,6 +24,7 @@
 #include "TExplorerTaskBarProgress.h"
 #include "../libchengine/TTask.h"
 #include "../libchengine/TTaskManager.h"
+#include "TaskContextMenu.h"
 
 namespace chengine {
 	class TTaskManager;
@@ -56,6 +57,9 @@ public:
 protected:
 	void DoDataExchange(CDataExchange* pDX) override;    // DDX/DDV support
 	BOOL OnCommand(WPARAM wParam, LPARAM lParam) override;
+
+	void OnResetUserFeedback();
+
 	LRESULT WindowProc(UINT message, WPARAM wParam, LPARAM lParam) override;
 
 	void OnLanguageChanged() override;
@@ -98,6 +102,7 @@ protected:
 	afx_msg void OnRemoveFinishedButton();
 	afx_msg void OnKeydownStatusList(NMHDR* pNMHDR, LRESULT* pResult);
 	afx_msg void OnSelectionChanged(NMHDR* /*pNMHDR*/, LRESULT* /*pResult*/);
+	afx_msg void OnStatusListRClick(NMHDR* pNMHDR, LRESULT* pResult);
 	void OnCancel() override;
 	afx_msg void OnShowLogButton();
 	afx_msg void OnStickButton();
@@ -122,6 +127,9 @@ protected:
 	TProgressCtrlEx m_ctlSubTaskCountProgress;
 	TProgressCtrlEx m_ctlSubTaskSizeProgress;
 	TProgressCtrlEx	m_ctlProgressAll;
+
+	TaskContextMenu m_menuContext;
+	chengine::taskid_t m_currentTaskId = chengine::NoTaskID;
 
 	chengine::TTaskManagerStatsSnapshotPtr m_spTaskMgrStats;
 	TExplorerTaskBarProgress m_taskBarProgress;

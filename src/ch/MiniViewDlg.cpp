@@ -1,21 +1,21 @@
-/***************************************************************************
-*   Copyright (C) 2001-2008 by Jozef Starosczyk                           *
-*   ixen@copyhandler.com                                                  *
-*                                                                         *
-*   This program is free software; you can redistribute it and/or modify  *
-*   it under the terms of the GNU Library General Public License          *
-*   (version 2) as published by the Free Software Foundation;             *
-*                                                                         *
-*   This program is distributed in the hope that it will be useful,       *
-*   but WITHOUT ANY WARRANTY; without even the implied warranty of        *
-*   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
-*   GNU General Public License for more details.                          *
-*                                                                         *
-*   You should have received a copy of the GNU Library General Public     *
-*   License along with this program; if not, write to the                 *
-*   Free Software Foundation, Inc.,                                       *
-*   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
-***************************************************************************/
+// ============================================================================
+//  Copyright (C) 2001-2020 by Jozef Starosczyk
+//  ixen {at} copyhandler [dot] com
+//
+//  This program is free software; you can redistribute it and/or modify
+//  it under the terms of the GNU Library General Public License
+//  (version 2) as published by the Free Software Foundation;
+//
+//  This program is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU General Public License for more details.
+//
+//  You should have received a copy of the GNU Library General Public
+//  License along with this program; if not, write to the
+//  Free Software Foundation, Inc.,
+//  59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+// ============================================================================
 #include "stdafx.h"
 #include "MiniViewDlg.h"
 #include "ch.h"
@@ -24,6 +24,7 @@
 #include "resource.h"
 #include "../libchengine/TTaskManager.h"
 #include "../libchengine/TTask.h"
+#include "GuiOptions.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -33,271 +34,9 @@ static char THIS_FILE[] = __FILE__;
 
 #define WM_INITDATA				WM_USER+5
 
-static const int sg_iMargin = 8;
-
-#define ROUND(val) ( ( (val)-static_cast<int>(val) > 0.5 ) ? static_cast<int>(val)+1 : static_cast<int>(val) )
-#undef ROUNDUP	// from other module
-#define ROUNDUP(val, to) ( (static_cast<int>((val)/(to))+1 )*(to) )
+using namespace chengine;
 
 bool CMiniViewDlg::m_bLock=false;
-
-void OnPause(CMiniViewDlg* pDlg, UINT uiMsg, CMiniViewDlg::_BTNDATA_* pData, CDC* pDC)
-{
-	switch (uiMsg)
-	{
-	case MSG_DRAWBUTTON:
-	{
-		CRect rcCopy = pData->rcButton;
-		rcCopy.DeflateRect(2, 2, 2, 2);
-
-		// frame drawing
-		if (!pData->bPressed || pDlg->m_ctlStatus.GetCurSel() == LB_ERR)
-			pDC->Draw3dRect(&rcCopy, GetSysColor(COLOR_BTNHIGHLIGHT), GetSysColor(COLOR_BTNSHADOW));
-		else
-			pDC->Draw3dRect(&rcCopy, GetSysColor(COLOR_BTNSHADOW), GetSysColor(COLOR_BTNHIGHLIGHT));
-
-		// fill the background
-		rcCopy.DeflateRect(1, 1, 1, 1);
-		pDC->FillSolidRect(&rcCopy, GetSysColor(COLOR_3DFACE));
-
-		// pause
-		CPen pen;
-		int iPenWidth = rcCopy.Width() / 10 + 1;
-		pen.CreatePen(PS_SOLID, iPenWidth, pData->bEnabled ? GetSysColor(COLOR_BTNTEXT) : GetSysColor(COLOR_BTNSHADOW));
-		CPen* pOld = pDC->SelectObject(&pen);
-
-		int iOffset = rcCopy.Width() / 3;
-		pDC->MoveTo(rcCopy.left + iOffset - ROUND(0.66*iPenWidth) + pData->bPressed, rcCopy.top + 1 * iPenWidth + pData->bPressed);
-		pDC->LineTo(rcCopy.left + iOffset - ROUND(0.66*iPenWidth) + pData->bPressed, rcCopy.bottom - ROUND(1.5*iPenWidth) + pData->bPressed);
-		pDC->MoveTo(rcCopy.right - iOffset - ROUND(0.66*iPenWidth) + pData->bPressed, rcCopy.top + 1 * iPenWidth + pData->bPressed);
-		pDC->LineTo(rcCopy.right - iOffset - ROUND(0.66*iPenWidth) + pData->bPressed, rcCopy.bottom - ROUND(1.5*iPenWidth) + pData->bPressed);
-
-		pDC->SelectObject(pOld);
-		break;
-	}
-	case MSG_ONCLICK:
-	{
-		int iSel = pDlg->m_ctlStatus.GetCurSel();
-		if (iSel == LB_ERR || (size_t)iSel >= pDlg->m_ctlStatus.m_vItems.size())
-			return;
-
-		chengine::TTaskPtr spTask = pDlg->m_pTasks->GetTaskByTaskID(pDlg->m_ctlStatus.m_vItems.at(iSel)->m_tTaskID);
-		if (spTask)
-			spTask->PauseProcessing();
-		else
-			pDlg->m_pTasks->TasksPauseProcessing();
-
-		break;
-	}
-	}
-}
-
-void OnCloseBtn(CMiniViewDlg* pDlg, UINT uiMsg, CMiniViewDlg::_BTNDATA_* pData, CDC* pDC)
-{
-	switch (uiMsg)
-	{
-	case MSG_DRAWBUTTON:
-	{
-		CRect rcCopy = pData->rcButton;
-		rcCopy.DeflateRect(2, 2, 2, 2);
-
-		// frame
-		if (!pData->bPressed)
-			pDC->Draw3dRect(&rcCopy, GetSysColor(COLOR_BTNHIGHLIGHT), GetSysColor(COLOR_BTNSHADOW));
-		else
-			pDC->Draw3dRect(&rcCopy, GetSysColor(COLOR_BTNSHADOW), GetSysColor(COLOR_BTNHIGHLIGHT));
-
-		// background
-		rcCopy.DeflateRect(1, 1, 1, 1);
-		pDC->FillSolidRect(&rcCopy, GetSysColor(COLOR_3DFACE));
-
-		// close
-		CPen pen;
-		int iPenSize = rcCopy.Width() / 10 + 1;
-		pen.CreatePen(PS_SOLID | PS_INSIDEFRAME, iPenSize, GetSysColor(COLOR_BTNTEXT));
-		CPen* pOld = pDC->SelectObject(&pen);
-
-		switch (iPenSize)
-		{
-		case 1:
-			pDC->MoveTo(rcCopy.left + pData->bPressed + ROUND(1.4*iPenSize), rcCopy.top + pData->bPressed + ROUND(1.4*iPenSize));
-			pDC->LineTo(rcCopy.right + pData->bPressed - ROUND(1.4*iPenSize), rcCopy.bottom + pData->bPressed - ROUND(1.6*iPenSize));
-			pDC->MoveTo(rcCopy.left + pData->bPressed + ROUND(1.4*iPenSize), rcCopy.bottom + pData->bPressed - ROUND(2.6*iPenSize));
-			pDC->LineTo(rcCopy.right + pData->bPressed - ROUND(1.4*iPenSize), rcCopy.top + pData->bPressed + ROUND(0.4*iPenSize));
-			break;
-		default:
-			pDC->MoveTo(rcCopy.left + pData->bPressed + ROUND(1.4*iPenSize), rcCopy.top + pData->bPressed + ROUND(1.4*iPenSize));
-			pDC->LineTo(rcCopy.right + pData->bPressed - ROUND(2.0*iPenSize), rcCopy.bottom + pData->bPressed - ROUND(2.0*iPenSize));
-			pDC->MoveTo(rcCopy.left + pData->bPressed + ROUND(1.4*iPenSize), rcCopy.bottom + pData->bPressed - ROUND(2.0*iPenSize));
-			pDC->LineTo(rcCopy.right + pData->bPressed - ROUND(2.0*iPenSize), rcCopy.top + pData->bPressed + ROUND(1.4*iPenSize));
-			break;
-		}
-
-		pDC->SelectObject(pOld);
-		break;
-	}
-	case MSG_ONCLICK:
-		pDlg->SendMessage(WM_CLOSE, 0, 0);
-		break;
-	}
-}
-
-void OnResume(CMiniViewDlg* pDlg, UINT uiMsg, CMiniViewDlg::_BTNDATA_* pData, CDC* pDC)
-{
-	switch (uiMsg)
-	{
-	case MSG_DRAWBUTTON:
-	{
-		CRect rcCopy = pData->rcButton;
-		rcCopy.DeflateRect(2, 2, 2, 2);
-
-		// frame
-		if (!pData->bPressed || pDlg->m_ctlStatus.GetCurSel() == LB_ERR)
-			pDC->Draw3dRect(&rcCopy, GetSysColor(COLOR_BTNHIGHLIGHT), GetSysColor(COLOR_BTNSHADOW));
-		else
-			pDC->Draw3dRect(&rcCopy, GetSysColor(COLOR_BTNSHADOW), GetSysColor(COLOR_BTNHIGHLIGHT));
-
-		// bkgnd
-		rcCopy.DeflateRect(1, 1, 1, 1);
-		pDC->FillSolidRect(&rcCopy, GetSysColor(COLOR_3DFACE));
-
-		// triangle
-		int iOffset = rcCopy.Width() / 4;
-		int iHeight = rcCopy.Width() / 10 + 1;
-		POINT pt[3] = { {rcCopy.left + iOffset - 1 + pData->bPressed, rcCopy.top + 1 * iHeight + pData->bPressed}, {rcCopy.left + iOffset - 1 + pData->bPressed, rcCopy.bottom - ROUND(1.625*iHeight) + pData->bPressed},
-						{rcCopy.right - iOffset - 1 + pData->bPressed, rcCopy.top + 1 * iHeight + pData->bPressed + (rcCopy.Height() - 3 * iHeight + 1) / 2} };
-
-		CBrush brs;
-		brs.CreateSolidBrush(pData->bEnabled ? GetSysColor(COLOR_BTNTEXT) : GetSysColor(COLOR_BTNSHADOW));
-		CBrush* pOld = pDC->SelectObject(&brs);
-
-		CPen pen;
-		pen.CreatePen(PS_SOLID, 1, pData->bEnabled ? GetSysColor(COLOR_BTNTEXT) : GetSysColor(COLOR_BTNSHADOW));
-		CPen *pOldPen = pDC->SelectObject(&pen);
-		pDC->SetPolyFillMode(WINDING);
-
-		pDC->Polygon(pt, 3);
-
-		pDC->SelectObject(pOld);
-		pDC->SelectObject(pOldPen);
-
-		break;
-	}
-	case MSG_ONCLICK:
-	{
-		int iSel = pDlg->m_ctlStatus.GetCurSel();
-		if (iSel == LB_ERR || (size_t)iSel >= pDlg->m_ctlStatus.m_vItems.size())
-			return;
-
-		chengine::TTaskPtr spTask = pDlg->m_pTasks->GetTaskByTaskID(pDlg->m_ctlStatus.m_vItems.at(iSel)->m_tTaskID);
-		if (spTask)
-		{
-			if (spTask->GetTaskState() == chengine::eTaskState_Waiting)
-				spTask->SetForceFlag(true);
-			else
-				spTask->ResumeProcessing();
-		}
-		else
-			pDlg->m_pTasks->TasksResumeProcessing();
-		break;
-	}
-	}
-}
-
-void OnCancelBtn(CMiniViewDlg* pDlg, UINT uiMsg, CMiniViewDlg::_BTNDATA_* pData, CDC* pDC)
-{
-	switch (uiMsg)
-	{
-	case MSG_DRAWBUTTON:
-	{
-		CRect rcCopy = pData->rcButton;
-		rcCopy.DeflateRect(2, 2, 2, 2);
-
-		// frame
-		if (!pData->bPressed || pDlg->m_ctlStatus.GetCurSel() == LB_ERR)
-			pDC->Draw3dRect(&rcCopy, GetSysColor(COLOR_BTNHIGHLIGHT), GetSysColor(COLOR_BTNSHADOW));
-		else
-			pDC->Draw3dRect(&rcCopy, GetSysColor(COLOR_BTNSHADOW), GetSysColor(COLOR_BTNHIGHLIGHT));
-
-		// bkgnd
-		rcCopy.DeflateRect(1, 1, 1, 1);
-		pDC->FillSolidRect(&rcCopy, GetSysColor(COLOR_3DFACE));
-
-		// square
-		int iWidth = rcCopy.Width() / 10 + 1;
-		rcCopy.DeflateRect(1 * iWidth + pData->bPressed, 1 * iWidth + pData->bPressed, ROUND(1.6*iWidth) - pData->bPressed, 1 * iWidth - pData->bPressed);
-		pDC->FillSolidRect(&rcCopy, pData->bEnabled ? GetSysColor(COLOR_BTNTEXT) : GetSysColor(COLOR_BTNSHADOW));
-		break;
-	}
-	case MSG_ONCLICK:
-		int iSel = pDlg->m_ctlStatus.GetCurSel();
-		if (iSel == LB_ERR || (size_t)iSel >= pDlg->m_ctlStatus.m_vItems.size())
-			return;
-
-		chengine::TTaskPtr spTask = pDlg->m_pTasks->GetTaskByTaskID(pDlg->m_ctlStatus.m_vItems.at(iSel)->m_tTaskID);
-		if (spTask)
-			spTask->CancelProcessing();
-		else
-			pDlg->m_pTasks->TasksCancelProcessing();
-		break;
-	}
-}
-
-void OnRestartBtn(CMiniViewDlg* pDlg, UINT uiMsg, CMiniViewDlg::_BTNDATA_* pData, CDC* pDC)
-{
-	switch (uiMsg)
-	{
-	case MSG_DRAWBUTTON:
-	{
-		CRect rcCopy = pData->rcButton;
-		rcCopy.DeflateRect(2, 2, 2, 2);
-
-		// frame
-		if (!pData->bPressed || pDlg->m_ctlStatus.GetCurSel() == LB_ERR)
-			pDC->Draw3dRect(&rcCopy, GetSysColor(COLOR_BTNHIGHLIGHT), GetSysColor(COLOR_BTNSHADOW));
-		else
-			pDC->Draw3dRect(&rcCopy, GetSysColor(COLOR_BTNSHADOW), GetSysColor(COLOR_BTNHIGHLIGHT));
-
-		// bkgnd
-		rcCopy.DeflateRect(1, 1, 1, 1);
-		pDC->FillSolidRect(&rcCopy, GetSysColor(COLOR_3DFACE));
-
-		// triangle in a square
-		int iOffset = rcCopy.Width() / 4;
-		int iHeight = rcCopy.Width() / 10 + 1;
-		POINT pt[3] = { {rcCopy.left + iOffset - 1 + pData->bPressed, rcCopy.top + 1 * iHeight + pData->bPressed}, {rcCopy.left + iOffset - 1 + pData->bPressed, rcCopy.bottom - ROUND(1.625*iHeight) + pData->bPressed},
-						{rcCopy.right - iOffset - 1 + pData->bPressed, rcCopy.top + 1 * iHeight + pData->bPressed + (rcCopy.Height() - 3 * iHeight + 1) / 2} };
-
-		CBrush brs;
-		brs.CreateSolidBrush(pData->bEnabled ? RGB(255, 0, 0) : GetSysColor(COLOR_BTNSHADOW));
-		CBrush* pOld = pDC->SelectObject(&brs);
-
-		CPen pen;
-		pen.CreatePen(PS_SOLID, 1, pData->bEnabled ? RGB(255, 0, 0) : GetSysColor(COLOR_BTNSHADOW));
-		CPen *pOldPen = pDC->SelectObject(&pen);
-
-		pDC->SetPolyFillMode(WINDING);
-		pDC->Polygon(pt, 3);
-		pDC->SelectObject(pOld);
-		pDC->SelectObject(pOldPen);
-
-		break;
-	}
-	case MSG_ONCLICK:
-	{
-		int iSel = pDlg->m_ctlStatus.GetCurSel();
-		if (iSel == LB_ERR || (size_t)iSel >= pDlg->m_ctlStatus.m_vItems.size())
-			return;
-
-		chengine::TTaskPtr spTask = pDlg->m_pTasks->GetTaskByTaskID(pDlg->m_ctlStatus.m_vItems.at(iSel)->m_tTaskID);
-		if (spTask)
-			spTask->RestartProcessing();
-		else
-			pDlg->m_pTasks->TasksRestartProcessing();
-		break;
-	}
-	}
-}
 
 /////////////////////////////////////////////////////////////////////////////
 // CMiniViewDlg dialog
@@ -311,68 +50,32 @@ CMiniViewDlg::CMiniViewDlg(chengine::TTaskManager* pTaskManager, bool *pbHide, C
 	m_pbHide(pbHide),
 	m_iIndex(-1)
 {
-	COLORREF cr3DFace = GetSysColor(COLOR_3DFACE);
-	m_brBackground.CreateSolidBrush(cr3DFace);
 }
 
 void CMiniViewDlg::DoDataExchange(CDataExchange* pDX)
 {
 	CLanguageDialog::DoDataExchange(pDX);
-	//{{AFX_DATA_MAP(CMiniViewDlg)
 	DDX_Control(pDX, IDC_PROGRESS_LIST, m_ctlStatus);
-	//}}AFX_DATA_MAP
 }
 
 BEGIN_MESSAGE_MAP(CMiniViewDlg,ictranslate::CLanguageDialog)
-	//{{AFX_MSG_MAP(CMiniViewDlg)
-	ON_WM_CTLCOLOR()
 	ON_WM_TIMER()
 	ON_LBN_SELCHANGE(IDC_PROGRESS_LIST, OnSelchangeProgressList)
-	ON_WM_NCLBUTTONDOWN()
-	ON_WM_LBUTTONUP()
-	ON_WM_NCPAINT()
-	ON_WM_NCACTIVATE()
 	ON_LBN_SETFOCUS(IDC_PROGRESS_LIST, OnSetfocusProgressList)
 	ON_LBN_SELCANCEL(IDC_PROGRESS_LIST, OnSelcancelProgressList)
-	ON_WM_MOUSEMOVE()
 	ON_WM_SETTINGCHANGE()
 	ON_LBN_DBLCLK(IDC_PROGRESS_LIST, OnDblclkProgressList)
-	//}}AFX_MSG_MAP
+	ON_MESSAGE(WM_TASK_RCLICK, OnTaskRClick)
 END_MESSAGE_MAP()
 
 /////////////////////////////////////////////////////////////////////////////
 // CMiniViewDlg message handlers
 
-HBRUSH CMiniViewDlg::OnCtlColor(CDC*, CWnd*, UINT) 
-{
-	return m_brBackground;
-}
-
 BOOL CMiniViewDlg::OnInitDialog() 
 {
 	CLanguageDialog::OnInitDialog();
 
-	// fill the buttons' structure
-	m_bdButtons[0].pfnCallbackFunc=&OnPause;
-	m_bdButtons[0].iPosition=4;
-	m_bdButtons[0].bPressed=false;
-	m_bdButtons[0].bEnabled=false;
-	m_bdButtons[1].pfnCallbackFunc=&OnResume;
-	m_bdButtons[1].iPosition=3;
-	m_bdButtons[1].bPressed=false;
-	m_bdButtons[1].bEnabled=false;
-	m_bdButtons[2].pfnCallbackFunc=&OnCancelBtn;
-	m_bdButtons[2].iPosition=2;
-	m_bdButtons[2].bPressed=false;
-	m_bdButtons[2].bEnabled=false;
-	m_bdButtons[3].pfnCallbackFunc=&OnRestartBtn;
-	m_bdButtons[3].iPosition=1;
-	m_bdButtons[3].bPressed=false;
-	m_bdButtons[3].bEnabled=false;
-	m_bdButtons[4].pfnCallbackFunc=&OnCloseBtn;
-	m_bdButtons[4].iPosition=0;
-	m_bdButtons[4].bPressed=false;
-	m_bdButtons[4].bEnabled=true;
+	m_menuContext.Load();
 
 	ResizeDialog();
 	PostMessage(WM_INITDATA);
@@ -396,6 +99,13 @@ void CMiniViewDlg::OnTimer(UINT_PTR nIDEvent)
 
 void CMiniViewDlg::RecalcSize(int nHeight, bool bInitial)
 {
+	CRect rcMargins(0, 0, 5, 3);
+
+	MapDialogRect(&rcMargins);
+
+	const int XMargin = rcMargins.Width();
+	const int YMargin = rcMargins.Height();
+
 	// set listbox size
 	CRect rcList;
 	m_ctlStatus.GetWindowRect(&rcList);
@@ -411,26 +121,18 @@ void CMiniViewDlg::RecalcSize(int nHeight, bool bInitial)
 	m_iLastHeight = nHeight;
 
 	CRect rcNewDlgPos(rcList);
+	rcNewDlgPos.InflateRect(XMargin, YMargin);
+
+	CRect rcNewDlgPosClient = rcNewDlgPos;
+
 	AdjustWindowRectEx(&rcNewDlgPos, GetStyle(), FALSE, GetWindowLong(GetSafeHwnd(), GWL_EXSTYLE));
 
 	// use dynamic margin
 	int iWidth = rcNewDlgPos.Width();
 	int iHeight = rcNewDlgPos.Height();
 
-	int iListXOffset = 0;
-	int iXMargin = (rcNewDlgPos.Width() - rcList.Width()) / 2;
-	if(iXMargin < sg_iMargin)
-	{
-		iListXOffset = (sg_iMargin - iXMargin);
-		iWidth += (sg_iMargin - iXMargin) * 2;
-	}
-	
-	int iYMargin = rcNewDlgPos.bottom - rcList.bottom;
-	if(iYMargin < sg_iMargin)
-		iHeight += (sg_iMargin - iYMargin);
-
 	// place listbox in the best place
-	m_ctlStatus.SetWindowPos(nullptr, iListXOffset, 0, 0, 0, SWP_NOZORDER | SWP_NOSIZE);
+	m_ctlStatus.SetWindowPos(nullptr, XMargin, YMargin / 2, 0, 0, SWP_NOZORDER | SWP_NOSIZE);
 
 	// size of a dialog and screen
 	CRect rcDialog, rcScreen;
@@ -474,7 +176,7 @@ void CMiniViewDlg::RefreshStatus()
 				if(eTaskState == chengine::eTaskState_Error)
 					pItem->m_crColor=RGB(255, 0, 0);
 				else if(eTaskState == chengine::eTaskState_Paused)
-					pItem->m_crColor=RGB(255, 255, 0);
+					pItem->m_crColor=RGB(255, 201, 14);
 				else if(eTaskState == chengine::eTaskState_Waiting)
 					pItem->m_crColor=RGB(0, 0, 255);
 				else
@@ -564,166 +266,11 @@ LRESULT CMiniViewDlg::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 	return ictranslate::CLanguageDialog::WindowProc(message, wParam, lParam);
 }
 
-void CMiniViewDlg::OnNcPaint() 
-{
-	int iCXBorder=GetSystemMetrics(SM_CXBORDER);
-	int iCYBorder=GetSystemMetrics(SM_CYBORDER);
-	int iWidth=GetSystemMetrics(SM_CXSMSIZE);
-	int iHeight=GetSystemMetrics(SM_CYSMSIZE);
-	int iFrameHeight=GetSystemMetrics(SM_CYDLGFRAME);
-	int iFrameWidth=GetSystemMetrics(SM_CXDLGFRAME);
-	bool bEnabled=(m_ctlStatus.GetCurSel() != LB_ERR);
-
-	// NC coordinates
-	CRect rcWindow;
-	GetWindowRect(&rcWindow);
-	rcWindow.OffsetRect(-rcWindow.left, -rcWindow.top);
-
-	// device context
-	CWindowDC ncdc(this);
-
-	// frame
-	ncdc.DrawEdge(&rcWindow, EDGE_RAISED, BF_RECT);
-	rcWindow.DeflateRect(iFrameWidth-iCXBorder, iFrameHeight-iCYBorder, iFrameWidth-iCXBorder, iFrameHeight-iCYBorder);
-
-	CPen pen, pen2;
-	pen.CreatePen(PS_SOLID, iCXBorder, GetSysColor(COLOR_3DFACE));
-	pen2.CreatePen(PS_SOLID, 1, GetSysColor(COLOR_3DFACE));
-
-	ncdc.SelectObject(&pen);
-	ncdc.SelectObject(m_brBackground);
-	
-	ncdc.Rectangle(&rcWindow);
-
-	// caption bar
-	rcWindow.DeflateRect(iCXBorder, iCXBorder, iCXBorder, 0);
-	rcWindow.bottom=rcWindow.top+iHeight;	// caption pos
-
-	// additional horz bar
-	ncdc.SelectObject(&pen2);
-	ncdc.MoveTo(rcWindow.left, rcWindow.bottom);
-	ncdc.LineTo(rcWindow.right, rcWindow.bottom);
-
-	// memdc
-	CMemDC dc(ncdc, &rcWindow);
-
-	COLORREF crLeft=GetSysColor(m_bActive ? COLOR_ACTIVECAPTION : COLOR_INACTIVECAPTION);
-	dc.GetDC().FillSolidRect(&rcWindow, crLeft);
-
-	// caption text
-	CString strWindow;
-	GetWindowText(strWindow);
-//	TRACE("DRAWING TEXT: "+strWindow+"\n");
-
-	rcWindow.DeflateRect(5, 0, BTN_COUNT*iWidth+iFrameWidth+5, 0);
-	
-	// caption font
-	NONCLIENTMETRICS ncm;
-	memset(&ncm, 0, sizeof(NONCLIENTMETRICS));
-	ncm.cbSize=sizeof(NONCLIENTMETRICS);
-	SystemParametersInfo(SPI_GETNONCLIENTMETRICS, ncm.cbSize, &ncm, 0);
-	
-	CFont font;
-	font.CreateFontIndirect(&ncm.lfSmCaptionFont);
-	dc.GetDC().SelectObject(&font);
-	
-	dc.GetDC().SetTextColor(GetSysColor(COLOR_CAPTIONTEXT));
-	dc.GetDC().SetBkMode(TRANSPARENT);
-	dc.GetDC().DrawText(strWindow, &rcWindow, DT_END_ELLIPSIS | DT_VCENTER | DT_LEFT | DT_NOCLIP | DT_SINGLELINE);
-	// button drawing
-	GetClientRect(&rcWindow);
-	
-	for (int i=0;i<BTN_COUNT;i++)
-	{
-		if (m_bdButtons[i].iPosition == 0)
-		{
-			m_bdButtons[i].rcButton.left=rcWindow.right-iWidth+2;
-			m_bdButtons[i].bEnabled=true;
-		}
-		else
-		{
-			m_bdButtons[i].rcButton.left=rcWindow.right-(m_bdButtons[i].iPosition+1)*iWidth-iFrameWidth;
-			m_bdButtons[i].bEnabled=bEnabled;
-		}
-
-		m_bdButtons[i].rcButton.top=iFrameHeight;
-		m_bdButtons[i].rcButton.right=m_bdButtons[i].rcButton.left+iWidth;
-		m_bdButtons[i].rcButton.bottom=m_bdButtons[i].rcButton.top+iHeight;
-		
-		m_bdButtons[i].pfnCallbackFunc(this, MSG_DRAWBUTTON, &m_bdButtons[i], &dc.GetDC());
-	}
-}
-
 void CMiniViewDlg::OnSelchangeProgressList() 
 {
 	RefreshStatus();
 	RedrawWindow(nullptr, nullptr, RDW_INVALIDATE | RDW_FRAME);
 //	PostMessage(WM_NCPAINT);
-}
-
-void CMiniViewDlg::OnNcLButtonDown(UINT nHitTest, CPoint point) 
-{
-	bool bEnabled=false;
-	CRect rcBtn;
-	int iNCHeight=GetSystemMetrics(SM_CYSMCAPTION)+GetSystemMetrics(SM_CYDLGFRAME);
-		
-	// has been button pressed ?
-	for (int i=0;i<BTN_COUNT;i++)
-	{
-		// translate coordinates
-		rcBtn=m_bdButtons[i].rcButton;
-		ClientToScreen(rcBtn);
-		rcBtn.top-=iNCHeight;
-		rcBtn.bottom-=iNCHeight;
-			
-		// check
-		if (rcBtn.PtInRect(point))
-		{
-			bEnabled=true;
-			if (m_bdButtons[i].bEnabled)
-			{
-				m_iIndex=i;
-				m_bdButtons[i].bPressed=true;
-				SetCapture();
-				RedrawWindow(nullptr, nullptr, RDW_INVALIDATE | RDW_FRAME);
-//				PostMessage(WM_NCPAINT, nullptr, nullptr);
-				return;
-			}
-		}
-	}
-
-	if (!bEnabled)
-		CLanguageDialog::OnNcLButtonDown(nHitTest, point);
-}
-
-void CMiniViewDlg::OnLButtonUp(UINT nFlags, CPoint point) 
-{
-	ReleaseCapture();
-	bool bProcessed=false;
-
-	if (m_iIndex != -1 && m_bdButtons[m_iIndex].bPressed)
-	{
-		m_bdButtons[m_iIndex].bPressed=false;
-		RedrawWindow(nullptr, nullptr, RDW_INVALIDATE | RDW_FRAME);
-//		PostMessage(WM_NCPAINT, nullptr, nullptr);
-		m_bdButtons[m_iIndex].pfnCallbackFunc(this, MSG_ONCLICK, &m_bdButtons[m_iIndex], nullptr);
-		bProcessed=true;
-	}
-
-	if (!bProcessed)
-		m_ctlStatus.SetCurrentSelection(-1);
-
-	m_iIndex=-1;
-
-	CLanguageDialog::OnLButtonUp(nFlags, point);
-}
-
-BOOL CMiniViewDlg::OnNcActivate(BOOL bActive) 
-{
-	m_bActive=bActive != 0;
-	RedrawWindow(nullptr, nullptr, RDW_INVALIDATE | RDW_FRAME);
-//	PostMessage(WM_NCPAINT);	
-	return TRUE/*bResult*/;
 }
 
 void CMiniViewDlg::OnSetfocusProgressList() 
@@ -737,35 +284,6 @@ void CMiniViewDlg::OnSelcancelProgressList()
 	RefreshStatus();
 	RedrawWindow(nullptr, nullptr, RDW_INVALIDATE | RDW_FRAME);
 //	PostMessage(WM_NCPAINT);	
-}
-
-void CMiniViewDlg::OnMouseMove(UINT nFlags, CPoint point) 
-{
-//	int iNCHeight=GetSystemMetrics(SM_CYSMCAPTION)+GetSystemMetrics(SM_CYDLGFRAME);
-
-	if (m_iIndex != -1)
-	{
-		point.x+=GetSystemMetrics(SM_CYDLGFRAME);
-		point.y+=GetSystemMetrics(SM_CYSMCAPTION)+GetSystemMetrics(SM_CYDLGFRAME);
-		if (m_bdButtons[m_iIndex].rcButton.PtInRect(point))
-		{
-			if (!m_bdButtons[m_iIndex].bPressed)
-			{
-				m_bdButtons[m_iIndex].bPressed=true;
-				SendMessage(WM_NCPAINT);
-			}
-		}
-		else
-		{
-			if (m_bdButtons[m_iIndex].bPressed)
-			{
-				m_bdButtons[m_iIndex].bPressed=false;
-				SendMessage(WM_NCPAINT);
-			}
-		}
-	}
-	
-	CLanguageDialog::OnMouseMove(nFlags, point);
 }
 
 void CMiniViewDlg::OnSettingChange(UINT uFlags, LPCTSTR lpszSection) 
@@ -798,12 +316,102 @@ void CMiniViewDlg::ShowWindow()
 
 void CMiniViewDlg::OnDblclkProgressList() 
 {
-	int iSel = m_ctlStatus.GetCurSel();
-	if(iSel == LB_ERR || (size_t)iSel >= m_ctlStatus.m_vItems.size())
+	chengine::taskid_t tTaskID = m_ctlStatus.GetSelectedTaskId();
+	GetParent()->PostMessage(WM_MINIVIEWDBLCLK, 0, boost::numeric_cast<LPARAM>(tTaskID));
+}
+
+LRESULT CMiniViewDlg::OnTaskRClick(WPARAM /*wParam*/, LPARAM lParam)
+{
+	TASK_CLICK_NOTIFICATION* pNotify = (TASK_CLICK_NOTIFICATION*)lParam;
+	m_currentTaskId = pNotify->taskId;
+
+	ETaskCurrentState eState = eTaskState_None;
+
+	TTaskPtr spTask = m_pTasks->GetTaskByTaskID(m_currentTaskId);
+	if(spTask)
+		eState = spTask->GetTaskState();
+	spTask.reset();
+
+	int iMenuItem = m_menuContext.TrackPopupMenu(eState, TPM_RIGHTALIGN | TPM_BOTTOMALIGN | TPM_RIGHTBUTTON | TPM_RETURNCMD, pNotify->point.x, pNotify->point.y, this);
+	switch(iMenuItem)
+	{
+	case ID_TASK_MENU_PAUSE:
+	case ID_TASK_MENU_RESUME:
+	case ID_TASK_MENU_RESTART:
+	case ID_TASK_MENU_CANCEL:
+	case ID_TASK_MENU_REMOVE:
+	case ID_TASK_MENU_RESET_FEEDBACK:
+		ExecTaskCommand(iMenuItem);
+		break;
+
+	case ID_TASK_MENU_PAUSE_ALL:
+		m_pTasks->TasksPauseProcessing();
+		break;
+	case ID_TASK_MENU_RESUME_ALL:
+		m_pTasks->TasksResumeProcessing();
+		break;
+	case ID_TASK_MENU_RESTART_ALL:
+		m_pTasks->TasksRestartProcessing();
+		break;
+	case ID_TASK_MENU_CANCEL_ALL:
+		m_pTasks->TasksCancelProcessing();
+		break;
+	case ID_TASK_MENU_REMOVE_INACTIVE:
+		m_pTasks->RemoveAllFinished();
+		break;
+	}
+
+	return 0;
+}
+
+void CMiniViewDlg::ExecTaskCommand(int idCmd)
+{
+	TTaskPtr spTask = m_pTasks->GetTaskByTaskID(m_currentTaskId);
+	if(!spTask)
 		return;
 
-	chengine::taskid_t tTaskID = m_ctlStatus.m_vItems.at(iSel)->m_tTaskID;
-	GetParent()->PostMessage(WM_MINIVIEWDBLCLK, 0, boost::numeric_cast<LPARAM>(tTaskID));
+	ETaskCurrentState eState = spTask->GetTaskState();
+
+	switch(idCmd)
+	{
+	case ID_TASK_MENU_PAUSE:
+		spTask->PauseProcessing();
+		break;
+	case ID_TASK_MENU_RESUME:
+		if(eState == chengine::eTaskState_Waiting)
+			spTask->SetForceFlag(true);
+		else
+			spTask->ResumeProcessing();
+		break;
+	case ID_TASK_MENU_RESTART:
+		spTask->RestartProcessing();
+		break;
+	case ID_TASK_MENU_CANCEL:
+		spTask->CancelProcessing();
+		break;
+	case ID_TASK_MENU_REMOVE:
+	{
+		switch(eState)
+		{
+		case chengine::eTaskState_Finished:
+		case chengine::eTaskState_Cancelled:
+		case chengine::eTaskState_LoadError:
+			break;
+
+		default:
+			if(MsgBox(IDS_CONFIRMCANCEL_STRING, MB_OKCANCEL | MB_ICONQUESTION) == IDOK)
+				spTask->CancelProcessing();
+			else
+				return;
+		}
+
+		m_pTasks->RemoveFinished(spTask);
+		break;
+	}
+	case ID_TASK_MENU_RESET_FEEDBACK:
+		spTask->RestoreFeedbackDefaults();
+		break;
+	}
 }
 
 void CMiniViewDlg::OnLanguageChanged()

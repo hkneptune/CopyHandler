@@ -65,6 +65,7 @@
 #define IDR_ERROR_MASS_SKIP_MENU        237
 #define IDR_ERROR_MASS_RETRY_MENU       238
 #define IDR_FILTER_TYPE_MENU            244
+#define IDR_TASK_MENU                   247
 #define IDC_PROGRAM_STATIC              1000
 #define IDC_ADDFILE_BUTTON              1002
 #define IDC_STATUS_LIST                 1003
@@ -822,7 +823,7 @@
 #define IDS_STATUS_LOADERROR_STRING     21555
 #define IDS_EXPORTING_TASK_FAILED       21556
 #define IDS_LOGFILEEMPTY_STRING         21558
-#define IDS_INVALID_FILTER_STRING              21559
+#define IDS_INVALID_FILTER_STRING       21559
 #define IDS_STATUS_EXCLUDE_EMPTY_DIRECTORIES_STRING 21560
 #define ID_POPUP_SHOW_STATUS            32773
 #define ID_POPUP_TIME_CRITICAL          32774
@@ -869,14 +870,25 @@
 #define ID_POPUP_FILTER_FILE_REGEX_EXAMPLE 32846
 #define ID_POPUP_FILTER_PATH_REGEX_EXAMPLE 32847
 #define ID_POPUP_FILTER_SEPARATOR_CHAR  32848
+#define ID_TASK_MENU_PAUSE              32856
+#define ID_TASK_MENU_RESUME             32857
+#define ID_TASK_MENU_RESTART            32858
+#define ID_TASK_MENU_CANCEL             32859
+#define ID_TASK_MENU_REMOVE             32860
+#define ID_TASK_MENU_RESET_FEEDBACK     32861
+#define ID_TASK_MENU_RESUME_ALL         32867
+#define ID_TASK_MENU_PAUSE_ALL          32868
+#define ID_TASK_MENU_RESTART_ALL        32869
+#define ID_TASK_MENU_CANCEL_ALL         32870
+#define ID_TASK_MENU_REMOVE_INACTIVE    32871
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_3D_CONTROLS                     1
-#define _APS_NEXT_RESOURCE_VALUE        246
-#define _APS_NEXT_COMMAND_VALUE         32849
+#define _APS_NEXT_RESOURCE_VALUE        248
+#define _APS_NEXT_COMMAND_VALUE         32872
 #define _APS_NEXT_CONTROL_VALUE         1451
 #define _APS_NEXT_SYMED_VALUE           101
 #endif

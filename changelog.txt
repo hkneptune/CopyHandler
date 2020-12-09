@@ -1,0 +1,24 @@
+1.50
+User feedback improvements:
+* Added possibility to define automatic responses to user-feedback dialogs (file already exists, not enough space, error) for fully unattended operations
+* Added possibility to rename file when file already exists
+
+Better filtering support:
+* Added regex-based file and path filtering options
+* Added glob-based path filtering options
+
+GUI:
+* Simplified task edit and user-feedback dialogs
+* Adjusted the look of mini-view dialog
+* Added context menus to both status dialog and mini-view
+
+Other:
+* Task definition xml files now uses human-readable attribute values instead of numeric ones
+
+Breaking changes:
+* Multiple filters are now separated with semicolon instead of vertical line
+* Removed support for Windows XP and Windows Vista
+* Removed support for outdated html help
+
+Development changes:
+* Updated toolsets used to build binaries - InnoSetup to 6.0, Visual Studio to 2019

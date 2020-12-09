@@ -101,13 +101,13 @@ BEGIN
     LTEXT           "Alternate file:",IDC_DST_NAME_STATIC,45,52,54,8
 END
 
-IDD_MINIVIEW_DIALOG DIALOGEX 0, 0, 91, 23
-STYLE DS_ABSALIGN | DS_SYSMODAL | DS_SETFONT | DS_MODALFRAME | DS_SETFOREGROUND | WS_POPUP | WS_CAPTION
+IDD_MINIVIEW_DIALOG DIALOGEX 0, 0, 105, 23
+STYLE DS_ABSALIGN | DS_SYSMODAL | DS_SETFONT | DS_SETFOREGROUND | WS_POPUP | WS_CAPTION | WS_SYSMENU
 EXSTYLE WS_EX_TOOLWINDOW
 CAPTION "Status"
 FONT 8, "Tahoma", 0, 0, 0x1
 BEGIN
-    LISTBOX         IDC_PROGRESS_LIST,7,7,77,9,LBS_OWNERDRAWFIXED | LBS_NOINTEGRALHEIGHT | NOT WS_BORDER | WS_TABSTOP
+    LISTBOX         IDC_PROGRESS_LIST,7,7,91,9,LBS_OWNERDRAWFIXED | LBS_NOINTEGRALHEIGHT | NOT WS_BORDER | WS_TABSTOP
 END
 
 IDD_OPTIONS_DIALOG DIALOGEX 0, 0, 397, 214
@@ -589,7 +589,7 @@ BEGIN
     IDD_MINIVIEW_DIALOG, DIALOG
     BEGIN
         LEFTMARGIN, 7
-        RIGHTMARGIN, 84
+        RIGHTMARGIN, 98
         TOPMARGIN, 7
         BOTTOMMARGIN, 16
     END
@@ -855,6 +855,11 @@ BEGIN
     0
 END
 
+IDD_MINIVIEW_DIALOG AFX_DIALOG_LAYOUT
+BEGIN
+    0
+END
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -1048,6 +1053,26 @@ BEGIN
     POPUP "POPUP"
     BEGIN
         MENUITEM "Skip when the same error is encountered again", ID_FEEDBACK_SKIP_WHEN_SAME_ERROR
+    END
+END
+
+IDR_TASK_MENU MENU
+BEGIN
+    POPUP "_POPUP_"
+    BEGIN
+        MENUITEM "&Pause",                      ID_TASK_MENU_PAUSE
+        MENUITEM "&Resume",                     ID_TASK_MENU_RESUME
+        MENUITEM "R&estart",                    ID_TASK_MENU_RESTART
+        MENUITEM "&Cancel",                     ID_TASK_MENU_CANCEL
+        MENUITEM "Re&move",                     ID_TASK_MENU_REMOVE
+        MENUITEM SEPARATOR
+        MENUITEM "Reset user-feedback state",   ID_TASK_MENU_RESET_FEEDBACK
+        MENUITEM SEPARATOR
+        MENUITEM "Pause all",                   ID_TASK_MENU_PAUSE_ALL
+        MENUITEM "Resume all",                  ID_TASK_MENU_RESUME_ALL
+        MENUITEM "Restart all",                 ID_TASK_MENU_RESTART_ALL
+        MENUITEM "Cancel all",                  ID_TASK_MENU_CANCEL_ALL
+        MENUITEM "Remove inactive",             ID_TASK_MENU_REMOVE_INACTIVE
     END
 END
 
