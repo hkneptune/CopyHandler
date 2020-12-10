@@ -75,7 +75,7 @@ protected:
 	CString GetProcessedText(unsigned long long ullProcessedCount, unsigned long long ullTotalCount, unsigned long long ullProcessedSize, unsigned long long ullTotalSize);
 	void UpdateTaskStatsDetails(const chengine::TTaskStatsSnapshotPtr& spTaskStats);
 	void SetTaskListEntry(size_t stPos, const chengine::TTaskStatsSnapshotPtr& spTaskStats);
-	CString GetSubtaskName(chengine::ESubOperationType eSubtask) const;
+	CString GetSubtaskName(chengine::EOperationType eOperation, chengine::ESubOperationType eSubtask) const;
 
 	CString GetProgressWindowTitleText() const;
 	void UpdateTaskBarProgress() const;

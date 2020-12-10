@@ -407,13 +407,27 @@ namespace chengine
 		spSnapshot->SetBufferCount(GetTaskPropValue<eTO_BufferQueueDepth>(m_tConfiguration));
 
 		TSubTaskStatsSnapshotPtr spCurrentSubTask = spSnapshot->GetSubTasksStats().GetCurrentSubTaskSnapshot();
-		if(spCurrentSubTask)
-			spSnapshot->SetSourcePath(spCurrentSubTask->GetCurrentPath());
-		else if(m_spSrcPaths->GetCount() > 0)
+		if(m_spSrcPaths->GetCount() > 0)
 		{
-			TBasePathDataPtr spBasePath = m_spSrcPaths->GetAt(0);
-			if(spBasePath)
-				spSnapshot->SetSourcePath(spBasePath->GetSrcPath().ToString());
+			std::wstring wstrPaths;
+
+			const size_t stMaxPaths = std::min(2UL, m_spSrcPaths->GetCount());
+			for(file_count_t stIndex = 0; stIndex < stMaxPaths; ++stIndex)
+			{
+				TBasePathDataPtr spBasePath = m_spSrcPaths->GetAt(stIndex);
+				if(spBasePath)
+				{
+					if(!wstrPaths.empty())
+						wstrPaths += L"; ";
+
+					wstrPaths += spBasePath->GetSrcPath().ToString();
+				}
+			}
+
+			if(stMaxPaths < m_spSrcPaths->GetCount())
+				wstrPaths += L"; ...";
+
+			spSnapshot->SetSourcePath(wstrPaths.c_str());
 		}
 
 		int iCurrentBufferIndex = spCurrentSubTask ? spCurrentSubTask->GetCurrentBufferIndex() : TBufferSizes::eBuffer_Default;

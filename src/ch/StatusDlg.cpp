@@ -222,12 +222,11 @@ void CStatusDlg::EnableControls(bool bEnable)
 		
 		// subtask
 		GetDlgItem(IDC_SUBTASKNAME_STATIC)->SetWindowText(GetResManager().LoadString(IDS_EMPTYSUBTASKNAME_STRING));
+		GetDlgItem(IDC_CURRENT_ITEM_STATIC)->SetWindowText(GetResManager().LoadString(IDS_EMPTYSOURCETEXT_STRING));
 		GetDlgItem(IDC_SUBTASKPROCESSED_STATIC)->SetWindowText(GetResManager().LoadString(IDS_EMPTYPROCESSEDTEXT_STRING));
 		GetDlgItem(IDC_SUBTASKTIME_STATIC)->SetWindowText(GetResManager().LoadString(IDS_EMPTYTIMETEXT_STRING));
 		GetDlgItem(IDC_SUBTASKTRANSFER_STATIC)->SetWindowText(GetResManager().LoadString(IDS_EMPTYTRANSFERTEXT_STRING));
 
-		GetDlgItem(IDC_TASKPROCESSED_STATIC)->SetWindowText(GetResManager().LoadString(IDS_EMPTYPROCESSEDTEXT_STRING));
-		GetDlgItem(IDC_TASKTRANSFER_STATIC)->SetWindowText(GetResManager().LoadString(IDS_EMPTYTRANSFERTEXT_STRING));
 		GetDlgItem(IDC_TASKTIME_STATIC)->SetWindowText(GetResManager().LoadString(IDS_EMPTYTIMETEXT_STRING));
 
 		m_ctlTaskCountProgress.SetPos(0);
@@ -895,6 +894,9 @@ void CStatusDlg::PrepareResizableControls()
 	AddResizableControl(IDC_SUBTASKNAME_LABEL_STATIC, 0.5, 0.0, 0.0, 0);
 	AddResizableControl(IDC_SUBTASKNAME_STATIC, 0.5, 0.0, 0.5, 0);
 
+	AddResizableControl(IDC_CURRENT_ITEM_LABEL_STATIC, 0.5, 0.0, 0.0, 0);
+	AddResizableControl(IDC_CURRENT_ITEM_STATIC, 0.5, 0.0, 0.5, 0);
+
 	AddResizableControl(IDC_SUBTASKPROCESSED_LABEL_STATIC, 0.5, 0.0, 0.0, 0);
 	AddResizableControl(IDC_SUBTASKPROCESSED_STATIC, 0.5, 0.0, 0.5, 0);
 
@@ -914,16 +916,8 @@ void CStatusDlg::PrepareResizableControls()
 	AddResizableControl(IDC_SUBTASKSIZE_PROGRESS, 0.5, 0.0, 0.5, 0);
 
 	// right part of the dialog (task stats)
-	AddResizableControl(IDC_ENTIRETASK_GROUP_STATIC, 0.5, 0.0, 0.5, 0);
-
-	AddResizableControl(IDC_TASKPROCESSED_LABEL_STATIC, 0.5, 0.0, 0.0, 0);
-	AddResizableControl(IDC_TASKPROCESSED_STATIC, 0.5, 0.0, 0.5, 0);
-
 	AddResizableControl(IDC_TASKTIME_LABEL_STATIC, 0.5, 0.0, 0.0, 0);
 	AddResizableControl(IDC_TASKTIME_STATIC, 0.5, 0.0, 0.5, 0);
-
-	AddResizableControl(IDC_TASKTRANSFER_LABEL_STATIC, 0.5, 0.0, 0.0, 0);
-	AddResizableControl(IDC_TASKTRANSFER_STATIC, 0.5, 0.0, 0.5, 0);
 
 	AddResizableControl(IDC_TASKCOUNT_LABEL_STATIC, 0.5, 0.0, 0.0, 0);
 	AddResizableControl(IDC_TASKCOUNT_PROGRESS, 0.5, 0.0, 0.5, 0);
@@ -993,20 +987,10 @@ CString CStatusDlg::GetStatusString(const chengine::TTaskStatsSnapshotPtr& spTas
 	}
 
 	// second part
-	chengine::ESubOperationType eSubOperationType = chengine::eSubOperation_None;
-	chengine::TSubTaskStatsSnapshotPtr spSubtaskStats = spTaskStats->GetSubTasksStats().GetCurrentSubTaskSnapshot();
-	if(spSubtaskStats)
-		eSubOperationType = spSubtaskStats->GetSubOperationType();
-
-	if(eSubOperationType == chengine::eSubOperation_Deleting)
-		strStatusText += GetResManager().LoadString(IDS_STATUS_DELETING_STRING);
-	else if(eSubOperationType == chengine::eSubOperation_Scanning)
-		strStatusText += GetResManager().LoadString(IDS_STATUS_SEARCHING_STRING);
-	else if(eSubOperationType == chengine::eSubOperation_FastMove)
-		strStatusText += GetResManager().LoadString(IDS_STATUS_FASTMOVE_STRING);
-	else if(spTaskStats->GetOperationType() == chengine::eOperation_Copy)
+	EOperationType eOperation = spTaskStats->GetOperationType();
+	if(eOperation == chengine::eOperation_Copy)
 		strStatusText += GetResManager().LoadString(IDS_STATUS_COPYING_STRING);
-	else if(spTaskStats->GetOperationType() == chengine::eOperation_Move)
+	else if(eOperation == chengine::eOperation_Move)
 		strStatusText += GetResManager().LoadString(IDS_STATUS_MOVING_STRING);
 	else
 		strStatusText += GetResManager().LoadString(IDS_STATUS_UNKNOWN_STRING);
@@ -1034,7 +1018,7 @@ CString CStatusDlg::GetStatusString(const chengine::TTaskStatsSnapshotPtr& spTas
 	return strStatusText;
 }
 
-CString CStatusDlg::GetSubtaskName(chengine::ESubOperationType eSubtask) const
+CString CStatusDlg::GetSubtaskName(EOperationType eOperation, ESubOperationType eSubtask) const
 {
 	if(eSubtask == chengine::eSubOperation_Deleting)
 		return GetResManager().LoadString(IDS_STATUS_DELETING_STRING);
@@ -1043,7 +1027,12 @@ CString CStatusDlg::GetSubtaskName(chengine::ESubOperationType eSubtask) const
 	if(eSubtask == chengine::eSubOperation_FastMove)
 		return GetResManager().LoadString(IDS_STATUS_FASTMOVE_STRING);
 	if(eSubtask == chengine::eSubOperation_Copying)
-		return GetResManager().LoadString(IDS_STATUS_COPYING_STRING);
+	{
+		if(eOperation == chengine::eOperation_Move)
+			return GetResManager().LoadString(IDS_STATUS_MOVING_STRING);
+		else
+			return GetResManager().LoadString(IDS_STATUS_COPYING_STRING);
+	}
 
 	return GetResManager().LoadString(IDS_STATUS_UNKNOWN_STRING);
 }
@@ -1158,13 +1147,14 @@ void CStatusDlg::UpdateTaskStatsDetails(const chengine::TTaskStatsSnapshotPtr& s
 
 		// subtask name
 		chengine::ESubOperationType eSubOperationType = spSubTaskStats->GetSubOperationType();
-		CString strSubtaskName = GetSubtaskName(eSubOperationType);
+		CString strSubtaskName = GetSubtaskName(spTaskStats->GetOperationType(), eSubOperationType);
 		GetDlgItem(IDC_SUBTASKNAME_STATIC)->SetWindowText(strSubtaskName);
 
 		// current path
 		string::TString strPath = spSubTaskStats->GetCurrentPath();
 		if(strPath.IsEmpty())
 			strPath = GetResManager().LoadString(IDS_NONEINPUTFILE_STRING);
+		GetDlgItem(IDC_CURRENT_ITEM_STATIC)->SetWindowText(strPath.c_str());
 
 		SetBufferSizesString(spTaskStats->GetCurrentBufferSize(), spSubTaskStats->GetCurrentBufferIndex());
 	}
@@ -1175,6 +1165,7 @@ void CStatusDlg::UpdateTaskStatsDetails(const chengine::TTaskStatsSnapshotPtr& s
 		m_ctlSubTaskSizeProgress.SetProgress(0, 100);
 
 		GetDlgItem(IDC_SUBTASKNAME_STATIC)->SetWindowText(GetResManager().LoadString(IDS_EMPTYSUBTASKNAME_STRING));
+		GetDlgItem(IDC_CURRENT_ITEM_STATIC)->SetWindowText(GetResManager().LoadString(IDS_EMPTYSOURCETEXT_STRING));
 		GetDlgItem(IDC_SUBTASKPROCESSED_STATIC)->SetWindowText(GetResManager().LoadString(IDS_EMPTYPROCESSEDTEXT_STRING));
 		GetDlgItem(IDC_SUBTASKTIME_STATIC)->SetWindowText(GetResManager().LoadString(IDS_EMPTYTIMETEXT_STRING));
 		GetDlgItem(IDC_SUBTASKTRANSFER_STATIC)->SetWindowText(GetResManager().LoadString(IDS_EMPTYTRANSFERTEXT_STRING));
@@ -1190,16 +1181,7 @@ void CStatusDlg::UpdateTaskStatsDetails(const chengine::TTaskStatsSnapshotPtr& s
 	if(strSrcPath.IsEmpty())
 		strSrcPath = GetResManager().LoadString(IDS_EMPTYSOURCETEXT_STRING);
 
-	GetDlgItem(IDC_SOURCEOBJECT_STATIC)->SetWindowText(spTaskStats->GetSourcePath().c_str());	// src object
-
-	// count of processed data/overall count of data
-	CString strProcessedText = GetProcessedText(spTaskStats->GetProcessedCount(), spTaskStats->GetTotalCount(),
-		spTaskStats->GetProcessedSize(), spTaskStats->GetTotalSize());
-	GetDlgItem(IDC_TASKPROCESSED_STATIC)->SetWindowText(strProcessedText);
-
-	// transfer
-	CString strTaskSpeed = GetSpeedString(spTaskStats->GetSizeSpeed(), spTaskStats->GetAvgSizeSpeed(), spTaskStats->GetCountSpeed(), spTaskStats->GetAvgCountSpeed());
-	GetDlgItem(IDC_TASKTRANSFER_STATIC)->SetWindowText(strTaskSpeed);
+	GetDlgItem(IDC_SOURCEOBJECT_STATIC)->SetWindowText(strSrcPath);	// src object
 
 	// elapsed time / estimated total time (estimated time left)
 	timeTotalEstimated = spTaskStats->GetEstimatedTotalTime();
