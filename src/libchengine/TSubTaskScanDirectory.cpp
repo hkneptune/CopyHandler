@@ -227,6 +227,8 @@ namespace chengine
 		TBasePathDataContainerPtr spBasePaths = GetContext().GetBasePaths();
 		const IFilesystemPtr& spFilesystem = GetContext().GetLocalFilesystem();
 
+		m_tSubTaskStats.SetCurrentPath(pathDirName.ToString());
+
 		IFilesystemFindPtr spFinder = spFilesystem->CreateFinderObject(pathDirName, PathFromString(_T("*")));
 		TFileInfoPtr spFileInfo(std::make_shared<TFileInfo>());
 

@@ -1116,8 +1116,18 @@ void CStatusDlg::UpdateTaskStatsDetails(const chengine::TTaskStatsSnapshotPtr& s
 	unsigned long long timeElapsed = 0;
 	unsigned long long timeRemaining = 0;
 
+	bool bShowDetails = true;
+	switch(spTaskStats->GetTaskState())
+	{
+	case chengine::eTaskState_Error:
+	case chengine::eTaskState_LoadError:
+	case chengine::eTaskState_Cancelled:
+	case chengine::eTaskState_None:
+		bShowDetails = false;
+	}
+
 	chengine::TSubTaskStatsSnapshotPtr spSubTaskStats = spTaskStats->GetSubTasksStats().GetCurrentSubTaskSnapshot();
-	if(spSubTaskStats)
+	if(spSubTaskStats && bShowDetails)
 	{
 		// text progress
 		CString strProcessedText = GetProcessedText(spSubTaskStats->GetProcessedCount(), spSubTaskStats->GetTotalCount(), spSubTaskStats->GetProcessedSize(), spSubTaskStats->GetTotalSize());
