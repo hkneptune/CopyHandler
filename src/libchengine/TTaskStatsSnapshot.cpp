@@ -82,7 +82,9 @@ namespace chengine
 		m_ullProcessedSize = 0;
 		m_ullTotalSize = 0;
 		m_dTaskCountSpeed = 0.0;
+		m_dTaskAvgCountSpeed = 0.0;
 		m_dTaskSizeSpeed = 0.0;
+		m_dTaskAvgSizeSpeed = 0.0;
 		m_dCombinedProgress = 0.0;
 		m_uiBufferCount = 0;
 	}
@@ -95,8 +97,12 @@ namespace chengine
 		m_ullProcessedSize = 0;
 		m_ullTotalSize = 0;
 		m_dTaskCountSpeed = 0.0;
+		m_dTaskAvgCountSpeed = 0.0;
 		m_dTaskSizeSpeed = 0.0;
+		m_dTaskAvgSizeSpeed = 0.0;
 		m_dCombinedProgress = 0.0;
+
+		auto currentSubtask = m_tSubTasksStats.GetCurrentSubtaskIndex();
 
 		size_t stCount = m_tSubTasksStats.GetSubTaskSnapshotCount();
 		for (size_t stIndex = 0; stIndex < stCount; ++stIndex)
@@ -106,13 +112,18 @@ namespace chengine
 			m_ullProcessedCount += spSubtaskStats->GetProcessedCount();
 			m_ullTotalCount += spSubtaskStats->GetTotalCount();
 
-			m_ullProcessedSize += spSubtaskStats->GetProcessedSize();
-			m_ullTotalSize += spSubtaskStats->GetTotalSize();
+			if(!spSubtaskStats->GetIgnoreSizeInAggregateStats())
+			{
+				m_ullProcessedSize += spSubtaskStats->GetProcessedSize();
+				m_ullTotalSize += spSubtaskStats->GetTotalSize();
+			}
 
-			if(IsTaskRunning())
+			if(stIndex == currentSubtask)
 			{
 				m_dTaskCountSpeed += spSubtaskStats->GetCountSpeed();
 				m_dTaskSizeSpeed += spSubtaskStats->GetSizeSpeed();
+				m_dTaskAvgCountSpeed = spSubtaskStats->GetAvgCountSpeed();
+				m_dTaskAvgSizeSpeed = spSubtaskStats->GetAvgSizeSpeed();
 			}
 		}
 
@@ -199,10 +210,7 @@ namespace chengine
 		if (!m_bCacheFilled)
 			CalculateProgressAndSpeeds();
 
-		if (m_ullTimeElapsed)
-			return Math::Div64(m_ullProcessedCount, m_ullTimeElapsed / 1000.0);
-
-		return 0.0;
+		return m_dTaskAvgCountSpeed;
 	}
 
 	double TTaskStatsSnapshot::GetAvgSizeSpeed() const
@@ -210,10 +218,7 @@ namespace chengine
 		if (!m_bCacheFilled)
 			CalculateProgressAndSpeeds();
 
-		if (m_ullTimeElapsed)
-			return Math::Div64(m_ullProcessedSize, m_ullTimeElapsed / 1000.0);
-
-		return 0.0;
+		return m_dTaskAvgSizeSpeed;
 	}
 
 	unsigned long long TTaskStatsSnapshot::GetEstimatedTotalTime() const

@@ -209,7 +209,7 @@ namespace chengine
 		m_tSubTaskStats.SetProcessedCount(totalCount);
 		auto totalSize = rFilesCache.CalculateTotalSize();
 		m_tSubTaskStats.SetTotalSize(totalSize);
-		m_tSubTaskStats.SetProcessedSize(totalSize);
+		m_tSubTaskStats.SetProcessedSize(0);
 
 		m_tSubTaskStats.SetCurrentPath(TString());
 
@@ -224,6 +224,7 @@ namespace chengine
 	void TSubTaskScanDirectories::GetStatsSnapshot(TSubTaskStatsSnapshotPtr& spStats) const
 	{
 		m_tSubTaskStats.GetSnapshot(spStats);
+		spStats->SetIgnoreSizeInAggregateStats(true);
 	}
 
 	size_t TSubTaskScanDirectories::ScanDirectory(TSmartPath pathDirName, const TBasePathDataPtr& spBasePathData,
@@ -278,10 +279,10 @@ namespace chengine
 
 		auto totalCount = rFilesCache.GetCount();
 		m_tSubTaskStats.SetTotalCount(totalCount);
-		m_tSubTaskStats.SetProcessedCount(totalCount);
+		m_tSubTaskStats.SetProcessedCount(0);
 		auto totalSize = rFilesCache.CalculateTotalSize();
 		m_tSubTaskStats.SetTotalSize(totalSize);
-		m_tSubTaskStats.SetProcessedSize(totalSize);
+		m_tSubTaskStats.SetProcessedSize(0);
 
 		return stFilesCount;
 	}

@@ -98,7 +98,9 @@ namespace chengine
 
 	double TSubTaskStatsSnapshot::GetSizeSpeed() const
 	{
-		return m_dAvgSizeSpeed;
+		if(m_bSubTaskIsRunning)
+			return m_dSizeSpeed;
+		return 0.0;
 	}
 
 	void TSubTaskStatsSnapshot::SetCountSpeed(double dCountSpeed)

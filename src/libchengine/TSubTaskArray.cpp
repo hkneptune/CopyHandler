@@ -200,7 +200,6 @@ namespace chengine
 		rSnapshot.Clear();
 
 		// current task
-		// ugly const_cast - const method, non-const interlocked intrinsic and we're really not modifying the member...
 		object_id_t oidIndex = m_oidSubOperationIndex.load(std::memory_order_acquire);
 		rSnapshot.SetCurrentSubtaskIndex(oidIndex);
 

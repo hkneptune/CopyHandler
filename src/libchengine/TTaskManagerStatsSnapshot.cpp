@@ -109,26 +109,25 @@ namespace chengine
 
 		for(TTaskStatsSnapshotPtr spTaskStats : m_vTasksSnapshots)
 		{
-			m_ullProcessedCount += spTaskStats->GetProcessedCount();
-			m_ullTotalCount += spTaskStats->GetTotalCount();
-
-			m_ullProcessedSize += spTaskStats->GetProcessedSize();
-			m_ullTotalSize += spTaskStats->GetTotalSize();
-			
-			if(spTaskStats->IsTaskRunning())
+			if(spTaskStats->GetTaskState() == eTaskState_Waiting ||
+				spTaskStats->GetTaskState() == eTaskState_Processing ||
+				spTaskStats->GetTaskState() == eTaskState_Finished)
 			{
-				m_dCountSpeed += spTaskStats->GetCountSpeed();
-				m_dSizeSpeed += spTaskStats->GetSizeSpeed();
+				m_ullProcessedCount += spTaskStats->GetProcessedCount();
+				m_ullTotalCount += spTaskStats->GetTotalCount();
+
+				m_ullProcessedSize += spTaskStats->GetProcessedSize();
+				m_ullTotalSize += spTaskStats->GetTotalSize();
+			
+				if(spTaskStats->IsTaskRunning())
+				{
+					m_dCountSpeed += spTaskStats->GetCountSpeed();
+					m_dSizeSpeed += spTaskStats->GetSizeSpeed();
+				}
+
+				m_dAvgCountSpeed += spTaskStats->GetAvgCountSpeed();
+				m_dAvgSizeSpeed += spTaskStats->GetAvgSizeSpeed();
 			}
-
-			m_dAvgCountSpeed += spTaskStats->GetAvgCountSpeed();
-			m_dAvgSizeSpeed += spTaskStats->GetAvgSizeSpeed();
-		}
-
-		if(!m_vTasksSnapshots.empty())
-		{
-			m_dAvgCountSpeed /= m_vTasksSnapshots.size();
-			m_dAvgSizeSpeed /= m_vTasksSnapshots.size();
 		}
 
 		// we're treating each of the items as 4k object to process

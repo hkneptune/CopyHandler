@@ -55,6 +55,9 @@ namespace chengine
 		void SetTotalSize(unsigned long long ullTotalSize) { m_ullTotalSize = ullTotalSize; }
 		unsigned long long GetTotalSize() const { return m_ullTotalSize; }
 
+		bool GetIgnoreSizeInAggregateStats() const { return m_bIgnoreSizeInAggregateStats; }
+		void SetIgnoreSizeInAggregateStats(bool bIgnoreSizeInAggregateStats) { m_bIgnoreSizeInAggregateStats = bIgnoreSizeInAggregateStats; }
+
 		// current file
 		void SetCurrentItemProcessedSize(unsigned long long ullProcessedSize) { m_ullCurrentItemProcessedSize = ullProcessedSize; }
 		unsigned long long GetCurrentItemProcessedSize() const { return m_ullCurrentItemProcessedSize; }
@@ -106,6 +109,9 @@ namespace chengine
 		// subtask size and size speed per second
 		unsigned long long m_ullTotalSize;
 		unsigned long long m_ullProcessedSize;
+
+		bool m_bIgnoreSizeInAggregateStats = false;
+
 		double m_dSizeSpeed = 0.0;
 		double m_dAvgSizeSpeed = 0.0;
 

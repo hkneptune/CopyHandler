@@ -148,8 +148,10 @@ namespace chengine
 		mutable unsigned long long m_ullProcessedSize;
 		mutable unsigned long long m_ullTotalSize;
 
-		mutable double m_dTaskCountSpeed;
-		mutable double m_dTaskSizeSpeed;
+		mutable double m_dTaskCountSpeed = 0.0;
+		mutable double m_dTaskAvgCountSpeed = 0.0;
+		mutable double m_dTaskSizeSpeed = 0.0;
+		mutable double m_dTaskAvgSizeSpeed = 0.0;
 
 		mutable double m_dCombinedProgress;
 	};
