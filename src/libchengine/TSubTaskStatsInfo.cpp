@@ -28,6 +28,7 @@
 #include "../libchcore/ErrorCodes.h"
 #include <boost/thread/locks.hpp>
 #include "../libserializer/ISerializerRowData.h"
+#include "../libchcore/MathFunctions.h"
 
 using namespace chcore;
 using namespace string;
@@ -38,7 +39,7 @@ namespace chengine
 	///////////////////////////////////////////////////////////////////////////////////
 	// class TSubTaskStatsInfo
 
-	TSubTaskStatsInfo::TSubTaskStatsInfo(ESubOperationType eSubTaskType) :
+	TSubTaskStatsInfo::TSubTaskStatsInfo(ESubOperationType eSubTaskType, bool bIgnoreSizeSpeed) :
 		m_bSubTaskIsRunning(m_setModifications, false),
 		m_ullTotalSize(m_setModifications, 0),
 		m_ullProcessedSize(m_setModifications, 0),
@@ -54,7 +55,8 @@ namespace chengine
 		m_iCurrentBufferIndex(m_setModifications, 0),
 		m_strCurrentPath(m_setModifications),
 		m_bIsInitialized(m_setModifications, false),
-		m_eSubOperationType(eSubTaskType)
+		m_eSubOperationType(eSubTaskType),
+		m_bIgnoreSizeSpeed(bIgnoreSizeSpeed)
 	{
 		m_setModifications[eMod_Added] = true;
 	}
@@ -89,6 +91,8 @@ namespace chengine
 		if (m_bSubTaskIsRunning)
 			UpdateTime(lock);
 
+		auto totalTime = m_tTimer.Get().GetTotalTime();
+
 		spStatsSnapshot->SetRunning(m_bSubTaskIsRunning);
 		spStatsSnapshot->SetProcessedCount(m_fcProcessedCount);
 		spStatsSnapshot->SetTotalCount(m_fcTotalCount);
@@ -96,9 +100,17 @@ namespace chengine
 		spStatsSnapshot->SetTotalSize(m_ullTotalSize);
 		spStatsSnapshot->SetCurrentBufferIndex(m_iCurrentBufferIndex);
 		spStatsSnapshot->SetCurrentPath(m_strCurrentPath);
-		spStatsSnapshot->SetTimeElapsed(m_tTimer.Get().GetTotalTime());
+		spStatsSnapshot->SetTimeElapsed(totalTime);
+
 		spStatsSnapshot->SetSizeSpeed(m_tSizeSpeed.Get().GetSpeed());
+		if(!m_bIgnoreSizeSpeed)
+			spStatsSnapshot->SetAvgSizeSpeed(totalTime != 0 ? Math::Div64(m_ullProcessedSize, totalTime / 1000.0) : 0.0);
+		else
+			spStatsSnapshot->SetAvgSizeSpeed(0.0);
+
 		spStatsSnapshot->SetCountSpeed(m_tCountSpeed.Get().GetSpeed());
+		spStatsSnapshot->SetAvgCountSpeed(totalTime != 0 ? Math::Div64(m_fcProcessedCount, totalTime / 1000.0) : 0.0);
+
 		spStatsSnapshot->SetCurrentItemProcessedSize(m_ullCurrentItemProcessedSize);
 		spStatsSnapshot->SetCurrentItemTotalSize(m_ullCurrentItemTotalSize);
 		spStatsSnapshot->SetSubOperationType(m_eSubOperationType);
@@ -163,7 +175,8 @@ namespace chengine
 		boost::unique_lock<boost::shared_mutex> lock(m_lock);
 		m_ullProcessedSize.Modify() += ullIncreaseBy;
 
-		m_tSizeSpeed.Modify().AddSample(ullIncreaseBy, m_tTimer.Modify().Tick());
+		if(!m_bIgnoreSizeSpeed)
+			m_tSizeSpeed.Modify().AddSample(ullIncreaseBy, m_tTimer.Modify().Tick());
 
 		_ASSERTE(m_ullProcessedSize <= m_ullTotalSize);
 		if (m_ullProcessedSize > m_ullTotalSize)
@@ -176,7 +189,8 @@ namespace chengine
 		m_ullProcessedSize.Modify() -= ullDecreaseBy;
 
 		// we didn't process anything here - hence the 0-sized sample
-		m_tSizeSpeed.Modify().AddSample(0, m_tTimer.Modify().Tick());
+		if(!m_bIgnoreSizeSpeed)
+			m_tSizeSpeed.Modify().AddSample(0, m_tTimer.Modify().Tick());
 
 		_ASSERTE(m_ullProcessedSize <= m_ullTotalSize);
 		if (m_ullProcessedSize > m_ullTotalSize)
@@ -187,7 +201,8 @@ namespace chengine
 	{
 		boost::unique_lock<boost::shared_mutex> lock(m_lock);
 
-		m_tSizeSpeed.Modify().AddSample(ullProcessedSize > m_ullProcessedSize ? ullProcessedSize - m_ullProcessedSize : 0, m_tTimer.Modify().Tick());
+		if(!m_bIgnoreSizeSpeed)
+			m_tSizeSpeed.Modify().AddSample(ullProcessedSize > m_ullProcessedSize ? ullProcessedSize - m_ullProcessedSize : 0, m_tTimer.Modify().Tick());
 
 		m_ullProcessedSize = ullProcessedSize;
 		_ASSERTE(m_ullProcessedSize <= m_ullTotalSize);
@@ -252,7 +267,8 @@ namespace chengine
 			m_ullCurrentItemProcessedSize.Modify() += fsDiff;
 			m_ullProcessedSize.Modify() += fsDiff;
 
-			m_tSizeSpeed.Modify().AddSample(fsDiff, m_tTimer.Modify().Tick());
+			if(!m_bIgnoreSizeSpeed)
+				m_tSizeSpeed.Modify().AddSample(fsDiff, m_tTimer.Modify().Tick());
 		}
 		else
 		{
@@ -261,7 +277,8 @@ namespace chengine
 			m_ullCurrentItemProcessedSize.Modify() -= fsDiff;
 			m_ullProcessedSize.Modify() -= fsDiff;
 
-			m_tSizeSpeed.Modify().AddSample(0, m_tTimer.Modify().Tick());
+			if(!m_bIgnoreSizeSpeed)
+				m_tSizeSpeed.Modify().AddSample(0, m_tTimer.Modify().Tick());
 		}
 
 		VerifyProcessedVsTotal();
@@ -319,7 +336,8 @@ namespace chengine
 		if (m_tTimer.Get().IsRunning())
 		{
 			m_tTimer.Modify().Tick();
-			m_tSizeSpeed.Modify().AddSample(0, m_tTimer.Get().GetLastTimestamp());
+			if(!m_bIgnoreSizeSpeed)
+				m_tSizeSpeed.Modify().AddSample(0, m_tTimer.Get().GetLastTimestamp());
 			m_tCountSpeed.Modify().AddSample(0, m_tTimer.Get().GetLastTimestamp());
 		}
 	}

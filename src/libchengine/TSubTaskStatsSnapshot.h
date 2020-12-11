@@ -86,11 +86,13 @@ namespace chengine
 		// speed
 		void SetSizeSpeed(double dSizeSpeed);
 		double GetSizeSpeed() const;
+		void SetAvgSizeSpeed(double dSizeSpeed) { m_dAvgSizeSpeed = dSizeSpeed; }
+		double GetAvgSizeSpeed() const { return m_dAvgSizeSpeed; }
+
 		void SetCountSpeed(double dCountSpeed);
 		double GetCountSpeed() const;
-
-		double GetAvgSizeSpeed() const;
-		double GetAvgCountSpeed() const;
+		void SetAvgCountSpeed(double dCountSpeed) { m_dAvgCountSpeed = dCountSpeed; }
+		double GetAvgCountSpeed() const { return m_dAvgCountSpeed; }
 
 		ESubOperationType GetSubOperationType() const { return m_eSubOperationType; }
 		void SetSubOperationType(ESubOperationType val) { m_eSubOperationType = val; }
@@ -104,12 +106,14 @@ namespace chengine
 		// subtask size and size speed per second
 		unsigned long long m_ullTotalSize;
 		unsigned long long m_ullProcessedSize;
-		double m_dSizeSpeed;
+		double m_dSizeSpeed = 0.0;
+		double m_dAvgSizeSpeed = 0.0;
 
 		// subtask count of items and its speed per second
 		file_count_t m_fcTotalCount;
 		file_count_t m_fcProcessedCount;
-		double m_dCountSpeed;
+		double m_dCountSpeed = 0.0;
+		double m_dAvgCountSpeed = 0.0;
 
 		// current item size
 		unsigned long long m_ullCurrentItemTotalSize;

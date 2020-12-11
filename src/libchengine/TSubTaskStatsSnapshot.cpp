@@ -98,10 +98,7 @@ namespace chengine
 
 	double TSubTaskStatsSnapshot::GetSizeSpeed() const
 	{
-		if(m_bSubTaskIsRunning)
-			return m_dSizeSpeed;
-
-		return 0.0;
+		return m_dAvgSizeSpeed;
 	}
 
 	void TSubTaskStatsSnapshot::SetCountSpeed(double dCountSpeed)
@@ -113,22 +110,6 @@ namespace chengine
 	{
 		if(m_bSubTaskIsRunning)
 			return m_dCountSpeed;
-		return 0.0;
-	}
-
-	double TSubTaskStatsSnapshot::GetAvgSizeSpeed() const
-	{
-		if (m_timeElapsed)
-			return Math::Div64(m_ullProcessedSize, m_timeElapsed / 1000.0);
-
-		return 0.0;
-	}
-
-	double TSubTaskStatsSnapshot::GetAvgCountSpeed() const
-	{
-		if (m_timeElapsed)
-			return Math::Div64(m_fcProcessedCount, m_timeElapsed / 1000.0);
-
 		return 0.0;
 	}
 

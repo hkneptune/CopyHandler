@@ -45,7 +45,7 @@ namespace chengine
 	// class TSubTaskScanDirectories
 	TSubTaskScanDirectories::TSubTaskScanDirectories(TSubTaskContext& rContext) :
 		TSubTaskBase(rContext),
-		m_tSubTaskStats(eSubOperation_Scanning),
+		m_tSubTaskStats(eSubOperation_Scanning, true),
 		m_spLog(std::make_unique<logger::TLogger>(rContext.GetLogFileData(), L"ST-ScanDirs"))
 	{
 	}
@@ -108,7 +108,7 @@ namespace chengine
 
 		// new stats
 		m_tSubTaskStats.SetCurrentBufferIndex(TBufferSizes::eBuffer_Default);
-		m_tSubTaskStats.SetTotalCount(spBasePaths->GetCount());
+		m_tSubTaskStats.SetTotalCount(0);
 		m_tSubTaskStats.SetProcessedCount(0);
 		m_tSubTaskStats.SetTotalSize(0);
 		m_tSubTaskStats.SetProcessedSize(0);
@@ -203,7 +203,14 @@ namespace chengine
 
 		// update stats
 		m_tSubTaskStats.SetCurrentIndex(fcIndex);
-		m_tSubTaskStats.SetProcessedCount(fcIndex);
+
+		auto totalCount = rFilesCache.GetCount();
+		m_tSubTaskStats.SetTotalCount(totalCount);
+		m_tSubTaskStats.SetProcessedCount(totalCount);
+		auto totalSize = rFilesCache.CalculateTotalSize();
+		m_tSubTaskStats.SetTotalSize(totalSize);
+		m_tSubTaskStats.SetProcessedSize(totalSize);
+
 		m_tSubTaskStats.SetCurrentPath(TString());
 
 		rFilesCache.SetComplete(true);
@@ -268,6 +275,13 @@ namespace chengine
 				}
 			}
 		}
+
+		auto totalCount = rFilesCache.GetCount();
+		m_tSubTaskStats.SetTotalCount(totalCount);
+		m_tSubTaskStats.SetProcessedCount(totalCount);
+		auto totalSize = rFilesCache.CalculateTotalSize();
+		m_tSubTaskStats.SetTotalSize(totalSize);
+		m_tSubTaskStats.SetProcessedSize(totalSize);
 
 		return stFilesCount;
 	}

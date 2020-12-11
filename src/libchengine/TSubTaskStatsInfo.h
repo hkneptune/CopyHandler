@@ -56,7 +56,7 @@ namespace chengine
 		static const unsigned long long DefaultSpeedSampleTime = 100;	// in miliseconds
 
 	public:
-		explicit TSubTaskStatsInfo(ESubOperationType eSubTaskType);
+		explicit TSubTaskStatsInfo(ESubOperationType eSubTaskType, bool bIgnoreSizeSpeed = false);
 		TSubTaskStatsInfo(const TSubTaskStatsInfo&) = delete;
 
 		TSubTaskStatsInfo& operator=(const TSubTaskStatsInfo&) = delete;
@@ -179,6 +179,7 @@ namespace chengine
 		serializer::TSharedModificationTracker<bool, Bitset, eMod_IsInitialized> m_bIsInitialized;
 
 		const ESubOperationType m_eSubOperationType;
+		bool m_bIgnoreSizeSpeed = false;
 
 #pragma warning(push)
 #pragma warning(disable: 4251)
