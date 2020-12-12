@@ -111,6 +111,7 @@ namespace chengine
 		{
 			if(spTaskStats->GetTaskState() == eTaskState_Waiting ||
 				spTaskStats->GetTaskState() == eTaskState_Processing ||
+				spTaskStats->GetTaskState() == eTaskState_Paused ||
 				spTaskStats->GetTaskState() == eTaskState_Finished)
 			{
 				m_ullProcessedCount += spTaskStats->GetProcessedCount();
