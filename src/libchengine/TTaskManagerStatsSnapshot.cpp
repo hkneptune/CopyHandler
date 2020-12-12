@@ -120,11 +120,8 @@ namespace chengine
 				m_ullProcessedSize += spTaskStats->GetProcessedSize();
 				m_ullTotalSize += spTaskStats->GetTotalSize();
 			
-				if(spTaskStats->IsTaskRunning())
-				{
-					m_dCountSpeed += spTaskStats->GetCountSpeed();
-					m_dSizeSpeed += spTaskStats->GetSizeSpeed();
-				}
+				m_dCountSpeed += spTaskStats->GetCountSpeed();
+				m_dSizeSpeed += spTaskStats->GetSizeSpeed();
 
 				m_dAvgCountSpeed += spTaskStats->GetAvgCountSpeed();
 				m_dAvgSizeSpeed += spTaskStats->GetAvgSizeSpeed();
