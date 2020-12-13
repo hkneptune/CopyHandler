@@ -588,7 +588,6 @@
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="TCommandLineParser.h" />
     <ClInclude Include="MainWnd.h" />
-    <ClInclude Include="Theme Helpers.h" />
     <ClInclude Include="TrayIcon.h" />
     <ClInclude Include="DirTreeCtrl.h" />
     <ClInclude Include="FFListCtrl.h" />
@@ -680,7 +679,6 @@
     </ClCompile>
     <ClCompile Include="TCommandLineParser.cpp" />
     <ClCompile Include="MainWnd.cpp" />
-    <ClCompile Include="Theme Helpers.cpp" />
     <ClCompile Include="TrayIcon.cpp" />
     <ClCompile Include="DirTreeCtrl.cpp" />
     <ClCompile Include="FFListCtrl.cpp" />

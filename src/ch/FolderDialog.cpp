@@ -20,7 +20,6 @@
 #include "ch.h"
 #include "DirTreeCtrl.h"
 #include "FolderDialog.h"
-#include "Theme Helpers.h"
 #include "shlobj.h"
 #include "StringHelpers.h"
 #include "TRecentPathsTools.h"
@@ -1040,8 +1039,7 @@ void CFolderDialog::OnSize(UINT nType, int cx, int cy)
 void CFolderDialog::ResizeControls(int cx, int cy)
 {
 	// is app themed ?
-	CUxThemeSupport uxt;
-	bool bThemed=uxt.IsThemeSupported() && uxt.IsAppThemed();
+	bool bThemed=IsAppThemed();
 
 	// settings
 	const int iMargin=7;	// dialog units

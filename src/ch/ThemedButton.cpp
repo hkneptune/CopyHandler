@@ -18,7 +18,6 @@
 ***************************************************************************/
 #include "stdafx.h"
 #include "ThemedButton.h"
-#include "Theme helpers.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -69,15 +68,14 @@ void CThemedButton::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
 	CRect rcItem=lpDrawItemStruct->rcItem;
 	
 	// draw button's frame
-	CUxThemeSupport uxTheme;
-	if (uxTheme.IsThemeSupported() && uxTheme.IsAppThemed())
+	if (IsAppThemed())
 	{
-		HTHEME ht=uxTheme.OpenThemeData(lpDrawItemStruct->hwndItem, L"TOOLBAR");
+		HTHEME ht=OpenThemeData(lpDrawItemStruct->hwndItem, L"TOOLBAR");
 		
-		uxTheme.DrawThemeParentBackground(lpDrawItemStruct->hwndItem, memdc.GetDC().GetSafeHdc(), &rcItem);
-		uxTheme.DrawThemeBackground(ht, memdc.GetDC().GetSafeHdc(), TP_BUTTON, bPushed ? TS_PRESSED : (m_bHovering ? TS_HOT : TS_NORMAL), &rcItem, nullptr);
+		DrawThemeParentBackground(lpDrawItemStruct->hwndItem, memdc.GetDC().GetSafeHdc(), &rcItem);
+		DrawThemeBackground(ht, memdc.GetDC().GetSafeHdc(), TP_BUTTON, bPushed ? TS_PRESSED : (m_bHovering ? TS_HOT : TS_NORMAL), &rcItem, nullptr);
 		
-		uxTheme.CloseThemeData(ht);
+		CloseThemeData(ht);
 	}
 	else
 		DrawFrameControl(memdc.GetDC().GetSafeHdc(), &rcItem, DFC_BUTTON, DFCS_ADJUSTRECT | DFCS_BUTTONPUSH | (bPushed ? DFCS_PUSHED : 0));
