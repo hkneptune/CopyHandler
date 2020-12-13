@@ -11,6 +11,7 @@ GUI:
 * Simplified task edit and user-feedback dialogs
 * Adjusted the look of mini-view dialog
 * Added context menus to both status dialog and mini-view
+* Simplified status dialog and adjusted the way copy stats are calculated
 
 Other:
 * Task definition xml files now uses human-readable attribute values instead of numeric ones
