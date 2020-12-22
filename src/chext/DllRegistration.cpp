@@ -56,12 +56,22 @@ namespace
 
 	void DeleteSingleValue(HKEY key, const wchar_t* pszKey, const wchar_t* pszValueKey)
 	{
+		TRegistry reg(key, pszKey, false, false);
+		if(reg.IsOpen())
+			reg.DeleteValue(pszValueKey);
+	}
+
+	void CreateNodes(HKEY key, const wchar_t* pszKey, std::wstring strSubKey)
+	{
 		TRegistry reg(key, pszKey, false);
-		reg.DeleteValue(pszValueKey);
+		reg.CreateSubKey(strSubKey.c_str());
 	}
 
 	void CreateNodeWithDefaultValue(HKEY key, const wchar_t* pszKey, const wchar_t* pszSubKey, const wchar_t* pszValue)
 	{
+		// ensure key exists
+		CreateNodes(key, L"", pszKey);
+
 		TRegistry reg(key, pszKey, false);
 		reg.CreateSubKey(pszSubKey);
 
@@ -75,14 +85,9 @@ namespace
 
 	void DeleteSingleNode(HKEY key, const wchar_t* pszKey, const wchar_t* pszValueKey)
 	{
-		TRegistry reg(key, pszKey, false);
-		reg.DeleteSubKey(pszValueKey);
-	}
-
-	void CreateNodes(HKEY key, const wchar_t* pszKey, std::wstring strSubKey)
-	{
-		TRegistry reg(key, pszKey, false);
-		reg.CreateSubKey(strSubKey.c_str());
+		TRegistry reg(key, pszKey, false, false);
+		if(reg.IsOpen())
+			reg.DeleteSubKey(pszValueKey);
 	}
 }
 
