@@ -22,10 +22,12 @@
 class TRegistry
 {
 public:
-	TRegistry(HKEY key, const wchar_t* pszKey, bool bReadOnly = true);
+	TRegistry(HKEY key, const wchar_t* pszKey, bool bReadOnly = true, bool bFailIfNotFound = true);
 	~TRegistry();
 
-	void ReOpen(HKEY key, const wchar_t* pszKey, bool bReadOnly = true);
+	bool IsOpen() const { return m_hKey != nullptr; }
+
+	void ReOpen(HKEY key, const wchar_t* pszKey, bool bReadOnly = true, bool bFailIfNotFound = true);
 
 	void CreateSubKey(const wchar_t* pszKey);
 	void DeleteSubKey(const wchar_t* pszKey);
