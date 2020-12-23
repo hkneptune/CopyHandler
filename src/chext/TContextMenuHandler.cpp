@@ -232,7 +232,8 @@ std::wstring TContextMenuHandler::GetDisplayText(const TShellMenuItemPtr& spMenu
 			spMenuItem->SetLocalName(wstrItemName.c_str());
 	}
 
-	return wstrItemName;
+	// NOTE: don't use wstrItemName here as there is an additional processing hidden in SetLocalName()
+	return spMenuItem->GetLocalName().c_str();
 }
 
 void TContextMenuHandler::Clear()

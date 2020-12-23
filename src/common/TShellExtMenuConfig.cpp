@@ -267,7 +267,7 @@ const string::TString& TShellMenuItem::GetLocalName(bool bUseFallback) const
 
 void TShellMenuItem::SetLocalName(const string::TString& strLocalName)
 {
-	m_strLocalName = strLocalName;
+	m_strLocalName = strLocalName + m_strWorkaroundSuffix.c_str();
 }
 
 void TShellMenuItem::InitSeparatorItem()
@@ -300,6 +300,44 @@ void TShellMenuItem::InitGroupItem(const string::TString& wstrName, const string
 	m_eItemType = eGroupItem;
 	m_strName = wstrName;
 	m_strItemTip = wstrItemTip;
+}
+
+// function tries to make item names unique by setting a text suffix composed of spaces that will be used
+// to display shell context menu;
+// This workaround is required due to specific way of handling menus for more than 16 items (files/folders)
+// selected in explorer - when invoking specific menu item, explorer forces shell extension to re-add all
+// menu items to a menu, and then invokes the first one with the name matching the one clicked by user.
+// Final effect was that a wrong menu item was selected when there were duplicate names in menu.
+void TShellMenuItem::CalculateWorkaroundSuffixes()
+{
+	std::map<std::wstring, std::wstring> mapNames;
+	std::list<TShellMenuItemPtr> listToProcess;
+	listToProcess.insert(listToProcess.end(), m_vChildItems.begin(), m_vChildItems.end());
+
+	while(!listToProcess.empty())
+	{
+		TShellMenuItemPtr spItem = listToProcess.front();
+		listToProcess.pop_front();
+
+		if(spItem->GetItemType() == eStandardItem)
+		{
+			auto iterFnd = mapNames.find(spItem->GetName().c_str());
+			if(iterFnd == mapNames.end())
+			{
+				mapNames.emplace(spItem->GetName().c_str(), L"");
+				spItem->SetWorkaroundSuffix(L"");
+			}
+			else
+			{
+				iterFnd->second += L" ";
+				spItem->SetWorkaroundSuffix(iterFnd->second);
+			}
+		}
+		else if(spItem->GetItemType() == eGroupItem)
+		{
+			listToProcess.insert(listToProcess.end(), spItem->m_vChildItems.begin(), spItem->m_vChildItems.end());
+		}
+	}
 }
 
 bool TShellMenuItem::SpecifiesDestinationPath() const
@@ -529,8 +567,11 @@ bool TShellExtMenuConfig::ReadFromConfig(TConfig& rConfig, PCTSTR pszNodeName)
 
 	if(!m_spDragAndDropRoot->ReadFromConfig(rConfig, Concat(strBuffer, pszNodeName, _T("DragAndDropRootItem"))))
 		return false;
+	m_spDragAndDropRoot->CalculateWorkaroundSuffixes();
+
 	if(!m_spNormalRoot->ReadFromConfig(rConfig, Concat(strBuffer, pszNodeName, _T("NormalRootItem"))))
 		return false;
+	m_spNormalRoot->CalculateWorkaroundSuffixes();
 
 	return true;
 }

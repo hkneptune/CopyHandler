@@ -150,6 +150,8 @@ public:
 	// initializer for group item
 	void InitGroupItem(const string::TString& wstrName, const string::TString& wstrItemTip);
 
+	void CalculateWorkaroundSuffixes();
+	
 	// clears everything
 	void Clear();
 
@@ -178,6 +180,9 @@ public:
 	bool SpecifiesDestinationPath() const;
 	// helper - retrieves info if this command requires some paths present in clipboard to be enabled
 	bool RequiresClipboardPaths() const;
+
+	std::wstring GetWorkaroundSuffix() const { return m_strWorkaroundSuffix; }
+	void SetWorkaroundSuffix(std::wstring val) { m_strWorkaroundSuffix = val; }
 
 	// operations on children
 	size_t GetChildrenCount() const;
@@ -215,6 +220,8 @@ private:
 
 	// hints that this item is to be made default (bold), when detected operation type is equal to this operation type
 	chengine::EOperationType m_eDefaultItemHint;
+
+	std::wstring m_strWorkaroundSuffix;
 
 	std::vector<TShellMenuItemPtr> m_vChildItems;
 };
