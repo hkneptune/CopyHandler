@@ -135,7 +135,6 @@ namespace chengine
 			m_tSubTaskStats.SetCurrentIndex(fcIndex);
 
 			// new stats
-			m_tSubTaskStats.SetProcessedCount(fcIndex);
 			m_tSubTaskStats.SetCurrentPath(pathCurrent.ToString());
 
 			TFileInfoPtr spFileInfo(std::make_shared<TFileInfo>());
@@ -209,7 +208,7 @@ namespace chengine
 		m_tSubTaskStats.SetProcessedCount(totalCount);
 		auto totalSize = rFilesCache.CalculateTotalSize();
 		m_tSubTaskStats.SetTotalSize(totalSize);
-		m_tSubTaskStats.SetProcessedSize(0);
+		m_tSubTaskStats.SetProcessedSize(totalSize);
 
 		m_tSubTaskStats.SetCurrentPath(TString());
 
