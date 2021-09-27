@@ -38,8 +38,8 @@
 #define RegCHExtFilename32 "regchext.exe"
 #define RegCHExtFilename64 "regchext64.exe"
 
-#define MSRedistDir32 "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Redist\MSVC\14.27.29016\x86"
-#define MSRedistDir64 "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Redist\MSVC\14.27.29016\x64"
+#define MSRedistDir32 "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Redist\MSVC\14.29.30133\x86"
+#define MSRedistDir64 "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Redist\MSVC\14.29.30133\x64"
 #define DbgHelp32 "C:\Program Files (x86)\Windows Kits\10\Debuggers\x86"
 #define DbgHelp64 "C:\Program Files (x86)\Windows Kits\10\Debuggers\x64"
 #define UCrtDir32 "C:\Program Files (x86)\Windows Kits\10\Redist\10.0.19041.0\ucrt\DLLs\x86"
