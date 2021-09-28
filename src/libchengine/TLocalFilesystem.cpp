@@ -344,7 +344,7 @@ namespace chengine
 	{
 		const TSmartPath pathPrefix = PathFromString(L"\\\\?\\");
 
-		if (pathInput.GetLength() >= 248 && !pathInput.StartsWith(pathPrefix))
+		if (!pathInput.StartsWith(pathPrefix))
 			return pathPrefix + pathInput;
 
 		return pathInput;
