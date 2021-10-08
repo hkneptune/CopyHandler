@@ -4,6 +4,7 @@
 #include "resource.h"
 #include "../libstring/TStringArray.h"
 #include <regex>
+#include "../libchcore/TCoreException.h"
 
 void FilterTypesMenuWrapper::Init()
 {
@@ -62,9 +63,13 @@ bool FilterTypesMenuWrapper::ValidateFilter(const chcore::TStringPatternArray& a
 	{
 		arrPattern.MatchesAny(chcore::PathFromString(L""));
 	}
-	catch(const std::regex_error& e)
+	catch(const chcore::TCoreException& e)
 	{
-		strMsg = e.what();
+		const size_t BufferSize = 8192;
+		wchar_t szData[BufferSize] = {};
+
+		e.GetErrorInfo(szData, BufferSize);
+		strMsg = szData;
 	}
 
 	if(!strMsg.IsEmpty())
