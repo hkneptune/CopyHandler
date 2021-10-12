@@ -28,6 +28,7 @@
 #include "../libchengine/TTaskManager.h"
 #include "../libchengine/TLocalFilesystem.h"
 #include "GuiOptions.h"
+#include "RuleEditDlg.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -260,7 +261,7 @@ void CStatusDlg::OnSetBuffersizeButton()
 		return;
 
 	int iCurrentBufferIndex = 0;
-	chengine::TTaskStatsSnapshotPtr spTaskStats = m_spTaskMgrStats->GetTaskStatsForTaskID(boost::numeric_cast<chengine::taskid_t>(GetSelectedItemSessionUniqueID()));
+	chengine::TTaskStatsSnapshotPtr spTaskStats = m_spTaskMgrStats->GetTaskStatsForTaskID(boost::numeric_cast<chengine::taskid_t>(GetSelectedItemTaskID()));
 	if(spTaskStats)
 	{
 		chengine::TSubTaskStatsSnapshotPtr spSubTaskStats = spTaskStats->GetSubTasksStats().GetCurrentSubTaskSnapshot();
@@ -278,28 +279,23 @@ void CStatusDlg::OnSetBuffersizeButton()
 
 chengine::TTaskPtr CStatusDlg::GetSelectedItemPointer()
 {
-	// returns ptr to a TTask for a given element in listview
-	if(m_ctlStatusList.GetSelectedCount() == 1)
-	{
-		POSITION pos = m_ctlStatusList.GetFirstSelectedItemPosition();
-		int nPos = m_ctlStatusList.GetNextSelectedItem(pos);
-		return m_pTasks->GetTaskByTaskID(boost::numeric_cast<chengine::taskid_t>(m_ctlStatusList.GetItemData(nPos)));
-	}
+	taskid_t taskID = GetSelectedItemTaskID();
+	if(taskID != chengine::NoTaskID)
+		return m_pTasks->GetTaskByTaskID(taskID);
 
 	return chengine::TTaskPtr();
 }
 
-size_t CStatusDlg::GetSelectedItemSessionUniqueID()
+chengine::taskid_t CStatusDlg::GetSelectedItemTaskID()
 {
-	// returns ptr to a TTask for a given element in listview
 	if(m_ctlStatusList.GetSelectedCount() == 1)
 	{
 		POSITION pos = m_ctlStatusList.GetFirstSelectedItemPosition();
 		int nPos = m_ctlStatusList.GetNextSelectedItem(pos);
-		return m_ctlStatusList.GetItemData(nPos);
+		return boost::numeric_cast<chengine::taskid_t>(m_ctlStatusList.GetItemData(nPos));
 	}
 
-	return std::numeric_limits<size_t>::max();
+	return chengine::NoTaskID;
 }
 
 void CStatusDlg::StickDialogToScreenEdge()
@@ -406,6 +402,30 @@ void CStatusDlg::OnResetUserFeedback()
 
 	if(spSelectedTask)
 		spSelectedTask->RestoreFeedbackDefaults();
+}
+
+void CStatusDlg::OnEditUserFeedback()
+{
+	chengine::TTaskPtr spSelectedTask = GetSelectedItemPointer();
+
+	if(spSelectedTask)
+	{
+		taskid_t selectedTaskID = GetSelectedItemTaskID();
+
+		FeedbackRules rules = spSelectedTask->GetFeedbackRules();
+		spSelectedTask.reset();
+
+		RuleEditDlg dlg(rules);
+		if(dlg.DoModal() == IDOK)
+		{
+			rules = dlg.GetRules();
+
+			// re-try searching for specific task to ensure it was not deleted in the meantime
+			spSelectedTask = m_pTasks->GetTaskByTaskID(selectedTaskID);
+			if(spSelectedTask)
+				spSelectedTask->SetFeedbackRules(rules);
+		}
+	}
 }
 
 void CStatusDlg::OnPauseButton() 
@@ -594,7 +614,7 @@ CString CStatusDlg::FormatTimeMiliseconds(unsigned long long timeMiliSeconds)
 void CStatusDlg::RefreshStatus()
 {
 	// remember address of a current selection
-	size_t stSelectedTaskID = GetSelectedItemSessionUniqueID();
+	size_t stSelectedTaskID = GetSelectedItemTaskID();
 
 	// get all the stats needed
 	m_pTasks->GetStatsSnapshot(m_spTaskMgrStats);
@@ -686,6 +706,9 @@ void CStatusDlg::OnStatusListRClick(NMHDR* pNMHDR, LRESULT* /*pResult*/)
 		break;
 	case ID_TASK_MENU_RESET_FEEDBACK:
 		OnResetUserFeedback();
+		break;
+	case ID_TASK_MENU_EDIT_FEEDBACK:
+		OnEditUserFeedback();
 		break;
 
 	case ID_TASK_MENU_PAUSE_ALL:

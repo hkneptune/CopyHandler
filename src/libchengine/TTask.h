@@ -87,6 +87,8 @@ namespace chengine
 		void SetForceFlag(bool bFlag = true);
 		bool GetForceFlag();
 
+		chengine::FeedbackRules GetFeedbackRules();
+		void SetFeedbackRules(const chengine::FeedbackRules& feedbackRules);
 		void RestoreFeedbackDefaults();
 
 	private:

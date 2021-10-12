@@ -1050,7 +1050,8 @@ BEGIN
         MENUITEM "&Cancel",                     ID_TASK_MENU_CANCEL
         MENUITEM "Re&move",                     ID_TASK_MENU_REMOVE
         MENUITEM SEPARATOR
-        MENUITEM "Reset user-feedback state",   ID_TASK_MENU_RESET_FEEDBACK
+        MENUITEM "Edit automatic responses",   ID_TASK_MENU_EDIT_FEEDBACK
+        MENUITEM "Reset automatic responses",   ID_TASK_MENU_RESET_FEEDBACK
         MENUITEM SEPARATOR
         MENUITEM "Pause all",                   ID_TASK_MENU_PAUSE_ALL
         MENUITEM "Resume all",                  ID_TASK_MENU_RESUME_ALL

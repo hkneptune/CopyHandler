@@ -360,6 +360,16 @@ namespace chengine
 		m_spFeedbackManager->RestoreDefaults();
 	}
 
+	chengine::FeedbackRules TTask::GetFeedbackRules()
+	{
+		return m_spFeedbackManager->GetRules();
+	}
+
+	void TTask::SetFeedbackRules(const chengine::FeedbackRules& feedbackRules)
+	{
+		m_spFeedbackManager->SetRules(feedbackRules);
+	}
+
 	void TTask::PauseProcessing()
 	{
 		if (GetTaskState() != eTaskState_Finished && GetTaskState() != eTaskState_Cancelled)

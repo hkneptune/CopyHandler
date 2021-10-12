@@ -25,6 +25,7 @@
 #include "../libchengine/TTaskManager.h"
 #include "../libchengine/TTask.h"
 #include "GuiOptions.h"
+#include "RuleEditDlg.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -341,6 +342,7 @@ LRESULT CMiniViewDlg::OnTaskRClick(WPARAM /*wParam*/, LPARAM lParam)
 	case ID_TASK_MENU_CANCEL:
 	case ID_TASK_MENU_REMOVE:
 	case ID_TASK_MENU_RESET_FEEDBACK:
+	case ID_TASK_MENU_EDIT_FEEDBACK:
 		ExecTaskCommand(iMenuItem);
 		break;
 
@@ -411,6 +413,34 @@ void CMiniViewDlg::ExecTaskCommand(int idCmd)
 	case ID_TASK_MENU_RESET_FEEDBACK:
 		spTask->RestoreFeedbackDefaults();
 		break;
+	case ID_TASK_MENU_EDIT_FEEDBACK:
+		OnEditUserFeedback();
+		break;
+	}
+}
+
+void CMiniViewDlg::OnEditUserFeedback()
+{
+	taskid_t taskID = m_currentTaskId;
+	TTaskPtr spTask = m_pTasks->GetTaskByTaskID(taskID);
+	if(!spTask)
+		return;
+
+	if(spTask)
+	{
+		FeedbackRules rules = spTask->GetFeedbackRules();
+		spTask.reset();
+
+		RuleEditDlg dlg(rules);
+		if(dlg.DoModal() == IDOK)
+		{
+			rules = dlg.GetRules();
+
+			// re-try searching for specific task to ensure it was not deleted in the meantime
+			spTask = m_pTasks->GetTaskByTaskID(taskID);
+			if(spTask)
+				spTask->SetFeedbackRules(rules);
+		}
 	}
 }
 

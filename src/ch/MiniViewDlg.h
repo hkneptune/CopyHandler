@@ -64,6 +64,7 @@ protected:
 	afx_msg LRESULT OnTaskRClick(WPARAM wParam, LPARAM lParam);
 
 	void ExecTaskCommand(int idCmd);
+	void OnEditUserFeedback();
 
 	DECLARE_MESSAGE_MAP()
 

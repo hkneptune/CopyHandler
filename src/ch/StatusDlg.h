@@ -25,6 +25,7 @@
 #include "../libchengine/TTask.h"
 #include "../libchengine/TTaskManager.h"
 #include "TaskContextMenu.h"
+#include "../libchengine/TaskID.h"
 
 namespace chengine {
 	class TTaskManager;
@@ -50,7 +51,7 @@ public:
 
 	void ApplyButtonsState();
 	chengine::TTaskPtr GetSelectedItemPointer();
-	size_t GetSelectedItemSessionUniqueID();
+	chengine::taskid_t GetSelectedItemTaskID();
 
 	void EnableControls(bool bEnable=true);
 
@@ -59,6 +60,7 @@ protected:
 	BOOL OnCommand(WPARAM wParam, LPARAM lParam) override;
 
 	void OnResetUserFeedback();
+	void OnEditUserFeedback();
 
 	LRESULT WindowProc(UINT message, WPARAM wParam, LPARAM lParam) override;
 
