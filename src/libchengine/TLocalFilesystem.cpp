@@ -341,10 +341,18 @@ namespace chengine
 
 	TSmartPath TLocalFilesystem::PrependPathExtensionIfNeeded(const TSmartPath& pathInput)
 	{
-		const TSmartPath pathPrefix = PathFromString(L"\\\\?\\");
-
-		if (!pathInput.StartsWith(pathPrefix))
-			return pathPrefix + pathInput;
+		if(pathInput.IsNetworkPath())
+		{
+			const TSmartPath pathNetPrefix = PathFromString(L"\\\\?\\UNC\\");
+			if(!pathInput.StartsWith(pathNetPrefix))
+				return pathNetPrefix + PathFromWString(pathInput.ToWString().Mid(1));
+		}
+		else
+		{
+			const TSmartPath pathPrefix = PathFromString(L"\\\\?\\");
+			if(!pathInput.StartsWith(pathPrefix))
+				return pathPrefix + pathInput;
+		}
 
 		return pathInput;
 	}
@@ -352,8 +360,11 @@ namespace chengine
 	TSmartPath TLocalFilesystem::StripPathExtensionIfNeeded(const TSmartPath& pathInput)
 	{
 		const TSmartPath pathPrefix = PathFromString(L"\\\\?\\");
+		const TSmartPath pathNetPrefix = PathFromString(L"\\\\?\\UNC\\");
 
-		if(pathInput.StartsWith(pathPrefix))
+		if(pathInput.StartsWith(pathNetPrefix))
+			return PathFromString(pathInput.ToWString().Mid(pathNetPrefix.GetLength()).c_str());
+		else if(pathInput.StartsWith(pathPrefix))
 			return PathFromString(pathInput.ToWString().Mid(pathPrefix.GetLength()).c_str());
 
 		return pathInput;

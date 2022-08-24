@@ -47,7 +47,7 @@ namespace chengine
 		explicit TLocalFilesystem(const logger::TLogFileDataPtr& spLogFileData);
 		TLocalFilesystem(const TLocalFilesystem&) = delete;
 
-		virtual ~TLocalFilesystem();
+		~TLocalFilesystem() override;
 
 		TLocalFilesystem& operator=(const TLocalFilesystem&) = delete;
 
